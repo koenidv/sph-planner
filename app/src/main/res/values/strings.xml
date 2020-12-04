@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">SPH-Planer</string>
+    <string name="title_overview">Overview</string>
+    <string name="title_courses">My Courses</string>
+    <string name="title_messages">Messages</string>
+    <string name="title_links">Links</string>
+</resources>

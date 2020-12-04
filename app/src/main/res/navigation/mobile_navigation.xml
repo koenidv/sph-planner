@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/nav_home">
+
+    <fragment
+        android:id="@+id/nav_home"
+        android:name="de.koenidv.sph.ui.home.HomeFragment"
+        android:label="@string/title_overview"
+        tools:layout="@layout/fragment_home" />
+
+    <fragment
+        android:id="@+id/nav_courses"
+        android:name="de.koenidv.sph.ui.dashboard.DashboardFragment"
+        android:label="@string/title_courses"
+        tools:layout="@layout/fragment_dashboard" />
+
+    <fragment
+        android:id="@+id/nav_messages"
+        android:name="de.koenidv.sph.ui.notifications.NotificationsFragment"
+        android:label="@string/title_messages"
+        tools:layout="@layout/fragment_notifications" />
+
+    <fragment
+        android:id="@+id/nav_links"
+        android:name="de.koenidv.sph.ui.links.LinksFragment"
+        android:label="@string/title_links"
+        tools:layout="@layout/fragment_dashboard" />
+</navigation>
