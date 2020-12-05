@@ -26,26 +26,15 @@ import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 
 class LinksFragment : Fragment() {
-    private val linksViewModel: LinksViewModel? = null
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        /*linksViewModel =
-                new ViewModelProvider(this).get(LinksViewModel.class);
-        View root = inflater.inflate(R.layout.fragment_dashboard, container, false);
-        final TextView textView = root.findViewById(R.id.text_dashboard);
-        linksViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
-            @Override
-            public void onChanged(@Nullable String s) {
-                textView.setText(s);
-            }
-        });*/
 
         val prefs: SharedPreferences = applicationContext().getSharedPreferences("sharedPrefs", MODE_PRIVATE)
 
         val view = inflater.inflate(R.layout.fragment_links, container, false)
 
 
-        
+
         val webView = view.findViewById<WebView>(R.id.webview)
         val cookieManager = CookieManager.getInstance()
         cookieManager.acceptCookie()

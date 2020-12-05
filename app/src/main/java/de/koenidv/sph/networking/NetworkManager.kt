@@ -10,8 +10,6 @@ import com.androidnetworking.error.ANError
 import com.androidnetworking.interfaces.StringRequestListener
 import com.facebook.stetho.okhttp3.StethoInterceptor
 import de.koenidv.sph.SphPlanner.Companion.applicationContext
-import de.koenidv.sph.ui.home.HomeFragment
-import de.koenidv.sph.ui.home.HomeViewModel
 import okhttp3.Cookie
 import okhttp3.CookieJar
 import okhttp3.HttpUrl

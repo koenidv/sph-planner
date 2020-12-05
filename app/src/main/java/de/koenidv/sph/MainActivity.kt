@@ -27,6 +27,8 @@ class MainActivity : AppCompatActivity() {
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration)
         NavigationUI.setupWithNavController(navView, navController)
 
+        // Temporarily use links fragments with webview as home screen
+        navView.selectedItemId = R.id.nav_links
 
     }
 }
