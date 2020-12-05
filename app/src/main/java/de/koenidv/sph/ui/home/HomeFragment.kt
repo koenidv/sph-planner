@@ -1,38 +1,56 @@
 package de.koenidv.sph.ui.home
 
+import android.content.Context.MODE_PRIVATE
+import android.content.SharedPreferences
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.TextView
+import android.widget.EditText
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import de.koenidv.sph.R
+import de.koenidv.sph.SphPlanner.Companion.applicationContext
 import de.koenidv.sph.networking.NetworkManager
 
-class HomeFragment : Fragment() {
 
-    //private var homeViewModel: HomeViewModel? = null
+class HomeFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
-        /*homeViewModel = ViewModelProvider(this).get(HomeViewModel::class.java)
-        val root = inflater.inflate(R.layout.fragment_home, container, false)
-        val textView = root.findViewById<TextView>(R.id.text_home)
-        homeViewModel!!.text.observe(viewLifecycleOwner, Observer { s -> textView.text = s })*/
+        val prefs: SharedPreferences = applicationContext().getSharedPreferences("sharedPrefs", MODE_PRIVATE)
 
-        //val binding = DataBindingUtil.inflate(inflater, R.layout.fragment_home, container, false);
         val view = inflater.inflate(R.layout.fragment_home, container, false);
 
-        val loginButton = view.findViewById<Button>(R.id.loginButton);
+        val loginButton = view.findViewById<Button>(R.id.loginButton)
         loginButton.setOnClickListener {
             val networkManager = NetworkManager()
             networkManager.getAccessToken()
         }
+
+        val userEditText = view.findViewById<EditText>(R.id.userEditText)
+        userEditText.setText(prefs.getString("user", ""))
+        userEditText.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                prefs.edit().putString("user", s.toString()).apply()
+            }
+        })
+
+        val passwordEditText = view.findViewById<EditText>(R.id.passwordEditText)
+        passwordEditText.setText(prefs.getString("password", ""))
+        passwordEditText.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                prefs.edit().putString("password", s.toString()).apply()
+            }
+        })
 
         return view;
 
