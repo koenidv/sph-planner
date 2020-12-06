@@ -10,38 +10,35 @@ import com.androidnetworking.error.ANError
 import com.androidnetworking.interfaces.StringRequestListener
 import com.facebook.stetho.okhttp3.StethoInterceptor
 import de.koenidv.sph.SphPlanner
+import de.koenidv.sph.SphPlanner.Companion.TAG
 import de.koenidv.sph.SphPlanner.Companion.applicationContext
-import okhttp3.Cookie
-import okhttp3.CookieJar
-import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import java.util.*
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 
 
 //  Created by koenidv on 05.12.2020.
 class NetworkManager {
 
-    val cookies = Cookies()
     val prefs: SharedPreferences = applicationContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
 
-    /** Signs in with an externally generated access token and returns it
-     *
+    /*
+     * Returns an signed-in access token
+     * todo: Use callbacks
      */
+
     fun getAccessToken() {
 
         // Return existing, signed-in token if it was used within 15 Minutes
         // Else get a new token
-        if (Date().time - prefs.getLong("token_lastuse", 0) <= 15 * 60 * 1000) {
-            Log.d(SphPlanner.TAG, prefs.getString("token", "")!!)
+        if (Date().time - prefs.getLong("token_last_success", 0) <= 15 * 60 * 1000) {
+            Log.d(TAG, prefs.getString("token", "")!! + " (reuse)")
             //TODO("Callback with current token")
         } else {
 
             // Adding an Network Interceptor for Debugging purpose :
             val okHttpClient = OkHttpClient.Builder()
                     .addNetworkInterceptor(StethoInterceptor())
-                    .cookieJar(cookies)
+                    .cookieJar(CookieStore)
                     .build()
             AndroidNetworking.initialize(applicationContext(), okHttpClient)
 
@@ -54,14 +51,15 @@ class NetworkManager {
                     .build()
                     .getAsString(object : StringRequestListener {
                         override fun onResponse(response: String) {
-                            prefs.edit().putString("token", cookies.getCookie("schulportal.hessen.de", "sid"))
-                                    .putLong("token_lastuse", Date().time)
+                            // Todo check if sign-in was successfull
+                            prefs.edit().putString("token", CookieStore.getCookie("schulportal.hessen.de", "sid"))
+                                    .putLong("token_last_success", Date().time)
                                     .apply()
 
                             Toast.makeText(applicationContext(), "Success", Toast.LENGTH_LONG).show()
                             getCalendarLink()
 
-                            Log.d(SphPlanner.TAG, prefs.getString("token", "")!!)
+                            Log.d(TAG, prefs.getString("token", "")!!)
                             //TODO("Callback with new token")
                         }
 
@@ -79,7 +77,7 @@ class NetworkManager {
         // Adding an Network Interceptor for Debugging purpose :
         val okHttpClient = OkHttpClient.Builder()
                 .addNetworkInterceptor(StethoInterceptor())
-                .cookieJar(cookies)
+                .cookieJar(CookieStore)
                 .build()
         AndroidNetworking.initialize(applicationContext(), okHttpClient)
 
@@ -93,40 +91,14 @@ class NetworkManager {
                 .getAsString(object : StringRequestListener {
                     override fun onResponse(response: String) {
                         prefs.edit().putString("iCalLink", response).apply()
+                        Log.d(TAG, response)
                     }
 
                     override fun onError(error: ANError) {
                         Toast.makeText(applicationContext(), error.errorDetail, Toast.LENGTH_LONG).show()
-                        Log.d("sph-n", error.errorBody)
+                        Log.d(TAG, error.errorBody)
                     }
                 })
-    }
-
-    class Cookies : CookieJar {
-        private val cookies: HashMap<String, List<Cookie>> = HashMap()
-
-        // Save cookies for a domain and account for sph's weird cookie behavior
-        override fun saveFromResponse(url: HttpUrl, cookies: List<Cookie>) {
-            if (url.host().contains("schulportal.hessen.de"))
-                this.cookies[url.host().substring(url.host().indexOf(".") + 1)] = cookies
-            else
-                this.cookies[url.host()] = cookies
-
-        }
-
-        // Load cookies for a domain and account for sph's weird cookie behavior
-        override fun loadForRequest(url: HttpUrl): List<Cookie> {
-            if (url.host().contains("schulportal.hessen.de"))
-                return cookies[url.host().substring(url.host().indexOf(".") + 1)] ?: ArrayList()
-            else
-                return cookies[url.host()] ?: ArrayList()
-
-        }
-
-        // Get a specific cookie for a domain
-        fun getCookie(host: String, name: String): String? {
-            return cookies[host]?.firstOrNull { it.name() == name }?.value()
-        }
     }
 
 }

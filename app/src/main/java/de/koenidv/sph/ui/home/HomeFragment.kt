@@ -28,6 +28,8 @@ class HomeFragment : Fragment() {
 
         val view = inflater.inflate(R.layout.fragment_home, container, false)
 
+        // Only for demonstration
+
         val loginButton = view.findViewById<Button>(R.id.loginButton)
         loginButton.setOnClickListener {
             val networkManager = NetworkManager()
@@ -35,7 +37,7 @@ class HomeFragment : Fragment() {
         }
 
         view.findViewById<Button>(R.id.logoutButton).setOnClickListener {
-            prefs.edit().remove("token").apply()
+            prefs.edit().remove("token").remove("token_last_success").apply()
         }
 
         val userEditText = view.findViewById<EditText>(R.id.userEditText)

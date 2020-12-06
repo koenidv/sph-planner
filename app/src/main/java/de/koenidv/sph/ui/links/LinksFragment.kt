@@ -35,7 +35,7 @@ class LinksFragment : Fragment() {
 
         val view = inflater.inflate(R.layout.fragment_links, container, false)
 
-
+        // WebView - Only fdr demonstration
 
         val webView = view.findViewById<WebView>(R.id.webview)
         val cookieManager = CookieManager.getInstance()
@@ -55,7 +55,8 @@ class LinksFragment : Fragment() {
         WebView.setWebContentsDebuggingEnabled(true)
         webView.loadUrl(domain)
 
-        prefs.edit().putLong("token_lastuse", Date().time).apply()
+        // Only update counter if sign-in was successfull
+        // prefs.edit().putLong("token_lastuse", Date().time).apply()
 
 
         return view
