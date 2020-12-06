@@ -19,11 +19,13 @@ import com.androidnetworking.error.ANError
 import com.androidnetworking.interfaces.StringRequestListener
 import com.facebook.stetho.okhttp3.StethoInterceptor
 import de.koenidv.sph.R
+import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.SphPlanner.Companion.applicationContext
 import okhttp3.Cookie
 import okhttp3.CookieJar
 import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
+import java.util.*
 
 class LinksFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater,
@@ -44,11 +46,16 @@ class LinksFragment : Fragment() {
         webView.webViewClient = WebViewClient()
         webView.settings.javaScriptEnabled = true
 
+        cookieManager.removeSessionCookies(null)
         cookieManager.setCookie(domain,"sid=" + prefs.getString("token", ""))
         cookieManager.setAcceptThirdPartyCookies(webView, true)
 
+        Log.d(SphPlanner.TAG, cookieManager.getCookie(domain))
+
+        WebView.setWebContentsDebuggingEnabled(true)
         webView.loadUrl(domain)
 
+        prefs.edit().putLong("token_lastuse", Date().time).apply()
 
 
         return view

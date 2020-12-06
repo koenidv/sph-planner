@@ -18,10 +18,12 @@ class SphPlanner : Application() {
         fun applicationContext() : Context {
             return instance!!.applicationContext
         }
+
+        val TAG = "SPH-Planner"
     }
 
     override fun onCreate() {
         super.onCreate()
-        Stetho.initializeWithDefaults(this);
+        Stetho.initializeWithDefaults(this)
     }
 }

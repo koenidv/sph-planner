@@ -9,11 +9,15 @@ import com.androidnetworking.common.Priority
 import com.androidnetworking.error.ANError
 import com.androidnetworking.interfaces.StringRequestListener
 import com.facebook.stetho.okhttp3.StethoInterceptor
+import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.SphPlanner.Companion.applicationContext
 import okhttp3.Cookie
 import okhttp3.CookieJar
 import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 
 //  Created by koenidv on 05.12.2020.
@@ -25,37 +29,51 @@ class NetworkManager {
     /** Signs in with an externally generated access token and returns it
      *
      */
-    fun getAccessToken(): String {
+    fun getAccessToken() {
 
-        // Adding an Network Interceptor for Debugging purpose :
-        val okHttpClient = OkHttpClient.Builder()
-                .addNetworkInterceptor(StethoInterceptor())
-                .cookieJar(cookies)
-                .build()
-        AndroidNetworking.initialize(applicationContext(), okHttpClient)
+        // Return existing, signed-in token if it was used within 15 Minutes
+        // Else get a new token
+        if (Date().time - prefs.getLong("token_lastuse", 0) <= 15 * 60 * 1000) {
+            Log.d(SphPlanner.TAG, prefs.getString("token", "")!!)
+            //TODO("Callback with current token")
+        } else {
 
-        AndroidNetworking.post("https://login.schulportal.hessen.de/")
-                .addBodyParameter("user", prefs.getString("user", ""))
-                .addBodyParameter("password", prefs.getString("password", ""))
-                .setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.27 Safari/537.36")
-                .setTag("test")
-                .setPriority(Priority.LOW)
-                .build()
-                .getAsString(object : StringRequestListener {
-                    override fun onResponse(response: String) {
-                        Log.d("sid", cookies.getCookie("schulportal.hessen.de", "sid")
-                                ?: "SID Error")
-                        prefs.edit().putString("token", cookies.getCookie("schulportal.hessen.de", "sid")).apply()
-                        getCalendarLink()
-                    }
+            // Adding an Network Interceptor for Debugging purpose :
+            val okHttpClient = OkHttpClient.Builder()
+                    .addNetworkInterceptor(StethoInterceptor())
+                    .cookieJar(cookies)
+                    .build()
+            AndroidNetworking.initialize(applicationContext(), okHttpClient)
 
-                    override fun onError(error: ANError) {
-                        Toast.makeText(applicationContext(), error.toString(), Toast.LENGTH_LONG).show()
-                    }
-                })
+            AndroidNetworking.post("https://login.schulportal.hessen.de/")
+                    .addBodyParameter("user", prefs.getString("user", ""))
+                    .addBodyParameter("password", prefs.getString("password", ""))
+                    .setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.27 Safari/537.36")
+                    .setTag("test")
+                    .setPriority(Priority.LOW)
+                    .build()
+                    .getAsString(object : StringRequestListener {
+                        override fun onResponse(response: String) {
+                            prefs.edit().putString("token", cookies.getCookie("schulportal.hessen.de", "sid"))
+                                    .putLong("token_lastuse", Date().time)
+                                    .apply()
 
-        return "test"
+                            Toast.makeText(applicationContext(), "Success", Toast.LENGTH_LONG).show()
+                            getCalendarLink()
+
+                            Log.d(SphPlanner.TAG, prefs.getString("token", "")!!)
+                            //TODO("Callback with new token")
+                        }
+
+                        override fun onError(error: ANError) {
+                            Toast.makeText(applicationContext(), error.toString(), Toast.LENGTH_LONG).show()
+                        }
+                    })
+        }
     }
+
+
+    // DEMO: Getting calendar ics link
 
     fun getCalendarLink() {
         // Adding an Network Interceptor for Debugging purpose :
@@ -64,6 +82,7 @@ class NetworkManager {
                 .cookieJar(cookies)
                 .build()
         AndroidNetworking.initialize(applicationContext(), okHttpClient)
+
 
         AndroidNetworking.post("https://start.schulportal.hessen.de/kalender.php")
                 .addBodyParameter("f", "iCalAbo")
