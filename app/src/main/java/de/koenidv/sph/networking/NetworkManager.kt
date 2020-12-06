@@ -20,13 +20,12 @@ import okhttp3.OkHttpClient
 class NetworkManager {
 
     val cookies = Cookies()
+    val prefs: SharedPreferences = applicationContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
 
     /** Signs in with an externally generated access token and returns it
      *
      */
     fun getAccessToken(): String {
-
-        val prefs: SharedPreferences = applicationContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
 
         // Adding an Network Interceptor for Debugging purpose :
         val okHttpClient = OkHttpClient.Builder()
@@ -44,10 +43,10 @@ class NetworkManager {
                 .build()
                 .getAsString(object : StringRequestListener {
                     override fun onResponse(response: String) {
-                        Toast.makeText(applicationContext(), response, Toast.LENGTH_LONG).show()
                         Log.d("sid", cookies.getCookie("schulportal.hessen.de", "sid")
                                 ?: "SID Error")
                         prefs.edit().putString("token", cookies.getCookie("schulportal.hessen.de", "sid")).apply()
+                        getCalendarLink()
                     }
 
                     override fun onError(error: ANError) {
@@ -56,6 +55,32 @@ class NetworkManager {
                 })
 
         return "test"
+    }
+
+    fun getCalendarLink() {
+        // Adding an Network Interceptor for Debugging purpose :
+        val okHttpClient = OkHttpClient.Builder()
+                .addNetworkInterceptor(StethoInterceptor())
+                .cookieJar(cookies)
+                .build()
+        AndroidNetworking.initialize(applicationContext(), okHttpClient)
+
+        AndroidNetworking.post("https://start.schulportal.hessen.de/kalender.php")
+                .addBodyParameter("f", "iCalAbo")
+                .setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.27 Safari/537.36")
+                .setTag("test")
+                .setPriority(Priority.LOW)
+                .build()
+                .getAsString(object : StringRequestListener {
+                    override fun onResponse(response: String) {
+                        prefs.edit().putString("iCalLink", response).apply()
+                    }
+
+                    override fun onError(error: ANError) {
+                        Toast.makeText(applicationContext(), error.errorDetail, Toast.LENGTH_LONG).show()
+                        Log.d("sph-n", error.errorBody)
+                    }
+                })
     }
 
     class Cookies : CookieJar {

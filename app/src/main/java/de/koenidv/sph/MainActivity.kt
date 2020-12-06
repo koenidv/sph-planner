@@ -2,6 +2,7 @@ package de.koenidv.sph
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.navigation.Navigation
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
@@ -26,9 +27,6 @@ class MainActivity : AppCompatActivity() {
         val navController = navHostFragment!!.navController
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration)
         NavigationUI.setupWithNavController(navView, navController)
-
-        // Temporarily use links fragments with webview as home screen
-        navView.selectedItemId = R.id.nav_links
 
     }
 }

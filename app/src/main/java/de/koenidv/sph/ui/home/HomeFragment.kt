@@ -5,11 +5,13 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.text.method.LinkMovementMethod
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner.Companion.applicationContext
@@ -24,12 +26,16 @@ class HomeFragment : Fragment() {
 
         val prefs: SharedPreferences = applicationContext().getSharedPreferences("sharedPrefs", MODE_PRIVATE)
 
-        val view = inflater.inflate(R.layout.fragment_home, container, false);
+        val view = inflater.inflate(R.layout.fragment_home, container, false)
 
         val loginButton = view.findViewById<Button>(R.id.loginButton)
         loginButton.setOnClickListener {
             val networkManager = NetworkManager()
             networkManager.getAccessToken()
+        }
+
+        view.findViewById<Button>(R.id.logoutButton).setOnClickListener {
+            prefs.edit().remove("token").apply()
         }
 
         val userEditText = view.findViewById<EditText>(R.id.userEditText)
@@ -52,7 +58,9 @@ class HomeFragment : Fragment() {
             }
         })
 
-        return view;
+        val idText = view.findViewById(R.id.idText) as TextView
+        idText.text = prefs.getString("iCalLink", "")
+        return view
 
     }
 }
