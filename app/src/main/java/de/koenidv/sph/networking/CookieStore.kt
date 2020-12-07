@@ -37,6 +37,10 @@ object CookieStore : CookieJar {
 
     }
 
+    fun clearCookies() {
+        cookies.clear()
+    }
+
     /**
      * Get a specific cookie for a domain
      * @param host Domain the cookie is saved for

@@ -11,6 +11,7 @@ import com.androidnetworking.interfaces.StringRequestListener
 import com.facebook.stetho.okhttp3.StethoInterceptor
 import de.koenidv.sph.SphPlanner.Companion.TAG
 import de.koenidv.sph.SphPlanner.Companion.applicationContext
+import okhttp3.Cookie
 import okhttp3.OkHttpClient
 import java.util.*
 
@@ -44,6 +45,8 @@ class TokenManager {
                         .build()
                 AndroidNetworking.initialize(applicationContext(), okHttpClient)
 
+                CookieStore.clearCookies()
+
                 AndroidNetworking.post("https://login.schulportal.hessen.de/")
                         .addBodyParameter("user", prefs.getString("user", ""))
                         .addBodyParameter("password", prefs.getString("password", ""))
@@ -59,7 +62,8 @@ class TokenManager {
                                         .apply()
 
                                 Log.d(TAG, prefs.getString("token", "")!!)
-                                callback.onTokenGenerated(CookieStore.getCookie("schulportal.hessen.de", "sid")!!)
+                                if (CookieStore.getCookie("schulportal.hessen.de", "sid") != null)
+                                    callback.onTokenGenerated(CookieStore.getCookie("schulportal.hessen.de", "sid")!!)
                             }
 
                             override fun onError(error: ANError) {
