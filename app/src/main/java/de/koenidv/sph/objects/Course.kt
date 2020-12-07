@@ -5,15 +5,15 @@ import de.koenidv.sph.parsing.TeacherParser
 
 //  Created by koenidv on 06.12.2020.
 data class Course(
-        var id: String,
-        var gmb_id: String?,
-        var sph_id: String?,
-        var named_id: String?,
-        var number_id: String?,
-        var fullname: String,
-        var id_teacher: String,
-        var isFavorite: Boolean?,
-        var isLK: Boolean?) {
+        var courseId : String, // i.e. m_bar_1
+        var gmb_id : String? = null, // i.e. M-GK-3
+        var sph_id : String? = null, // i.e. Q3Mbar01 - GYM
+        var named_id : String? = null, // i.e. Mathematik GK 13
+        var number_id : String? = null, // i.e. 760
+        var fullname : String, // i.e. Mathe
+        var id_teacher : String, // i.e. bar
+        var isFavorite : Boolean? = null, // i.e. true (is member of course)
+        var isLK: Boolean? = null) { // i.e. false (not intensified course)
 
 
     /**
@@ -27,10 +27,10 @@ data class Course(
     override fun equals(other: Any?): Boolean {
         return when (other) {
             is Course -> {
-                other.id == this.id
+                other.courseId == this.courseId
             }
             is String -> {
-                (other == this.id
+                (other == this.courseId
                         || other == this.gmb_id
                         || other == this.sph_id
                         || other == this.named_id
@@ -47,7 +47,7 @@ data class Course(
      * @return Object hascode, containing only id value
      */
     override fun hashCode(): Int {
-        return id.hashCode()
+        return courseId.hashCode()
     }
 
     /**

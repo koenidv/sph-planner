@@ -1,7 +1,7 @@
 package de.koenidv.sph.parsing
 
 const val TYPE_UNKNOWN = -1 // Unknown id type
-const val TYPE_INTERNAL = 0 // Example: m-bar
+const val TYPE_INTERNAL = 0 // Example: m_bar_1
 const val TYPE_GMB = 1 // Example: M-GK-3
 const val TYPE_SPH = 2 // Example: Q3Mbar01 - GYM
 const val TYPE_NAMED = 3 // Example: Mathematik GK 13
@@ -40,7 +40,7 @@ class CourseInfoParser {
         val patternNamed = "^.*[^-0-9]\\s+.*\$".toRegex() // Named ID: Containing whitespace not following on digit or hyphen
         val patternSph = "^.*\\d\\s-\\s.*\$".toRegex() // SPH ID: Ending with at least one digit followed by " - " and non-digits
         val patternGmb = "^\\w{1,4}-\\w{1,2}-\\d{1,2}\$".toRegex() // GMB ID: 3 hyphen-separated sets: 1-4 chars, 1-2 chars, 1-2 digits
-        val patternInternal = "^\\w{1,4}-\\w{1,4}\$".toRegex() // Internal ID: 2 hyphen-separated sets of 1-4 word characters
+        val patternInternal = "^\\w{1,4}_\\w{1,4}_\\d{1,2}\$".toRegex() // Internal ID: 2 underscore-separated sets of 1-4 word characters and 1-2 digits in the end
 
         return when {
             patternNumber.matches(courseId) -> TYPE_NUMBER
