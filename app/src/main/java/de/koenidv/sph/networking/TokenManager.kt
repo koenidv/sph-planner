@@ -57,13 +57,14 @@ class TokenManager {
                         .getAsString(object : StringRequestListener {
                             override fun onResponse(response: String) {
                                 // Todo check if sign-in was successfull
-                                prefs.edit().putString("token", CookieStore.getCookie("schulportal.hessen.de", "sid"))
-                                        .putLong("token_last_success", Date().time)
-                                        .apply()
 
-                                Log.d(TAG, prefs.getString("token", "")!!)
-                                if (CookieStore.getCookie("schulportal.hessen.de", "sid") != null)
+                                if (CookieStore.getCookie("schulportal.hessen.de", "sid") != null) {
                                     callback.onTokenGenerated(CookieStore.getCookie("schulportal.hessen.de", "sid")!!)
+                                    prefs.edit().putString("token", CookieStore.getCookie("schulportal.hessen.de", "sid"))
+                                            .putLong("token_last_success", Date().time)
+                                            .apply()
+                                }
+                                Log.d(TAG, prefs.getString("token", "")!! + (" (new)"))
                             }
 
                             override fun onError(error: ANError) {
