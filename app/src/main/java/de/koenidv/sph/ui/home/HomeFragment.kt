@@ -5,17 +5,17 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.text.method.LinkMovementMethod
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner.Companion.applicationContext
-import de.koenidv.sph.networking.NetworkManager
+import de.koenidv.sph.networking.TokenManager
 
 
 class HomeFragment : Fragment() {
@@ -32,8 +32,12 @@ class HomeFragment : Fragment() {
 
         val loginButton = view.findViewById<Button>(R.id.loginButton)
         loginButton.setOnClickListener {
-            val networkManager = NetworkManager()
-            networkManager.getAccessToken()
+            val networkManager = TokenManager()
+            networkManager.generateAccessToken(object : TokenManager.TokenGeneratedListener {
+                override fun onTokenGenerated(token: String) {
+                    Toast.makeText(applicationContext(), "Success", Toast.LENGTH_LONG).show()
+                }
+            })
         }
 
         view.findViewById<Button>(R.id.logoutButton).setOnClickListener {

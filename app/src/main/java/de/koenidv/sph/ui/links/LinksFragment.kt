@@ -21,6 +21,7 @@ import com.facebook.stetho.okhttp3.StethoInterceptor
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.SphPlanner.Companion.applicationContext
+import de.koenidv.sph.networking.TokenManager
 import okhttp3.Cookie
 import okhttp3.CookieJar
 import okhttp3.HttpUrl
@@ -35,7 +36,7 @@ class LinksFragment : Fragment() {
 
         val view = inflater.inflate(R.layout.fragment_links, container, false)
 
-        // WebView - Only fdr demonstration
+        // WebView - Only for demonstration
 
         val webView = view.findViewById<WebView>(R.id.webview)
         val cookieManager = CookieManager.getInstance()
@@ -45,15 +46,19 @@ class LinksFragment : Fragment() {
 
         webView.webViewClient = WebViewClient()
         webView.settings.javaScriptEnabled = true
-
+        webView.settings.domStorageEnabled = true
         cookieManager.removeSessionCookies(null)
-        cookieManager.setCookie(domain,"sid=" + prefs.getString("token", ""))
         cookieManager.setAcceptThirdPartyCookies(webView, true)
-
-        Log.d(SphPlanner.TAG, cookieManager.getCookie(domain))
-
         WebView.setWebContentsDebuggingEnabled(true)
-        webView.loadUrl(domain)
+
+        // Generate access token, save as cookie and load once done
+        TokenManager().generateAccessToken(object : TokenManager.TokenGeneratedListener {
+            override fun onTokenGenerated(token: String) {
+                cookieManager.setCookie(domain, "sid=$token")
+                webView.loadUrl(domain)
+            }
+
+        })
 
         // Only update counter if sign-in was successfull
         // prefs.edit().putLong("token_lastuse", Date().time).apply()

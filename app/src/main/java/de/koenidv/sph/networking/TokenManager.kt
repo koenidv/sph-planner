@@ -17,22 +17,23 @@ import java.util.*
 
 
 //  Created by koenidv on 05.12.2020.
-class NetworkManager {
+class TokenManager {
 
     val prefs: SharedPreferences = applicationContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
 
     /*
      * Returns an signed-in access token
      * todo: Use callbacks
+     * todo: Documentation
      */
 
-    fun getAccessToken() {
+    fun generateAccessToken(callback : TokenGeneratedListener) {
 
         // Return existing, signed-in token if it was used within 15 Minutes
         // Else get a new token
         if (Date().time - prefs.getLong("token_last_success", 0) <= 15 * 60 * 1000) {
             Log.d(TAG, prefs.getString("token", "")!! + " (reuse)")
-            //TODO("Callback with current token")
+            callback.onTokenGenerated(prefs.getString("token", "")!!)
         } else {
 
             // Adding an Network Interceptor for Debugging purpose :
@@ -56,11 +57,8 @@ class NetworkManager {
                                     .putLong("token_last_success", Date().time)
                                     .apply()
 
-                            Toast.makeText(applicationContext(), "Success", Toast.LENGTH_LONG).show()
-                            getCalendarLink()
-
                             Log.d(TAG, prefs.getString("token", "")!!)
-                            //TODO("Callback with new token")
+                            callback.onTokenGenerated(CookieStore.getCookie("schulportal.hessen.de", "sid")!!)
                         }
 
                         override fun onError(error: ANError) {
@@ -71,6 +69,7 @@ class NetworkManager {
     }
 
 
+    /*
     // DEMO: Getting calendar ics link
 
     fun getCalendarLink() {
@@ -100,5 +99,11 @@ class NetworkManager {
                     }
                 })
     }
+    */
+
+    interface TokenGeneratedListener {
+        fun onTokenGenerated(token : String)
+    }
+
 
 }
