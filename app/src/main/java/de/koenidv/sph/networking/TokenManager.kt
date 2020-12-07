@@ -9,7 +9,6 @@ import com.androidnetworking.common.Priority
 import com.androidnetworking.error.ANError
 import com.androidnetworking.interfaces.StringRequestListener
 import com.facebook.stetho.okhttp3.StethoInterceptor
-import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.SphPlanner.Companion.TAG
 import de.koenidv.sph.SphPlanner.Companion.applicationContext
 import okhttp3.OkHttpClient
@@ -27,7 +26,7 @@ class TokenManager {
      * todo: Documentation
      */
 
-    fun generateAccessToken(callback : TokenGeneratedListener) {
+    fun generateAccessToken(callback: TokenGeneratedListener) {
 
         // Return existing, signed-in token if it was used within 15 Minutes
         // Else get a new token
@@ -36,35 +35,38 @@ class TokenManager {
             callback.onTokenGenerated(prefs.getString("token", "")!!)
         } else {
 
-            // Adding an Network Interceptor for Debugging purpose :
-            val okHttpClient = OkHttpClient.Builder()
-                    .addNetworkInterceptor(StethoInterceptor())
-                    .cookieJar(CookieStore)
-                    .build()
-            AndroidNetworking.initialize(applicationContext(), okHttpClient)
+            if (prefs.getString("user", "") != null && prefs.getString("password", "") != null) {
 
-            AndroidNetworking.post("https://login.schulportal.hessen.de/")
-                    .addBodyParameter("user", prefs.getString("user", ""))
-                    .addBodyParameter("password", prefs.getString("password", ""))
-                    .setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.27 Safari/537.36")
-                    .setTag("test")
-                    .setPriority(Priority.LOW)
-                    .build()
-                    .getAsString(object : StringRequestListener {
-                        override fun onResponse(response: String) {
-                            // Todo check if sign-in was successfull
-                            prefs.edit().putString("token", CookieStore.getCookie("schulportal.hessen.de", "sid"))
-                                    .putLong("token_last_success", Date().time)
-                                    .apply()
+                // Adding an Network Interceptor for Debugging purpose :
+                val okHttpClient = OkHttpClient.Builder()
+                        .addNetworkInterceptor(StethoInterceptor())
+                        .cookieJar(CookieStore)
+                        .build()
+                AndroidNetworking.initialize(applicationContext(), okHttpClient)
 
-                            Log.d(TAG, prefs.getString("token", "")!!)
-                            callback.onTokenGenerated(CookieStore.getCookie("schulportal.hessen.de", "sid")!!)
-                        }
+                AndroidNetworking.post("https://login.schulportal.hessen.de/")
+                        .addBodyParameter("user", prefs.getString("user", ""))
+                        .addBodyParameter("password", prefs.getString("password", ""))
+                        .setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.27 Safari/537.36")
+                        .setTag("test")
+                        .setPriority(Priority.LOW)
+                        .build()
+                        .getAsString(object : StringRequestListener {
+                            override fun onResponse(response: String) {
+                                // Todo check if sign-in was successfull
+                                prefs.edit().putString("token", CookieStore.getCookie("schulportal.hessen.de", "sid"))
+                                        .putLong("token_last_success", Date().time)
+                                        .apply()
 
-                        override fun onError(error: ANError) {
-                            Toast.makeText(applicationContext(), error.toString(), Toast.LENGTH_LONG).show()
-                        }
-                    })
+                                Log.d(TAG, prefs.getString("token", "")!!)
+                                callback.onTokenGenerated(CookieStore.getCookie("schulportal.hessen.de", "sid")!!)
+                            }
+
+                            override fun onError(error: ANError) {
+                                Toast.makeText(applicationContext(), error.toString(), Toast.LENGTH_LONG).show()
+                            }
+                        })
+            }
         }
     }
 
@@ -102,7 +104,7 @@ class TokenManager {
     */
 
     interface TokenGeneratedListener {
-        fun onTokenGenerated(token : String)
+        fun onTokenGenerated(token: String)
     }
 
 
