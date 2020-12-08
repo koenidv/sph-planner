@@ -1,18 +1,18 @@
 package de.koenidv.sph.objects
 
-import de.koenidv.sph.parsing.CourseInfoParser
+import de.koenidv.sph.parsing.CourseParser
 import de.koenidv.sph.parsing.TeacherParser
 
 //  Created by koenidv on 06.12.2020.
 data class Course(
-        var courseId : String, // i.e. m_bar_1
-        var gmb_id : String? = null, // i.e. M-GK-3
-        var sph_id : String? = null, // i.e. Q3Mbar01 - GYM
-        var named_id : String? = null, // i.e. Mathematik GK 13
-        var number_id : String? = null, // i.e. 760
-        var fullname : String, // i.e. Mathe
-        var id_teacher : String, // i.e. bar
-        var isFavorite : Boolean? = null, // i.e. true (is member of course)
+        var courseId: String, // i.e. m_bar_1
+        var gmb_id: String? = null, // i.e. M-GK-3
+        var sph_id: String? = null, // i.e. Q3Mbar01 - GYM
+        var named_id: String? = null, // i.e. Mathematik GK 13
+        var number_id: String? = null, // i.e. 760
+        var fullname: String, // i.e. Mathe
+        var id_teacher: String, // i.e. bar
+        var isFavorite: Boolean? = null, // i.e. true (is member of course)
         var isLK: Boolean? = null) { // i.e. false (not intensified course)
 
 
@@ -57,7 +57,7 @@ data class Course(
     constructor(internalCourseId: String) : this(
             internalCourseId,
             null, null, null, null,
-            CourseInfoParser().getCourseFullnameFromInternald(internalCourseId),
+            CourseParser().getCourseFullnameFromInternald(internalCourseId),
             TeacherParser().teacherIdFromInternalCourseId(internalCourseId),
             null, null)
 

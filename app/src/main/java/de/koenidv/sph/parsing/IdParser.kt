@@ -1,5 +1,10 @@
 package de.koenidv.sph.parsing
 
+import android.annotation.SuppressLint
+import de.koenidv.sph.objects.Change
+import java.text.SimpleDateFormat
+import java.util.*
+
 const val TYPE_UNKNOWN = -1 // Unknown id type
 const val TYPE_INTERNAL = 0 // Example: m_bar_1
 const val TYPE_GMB = 1 // Example: M-GK-3
@@ -8,7 +13,7 @@ const val TYPE_NAMED = 3 // Example: Mathematik GK 13
 const val TYPE_NUMBER = 4 // Example: 760
 
 //  Created by koenidv on 06.12.2020.
-class CourseInfoParser {
+class IdParser {
 
     /**
      * Parse a given external course id string to an internal course id
@@ -19,7 +24,7 @@ class CourseInfoParser {
      * @param teacherId The course teacher's id
      * @return Parsed internal id
      */
-    fun parseCourseId(courseId : String, courseIdType : Int?, teacherId : String) : String{
+    fun getCourseId(courseId: String, courseIdType: Int?, teacherId: String): String {
         // Get id type estimate if no type is passed
         val courseType = courseIdType ?: getCourseIdType(courseId)
 
@@ -35,7 +40,7 @@ class CourseInfoParser {
      * @param courseId Id to check
      * @return An estimate of the id's type
      */
-    fun getCourseIdType(courseId : String): Int {
+    fun getCourseIdType(courseId: String): Int {
         val patternNumber = "^\\d{1,4}\$".toRegex() // Number ID: 1-4 digits only
         val patternNamed = "^.*[^-0-9]\\s+.*\$".toRegex() // Named ID: Containing whitespace not following on digit or hyphen
         val patternSph = "^.*\\d\\s-\\s.*\$".toRegex() // SPH ID: Ending with at least one digit followed by " - " and non-digits
@@ -52,11 +57,16 @@ class CourseInfoParser {
         }
     }
 
+    // todo documentation
+    @SuppressLint("SimpleDateFormat")
+    fun getChangeId(internalCourseId: String, date: Date, allChanges: List<Change>): String {
+        val formatter = SimpleDateFormat("yyyy-MM-dd")
+        var index = 1
 
-    fun getCourseFullnameFromInternald(courseId : String) : String {
-        require(getCourseIdType(courseId) == TYPE_INTERNAL)
-        val subject = courseId.substring(courseId.indexOf("-") + 1)
-        TODO("Dictionary for subject ids")
+        while (allChanges.contains(internalCourseId + "_change" + formatter.format(date) + "_$index"))
+            index++
+
+        return internalCourseId + "_change" + formatter.format(date) + "_$index"
     }
 
 }
