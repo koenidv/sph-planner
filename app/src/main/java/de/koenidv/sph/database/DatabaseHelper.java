@@ -148,4 +148,29 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 
     }
+
+    public Course getCourseByGmb_id(String Gmb_id){
+        String queryString = "SELECT * FROM COURSES WHERE gmb_id = "+ Gmb_id;
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor =db.rawQuery(queryString,null);
+        cursor.moveToFirst();
+
+        String CourseId = cursor.getString(0);
+        String gmb_id = cursor.getString(1);
+        String sph_id = cursor.getString(2);
+        String named_id = cursor.getString(3);
+        String number_id = cursor.getString(4);
+        String fullname = cursor.getString(5);
+        String id_teacher = cursor.getString(6);
+        boolean isFavorite = cursor.getInt(7) == 1;
+        boolean isLK = cursor.getInt(8) == 1;
+
+        Course newCourse = new Course(CourseId,gmb_id,sph_id,named_id,number_id,fullname,id_teacher,isFavorite,isLK);
+
+        cursor.close();
+        db.close();
+
+        return newCourse;
+    }
 }
