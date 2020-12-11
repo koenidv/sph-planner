@@ -11,7 +11,6 @@ import com.androidnetworking.interfaces.StringRequestListener
 import com.facebook.stetho.okhttp3.StethoInterceptor
 import de.koenidv.sph.SphPlanner.Companion.TAG
 import de.koenidv.sph.SphPlanner.Companion.applicationContext
-import okhttp3.Cookie
 import okhttp3.OkHttpClient
 import java.util.*
 
@@ -74,39 +73,6 @@ class TokenManager {
             }
         }
     }
-
-
-    /*
-    // DEMO: Getting calendar ics link
-
-    fun getCalendarLink() {
-        // Adding an Network Interceptor for Debugging purpose :
-        val okHttpClient = OkHttpClient.Builder()
-                .addNetworkInterceptor(StethoInterceptor())
-                .cookieJar(CookieStore)
-                .build()
-        AndroidNetworking.initialize(applicationContext(), okHttpClient)
-
-
-        AndroidNetworking.post("https://start.schulportal.hessen.de/kalender.php")
-                .addBodyParameter("f", "iCalAbo")
-                .setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.27 Safari/537.36")
-                .setTag("test")
-                .setPriority(Priority.LOW)
-                .build()
-                .getAsString(object : StringRequestListener {
-                    override fun onResponse(response: String) {
-                        prefs.edit().putString("iCalLink", response).apply()
-                        Log.d(TAG, response)
-                    }
-
-                    override fun onError(error: ANError) {
-                        Toast.makeText(applicationContext(), error.errorDetail, Toast.LENGTH_LONG).show()
-                        Log.d(TAG, error.errorBody)
-                    }
-                })
-    }
-    */
 
     interface TokenGeneratedListener {
         fun onTokenGenerated(token: String)

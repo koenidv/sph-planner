@@ -1,4 +1,4 @@
-package de.koenidv.sph.ui.links
+package de.koenidv.sph.ui
 
 import android.content.Context.MODE_PRIVATE
 import android.content.SharedPreferences
@@ -44,7 +44,6 @@ class LinksFragment : Fragment() {
                 cookieManager.setCookie(domain, "sid=$token")
                 webView.loadUrl(domain)
             }
-
         })
 
         // Only update counter if sign-in was successfull

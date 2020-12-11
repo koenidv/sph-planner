@@ -7,25 +7,25 @@
 
     <fragment
         android:id="@+id/nav_home"
-        android:name="de.koenidv.sph.ui.home.HomeFragment"
+        android:name="de.koenidv.sph.ui.HomeFragment"
         android:label="@string/title_overview"
         tools:layout="@layout/fragment_home" />
 
     <fragment
         android:id="@+id/nav_courses"
-        android:name="de.koenidv.sph.ui.dashboard.DashboardFragment"
+        android:name="de.koenidv.sph.ui.DashboardFragment"
         android:label="@string/title_courses"
         tools:layout="@layout/fragment_dashboard" />
 
     <fragment
         android:id="@+id/nav_messages"
-        android:name="de.koenidv.sph.ui.notifications.NotificationsFragment"
+        android:name="de.koenidv.sph.ui.NotificationsFragment"
         android:label="@string/title_messages"
         tools:layout="@layout/fragment_notifications" />
 
     <fragment
         android:id="@+id/nav_links"
-        android:name="de.koenidv.sph.ui.links.LinksFragment"
+        android:name="de.koenidv.sph.ui.LinksFragment"
         android:label="@string/title_links"
         tools:layout="@layout/fragment_dashboard" />
 </navigation>

@@ -1,4 +1,4 @@
-package de.koenidv.sph.ui.home
+package de.koenidv.sph.ui
 
 import android.content.Context.MODE_PRIVATE
 import android.content.SharedPreferences
@@ -22,8 +22,9 @@ import com.facebook.stetho.okhttp3.StethoInterceptor
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.SphPlanner.Companion.applicationContext
+import de.koenidv.sph.networking.NetworkManager
 import de.koenidv.sph.networking.TokenManager
-import de.koenidv.sph.parsing.ChangeParser
+import de.koenidv.sph.parsing.RawParser
 import okhttp3.OkHttpClient
 
 
@@ -41,21 +42,27 @@ class HomeFragment : Fragment() {
 
         val loginButton = view.findViewById<Button>(R.id.loginButton)
         loginButton.setOnClickListener {
-            TokenManager().generateAccessToken(object : TokenManager.TokenGeneratedListener {
-                override fun onTokenGenerated(token: String) {
-                    Toast.makeText(applicationContext(), "Success", Toast.LENGTH_LONG).show()
+            /*TokenManager().generateAccessToken {
+                Toast.makeText(applicationContext(), "Success", Toast.LENGTH_LONG).show()
+            }*/
+            // Testing load all courses:
+            (NetworkManager().loadSiteWithToken("https://start.schulportal.hessen.de/stundenplan.php", object : StringRequestListener {
+                override fun onResponse(response: String?) {
+                    val courses = RawParser().parseCoursesFromTimetable(response!!)
                 }
-            })
 
+                override fun onError(anError: ANError?) {
+                    Toast.makeText(applicationContext(), anError.toString(), Toast.LENGTH_LONG).show()
+                }
+            }))
 
 
             //
             // Only for testing parsing changes
             //
 
-
             // Adding an Network Interceptor for Debugging purpose :
-            val okHttpClient = OkHttpClient.Builder()
+            /*val okHttpClient = OkHttpClient.Builder()
                     .addNetworkInterceptor(StethoInterceptor())
                     .build()
             AndroidNetworking.initialize(applicationContext(), okHttpClient)
@@ -66,15 +73,14 @@ class HomeFragment : Fragment() {
                     .build()
                     .getAsString(object : StringRequestListener {
                         override fun onResponse(response: String) {
-                            ChangeParser().parseChangesFromRaw(response)
+                            RawParser().parseChanges(response)
                         }
 
                         override fun onError(error: ANError) {
                             Toast.makeText(applicationContext(), error.errorDetail, Toast.LENGTH_LONG).show()
                             Log.d(SphPlanner.TAG, error.errorBody)
                         }
-                    })
-
+                    })*/
 
 
         }

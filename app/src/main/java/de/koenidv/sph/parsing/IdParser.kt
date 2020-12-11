@@ -26,10 +26,20 @@ class IdParser {
      */
     fun getCourseId(courseId: String, courseIdType: Int?, teacherId: String): String {
         // Get id type estimate if no type is passed
-        val courseType = courseIdType ?: getCourseIdType(courseId)
+        val idType = courseIdType ?: getCourseIdType(courseId)
 
-        when (courseIdType) {
+        when (idType) {
             TYPE_INTERNAL -> return courseId
+            TYPE_GMB -> {
+                val classType: String
+                if (courseId.contains("-"))
+                    classType = courseId.substring(0, courseId.indexOf("-")).take(8)
+                else
+                    classType = courseId
+                var index = 1
+                // todo check for duplicate
+                return classType + "_" + teacherId + "_" + index
+            }
             else -> TODO("Parse IDs")
         }
 
@@ -44,8 +54,8 @@ class IdParser {
         val patternNumber = "^\\d{1,4}\$".toRegex() // Number ID: 1-4 digits only
         val patternNamed = "^.*[^-0-9]\\s+.*\$".toRegex() // Named ID: Containing whitespace not following on digit or hyphen
         val patternSph = "^.*\\d\\s-\\s.*\$".toRegex() // SPH ID: Ending with at least one digit followed by " - " and non-digits
-        val patternGmb = "^\\w{1,4}-\\w{1,2}-\\d{1,2}\$".toRegex() // GMB ID: 3 hyphen-separated sets: 1-4 chars, 1-2 chars, 1-2 digits
-        val patternInternal = "^\\w{1,4}_\\w{1,4}_\\d{1,2}\$".toRegex() // Internal ID: 2 underscore-separated sets of 1-4 word characters and 1-2 digits in the end
+        val patternGmb = "^\\w{1,8}-\\w{1,2}-\\d{1,2}\$".toRegex() // GMB ID: 3 hyphen-separated sets: 1-6 chars, 1-2 chars, 1-2 digits
+        val patternInternal = "^\\w{1,8}_\\w{1,4}_\\d{1,2}\$".toRegex() // Internal ID: 2 underscore-separated sets of 1-6 word characters and 1-2 digits in the end
 
         return when {
             patternNumber.matches(courseId) -> TYPE_NUMBER
@@ -63,6 +73,7 @@ class IdParser {
         val formatter = SimpleDateFormat("yyyy-MM-dd")
         var index = 1
 
+        // todo will not work, use allChanges.none { ... }
         while (allChanges.contains(internalCourseId + "_change" + formatter.format(date) + "_$index"))
             index++
 

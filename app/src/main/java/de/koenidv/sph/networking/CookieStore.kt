@@ -18,7 +18,7 @@ object CookieStore : CookieJar {
      */
     override fun saveFromResponse(url: HttpUrl, cookies: List<Cookie>) {
         if (url.host().contains("schulportal.hessen.de"))
-            this.cookies[url.host().substring(url.host().indexOf(".") + 1)] = cookies
+            this.cookies["schulportal.hessen.de"] = cookies
         else
             this.cookies[url.host()] = cookies
 
@@ -31,12 +31,15 @@ object CookieStore : CookieJar {
      */
     override fun loadForRequest(url: HttpUrl): List<Cookie> {
         if (url.host().contains("schulportal.hessen.de"))
-            return cookies[url.host().substring(url.host().indexOf(".") + 1)] ?: ArrayList()
+            return cookies["schulportal.hessen.de"] ?: ArrayList()
         else
             return cookies[url.host()] ?: ArrayList()
 
     }
 
+    /**
+     * Deletes all cookies for all domains
+     */
     fun clearCookies() {
         cookies.clear()
     }

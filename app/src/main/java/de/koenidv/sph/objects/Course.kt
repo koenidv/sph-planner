@@ -10,7 +10,7 @@ data class Course(
         var sph_id: String? = null, // i.e. Q3Mbar01 - GYM
         var named_id: String? = null, // i.e. Mathematik GK 13
         var number_id: String? = null, // i.e. 760
-        var fullname: String, // i.e. Mathe
+        var fullname: String? = null, // i.e. Mathe todo: Set in init()
         var id_teacher: String, // i.e. bar
         var isFavorite: Boolean? = null, // i.e. true (is member of course)
         var isLK: Boolean? = null) { // i.e. false (not intensified course)
@@ -50,16 +50,19 @@ data class Course(
         return courseId.hashCode()
     }
 
+    /* This needs some love
     /**
      * Create a course object with only the necessary values using an internal id
      * @param internalCourseId An internal course id
      */
-    constructor(internalCourseId: String) : this(
+    constructor(internalCourseId : String) : this(
             internalCourseId,
             null, null, null, null,
             CourseParser().getCourseFullnameFromInternald(internalCourseId),
             TeacherParser().teacherIdFromInternalCourseId(internalCourseId),
             null, null)
+
+     */
 
 
     /*

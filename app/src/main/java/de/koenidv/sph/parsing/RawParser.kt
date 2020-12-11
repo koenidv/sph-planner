@@ -2,18 +2,20 @@ package de.koenidv.sph.parsing
 
 import android.annotation.SuppressLint
 import android.util.Log
+import android.widget.Toast
 import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.objects.Change
+import de.koenidv.sph.objects.Course
 import java.text.SimpleDateFormat
 import java.util.*
 
 //  Created by koenidv on 08.12.2020.
-class ChangeParser {
+class RawParser {
 
     // todo documentation
     @Suppress("LocalVariableName")
     @SuppressLint("DefaultLocale")
-    fun parseChangesFromRaw(rawResponse: String): List<Change>? {
+    fun parseChanges(rawResponse : String): List<Change> {
         val changes = mutableListOf<Change>()
 
         // todo check if response is valid
@@ -40,7 +42,7 @@ class ChangeParser {
         // We'll need those below to construct our Change object
         var date: Date
         var internalId: String
-        var id_course_external : String? = ""
+        var id_course_external: String? = ""
         var id_course_external_before: String?
         var lessons: List<Int>
         var type: String
@@ -63,7 +65,7 @@ class ChangeParser {
             rawToday = rawToday.substring(rawToday.indexOf("<tbody>") + 7, rawToday.indexOf("</tbody>"))
 
             // Parse date
-            val dateIndex = ordinalIndexOf(rawContent, "Vertretungen am ", dayInContent) + 16
+            val dateIndex = Utility().ordinalIndexOf(rawContent, "Vertretungen am ", dayInContent) + 16
             date = dateFormat.parse(rawContent.substring(dateIndex, dateIndex + 10))!!
 
             // We are left with a table, each row contains these columns:
@@ -148,20 +150,57 @@ class ChangeParser {
         return changes
     }
 
+
     /**
-     * Helper to get the nth index of a String in a String
-     * @param str String to check
-     * @param substr String to look for
-     * @param n Ordinal of occurance (0 -> First)
-     * @return Index of the nth occurence of a String or -1 if none is found
+     * Parse courses from raw timetable webpage
+     * @param rawResponse Html repsonse from SPH
+     * @return List of all found courses
      */
-    fun ordinalIndexOf(str: String, substr: String?, n: Int): Int {
-        var n = n
-        var pos = -1
-        do {
-            pos = str.indexOf(substr!!, pos + 1)
-        } while (n-- > 0 && pos != -1)
-        return pos
+    fun parseCoursesFromTimetable(rawResponse : String) : List<Course> {
+        val courses = mutableListOf<Course>()
+
+        // Split response into every entry
+        val lessons = rawResponse.split("<div class=\"stunde").toMutableList()
+        lessons[lessons.size - 1] = lessons.last().substring(0, lessons.last().indexOf("</div>"))
+        lessons.removeFirst() // Remove first element, it's not a lesson
+
+        var courseGmbId : String
+        var teacherId : String
+        var courseInternalId: String
+        // Add course from each lesson if not yet added
+        for (lesson in lessons) {
+            // Get gmb id from raw data
+            courseGmbId = lesson
+                    .substring(lesson.indexOf("<b>") + 3, lesson.indexOf("</b>"))
+                    .replace("\n", "")
+                    .replace(" ", "")
+                    .toLowerCase(Locale.ROOT)
+                    .take(14)
+
+            // Check if the course list already contains this id
+            if (courses.none { course -> course.gmb_id == courseGmbId }) {
+                // Get teacher id between <small> tags
+                teacherId = lesson
+                        .substring(lesson.indexOf("<small>") + 7, lesson.indexOf("</small>"))
+                        .replace("\n", "")
+                        .replace(" ", "")
+                        .replace("-", "")
+                        .toLowerCase(Locale.ROOT)
+                        .take(3)
+                // Create internal course id
+                courseInternalId = IdParser().getCourseId(courseGmbId, TYPE_GMB, teacherId)
+                // Add created course to list
+                courses.add(Course(
+                        courseId = courseInternalId,
+                        gmb_id = courseGmbId,
+                        fullname = CourseParser().getCourseFullnameFromInternald(courseInternalId),
+                        id_teacher = teacherId,
+                        isLK = courseGmbId.contains("lk")
+                ))
+            }
+        }
+
+        return courses
     }
 
 }
