@@ -36,7 +36,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     }
 
-    //add to Database
+    /**
+     * @param course course which should be added
+     * @return True, if course was added
+     */
     public boolean addCourse(Course course) {
         SQLiteDatabase  db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
@@ -54,10 +57,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         long insert=db.insert("COURSES", null, cv);
         return insert != -1;
     }
-    public List<Course> getAll(){
+
+    /**
+     * get all courses in database
+     * @return all Courses
+     */
+    public List<Course> getAllCourses(){
 
         List<Course> returnList = new ArrayList<>();
-        //get Data from Database
+
         String queryString = "SELECT * FROM COURSES";
 
         SQLiteDatabase db = this.getReadableDatabase();
@@ -82,5 +90,62 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
         db.close();
         return returnList;
+    }
+    /** search for courses
+     * @param condition will sort for courses which match condition
+     * @return List of all matching courses
+     */
+    public List<Course> getCourseByInternalPrefix(String condition){
+        List<Course> returnList = new ArrayList<>();
+        //Filter Course from Database
+        String queryString = "SELECT * FROM COURSES WHERE course_id LIKE "+ condition;
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor= db.rawQuery(queryString,null);
+        if(cursor.moveToFirst()) {
+            do{
+                //convert cursor to List<Course>
+                String CourseId = cursor.getString(0);
+                String gmb_id = cursor.getString(1);
+                String sph_id = cursor.getString(2);
+                String named_id = cursor.getString(3);
+                String number_id = cursor.getString(4);
+                String fullname = cursor.getString(5);
+                String id_teacher = cursor.getString(6);
+                boolean isFavorite = cursor.getInt(7) == 1;
+                boolean isLK = cursor.getInt(8) == 1;
+
+                Course newCourse = new Course(CourseId,gmb_id,sph_id,named_id,number_id,fullname,id_teacher,isFavorite,isLK);
+                returnList.add(newCourse);
+            }while(cursor.moveToNext());
+        }
+        cursor.close();
+        db.close();
+        return returnList;
+    }
+
+    /**
+     * @param course course which should be deleted
+     * @return True, if course was deleted
+     */
+    public boolean deleteCourse(Course course){
+
+        String queryString = "DELETE FROM COURSES WHERE course_id ="+ course.getCourseId();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor =db.rawQuery(queryString,null);
+
+        if(cursor.moveToFirst()) {
+            cursor.close();
+            db.close();
+            return true;
+        }else{
+            cursor.close();
+            db.close();
+            return false;
+        }
+
+
     }
 }
