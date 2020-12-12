@@ -171,19 +171,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Cursor cursor = db.rawQuery(queryString, null);
         if (cursor.moveToFirst()) {
             do {
-                //convert cursor to List<Course>
-                String CourseId = cursor.getString(0);
-                String gmb_id = cursor.getString(1);
-                String sph_id = cursor.getString(2);
-                String named_id = cursor.getString(3);
-                String number_id = cursor.getString(4);
-                String fullname = cursor.getString(5);
-                String id_teacher = cursor.getString(6);
-                boolean isFavorite = cursor.getInt(7) == 1;
-                boolean isLK = cursor.getInt(8) == 1;
-
-                Course newCourse = new Course(CourseId, gmb_id, sph_id, named_id, number_id, fullname, id_teacher, isFavorite, isLK);
-                returnList.add(newCourse);
+                returnList.add(cursorToCourse(cursor));
             } while (cursor.moveToNext());
         }
         cursor.close();
@@ -193,22 +181,35 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     /**
      * Get a course by named_id
+     * @param namedId External named id to look for
+     * @return Course with specified named id or null if none was found
      */
     public Course getCourseByNamedId(String namedId) {
         Cursor cursor = this.getReadableDatabase().rawQuery("SELECT * FROM courses WHERE named_id='" + namedId + "'", null);
+        // Return first row
         cursor.moveToFirst();
-
         if (cursor.getCount() == 0) return null;
 
-        return new Course(cursor.getString(0),
-                cursor.getString(1),
-                cursor.getString(2),
-                cursor.getString(3),
-                cursor.getString(4),
-                cursor.getString(5),
-                cursor.getString(6),
-                cursor.getInt(7) == 1,
-                cursor.getInt(8) == 1);
+        return cursorToCourse(cursor);
+
+    }
+
+    /**
+     * Get favorite Courses
+     * @return List of favorite courses in db
+     */
+    public List<Course> getFavoriteCourses() {
+        List<Course> returnList = new ArrayList<>();
+        Cursor cursor = this.getReadableDatabase().rawQuery("SELECT * FROM courses WHERE isFavorite=1", null);
+
+        // Add each row to returnList
+        if (cursor.moveToFirst()) {
+            do {
+                returnList.add(cursorToCourse(cursor));
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        return returnList;
 
     }
 
@@ -259,5 +260,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
 
         return newCourse;
+    }
+
+
+    Course cursorToCourse(Cursor cursor) {
+        String CourseId = cursor.getString(0);
+        String gmb_id = cursor.getString(1);
+        String sph_id = cursor.getString(2);
+        String named_id = cursor.getString(3);
+        String number_id = cursor.getString(4);
+        String fullname = cursor.getString(5);
+        String id_teacher = cursor.getString(6);
+        boolean isFavorite = cursor.getInt(7) == 1;
+        boolean isLK = cursor.getInt(8) == 1;
+
+        return new Course(CourseId, gmb_id, sph_id, named_id, number_id, fullname, id_teacher, isFavorite, isLK);
     }
 }

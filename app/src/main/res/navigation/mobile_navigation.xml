@@ -13,7 +13,7 @@
 
     <fragment
         android:id="@+id/nav_courses"
-        android:name="de.koenidv.sph.ui.DashboardFragment"
+        android:name="de.koenidv.sph.ui.CoursesFragment"
         android:label="@string/title_courses"
         tools:layout="@layout/fragment_dashboard" />
 
