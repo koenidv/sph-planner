@@ -15,22 +15,35 @@ import okhttp3.OkHttpClient
 //  Created by koenidv on 11.12.2020.
 class NetworkManager {
 
+    // todo save last refresh for checks
     fun createIndex(listener: DoneListener) {
-        //Firstly, load courses from timetable so we have an overview
-        (NetworkManager().loadSiteWithToken("https://start.schulportal.hessen.de/stundenplan.php", object : StringRequestListener {
+        // Remove old courses, it'll just lead to isses
+        val dbHelper = DatabaseHelper(applicationContext())
+        dbHelper.clear()
+
+        // Firstly, load courses from timetable so we have an overview
+        loadSiteWithToken("https://start.schulportal.hessen.de/stundenplan.php", object : StringRequestListener {
             override fun onResponse(response: String?) {
-                val courses = RawParser().parseCoursesFromTimetable(response!!)
-                val dbHelper = DatabaseHelper(applicationContext())
-                // testing - delete all courses before adding them, db isn't ready yet
-                dbHelper.clear()
-                // testing - dd each course individually as db isn't ready yet
-                dbHelper.save(courses)
+                dbHelper.save(RawParser().parseCoursesFromTimetable(response!!))
+
+                // Secondly, load those courses from study groups to find out where the user belongs
+                loadSiteWithToken("https://start.schulportal.hessen.de/lerngruppen.php", object : StringRequestListener {
+                    override fun onResponse(response: String?) {
+                        dbHelper.setNulledNotFavorite()
+                        dbHelper.save(RawParser().parseCoursesFromStudygroups(response!!))
+                    }
+
+                    override fun onError(anError: ANError?) {
+                        listener.onComplete(false)
+                    }
+                })
+
             }
 
             override fun onError(anError: ANError?) {
                 listener.onComplete(false)
             }
-        }))
+        })
     }
 
 
@@ -39,7 +52,7 @@ class NetworkManager {
      * @param url URL to load
      * @param listener Listen for results
      */
-    fun loadSiteWithToken(url: String, listener: StringRequestListener) {
+    private fun loadSiteWithToken(url: String, listener: StringRequestListener) {
 
         // Getting an access token
         TokenManager().generateAccessToken(object : TokenManager.TokenGeneratedListener {

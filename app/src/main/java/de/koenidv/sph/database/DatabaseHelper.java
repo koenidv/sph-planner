@@ -28,7 +28,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     //create Tables for Database
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String createCoursesTable = "CREATE TABLE courses(  course_id TEXT UNIQUE PRIMARY KEY, gmb_id TEXT UNIQUE, sph_id TEXT UNIQUE, named_id TEXT UNIQUE, number_id TEXT UNIQUE, fullname TEXT, id_Teacher TEXT, isFavorite BOOL, isLK Bool)";
+        String createCoursesTable = "CREATE TABLE courses(  course_id TEXT UNIQUE PRIMARY KEY, gmb_id TEXT UNIQUE, sph_id TEXT UNIQUE, named_id TEXT UNIQUE, number_id TEXT UNIQUE, fullname TEXT, id_teacher TEXT, isFavorite BOOL, isLK Bool)";
         String createChangesTable = "";
 
         db.execSQL(createCoursesTable);
@@ -78,7 +78,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if (course.getNamed_id() != null) cv.put("named_id", course.getNamed_id());
         if (course.getNumber_id() != null) cv.put("number_id", course.getNumber_id());
         if (course.getFullname() != null) cv.put("fullname", course.getFullname());
-        cv.put("id_Teacher", course.getId_teacher()); // Will never be null
+        cv.put("id_teacher", course.getId_teacher()); // Will never be null
         if (course.isFavorite() != null) cv.put("isFavorite", course.isFavorite());
         if (course.isLK() != null) cv.put("isLK", course.isLK());
 
@@ -109,8 +109,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.insert("courses", null, cv);
         else
             db.update("courses", cv, "course_id = '" + course.getCourseId() + "'", null);
+    }
 
-        //db.close();
+    /**
+     * This will set all courses with isFavorite = null in the db to isFavorite = false
+     * Used in course indexing where we know which courses are favorites, but not which are not
+     */
+    public void setNulledNotFavorite() {
+        SQLiteDatabase db = this.getWritableDatabase();
+            db.rawQuery("UPDATE courses SET isFavorite='false' WHERE isFavorite IS NULL", null).close();
     }
 
     /**

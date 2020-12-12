@@ -27,51 +27,115 @@ class IdParser {
      * @param teacherId The course teacher's id
      * @return Parsed internal id
      */
-    fun getCourseId(courseId: String, courseIdType: Int?, teacherId: String, allCourses: List<Course>? = null): String {
+    fun getCourseId(courseId: String, courseIdType: Int?, teacherId: String): String {
         // Get id type estimate if no type is passed
-        val idType = courseIdType ?: getCourseIdType(courseId)
 
-        when (idType) {
-            TYPE_INTERNAL -> return courseId
-            TYPE_GMB -> {
-                val classType: String
-
-                // GMB id might in some cases not include a dash
-                if (courseId.contains("-"))
-                    classType = courseId.substring(0, courseId.indexOf("-")).take(8)
-                else
-                    classType = courseId.take(8)
-
-                // Check if a course with the same internal id but different data already exists
-                var index = 1
-                val coursesWithSameId: List<Course>
-                // Get courses with same internal id prefix from dataset or database
-                coursesWithSameId = allCourses?.filter { it.courseId.startsWith(classType + "_" + teacherId + "_") }
-                        ?: DatabaseHelper(SphPlanner.applicationContext()).getCourseByInternalPrefix(classType + "_" + teacherId + "_")
-                var checkForNewIndex = coursesWithSameId.isNotEmpty()
-                var courseToCheck: Course
-                while (checkForNewIndex) {
-                    // Use current index if no same course was found
-                    if (index == coursesWithSameId.size + 1) {
-                        checkForNewIndex = false
-                    } else {
-                        // Use current index if there's already an interal id for this specific course
-                        courseToCheck = coursesWithSameId[index - 1]
-                        if (Utility().nullOrEquals(courseToCheck.gmb_id, courseId)
-                                // No real need to check this as check for gmb_id already includes it, we'll keep it here anyways
-                                && Utility().nullOrEquals(courseToCheck.isLK, courseId.toLowerCase(Locale.ROOT).contains("lk")))
-                            checkForNewIndex = false
-                        else
-                        // If internal id belongs to another course, try the next one
-                            index++
-                    }
-                }
-                // Return id, example: m_bar_1 or ch_cas_2
-                return classType + "_" + teacherId + "_" + index
-            }
+        return when (courseIdType ?: getCourseIdType(courseId)) {
+            TYPE_INTERNAL -> courseId
+            TYPE_GMB -> getCourseIdWithGmb(courseId, teacherId)
+            TYPE_SPH -> getCourseIdWithSph(courseId, teacherId, null)
             else -> TODO("Parse IDs")
         }
 
+    }
+
+    /**
+     * Returns an internal id for a gmb id and teacher id
+     * @param courseGmbId External course id from gmb
+     * @param teacherId The course's teacher id
+     * @param allCourses List of all courses to compare to. Will use database if unspecified
+     * @return Internal id for this course
+     */
+    fun getCourseIdWithGmb(courseGmbId: String, teacherId: String, allCourses: List<Course>? = null): String {
+        val classType: String
+
+        // GMB id might in some cases not include a dash
+        if (courseGmbId.contains("-"))
+            classType = courseGmbId.substring(0, courseGmbId.indexOf("-")).take(8)
+        else
+            classType = courseGmbId.take(8)
+
+        // Check if a course with the same internal id but different data already exists
+        var index = 1
+        var coursesWithSameId: List<Course>
+        // Get courses with same subject from dataset or database
+        coursesWithSameId = allCourses?.filter { it.courseId.startsWith(classType + "_") }
+                ?: DatabaseHelper(SphPlanner.applicationContext()).getCourseByInternalPrefix(classType + "_")
+        coursesWithSameId = coursesWithSameId.filter { it.isLK == courseGmbId.toLowerCase(Locale.ROOT).contains("lk") }
+        var checkForNewIndex = coursesWithSameId.isNotEmpty()
+        var courseToCheck: Course
+        while (checkForNewIndex) {
+            // Use current index if no same course was found
+            if (index == coursesWithSameId.size + 1) {
+                checkForNewIndex = false
+            } else {
+                // Use current index if there's already an interal id for this specific course
+                courseToCheck = coursesWithSameId[index - 1]
+                if (Utility().nullOrEquals(courseToCheck.gmb_id, courseGmbId)
+                        // No real need to check this as check for gmb_id already includes it, we'll keep it here anyways
+                        && Utility().nullOrEquals(courseToCheck.isLK, courseGmbId.toLowerCase(Locale.ROOT).contains("lk")))
+                    checkForNewIndex = false
+                else
+                // If internal id belongs to another course, try the next one
+                    index++
+            }
+        }
+        // Make sure there isn't another course with the same id
+        // This might happen if a teacher has both a GK and LK with the same subject
+        while ((allCourses?.filter { it.courseId == classType + "_" + teacherId + "_" + index }
+                        ?: DatabaseHelper(SphPlanner.applicationContext()).getCourseByInternalPrefix(classType + "_" + teacherId + "_" + index)).isNotEmpty()) {
+            index++
+        }
+        // Return id, example: m_bar_1 or ch_cas_2
+        return classType + "_" + teacherId + "_" + index
+    }
+
+    /**
+     * Returns an internal id for a gmb id and teacher id
+     * @param courseSphId External course id from sph
+     * @param teacherId The course's teacher id
+     * @param isLK If course is LK. Strongly advised to be specified for better accuracy
+     * @param allCourses List of all courses to compare to. Will use database if unspecified
+     * @return Internal id for this course
+     */
+    fun getCourseIdWithSph(courseSphId: String, teacherId: String, isLK: Boolean?, allCourses: List<Course>? = null): String {
+        // Extract some useful information from the external course id
+        val values = Regex("""([A-Z]{1,8})(?:[a-z]+)?(\d{2,3})""").find(courseSphId)!!.groupValues
+        val classType = values[1].toLowerCase(Locale.ROOT) // Get class type (i.e. G from Q3Gvac03)
+        val sphIndex = values[2].toInt().toString() // Get sph's index (i.e. 3 from Q3Gvac03)
+
+        // Check if there's already a matching course using sph's index
+        // ! This is still very vague
+        var filteredCourses = allCourses?.filter { it.courseId == classType + "_" + teacherId + "_" + sphIndex }
+                ?: DatabaseHelper(SphPlanner.applicationContext()).getCourseByInternalPrefix(classType + "_" + teacherId + "_" + sphIndex)
+        // The list should only contain 0 or 1 elements (unique id)
+        // Apart from classType and teacherId, isLK is the only property we can trust
+        if (filteredCourses.isNotEmpty()) {
+            return if (isLK != null && filteredCourses[0].isLK == isLK) {
+                classType + "_" + teacherId + "_" + sphIndex
+            } else {
+                // Just assume it's correct if nothing is specified for isLK
+                classType + "_" + teacherId + "_" + sphIndex
+            }
+        }
+
+        // sph index is not the same as internal index or course has not been seen yet
+        // Check if there's a matching course with any index
+        filteredCourses = allCourses?.filter { it.courseId == classType + "_" + teacherId + "_" }
+                ?: DatabaseHelper(SphPlanner.applicationContext()).getCourseByInternalPrefix(classType + "_" + teacherId + "_")
+        if (isLK != null) filteredCourses = filteredCourses.filter { it.isLK == isLK }
+
+        // If there are multiple courses with the same subject by the same teacher which are all LK/GK,
+        // there's no way for us to know which one is meant
+        // Therefore we'll just return the first one and hope for the best
+        // todo Ask user if course assignment is too vague
+        if (filteredCourses.isNotEmpty()) return filteredCourses[0].courseId
+
+        // If a matching course hasn't been seen before, we'll create a new id
+        // Check if there are any courses with the same prefix and use the next index
+        filteredCourses = allCourses?.filter { it.courseId == classType + "_" + teacherId + "_" }
+                ?: DatabaseHelper(SphPlanner.applicationContext()).getCourseByInternalPrefix(classType + "_" + teacherId + "_")
+        return classType + "_" + teacherId + "_" + filteredCourses.size + 1
     }
 
     /**

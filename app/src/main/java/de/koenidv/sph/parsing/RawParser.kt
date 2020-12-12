@@ -187,7 +187,7 @@ class RawParser {
                         .toLowerCase(Locale.ROOT)
                         .take(3)
                 // Create internal course id
-                courseInternalId = IdParser().getCourseId(courseGmbId, TYPE_GMB, teacherId, courses)
+                courseInternalId = IdParser().getCourseIdWithGmb(courseGmbId, teacherId, courses)
                 // Add created course to list
                 courses.add(Course(
                         courseId = courseInternalId,
@@ -202,4 +202,51 @@ class RawParser {
         return courses
     }
 
+
+    /**
+     * Parse courses from raw study groups webpage
+     * @param rawResponse Html repsonse from SPH
+     * @return List of all found courses
+     */
+    fun parseCoursesFromStudygroups(rawResponse : String) : List<Course> {
+        val courses = mutableListOf<Course>()
+        // Remove stuff we don't need
+        // There are multiple tables in this page, we'll just take the first one
+        val rawContent = rawResponse.substring(rawResponse.indexOf("<tbody>") + 7, rawResponse.indexOf("</tbody>"))
+
+        /*
+         * It seems as if the sph id index is in the same order as the timetable
+         * i.e. Q3Gvac03 - GYM is the 3rd History GK in the timetable
+         * This means that the internal id's should be in the same order as they're taken from it
+         * Let's just hope the best
+         */
+
+        val rawContents = rawContent.split("<tr").toMutableList()
+        rawContents.removeFirst()
+
+        var namedId : String
+        var sphId : String
+        var teacherId : String
+        var internalId : String
+
+        // Get data from each table row and save the courses
+        for (entry in rawContents) {
+            namedId = entry.substring(Utility().ordinalIndexOf(entry, "<td>", 1) + 4, entry.indexOf("<small>") - 1).trim()
+            sphId = entry.substring(entry.indexOf("<small>") + 8, entry.indexOf("</small>") - 1)
+            teacherId = entry.substring(Utility().ordinalIndexOf(entry, "<td>", 2))
+                    teacherId = teacherId.substring(teacherId.indexOf("(") + 1, teacherId.indexOf(")")).toLowerCase(Locale.ROOT)
+            internalId = IdParser().getCourseId(sphId, TYPE_SPH, teacherId)
+
+            courses.add(Course(
+                    courseId = internalId,
+                    sph_id = sphId,
+                    named_id = namedId,
+                    fullname = CourseParser().getCourseFullnameFromInternald(internalId),
+                    id_teacher = teacherId,
+                    isFavorite = true
+            ))
+        }
+
+        return courses
+    }
 }
