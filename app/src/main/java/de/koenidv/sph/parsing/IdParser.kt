@@ -103,7 +103,8 @@ class IdParser {
         var index = 1
 
         // todo will not work, use allChanges.none { ... }
-        while (allChanges.contains(internalCourseId + "_change" + formatter.format(date) + "_$index"))
+        while (allChanges.contains(internalCourseId + "_change" + formatter.format(date) + "_$index")
+        )
             index++
 
         return internalCourseId + "_change" + formatter.format(date) + "_$index"

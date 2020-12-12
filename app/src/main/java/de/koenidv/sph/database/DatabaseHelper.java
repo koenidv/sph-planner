@@ -44,38 +44,81 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * Clears all courses from course db
      */
     public void clear() {
-        SQLiteDatabase  db = this.getWritableDatabase();
+        SQLiteDatabase db = this.getWritableDatabase();
         //db.rawQuery("DELETE FROM courses", null).close();
         db.delete("courses", null, null);
     }
 
     /**
-     * @param course course which should be added
-     * @return True, if course was added
+     * Adds or updates courses in the database
+     * Will override everything for the same course_id if it's not null
+     *
+     * @param courses List of courses to be added or updated
      */
-    public boolean addCourse(Course course) {
-        SQLiteDatabase  db = this.getWritableDatabase();
+    public void save(List<Course> courses) {
+        for (Course course : courses) {
+            save(course);
+        }
+    }
+
+    /**
+     * Adds or updates a course in the database
+     * Will override everything for the same course_id if it's not null
+     *
+     * @param course course to be added or updated
+     */
+    public void save(Course course) {
+        SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
 
-        cv.put("course_id",course.getCourseId());
-        cv.put("gmb_id",course.getGmb_id());
-        cv.put("sph_id",course.getSph_id());
-        cv.put("named_id",course.getNamed_id());
-        cv.put("number_id",course.getNumber_id());
-        cv.put("fullname",course.getFullname());
-        cv.put("id_Teacher",course.getId_teacher());
-        cv.put("isFavorite",course.isFavorite());
-        cv.put("isLK",course.isLK());
+        // Only use values that are non-null
+        cv.put("course_id", course.getCourseId());
+        if (course.getGmb_id() != null) cv.put("gmb_id", course.getGmb_id());
+        if (course.getSph_id() != null) cv.put("sph_id", course.getSph_id());
+        if (course.getNamed_id() != null) cv.put("named_id", course.getNamed_id());
+        if (course.getNumber_id() != null) cv.put("number_id", course.getNumber_id());
+        if (course.getFullname() != null) cv.put("fullname", course.getFullname());
+        cv.put("id_Teacher", course.getId_teacher()); // Will never be null
+        if (course.isFavorite() != null) cv.put("isFavorite", course.isFavorite());
+        if (course.isLK() != null) cv.put("isLK", course.isLK());
 
-        long insert=db.insert("courses", null, cv);
-        return insert != -1;
+
+        /* Aaaah nevermind
+
+        StringBuilder keys = new StringBuilder();
+        StringBuilder createValues = new StringBuilder();
+        StringBuilder updateValues = new StringBuilder();
+
+        String prefix = "";
+        for (String key : cv.keySet()) {
+            keys.append(prefix).append(key);
+            createValues.append(prefix).append("'").append(cv.get(key)).append("'");
+            updateValues.append(prefix).append(key).append("='").append(cv.get(key)).append("'");
+            prefix = ",";
+        }
+
+        // Create row or ignore if it already exists
+        db.rawQuery("INSERT OR IGNORE INTO courses (" + keys.toString() + ") VALUES (" + createValues.toString() + ")", null);
+        // Update row with our data
+        db.rawQuery("UPDATE courses SET " + updateValues.toString() + " WHERE course_id='" + course.getCourseId() + "'", null);
+         */
+
+
+        // Check if row exists and insert or update accordingly
+        if (db.rawQuery("SELECT * FROM courses WHERE course_id = '" + course.getCourseId() + "'", null).getCount() == 0)
+            db.insert("courses", null, cv);
+        else
+            db.update("courses", cv, "course_id = '" + course.getCourseId() + "'", null);
+
+        //db.close();
     }
 
     /**
      * get all courses in database
+     *
      * @return all Courses
      */
-    public List<Course> getAllCourses(){
+    public List<Course> getAllCourses() {
 
         List<Course> returnList = new ArrayList<>();
 
@@ -83,9 +126,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         SQLiteDatabase db = this.getReadableDatabase();
 
-        Cursor cursor= db.rawQuery(queryString,null);
-        if(cursor.moveToFirst()) {
-            do{
+        Cursor cursor = db.rawQuery(queryString, null);
+        if (cursor.moveToFirst()) {
+            do {
                 String CourseId = cursor.getString(0);
                 String gmb_id = cursor.getString(1);
                 String sph_id = cursor.getString(2);
@@ -96,28 +139,31 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 boolean isFavorite = cursor.getInt(7) == 1;
                 boolean isLK = cursor.getInt(8) == 1;
 
-                Course newCourse = new Course(CourseId,gmb_id,sph_id,named_id,number_id,fullname,id_teacher,isFavorite,isLK);
+                Course newCourse = new Course(CourseId, gmb_id, sph_id, named_id, number_id, fullname, id_teacher, isFavorite, isLK);
                 returnList.add(newCourse);
-            }while(cursor.moveToNext());
+            } while (cursor.moveToNext());
         }
         cursor.close();
         db.close();
         return returnList;
     }
-    /** search for courses
+
+    /**
+     * search for courses
+     *
      * @param condition will sort for courses which match condition
      * @return List of all matching courses
      */
-    public List<Course> getCourseByInternalPrefix(String condition){
+    public List<Course> getCourseByInternalPrefix(String condition) {
         List<Course> returnList = new ArrayList<>();
         //Filter Course from Database
         String queryString = "SELECT * FROM courses WHERE course_id LIKE \"" + condition + "%\" ORDER BY course_id ASC";
 
         SQLiteDatabase db = this.getReadableDatabase();
 
-        Cursor cursor= db.rawQuery(queryString,null);
-        if(cursor.moveToFirst()) {
-            do{
+        Cursor cursor = db.rawQuery(queryString, null);
+        if (cursor.moveToFirst()) {
+            do {
                 //convert cursor to List<Course>
                 String CourseId = cursor.getString(0);
                 String gmb_id = cursor.getString(1);
@@ -129,9 +175,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 boolean isFavorite = cursor.getInt(7) == 1;
                 boolean isLK = cursor.getInt(8) == 1;
 
-                Course newCourse = new Course(CourseId,gmb_id,sph_id,named_id,number_id,fullname,id_teacher,isFavorite,isLK);
+                Course newCourse = new Course(CourseId, gmb_id, sph_id, named_id, number_id, fullname, id_teacher, isFavorite, isLK);
                 returnList.add(newCourse);
-            }while(cursor.moveToNext());
+            } while (cursor.moveToNext());
         }
         cursor.close();
         db.close();
@@ -142,18 +188,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * @param course course which should be deleted
      * @return True, if course was deleted
      */
-    public boolean deleteCourse(Course course){
+    public boolean deleteCourse(Course course) {
 
-        String queryString = "DELETE FROM courses WHERE course_id ="+ course.getCourseId();
+        String queryString = "DELETE FROM courses WHERE course_id =" + course.getCourseId();
         SQLiteDatabase db = this.getReadableDatabase();
 
-        Cursor cursor =db.rawQuery(queryString,null);
+        Cursor cursor = db.rawQuery(queryString, null);
 
-        if(cursor.moveToFirst()) {
+        if (cursor.moveToFirst()) {
             cursor.close();
             db.close();
             return true;
-        }else{
+        } else {
             cursor.close();
             db.close();
             return false;
@@ -162,11 +208,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     }
 
-    public Course getCourseByGmb_id(String Gmb_id){
-        String queryString = "SELECT * FROM courses WHERE gmb_id = "+ Gmb_id;
+    public Course getCourseByGmb_id(String Gmb_id) {
+        String queryString = "SELECT * FROM courses WHERE gmb_id = " + Gmb_id;
         SQLiteDatabase db = this.getReadableDatabase();
 
-        Cursor cursor =db.rawQuery(queryString,null);
+        Cursor cursor = db.rawQuery(queryString, null);
         cursor.moveToFirst();
 
         String CourseId = cursor.getString(0);
@@ -179,7 +225,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         boolean isFavorite = cursor.getInt(7) == 1;
         boolean isLK = cursor.getInt(8) == 1;
 
-        Course newCourse = new Course(CourseId,gmb_id,sph_id,named_id,number_id,fullname,id_teacher,isFavorite,isLK);
+        Course newCourse = new Course(CourseId, gmb_id, sph_id, named_id, number_id, fullname, id_teacher, isFavorite, isLK);
 
         cursor.close();
         db.close();

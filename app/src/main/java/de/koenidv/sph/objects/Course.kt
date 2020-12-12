@@ -1,8 +1,5 @@
 package de.koenidv.sph.objects
 
-import de.koenidv.sph.parsing.CourseParser
-import de.koenidv.sph.parsing.TeacherParser
-
 //  Created by koenidv on 06.12.2020.
 data class Course(
         var courseId: String, // i.e. m_bar_1

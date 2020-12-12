@@ -1,12 +1,10 @@
 package de.koenidv.sph.networking
 
-import android.util.Log
 import com.androidnetworking.AndroidNetworking
 import com.androidnetworking.common.Priority
 import com.androidnetworking.error.ANError
 import com.androidnetworking.interfaces.StringRequestListener
 import com.facebook.stetho.okhttp3.StethoInterceptor
-import de.koenidv.sph.SphPlanner.Companion.TAG
 import de.koenidv.sph.SphPlanner.Companion.applicationContext
 import de.koenidv.sph.database.DatabaseHelper
 import de.koenidv.sph.parsing.RawParser
@@ -26,10 +24,7 @@ class NetworkManager {
                 // testing - delete all courses before adding them, db isn't ready yet
                 dbHelper.clear()
                 // testing - dd each course individually as db isn't ready yet
-                for (course in courses) {
-                    val success = dbHelper.addCourse(course)
-                    if (!success) Log.d(TAG, course.toString())
-                }
+                dbHelper.save(courses)
             }
 
             override fun onError(anError: ANError?) {
