@@ -3,6 +3,7 @@ package de.koenidv.sph.parsing
 import android.annotation.SuppressLint
 import android.util.Log
 import de.koenidv.sph.SphPlanner
+import de.koenidv.sph.database.DatabaseHelper
 import de.koenidv.sph.objects.Change
 import de.koenidv.sph.objects.Course
 import java.text.SimpleDateFormat
@@ -192,7 +193,6 @@ class RawParser {
                 courses.add(Course(
                         courseId = courseInternalId,
                         gmb_id = courseGmbId,
-                        fullname = CourseParser().getCourseFullnameFromInternald(courseInternalId),
                         id_teacher = teacherId,
                         isLK = courseGmbId.contains("lk")
                 ))
@@ -235,16 +235,57 @@ class RawParser {
             sphId = entry.substring(entry.indexOf("<small>") + 8, entry.indexOf("</small>") - 1)
             teacherId = entry.substring(Utility().ordinalIndexOf(entry, "<td>", 2))
                     teacherId = teacherId.substring(teacherId.indexOf("(") + 1, teacherId.indexOf(")")).toLowerCase(Locale.ROOT)
-            internalId = IdParser().getCourseId(sphId, TYPE_SPH, teacherId)
+            internalId = IdParser().getCourseIdWithSph(sphId, teacherId, entry.contains("LK"))
 
             courses.add(Course(
                     courseId = internalId,
                     sph_id = sphId,
                     named_id = namedId,
-                    fullname = CourseParser().getCourseFullnameFromInternald(internalId),
                     id_teacher = teacherId,
-                    isFavorite = true
+                    fullname = namedId.substring(0, namedId.indexOf(" ")),
+                    isFavorite = true,
+                    isLK = entry.contains("LK")
             ))
+        }
+
+        return courses
+    }
+
+
+    /**
+     * Parse courses from raw post overview webpage
+     * @param rawResponse Html repsonse from SPH
+     * @return List of all found courses
+     */
+    fun parseCoursesFromPostsoverview(rawResponse: String): List<Course> {
+        val courses = mutableListOf<Course>()
+        // Remove stuff we don't need, get second menu <ul>
+        @Suppress("VARIABLE_WITH_REDUNDANT_INITIALIZER") var rawContent = rawResponse.substring(rawResponse.indexOf("<ul role=\"menu\"") + 15)
+        rawContent = rawContent.substring(rawContent.indexOf("<ul role=\"menu\""))
+        rawContent = rawContent.substring(0, rawContent.indexOf("</ul>"))
+
+        val rawContents = rawContent.split("<li >").toMutableList()
+        rawContents.removeFirst() // Trash
+        rawContents.removeFirst() // Overview link
+
+        var courseName : String
+        var courseId : String
+        var courseWithNamedId : Course?
+        // Get values from list
+        for (entry in rawContents) {
+            if (entry.contains("a=sus_view&id=")) {
+                courseId = entry.substring(entry.indexOf("a=sus_view&id=") + 14)
+                courseId = courseId.substring(0, courseId.indexOf("\""))
+                courseName = entry.substring(entry.indexOf("</span>") + 7, entry.indexOf("</a>")).trim()
+
+                // todo create new courses with teacher_id instead of using old ones: might not be available
+                // todo ! Info (instead of Informatik) for example will not be recognized
+                courseWithNamedId = DatabaseHelper(SphPlanner.applicationContext()).getCourseByNamedId(courseName)
+                if (courseWithNamedId != null) {
+                    courseWithNamedId.number_id = courseId
+                    courses.add(courseWithNamedId)
+                }
+            }
         }
 
         return courses

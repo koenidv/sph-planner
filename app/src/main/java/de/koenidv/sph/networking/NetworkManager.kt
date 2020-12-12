@@ -31,6 +31,17 @@ class NetworkManager {
                     override fun onResponse(response: String?) {
                         dbHelper.setNulledNotFavorite()
                         dbHelper.save(RawParser().parseCoursesFromStudygroups(response!!))
+
+                        // Lastly, load courses again from posts overview to get number ids
+                        loadSiteWithToken("https://start.schulportal.hessen.de/meinunterricht.php", object : StringRequestListener {
+                            override fun onResponse(response: String?) {
+                                dbHelper.save(RawParser().parseCoursesFromPostsoverview(response!!))
+                            }
+
+                            override fun onError(anError: ANError?) {
+                                listener.onComplete(false)
+                            }
+                        })
                     }
 
                     override fun onError(anError: ANError?) {

@@ -117,7 +117,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      */
     public void setNulledNotFavorite() {
         SQLiteDatabase db = this.getWritableDatabase();
-            db.rawQuery("UPDATE courses SET isFavorite='false' WHERE isFavorite IS NULL", null).close();
+        db.rawQuery("UPDATE courses SET isFavorite='false' WHERE isFavorite IS NULL", null).close();
     }
 
     /**
@@ -189,6 +189,27 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
         db.close();
         return returnList;
+    }
+
+    /**
+     * Get a course by named_id
+     */
+    public Course getCourseByNamedId(String namedId) {
+        Cursor cursor = this.getReadableDatabase().rawQuery("SELECT * FROM courses WHERE named_id='" + namedId + "'", null);
+        cursor.moveToFirst();
+
+        if (cursor.getCount() == 0) return null;
+
+        return new Course(cursor.getString(0),
+                cursor.getString(1),
+                cursor.getString(2),
+                cursor.getString(3),
+                cursor.getString(4),
+                cursor.getString(5),
+                cursor.getString(6),
+                cursor.getInt(7) == 1,
+                cursor.getInt(8) == 1);
+
     }
 
     /**
