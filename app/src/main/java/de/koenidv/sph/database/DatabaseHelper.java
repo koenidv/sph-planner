@@ -28,7 +28,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     //create Tables for Database
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String createCoursesTable = "CREATE TABLE courses(  course_id TEXT UNIQUE PRIMARY KEY, gmb_id TEXT UNIQUE, sph_id TEXT UNIQUE, named_id TEXT UNIQUE, number_id TEXT UNIQUE, fullname TEXT, id_teacher TEXT, isFavorite BOOL, isLK Bool)";
+        String createCoursesTable = "CREATE TABLE courses(course_id TEXT UNIQUE PRIMARY KEY, gmb_id TEXT UNIQUE, sph_id TEXT UNIQUE, named_id TEXT UNIQUE, number_id TEXT UNIQUE, fullname TEXT, id_teacher TEXT, isFavorite INTEGER, isLK INTEGER)";
         String createChangesTable = "";
 
         db.execSQL(createCoursesTable);
@@ -116,8 +116,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * Used in course indexing where we know which courses are favorites, but not which are not
      */
     public void setNulledNotFavorite() {
-        SQLiteDatabase db = this.getWritableDatabase();
-        db.rawQuery("UPDATE courses SET isFavorite='false' WHERE isFavorite IS NULL", null).close();
+        this.getReadableDatabase().execSQL("UPDATE courses SET isFavorite = 0 WHERE isFavorite IS NULL");
     }
 
     /**
