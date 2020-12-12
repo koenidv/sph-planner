@@ -2,7 +2,6 @@ package de.koenidv.sph.parsing
 
 import android.annotation.SuppressLint
 import android.util.Log
-import android.widget.Toast
 import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.objects.Change
 import de.koenidv.sph.objects.Course
@@ -188,7 +187,7 @@ class RawParser {
                         .toLowerCase(Locale.ROOT)
                         .take(3)
                 // Create internal course id
-                courseInternalId = IdParser().getCourseId(courseGmbId, TYPE_GMB, teacherId)
+                courseInternalId = IdParser().getCourseId(courseGmbId, TYPE_GMB, teacherId, courses)
                 // Add created course to list
                 courses.add(Course(
                         courseId = courseInternalId,

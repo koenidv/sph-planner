@@ -1,10 +1,15 @@
 package de.koenidv.sph.networking
 
+import android.util.Log
 import com.androidnetworking.AndroidNetworking
 import com.androidnetworking.common.Priority
+import com.androidnetworking.error.ANError
 import com.androidnetworking.interfaces.StringRequestListener
 import com.facebook.stetho.okhttp3.StethoInterceptor
+import de.koenidv.sph.SphPlanner.Companion.TAG
 import de.koenidv.sph.SphPlanner.Companion.applicationContext
+import de.koenidv.sph.database.DatabaseHelper
+import de.koenidv.sph.parsing.RawParser
 import okhttp3.Cookie
 import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
@@ -12,7 +17,34 @@ import okhttp3.OkHttpClient
 //  Created by koenidv on 11.12.2020.
 class NetworkManager {
 
-    fun loadSiteWithToken(url : String, listener : StringRequestListener) {
+    fun createIndex(listener: DoneListener) {
+        //Firstly, load courses from timetable so we have an overview
+        (NetworkManager().loadSiteWithToken("https://start.schulportal.hessen.de/stundenplan.php", object : StringRequestListener {
+            override fun onResponse(response: String?) {
+                val courses = RawParser().parseCoursesFromTimetable(response!!)
+                val dbHelper = DatabaseHelper(applicationContext())
+                // testing - delete all courses before adding them, db isn't ready yet
+                dbHelper.clear()
+                // testing - dd each course individually as db isn't ready yet
+                for (course in courses) {
+                    val success = dbHelper.addCourse(course)
+                    if (!success) Log.d(TAG, course.toString())
+                }
+            }
+
+            override fun onError(anError: ANError?) {
+                listener.onComplete(false)
+            }
+        }))
+    }
+
+
+    /**
+     * Loads a url within the sph and handles authentication
+     * @param url URL to load
+     * @param listener Listen for results
+     */
+    fun loadSiteWithToken(url: String, listener: StringRequestListener) {
 
         // Getting an access token
         TokenManager().generateAccessToken(object : TokenManager.TokenGeneratedListener {
@@ -36,7 +68,11 @@ class NetworkManager {
                         .build()
                         .getAsString(listener)
             }
-            })
+        })
 
+    }
+
+    interface DoneListener {
+        fun onComplete(success: Boolean)
     }
 }

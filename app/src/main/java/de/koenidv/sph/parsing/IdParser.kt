@@ -1,7 +1,10 @@
 package de.koenidv.sph.parsing
 
 import android.annotation.SuppressLint
+import de.koenidv.sph.SphPlanner
+import de.koenidv.sph.database.DatabaseHelper
 import de.koenidv.sph.objects.Change
+import de.koenidv.sph.objects.Course
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -24,7 +27,7 @@ class IdParser {
      * @param teacherId The course teacher's id
      * @return Parsed internal id
      */
-    fun getCourseId(courseId: String, courseIdType: Int?, teacherId: String): String {
+    fun getCourseId(courseId: String, courseIdType: Int?, teacherId: String, allCourses: List<Course>? = null): String {
         // Get id type estimate if no type is passed
         val idType = courseIdType ?: getCourseIdType(courseId)
 
@@ -32,12 +35,38 @@ class IdParser {
             TYPE_INTERNAL -> return courseId
             TYPE_GMB -> {
                 val classType: String
+
+                // GMB id might in some cases not include a dash
                 if (courseId.contains("-"))
                     classType = courseId.substring(0, courseId.indexOf("-")).take(8)
                 else
-                    classType = courseId
+                    classType = courseId.take(8)
+
+                // Check if a course with the same internal id but different data already exists
                 var index = 1
-                // todo check for duplicate
+                val coursesWithSameId: List<Course>
+                // Get courses with same internal id prefix from dataset or database
+                coursesWithSameId = allCourses?.filter { it.courseId.startsWith(classType + "_" + teacherId + "_") }
+                        ?: DatabaseHelper(SphPlanner.applicationContext()).getCourseByInternalPrefix(classType + "_" + teacherId + "_")
+                var checkForNewIndex = coursesWithSameId.isNotEmpty()
+                var courseToCheck: Course
+                while (checkForNewIndex) {
+                    // Use current index if no same course was found
+                    if (index == coursesWithSameId.size + 1) {
+                        checkForNewIndex = false
+                    } else {
+                        // Use current index if there's already an interal id for this specific course
+                        courseToCheck = coursesWithSameId[index - 1]
+                        if (Utility().nullOrEquals(courseToCheck.gmb_id, courseId)
+                                // No real need to check this as check for gmb_id already includes it, we'll keep it here anyways
+                                && Utility().nullOrEquals(courseToCheck.isLK, courseId.toLowerCase(Locale.ROOT).contains("lk")))
+                            checkForNewIndex = false
+                        else
+                        // If internal id belongs to another course, try the next one
+                            index++
+                    }
+                }
+                // Return id, example: m_bar_1 or ch_cas_2
                 return classType + "_" + teacherId + "_" + index
             }
             else -> TODO("Parse IDs")

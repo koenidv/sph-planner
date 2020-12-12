@@ -5,7 +5,6 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,18 +13,9 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import com.androidnetworking.AndroidNetworking
-import com.androidnetworking.common.Priority
-import com.androidnetworking.error.ANError
-import com.androidnetworking.interfaces.StringRequestListener
-import com.facebook.stetho.okhttp3.StethoInterceptor
 import de.koenidv.sph.R
-import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.SphPlanner.Companion.applicationContext
 import de.koenidv.sph.networking.NetworkManager
-import de.koenidv.sph.networking.TokenManager
-import de.koenidv.sph.parsing.RawParser
-import okhttp3.OkHttpClient
 
 
 class HomeFragment : Fragment() {
@@ -45,16 +35,11 @@ class HomeFragment : Fragment() {
             /*TokenManager().generateAccessToken {
                 Toast.makeText(applicationContext(), "Success", Toast.LENGTH_LONG).show()
             }*/
-            // Testing load all courses:
-            (NetworkManager().loadSiteWithToken("https://start.schulportal.hessen.de/stundenplan.php", object : StringRequestListener {
-                override fun onResponse(response: String?) {
-                    val courses = RawParser().parseCoursesFromTimetable(response!!)
+            NetworkManager().createIndex(object : NetworkManager.DoneListener {
+                override fun onComplete (success: Boolean) {
+                    Toast.makeText(context, "Success?", Toast.LENGTH_LONG).show()
                 }
-
-                override fun onError(anError: ANError?) {
-                    Toast.makeText(applicationContext(), anError.toString(), Toast.LENGTH_LONG).show()
-                }
-            }))
+            })
 
 
             //

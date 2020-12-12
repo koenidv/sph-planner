@@ -18,4 +18,12 @@ class Utility {
         return pos
     }
 
+    fun nullOrEquals(first: Any?, second: Any?): Boolean {
+        return (
+                first == null
+                        || second == null
+                        || first == second
+                )
+    }
+
 }

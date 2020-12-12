@@ -18,7 +18,7 @@ class SphPlanner : Application() {
         fun applicationContext() : Context {
             return instance!!.applicationContext
         }
-
+        // Set application tag for Log
         val TAG = "SPH-Planner"
     }
 
