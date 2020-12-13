@@ -8,36 +8,36 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-    <color name="colorPrimary">#fff</color>
-    <color name="colorPrimaryDark">#fff</color>
-    <color name="colorAccent">#4f76c5</color>
-    <color name="background">#fff</color>
-    <color name="cardBackground">#fff</color>
-    <color name="titleText">#808080</color>
-    <color name="infoText">#cccccc</color>
-    <color name="textColor">#000</color>
-    <bool name="lightStatusBar">true</bool>
-    <color name="highlight">#204f76c5</color>
+    <color name="colorPrimary">#202125</color>
+    <color name="colorPrimaryDark">#202125</color>
+    <color name="colorAccent">#FF6200EE</color>
+    <color name="background">#202125</color>
+    <color name="cardBackground">#1c1d21</color>
+    <color name="titleText">#ddd</color>
+    <color name="infoText">#4c4d50</color>
+    <color name="textColor">#fff</color>
+    <bool name="lightStatusBar">false</bool>
+    <color name="highlight">#202f3d5d</color>
 
     <color name="ambientShadowColor">#0A000000</color>
     <color name="spotShadowColor">#30000000</color>
 
     <color name="course_german">#40e21d1d</color>
     <color name="course_english">#40ff4500</color>
-    <color name="course_latin">#40000000</color>
-    <color name="course_french">#40000000</color>
-    <color name="course_history">#40a5682a</color>
+    <color name="course_latin">#40ef87a9</color>
+    <color name="course_french">#40ef87a9</color>
+    <color name="course_history">#60a5682a</color>
     <color name="course_it">#40aaf0d1</color>
     <color name="course_arts">#40ffff00</color>
     <color name="course_music">#40ffff00</color>
     <color name="course_maths">#401414eb</color>
     <color name="course_physics">#40eb14eb</color>
-    <color name="course_biology">#4000ff40</color>
+    <color name="course_biology">#2000ff40</color>
     <color name="course_chemistry">#40993299</color>
     <color name="course_geography">#406b4013</color>
     <color name="course_politics">#404c4cff</color>
     <color name="course_sports">#40000000</color>
-    <color name="course_religion">#40eeeeee</color>
+    <color name="course_religion">#40ffffff</color>
 
     <color name="type_eva">#6066cc99</color>
     <color name="type_freed">#6087d37c</color>

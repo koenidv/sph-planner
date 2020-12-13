@@ -1,11 +1,14 @@
 package de.koenidv.sph
 
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.koenidv.gmbplanner.OptionsSheet
 
 //  Created by koenidv on 05.12.2020.
 
@@ -27,5 +30,19 @@ class MainActivity : AppCompatActivity() {
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration)
         NavigationUI.setupWithNavController(navView, navController)
 
+    }
+
+    // Create options menu
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_main, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        // Ignore item, there's only one
+        // Show a bottom sheet with information and options
+        val optionsSheet = OptionsSheet()
+        optionsSheet.show(supportFragmentManager, "optionsSheet")
+        return super.onOptionsItemSelected(item)
     }
 }
