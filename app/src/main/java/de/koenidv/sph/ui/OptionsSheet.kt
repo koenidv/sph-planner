@@ -167,17 +167,19 @@ class OptionsSheet internal constructor() : BottomSheetDialogFragment() {
         }*/
         view.findViewById<View>(R.id.openSphButton).setOnClickListener {
             // Open koenidv's autosph to log browser in to sph
-            // This will transfer user data to an external server!
+            // This will transfer user data to an external server
+            // Ask user if wants this or log in manually
             val uri = Uri.parse("https://koenidv.de/autosph?direct="
                     + prefs.getString("user", "")
                     + "&" + prefs.getString("password", ""))
-            val browserIntent = Intent(Intent.ACTION_VIEW, uri)
+            val autoLoginIntent = Intent(Intent.ACTION_VIEW, uri)
+            val manualIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://start.schulportal.hessen.de/"))
 
             AlertDialog.Builder(context)
                     .setTitle(R.string.menu_open_sph_warning_title)
                     .setMessage(R.string.menu_open_sph_warning_description)
-                    .setPositiveButton(R.string.menu_open_sph_warning_yes) { dialog, which -> startActivity(browserIntent) }
-                    .setNegativeButton(R.string.menu_open_sph_warning_no) { dialog, which -> }
+                    .setPositiveButton(R.string.menu_open_sph_warning_yes) { dialog, which -> startActivity(autoLoginIntent) }
+                    .setNegativeButton(R.string.menu_open_sph_warning_no) { dialog, which -> startActivity(manualIntent) }
                     .show()
         }
 

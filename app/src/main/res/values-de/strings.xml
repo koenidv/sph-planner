@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Schulportal</string>
+    <string name="title_overview">Übersicht</string>
+    <string name="title_courses">Meine Kurse</string>
+    <string name="title_messages">Nachrichten</string>
+    <string name="title_links">Links</string>
+    <string name="cancel">Abbrechen</string>
+    <string name="save">Speichern</string>
+    <string name="done">Fertig</string>
+    <string name="remove">Entfernen</string>
+    <string name="not_now">Später</string>
+    <string name="info_menuaction">Optionen</string>
+    <string name="info_greeting">Hey %name</string>
+    <string name="info_app">SPHplanner %version</string>
+    <string name="info_author">Florian König 2020</string>
+    <string name="info_thanks">Besonderer Dank an Ryan etc</string>
+    <string name="menu_option_credentials">Zugangsdaten ändern</string>
+    <string name="menu_option_courses">Gefundene Kurse</string>
+    <string name="menu_option_theme_dark">Dunkles Design</string>
+    <string name="menu_option_theme_light">Helles Design</string>
+    <string name="menu_open_sph">Schulportal öffnen</string>
+    <string name="menu_open_sph_warning_title">Automatisch anmelden?</string>
+    <string name="menu_open_sph_warning_description">Dein Netzanbieter oder Angreifer könnten deine Zugangsdaten sehen, wenn du dich automatisch anmeldest.</string>
+    <string name="menu_open_sph_warning_no">Manuell anmelden</string>
+    <string name="menu_open_sph_warning_yes">Automatisch fortfahren</string>
+    <string name="info_last_refresh">Meine Kurse: %courses\nVertretungen: %changes\nLetzte Änderung: %changeTimestamp\nIndiziert: %indexed</string>
+    <string name="menu_feedback">Feedback senden</string>
+    <string name="menu_rate">Bewerten</string>
+    <string name="dateformat_hours">HH:mm</string>
+    <string name="dateformat_coursesrefreshed">d. MMM</string>
+    <string name="last_refreshed_shortly">Kürzlich aktualisiert</string>
+    <string name="last_refreshed_hourly">Innerhalb einer Stunde aktualisiert</string>
+    <string name="last_refreshed_other">Vor einer Weile aktualisiert</string>
+    <string name="imagedescr_expand">Erweitern</string>
+</resources>

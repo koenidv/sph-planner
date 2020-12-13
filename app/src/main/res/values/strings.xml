@@ -1,9 +1,9 @@
 <resources>
-    <string name="app_name">SPH-Planer</string>
+    <string name="app_name">SPHplanner</string>
     <string name="title_overview">Overview</string>
     <string name="title_courses">My Courses</string>
     <string name="title_messages">Messages</string>
-    <string name="title_links">(Links) Token Demo</string>
+    <string name="title_links">Links</string>
 
     <!-- General purpose -->
     <string name="cancel">Cancel</string>
@@ -27,7 +27,7 @@
     <string name="menu_open_sph_warning_description">Your service provider or attackers might be able to see your credentials if you log in automatically.</string>
     <string name="menu_open_sph_warning_no">Log in manually</string>
     <string name="menu_open_sph_warning_yes">Continue automatically</string>
-    <string name="info_last_refresh">My Courses: %courses\nChanges: %changes\nNewest changes: %changeTimestamp\nIndexed: %indexed</string>
+    <string name="info_last_refresh">My Courses: %courses Changes: %changes Newest changes: %changeTimestamp Indexed: %indexed</string>
     <string name="menu_feedback">Send feedback</string>
     <string name="menu_rate">Rate</string>
     <string name="dateformat_hours">HH:mm</string>
@@ -38,8 +38,8 @@
 
 
     <!-- Feedback -->
-    <string name="feedback_subject">[SPHplanner] Feedback</string>
-    <string name="feedback_body">\n\nApp version: %app\nAndroid version: %android</string>
+    <string name="feedback_subject" translatable="false">[SPHplanner] Feedback</string>
+    <string name="feedback_body" translatable="false">\n\nApp version: %app\nAndroid version: %android</string>
 
     <!-- Usabilty -->
     <string name="imagedescr_expand">Expand</string>
