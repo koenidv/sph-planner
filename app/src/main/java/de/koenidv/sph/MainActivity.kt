@@ -14,9 +14,17 @@ import com.koenidv.gmbplanner.OptionsSheet
 
 class MainActivity : AppCompatActivity() {
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
+
+        val prefs = getSharedPreferences("sharedPrefs", MODE_PRIVATE)
+        if (!prefs.getBoolean("credsVerified", false)) {
+            //startActivity(Intent(this, SignInActivity().javaClass).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP))
+            //uncomment this to enfore login screen
+            //finish()
+        }
+
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.activity_main)
         val navView = findViewById<BottomNavigationView>(R.id.nav_view)
         // Passing each menu ID as a set of Ids because each

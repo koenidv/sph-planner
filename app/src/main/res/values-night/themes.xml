@@ -1,39 +1,38 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Theme.SPHPlaner" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+    <style name="Theme.SPH" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/purple_500</item>
         <item name="colorPrimaryVariant">@color/purple_700</item>
         <item name="colorOnPrimary">@color/black</item>
+        <item name="backgroundColor">@color/black</item>
+        <item name="android:windowBackground">?attr/backgroundColor</item>
         <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/teal_200</item>
         <item name="colorSecondaryVariant">@color/teal_200</item>
         <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
-        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+        <item name="android:statusBarColor" tools:targetApi="l">@color/black</item>
         <!-- Customize your theme here. -->
-        <item name="bottomSheetDialogTheme">@style/AppTheme.Sheet</item>
+        <item name="bottomSheetDialogTheme">@style/Theme.SPH.Sheet</item>
+        <item name="actionBarStyle">@style/Theme.SPH.ActionBar</item>
     </style>
 
-    <style name="AppTheme.Sheet" parent="Theme.MaterialComponents.DayNight.BottomSheetDialog">
+    <style name="Theme.SPH.Sheet" parent="Theme.MaterialComponents.DayNight.BottomSheetDialog">
         <item name="android:windowIsFloating">false</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowSoftInputMode">adjustResize</item>
-        <item name="bottomSheetStyle">@style/AppTheme.ModalStyle</item>
+        <item name="bottomSheetStyle">@style/Theme.SPH.ModalStyle</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="colorPrimary">@color/textColor</item>
         <item name="android:windowContentTransitions">true</item>
     </style>
 
-    <style name="AppTheme.ModalStyle" parent="Widget.Design.BottomSheet.Modal">
+    <style name="Theme.SPH.ModalStyle" parent="Widget.Design.BottomSheet.Modal">
         <item name="android:background">@drawable/rounded_dialog</item>
     </style>
 
-    <style name="AppTheme.Sheet.Transparent" parent="AppTheme.Sheet">
-        <item name="bottomSheetStyle">@style/AppTheme.ModalStyle.Transparent</item>
-    </style>
-
-    <style name="AppTheme.ModalStyle.Transparent" parent="AppTheme.ModalStyle">
-        <item name="android:background">@drawable/transparent</item>
+    <style name="Theme.SPH.ActionBar" parent="Widget.AppCompat.ActionBar">
+        <item name="background">?attr/backgroundColor</item>
     </style>
 </resources>

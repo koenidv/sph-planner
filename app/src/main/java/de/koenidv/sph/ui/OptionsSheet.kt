@@ -165,6 +165,10 @@ class OptionsSheet internal constructor() : BottomSheetDialogFragment() {
                 dismiss()
             }
         }*/
+
+        /*
+         * "Open SPH" - Open sph in a browser with automatical oder manual login
+         */
         view.findViewById<View>(R.id.openSphButton).setOnClickListener {
             // Open koenidv's autosph to log browser in to sph
             // This will transfer user data to an external server
@@ -175,12 +179,17 @@ class OptionsSheet internal constructor() : BottomSheetDialogFragment() {
             val autoLoginIntent = Intent(Intent.ACTION_VIEW, uri)
             val manualIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://start.schulportal.hessen.de/"))
 
-            AlertDialog.Builder(context)
-                    .setTitle(R.string.menu_open_sph_warning_title)
-                    .setMessage(R.string.menu_open_sph_warning_description)
-                    .setPositiveButton(R.string.menu_open_sph_warning_yes) { dialog, which -> startActivity(autoLoginIntent) }
-                    .setNegativeButton(R.string.menu_open_sph_warning_no) { dialog, which -> startActivity(manualIntent) }
-                    .show()
+            if (prefs.getBoolean("open_sph_accepted_auto", false)) {
+                startActivity(autoLoginIntent)
+                super.dismiss()
+            } else {
+                AlertDialog.Builder(context)
+                        .setTitle(R.string.menu_open_sph_warning_title)
+                        .setMessage(R.string.menu_open_sph_warning_description)
+                        .setPositiveButton(R.string.menu_open_sph_warning_yes) { _, _ -> startActivity(autoLoginIntent); prefs.edit().putBoolean("open_sph_accepted_auto", true).apply();super.dismiss() }
+                        .setNegativeButton(R.string.menu_open_sph_warning_no) { _, _ -> startActivity(manualIntent); super.dismiss() }
+                        .show()
+            }
         }
 
         view.findViewById<View>(R.id.feedbackButton).setOnClickListener { v: View? ->
