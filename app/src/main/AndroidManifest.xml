@@ -14,11 +14,13 @@
         android:theme="@style/Theme.SPH">
         <activity
             android:name=".ui.SignInActivity"
-            android:label="@string/title_activity_sign_in"
-            android:theme="@style/Theme.SPH.NoActionBar" />
+            android:theme="@style/Theme.SPH.NoActionBar"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".MainActivity"
-            android:label="@string/app_name">
+            android:label="@string/app_name"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

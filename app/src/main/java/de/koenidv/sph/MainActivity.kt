@@ -1,5 +1,6 @@
 package de.koenidv.sph
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -9,6 +10,7 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.koenidv.gmbplanner.OptionsSheet
+import de.koenidv.sph.ui.SignInActivity
 
 //  Created by koenidv on 05.12.2020.
 
@@ -18,9 +20,9 @@ class MainActivity : AppCompatActivity() {
 
         val prefs = getSharedPreferences("sharedPrefs", MODE_PRIVATE)
         if (!prefs.getBoolean("credsVerified", false)) {
-            //startActivity(Intent(this, SignInActivity().javaClass).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP))
+            startActivity(Intent(this, SignInActivity().javaClass).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP))
             //uncomment this to enfore login screen
-            //finish()
+            finish()
         }
 
         super.onCreate(savedInstanceState)

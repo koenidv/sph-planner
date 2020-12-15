@@ -15,7 +15,14 @@ import okhttp3.OkHttpClient
 //  Created by koenidv on 11.12.2020.
 class NetworkManager {
 
+    val SUCCESS = 0
+    val FAILED_NO_NETWORK = 1
+    val FAILED_INVALID_CREDENTIALS = 2
+    val FAILED_MAINTENANCE = 3
+    val FAILED_CANCELLED = 4
+
     // todo save last refresh for checks
+    // todo return success as int
     fun createIndex(listener: DoneListener) {
         // Remove old courses, it'll just lead to isses
         val dbHelper = DatabaseHelper(applicationContext())
@@ -67,7 +74,7 @@ class NetworkManager {
 
         // Getting an access token
         TokenManager().generateAccessToken(object : TokenManager.TokenGeneratedListener {
-            override fun onTokenGenerated(token: String) {
+            override fun onTokenGenerated(success: Int, token: String) {
                 // Setting sid cookie
                 CookieStore.saveFromResponse(
                         HttpUrl.parse("https://schulportal.hessen.de")!!,

@@ -33,4 +33,13 @@
     <string name="last_refreshed_hourly">Innerhalb einer Stunde aktualisiert</string>
     <string name="last_refreshed_other">Vor einer Weile aktualisiert</string>
     <string name="imagedescr_expand">Erweitern</string>
+    <string name="continuenow">Fortfahren</string>
+    <string name="onboard_welcome_title">Hey</string>
+    <string name="onboard_welcome_description">Du benötigst einen Account des Schulportals, um diese App nutzen zu können.</string>
+    <string name="onboard_welcome_error_connection">Du musst online sein, um dich anzumelden.\nTippe, um es erneut zu versuchen.</string>
+    <string name="onboard_welcome_error_maintenance">Das Schulportal wird im Moment gewartet.\nTippe, um es erneut zu versuchen.</string>
+    <string name="onboard_select_school">Wähle deine Schule</string>
+    <string name="onboard_username">Nutzer (vor.nachname)</string>
+    <string name="onboard_password">Passwort</string>
+    <string name="onboard_signin">Anmelden</string>
 </resources>

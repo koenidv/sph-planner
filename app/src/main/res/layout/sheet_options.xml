@@ -51,11 +51,11 @@
                 style="@style/Widget.AppCompat.ImageButton"
                 android:layout_width="48dp"
                 android:layout_height="match_parent"
-                android:paddingTop="8dp"
-                android:background="@drawable/transparent"
+                android:background="@android:color/transparent"
                 android:clickable="false"
                 android:contentDescription="@string/imagedescr_expand"
                 android:focusable="false"
+                android:paddingTop="8dp"
                 android:src="@drawable/ic_more"
                 android:tint="@color/titleText" />
 

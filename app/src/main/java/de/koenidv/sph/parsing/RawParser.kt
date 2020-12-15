@@ -150,7 +150,6 @@ class RawParser {
         return changes
     }
 
-
     /**
      * Parse courses from raw timetable webpage
      * @param rawResponse Html repsonse from SPH
@@ -289,5 +288,34 @@ class RawParser {
         }
 
         return courses
+    }
+
+    /**
+     * Parse a list of school ids from raw select school webpage
+     * @param rawResponse Html repsonse from SPH
+     * @return List of all found schools and ids
+     */
+    fun parseSchoolIds(rawResponse: String): List<Pair<String, String>> {
+        val ids = mutableListOf<Pair<String, String>>()
+
+        // Split String into list items and remove stuff we don't need
+        val rawContents = rawResponse.replace("\n", "").split("<a class=\"list-group-item\"").toMutableList()
+        rawContents.removeFirst()
+
+        var id : String
+        for (content in rawContents) {
+            id = content.substring(content.indexOf("data-id=") + 9, content.indexOf("data-id=") + 13)
+            if (!id.startsWith("200") && !id.contains("\"")) { // 5-digit ids starting with 200 for companies or 3 only 3 digits
+                ids.add(Pair(
+                        content.substring(
+                                content.indexOf("\">") + 2, content.indexOf("</a>"))
+                                .replace(" <small>", ", ")
+                                .replace("</small>", ""),
+                        id))
+            }
+        }
+
+        ids.sortBy { it.first }
+        return ids
     }
 }

@@ -1,7 +1,5 @@
 package de.koenidv.sph.ui
 
-import android.content.Context.MODE_PRIVATE
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,14 +9,11 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.fragment.app.Fragment
 import de.koenidv.sph.R
-import de.koenidv.sph.SphPlanner.Companion.applicationContext
 import de.koenidv.sph.networking.TokenManager
 
 class LinksFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?, savedInstanceState: Bundle?): View? {
-
-        val prefs: SharedPreferences = applicationContext().getSharedPreferences("sharedPrefs", MODE_PRIVATE)
 
         val view = inflater.inflate(R.layout.fragment_links, container, false)
 
@@ -40,7 +35,7 @@ class LinksFragment : Fragment() {
 
         // Generate access token, save as cookie and load once done
         TokenManager().generateAccessToken(object : TokenManager.TokenGeneratedListener {
-            override fun onTokenGenerated(token: String) {
+            override fun onTokenGenerated(success: Int, token: String) {
                 cookieManager.setCookie(domain, "sid=$token")
                 webView.loadUrl(domain)
             }
