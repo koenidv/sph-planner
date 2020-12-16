@@ -18,6 +18,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.button.MaterialButtonToggleGroup
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
+import de.koenidv.sph.ui.SignInActivity
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
@@ -109,12 +110,14 @@ class OptionsSheet internal constructor() : BottomSheetDialogFragment() {
         }*/
 
         // todo creds
-        /* view.findViewById<View>(R.id.credentialsButton).setOnClickListener { v: View? ->
+        view.findViewById<View>(R.id.logoutButton).setOnClickListener {
             // Show a bottom sheet to edit credentials
-            val bottomsheet = CredentialsSheet()
-            bottomsheet.show(activity!!.supportFragmentManager, "credentialsSheet")
-            dismiss()
-        }*/
+            prefs.edit().clear().apply()
+            // todo check if we still need
+            // todo delete dbs
+            startActivity(Intent(context, SignInActivity().javaClass).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP))
+            requireActivity().finish()
+        }
 
         // Dark mode toggle group
         if (Build.VERSION.SDK_INT < 29) {
@@ -179,6 +182,7 @@ class OptionsSheet internal constructor() : BottomSheetDialogFragment() {
             val autoLoginIntent = Intent(Intent.ACTION_VIEW, uri)
             val manualIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://start.schulportal.hessen.de/"))
 
+            // todo Check if network is public
             if (prefs.getBoolean("open_sph_accepted_auto", false)) {
                 startActivity(autoLoginIntent)
                 super.dismiss()

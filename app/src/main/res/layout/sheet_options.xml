@@ -144,13 +144,13 @@
                 android:textColor="@color/titleText" />
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/credentialsButton"
+                android:id="@+id/logoutButton"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginStart="4dp"
                 android:layout_weight="1"
-                android:text="@string/menu_option_credentials"
+                android:text="@string/menu_option_logout"
                 android:textColor="@color/titleText" />
 
         </LinearLayout>

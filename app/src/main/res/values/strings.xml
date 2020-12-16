@@ -22,6 +22,9 @@
     <string name="onboard_username">User (firstname.lastname)</string>
     <string name="onboard_password">Password</string>
     <string name="onboard_signin">Login</string>
+    <string name="onboard_signin_error_network">Please check your network connection and retry.</string>
+    <string name="onboard_signin_error_credentials">Please check your credentials.</string>
+    <string name="onboard_signin_error_maintenance">The education portal is currently under maintenance.\nPlease try again later.</string>
 
     <!-- Options sheet -->
     <string name="info_menuaction">Options</string>
@@ -29,7 +32,7 @@
     <string name="info_app">SPHplanner %version</string>
     <string name="info_author">Florian König 2020</string>
     <string name="info_thanks">Special thanks to Ryan etc</string>
-    <string name="menu_option_credentials">Change credentials</string>
+    <string name="menu_option_logout">Logout</string>
     <string name="menu_option_courses">Discovered courses</string>
     <string name="menu_option_theme_dark">Dark theme</string>
     <string name="menu_option_theme_light">Light theme</string>

@@ -11,6 +11,7 @@ import com.facebook.stetho.okhttp3.StethoInterceptor
 import de.koenidv.sph.SphPlanner.Companion.applicationContext
 import okhttp3.OkHttpClient
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 
 //  Created by koenidv on 05.12.2020.
@@ -26,7 +27,7 @@ class TokenManager {
 
         // Return existing, signed-in token if it was used within 15 Minutes
         // Else get a new token
-        if (Date().time - prefs.getLong("token_last_success", 0) <= 15 * 60 * 1000 || forceNewToken) {
+        if (Date().time - prefs.getLong("token_last_success", 0) <= 15 * 60 * 1000 && !forceNewToken) {
             callback.onTokenGenerated(NetworkManager().SUCCESS, prefs.getString("token", "")!!)
         } else {
             // Get a new token
@@ -37,6 +38,7 @@ class TokenManager {
                         .addNetworkInterceptor(StethoInterceptor())
                         .cookieJar(CookieStore)
                         .cache(null)
+                        .connectTimeout(20, TimeUnit.SECONDS)
                         .build()
                 AndroidNetworking.initialize(applicationContext(), okHttpClient)
 
@@ -52,16 +54,18 @@ class TokenManager {
                         .getAsString(object : StringRequestListener {
                             override fun onResponse(response: String) {
                                 if (CookieStore.getCookie("schulportal.hessen.de", "sid") != null
-                                        && !response.contains("Anmelden")) {
+                                        && !response.contains("Login - Schulportal Hessen")) {
                                     // Login success
                                     callback.onTokenGenerated(NetworkManager().SUCCESS, CookieStore.getCookie("schulportal.hessen.de", "sid")!!)
                                     prefs.edit().putString("token", CookieStore.getCookie("schulportal.hessen.de", "sid"))
                                             .putLong("token_last_success", Date().time)
                                             .apply()
-                                } else if (response.contains("Anmelden")) {
+                                } else if (response.contains("Login - Schulportal Hessen")) {
+                                    // Login not successfull
                                     callback.onTokenGenerated(NetworkManager().FAILED_INVALID_CREDENTIALS, "")
                                     prefs.edit().putLong("token_last_success", 0).apply()
                                 } else if (response.contains("Wartungsarbeiten")) {
+                                    // Cannot login at the moment
                                     callback.onTokenGenerated(NetworkManager().FAILED_MAINTENANCE, "")
                                 }
                             }
@@ -69,6 +73,7 @@ class TokenManager {
                             override fun onError(error: ANError) {
                                 when (error.errorDetail) {
                                     "connectionError" -> {
+                                        // This will also be called if reqest timed out
                                         callback.onTokenGenerated(NetworkManager().FAILED_NO_NETWORK, "")
                                     }
                                     "requestCancelledError" -> {

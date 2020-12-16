@@ -15,7 +15,7 @@
     <string name="info_app">SPHplanner %version</string>
     <string name="info_author">Florian König 2020</string>
     <string name="info_thanks">Besonderer Dank an Ryan etc</string>
-    <string name="menu_option_credentials">Zugangsdaten ändern</string>
+    <string name="menu_option_logout">Abmelden</string>
     <string name="menu_option_courses">Gefundene Kurse</string>
     <string name="menu_option_theme_dark">Dunkles Design</string>
     <string name="menu_option_theme_light">Helles Design</string>
@@ -42,4 +42,7 @@
     <string name="onboard_username">Nutzer (vor.nachname)</string>
     <string name="onboard_password">Passwort</string>
     <string name="onboard_signin">Anmelden</string>
+    <string name="onboard_signin_error_network">Bitte überprüfe deine Netzwerkverbindung und versuche es erneut.</string>
+    <string name="onboard_signin_error_credentials">Bitte überprüfe deine Zugangsdaten.</string>
+    <string name="onboard_signin_error_maintenance">Das Schulportal wird im Moment gewartet.\nBitte versuche es später erneut.</string>
 </resources>

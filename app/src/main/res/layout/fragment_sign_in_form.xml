@@ -123,7 +123,6 @@
         android:layout_marginTop="48dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="32dp"
-        android:backgroundTint="@color/colorAccent"
         android:enabled="false"
         android:text="@string/onboard_signin"
         android:visibility="gone"

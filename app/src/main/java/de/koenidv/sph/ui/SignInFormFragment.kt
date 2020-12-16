@@ -8,10 +8,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
-import android.widget.ArrayAdapter
-import android.widget.EditText
-import android.widget.ProgressBar
-import android.widget.TextView
+import android.view.inputmethod.InputMethodManager
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
@@ -31,18 +29,13 @@ import de.koenidv.sph.parsing.RawParser
 import okhttp3.OkHttpClient
 
 
-/**
- * A simple [Fragment] subclass.
- * Use the [SignInFormFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class SignInFormFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
         val view = inflater.inflate(R.layout.fragment_sign_in_form, container, false)
-        var schoolIds : List<Pair<String, String>> = listOf()
+        var schoolIds: List<Pair<String, String>> = listOf()
 
         val loadicon = view.findViewById<ProgressBar>(R.id.signinLoading)
         val title = view.findViewById<TextView>(R.id.signinTitleTextView)
@@ -121,7 +114,7 @@ class SignInFormFragment : Fragment() {
                 signinButton.extend()
             } else {
                 signinButton.isEnabled = false
-                signinButton.shrink()
+                //signinButton.shrink()
             }
         }
         passText.doOnTextChanged { _, _, _, _ ->
@@ -130,7 +123,7 @@ class SignInFormFragment : Fragment() {
                 signinButton.extend()
             } else {
                 signinButton.isEnabled = false
-                signinButton.shrink()
+                //signinButton.shrink()
             }
         }
         // Sign in using keyboard mime action
@@ -153,11 +146,12 @@ class SignInFormFragment : Fragment() {
             textlayout1.visibility = View.GONE
             textlayout2.visibility = View.GONE
             signinButton.visibility = View.GONE
+            (requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).hideSoftInputFromWindow(view.windowToken, 0)
 
             val prefs = SphPlanner.applicationContext().getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
 
             prefs.edit()
-                    .putString("user", userText.text.toString())
+                    .putString("user", userText.text.toString().replace(" ", "."))
                     .putString("password", passText.text.toString())
                     // We'll assume schools have been loaded, as ui won't let the user get here otherwise
                     // We could mitigate this by checking for schoolIds.isNotEmpty()..
@@ -170,15 +164,32 @@ class SignInFormFragment : Fragment() {
                 override fun onTokenGenerated(success: Int, token: String) {
                     if (success == NetworkManager().SUCCESS) {
                         // todo User signed in successfully - NOW DO SOMETHING WITH IT :)
-                            prefs.edit().putBoolean("credsVerified", true).apply()
+                        prefs.edit().putBoolean("credsVerified", true).apply()
                         startActivity(Intent(context, MainActivity().javaClass))
-                    } else if (success == NetworkManager().FAILED_INVALID_CREDENTIALS) {
-                        TODO("Invalid Credentials")
-                    } else if (success == NetworkManager().FAILED_NO_NETWORK
-                            || success == NetworkManager().FAILED_CANCELLED) {
-                        TODO("No Network")
-                    } else if (success == NetworkManager().FAILED_MAINTENANCE) {
-                        TODO("Maintenance")
+                    } else {
+                        // Sign in failed, reshow ui
+                        loadicon.visibility = View.GONE
+                        title.visibility = View.VISIBLE
+                        description.visibility = View.VISIBLE
+                        schoolid.visibility = View.VISIBLE
+                        textlayout1.visibility = View.VISIBLE
+                        textlayout2.visibility = View.VISIBLE
+                        signinButton.visibility = View.VISIBLE
+
+                        // Show an error message
+                        description.setTextColor(context!!.getColor(R.color.colorAccent))
+                        description.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f)
+                        if (success == NetworkManager().FAILED_INVALID_CREDENTIALS) {
+                            // Incorrect user/password
+                            description.text = getString(R.string.onboard_signin_error_credentials)
+                        } else if (success == NetworkManager().FAILED_NO_NETWORK
+                                || success == NetworkManager().FAILED_CANCELLED) {
+                            // No connectivity, request timed out or got cancelled
+                            description.text = getString(R.string.onboard_signin_error_network)
+                        } else if (success == NetworkManager().FAILED_MAINTENANCE) {
+                            // sph is under maintenance
+                            description.text = getString(R.string.onboard_signin_error_maintenance)
+                        }
                     }
                 }
 
