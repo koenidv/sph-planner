@@ -19,7 +19,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
 
         val prefs = getSharedPreferences("sharedPrefs", MODE_PRIVATE)
-        if (!prefs.getBoolean("credsVerified", false)) {
+        if (!prefs.getBoolean("credsVerified", false)
+                || !prefs.getBoolean("introComplete", false)) {
             startActivity(Intent(this, SignInActivity().javaClass).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP))
             finish()
         }

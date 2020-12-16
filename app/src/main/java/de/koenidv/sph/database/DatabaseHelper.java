@@ -18,7 +18,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         super(context, "database", null, 1);
     }
 
-
     // todo use singleton
     // todo split into meaningful classes
     // todo save List<Course>

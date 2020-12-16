@@ -38,7 +38,7 @@ class TokenManager {
                         .addNetworkInterceptor(StethoInterceptor())
                         .cookieJar(CookieStore)
                         .cache(null)
-                        .connectTimeout(20, TimeUnit.SECONDS)
+                        .connectTimeout(60, TimeUnit.SECONDS)
                         .build()
                 AndroidNetworking.initialize(applicationContext(), okHttpClient)
 

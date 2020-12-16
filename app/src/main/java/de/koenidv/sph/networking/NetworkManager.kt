@@ -11,6 +11,7 @@ import de.koenidv.sph.parsing.RawParser
 import okhttp3.Cookie
 import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
+import java.util.concurrent.TimeUnit
 
 //  Created by koenidv on 11.12.2020.
 class NetworkManager {
@@ -69,8 +70,9 @@ class NetworkManager {
      * Loads a url within the sph and handles authentication
      * @param url URL to load
      * @param listener Listen for results
+     * todo check if request was successfull (signed in)
      */
-    private fun loadSiteWithToken(url: String, listener: StringRequestListener) {
+    fun loadSiteWithToken(url: String, listener: StringRequestListener) {
 
         // Getting an access token
         TokenManager().generateAccessToken(object : TokenManager.TokenGeneratedListener {
@@ -84,6 +86,7 @@ class NetworkManager {
                 val okHttpClient = OkHttpClient.Builder()
                         .addNetworkInterceptor(StethoInterceptor())
                         .cookieJar(CookieStore)
+                        .connectTimeout(60, TimeUnit.SECONDS)
                         .build()
                 AndroidNetworking.initialize(applicationContext(), okHttpClient)
 

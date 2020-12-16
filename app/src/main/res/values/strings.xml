@@ -12,6 +12,8 @@
     <string name="remove">Remove</string>
     <string name="not_now">Not now</string>
     <string name="continuenow">Continue</string>
+    <string name="emoji_check" translatable="false">✔</string>
+    <string name="emoji_cross" translatable="false">❌</string>
 
     <!-- Sign in process -->
     <string name="onboard_welcome_title">Hey</string>
@@ -25,6 +27,15 @@
     <string name="onboard_signin_error_network">Please check your network connection and retry.</string>
     <string name="onboard_signin_error_credentials">Please check your credentials.</string>
     <string name="onboard_signin_error_maintenance">The education portal is currently under maintenance.\nPlease try again later.</string>
+    <string name="onboard_supported_schooltested">✔ We tested the app with your school and it should work.</string>
+    <string name="onboard_supported_features_full">"✔ Your school supports all the features we need, but we didn't test it yet.\nPlease contact us via the options menu!"</string>
+    <string name="onboard_supported_features_partly_manual">✔ Your school supports some of the features we need, but you will need to enter some data manually.</string>
+    <string name="onboard_supported_features_partly_hidden">✔ Your school supports some of the features we need.</string>
+    <string name="onboard_supported_features_partly_not">❌ Your school does not support all the features we need. Please get in touch to see how you can help us support your school!</string><!--todo link to contact-->
+    <string name="onboard_supported_features_none">❌ Sorry, your school does not support the features we need to work.</string>
+    <string name="onboard_supported_featurelist">%mycourses My Courses\n%messages Messages\n%studygroups Study Groups\n%timetable Timetable\n%changes Changes</string>
+    <string name="onboard_supported_warning">Please report any issues you might experience via the options menu!</string>
+    <string name="onboard_supported_error_network">There was a network error.\nTap to retry.</string>
 
     <!-- Options sheet -->
     <string name="info_menuaction">Options</string>
@@ -57,4 +68,5 @@
 
     <!-- Usabilty -->
     <string name="imagedescr_expand">Expand</string>
+    <!-- TODO: Remove or change this placeholder text -->
 </resources>

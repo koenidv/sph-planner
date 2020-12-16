@@ -6,6 +6,7 @@ import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.database.DatabaseHelper
 import de.koenidv.sph.objects.Change
 import de.koenidv.sph.objects.Course
+import de.koenidv.sph.objects.Tile
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -317,5 +318,51 @@ class RawParser {
 
         ids.sortBy { it.first }
         return ids
+    }
+
+    /**
+     * Parse a list of supported tiles from sph start page
+     * @param rawResponse Html repsonse from SPH
+     * @return List of all found tiles with temporary urls as location
+     */
+    fun parseFeatureList(rawResponse: String): List<Tile> {
+        val tiles = mutableListOf<Tile>()
+        val ids = mutableListOf<String>()
+
+        // Split String into list items and remove stuff we don't need
+        val rawContents = rawResponse.replace("\n", "")
+                .substring(rawResponse.indexOf("id=\"accordion\">") + 15, rawResponse.indexOf("id=\"menuelist\"") - 5)
+                .split("<li class").toMutableList()
+        rawContents.removeFirst()
+
+        var id : String
+        var name : String
+        var locationTemp : String
+        var type = "unknown"
+        var icon : String
+        var color : String
+        for (content in rawContents) {
+            id = content.substring(content.indexOf("id=\"") + 4)
+            id = id.substring(0, id.indexOf("\""))
+            // Only if tile with id hasn't been added yet
+            if (!ids.contains(id)) {
+
+                name = content.substring(content.indexOf("<h3><span class=\"glyphicon \"></span>") + 36)
+                name = name.substring(0, name.indexOf("<")).trim()
+                locationTemp = content.substring(content.indexOf("<div class=\"textheight\"> <a href=\"") + 34)
+                locationTemp = "https://start.schulportal.hessen.de/" + locationTemp.substring(0, locationTemp.indexOf("\""))
+
+                icon = "" // todo get icon fa-class
+                color = "" // todo parse rgba string to color
+
+                tiles.add(Tile(name, locationTemp, type, icon, color))
+
+                // Remember tile id
+                ids.add(id)
+            }
+
+        }
+
+        return tiles
     }
 }

@@ -19,7 +19,7 @@ class SphPlanner : Application() {
             return instance!!.applicationContext
         }
         // Set application tag for Log
-        val TAG = "SPH-Planner"
+        const val TAG = "SPH-Planner"
     }
 
     override fun onCreate() {
