@@ -1,35 +1,31 @@
 package de.koenidv.sph.database;
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
-import android.provider.ContactsContract;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import androidx.annotation.Nullable;
-
-import de.koenidv.sph.MainActivity;
-import de.koenidv.sph.SphPlanner;
 import de.koenidv.sph.objects.Course;
 
-//  Created by R-Theis on 8.12.2020.
-public class DatabaseHelper extends SQLiteOpenHelper {
 
-    private static DatabaseHelper instance;
 
-    private DatabaseHelper(@Nullable Context context) {
-        super(context, "database", null, 1);
+public class CourseDbHelper {
+
+    private DatabaseHelper dbhelper = DatabaseHelper.getInstance();
+
+    private static CourseDbHelper instance;
+
+    private CourseDbHelper() {
+
     }
 
-    public static DatabaseHelper getInstance(){
-        if(DatabaseHelper.instance==null){
-            DatabaseHelper.instance = new DatabaseHelper(SphPlanner.Companion.applicationContext());
+    public static CourseDbHelper getInstance() {
+        if (CourseDbHelper.instance == null) {
+            CourseDbHelper.instance = new CourseDbHelper();
         }
-        return DatabaseHelper.instance;
+        return CourseDbHelper.instance;
     }
 
 
@@ -37,28 +33,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 
 
-    //create Tables for Database
-    @Override
-    public void onCreate(SQLiteDatabase db) {
-        String createCoursesTable = "CREATE TABLE courses(course_id TEXT UNIQUE PRIMARY KEY, gmb_id TEXT UNIQUE, sph_id TEXT UNIQUE, named_id TEXT UNIQUE, number_id TEXT UNIQUE, fullname TEXT, id_teacher TEXT, isFavorite INTEGER, isLK INTEGER)";
-        String createChangesTable = "CREATE TABLE changes( changeid TEXT UNIQUE PRIMARY KEY, id_course TEXT UNIQUE, id_course_external TEXT UNIQUE, date TEXT , lessons TEXT , type TEXT  , id_Teacher TEXT , id_course_external_before TEXT , className TEXT , className_before TEXT , id_teacher TEXT , id_subsTeacher TEXT , room TEXT , roombefore TEXT, description TEXT )";
 
-
-        db.execSQL(createCoursesTable);
-        db.execSQL(createChangesTable);
-    }
-
-    //upgrade Database
-    @Override
-    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
-
-    }
 
     /**
      * Clears all courses from course db
      */
     public void clear() {
-        SQLiteDatabase db = this.getWritableDatabase();
+        SQLiteDatabase db = dbhelper.getWritableDatabase();
         //db.rawQuery("DELETE FROM courses", null).close();
         db.delete("courses", null, null);
     }
@@ -82,7 +63,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * @param course course to be added or updated
      */
     public void save(Course course) {
-        SQLiteDatabase db = this.getWritableDatabase();
+        SQLiteDatabase db = dbhelper.getWritableDatabase();
         ContentValues cv = new ContentValues();
 
         // Only use values that are non-null
@@ -119,12 +100,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 
         // Check if row exists and insert or update accordingly
-        Cursor cursor = db.rawQuery("SELECT * FROM courses WHERE course_id = '" + course.getCourseId() + "'", null);
-        if (cursor.getCount() == 0)
+        Cursor cursor =db.rawQuery("SELECT * FROM courses WHERE course_id = '" + course.getCourseId() + "'", null);
+        if ( cursor.getCount()== 0)
             db.insert("courses", null, cv);
         else
             db.update("courses", cv, "course_id = '" + course.getCourseId() + "'", null);
         cursor.close();
+
     }
 
     /**
@@ -132,7 +114,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * Used in course indexing where we know which courses are favorites, but not which are not
      */
     public void setNulledNotFavorite() {
-        this.getReadableDatabase().execSQL("UPDATE courses SET isFavorite = 0 WHERE isFavorite IS NULL");
+        dbhelper.getReadableDatabase().execSQL("UPDATE courses SET isFavorite = 0 WHERE isFavorite IS NULL");
     }
 
     /**
@@ -146,7 +128,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         String queryString = "SELECT * FROM courses";
 
-        SQLiteDatabase db = this.getReadableDatabase();
+        SQLiteDatabase db = dbhelper.getReadableDatabase();
 
         Cursor cursor = db.rawQuery(queryString, null);
         if (cursor.moveToFirst()) {
@@ -181,7 +163,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         //Filter Course from Database
         String queryString = "SELECT * FROM courses WHERE course_id LIKE \"" + condition + "%\" ORDER BY course_id ASC";
 
-        SQLiteDatabase db = this.getReadableDatabase();
+        SQLiteDatabase db = dbhelper.getReadableDatabase();
 
         Cursor cursor = db.rawQuery(queryString, null);
         if (cursor.moveToFirst()) {
@@ -196,11 +178,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     /**
      * Get a course by named_id
+     *
      * @param namedId External named id to look for
      * @return Course with specified named id or null if none was found
      */
     public Course getCourseByNamedId(String namedId) {
-        Cursor cursor = this.getReadableDatabase().rawQuery("SELECT * FROM courses WHERE named_id='" + namedId + "'", null);
+        Cursor cursor = dbhelper.getReadableDatabase().rawQuery("SELECT * FROM courses WHERE named_id='" + namedId + "'", null);
         // Return first row
         cursor.moveToFirst();
         if (cursor.getCount() == 0) return null;
@@ -211,11 +194,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     /**
      * Get favorite Courses
+     *
      * @return List of favorite courses in db
      */
     public List<Course> getFavoriteCourses() {
         List<Course> returnList = new ArrayList<>();
-        Cursor cursor = this.getReadableDatabase().rawQuery("SELECT * FROM courses WHERE isFavorite=1", null);
+        Cursor cursor = dbhelper.getReadableDatabase().rawQuery("SELECT * FROM courses WHERE isFavorite=1", null);
 
         // Add each row to returnList
         if (cursor.moveToFirst()) {
@@ -235,7 +219,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public boolean deleteCourse(Course course) {
 
         String queryString = "DELETE FROM courses WHERE course_id =" + course.getCourseId();
-        SQLiteDatabase db = this.getReadableDatabase();
+        SQLiteDatabase db = dbhelper.getReadableDatabase();
 
         Cursor cursor = db.rawQuery(queryString, null);
 
@@ -254,7 +238,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public Course getCourseByGmb_id(String Gmb_id) {
         String queryString = "SELECT * FROM courses WHERE gmb_id = " + Gmb_id;
-        SQLiteDatabase db = this.getReadableDatabase();
+        SQLiteDatabase db = dbhelper.getReadableDatabase();
 
         Cursor cursor = db.rawQuery(queryString, null);
         cursor.moveToFirst();
@@ -291,4 +275,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         return new Course(CourseId, gmb_id, sph_id, named_id, number_id, fullname, id_teacher, isFavorite, isLK);
     }
+
 }
+

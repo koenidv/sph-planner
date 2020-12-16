@@ -25,7 +25,7 @@ class NetworkManager {
     // todo return success as int
     fun createIndex(listener: DoneListener) {
         // Remove old courses, it'll just lead to isses
-        val dbHelper = DatabaseHelper(applicationContext())
+        val dbHelper = DatabaseHelper.getInstance()
         dbHelper.clear()
 
         // Firstly, load courses from timetable so we have an overview
