@@ -42,10 +42,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         String createCoursesTable = "CREATE TABLE courses(course_id TEXT UNIQUE PRIMARY KEY, gmb_id TEXT UNIQUE, sph_id TEXT UNIQUE, named_id TEXT UNIQUE, number_id TEXT UNIQUE, fullname TEXT, id_teacher TEXT, isFavorite INTEGER, isLK INTEGER)";
         String createChangesTable = "CREATE TABLE changes( changeid TEXT UNIQUE PRIMARY KEY, id_course TEXT UNIQUE, id_course_external TEXT UNIQUE, date TEXT , lessons TEXT , type TEXT  , id_Teacher TEXT , id_course_external_before TEXT , className TEXT , className_before TEXT , id_teacher TEXT , id_subsTeacher TEXT , room TEXT , roombefore TEXT, description TEXT )";
-
+        String createFeaturesTable= "CREATE TABLE features(ID INTEGER  PRIMARY KEY AUTOINCREMENT, name TEXT, type TEXT, icon TEXT, icon TEXT, color TEXT )";
 
         db.execSQL(createCoursesTable);
         db.execSQL(createChangesTable);
+        db.execSQL(createFeaturesTable);
     }
 
     //upgrade Database
