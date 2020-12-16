@@ -25,24 +25,26 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         super(context, "database", null, 1);
     }
 
-    public static DatabaseHelper getInstance(){
-        if(DatabaseHelper.instance==null){
+    public static DatabaseHelper getInstance() {
+        if (DatabaseHelper.instance == null) {
             DatabaseHelper.instance = new DatabaseHelper(SphPlanner.Companion.applicationContext());
         }
         return DatabaseHelper.instance;
     }
 
 
-
-
-
-
     //create Tables for Database
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String createCoursesTable = "CREATE TABLE courses(course_id TEXT UNIQUE PRIMARY KEY, gmb_id TEXT UNIQUE, sph_id TEXT UNIQUE, named_id TEXT UNIQUE, number_id TEXT UNIQUE, fullname TEXT, id_teacher TEXT, isFavorite INTEGER, isLK INTEGER)";
-        String createChangesTable = "CREATE TABLE changes( changeid TEXT UNIQUE PRIMARY KEY, id_course TEXT UNIQUE, id_course_external TEXT UNIQUE, date TEXT , lessons TEXT , type TEXT  , id_Teacher TEXT , id_course_external_before TEXT , className TEXT , className_before TEXT , id_teacher TEXT , id_subsTeacher TEXT , room TEXT , roombefore TEXT, description TEXT )";
-        String createFeaturesTable= "CREATE TABLE features(ID INTEGER  PRIMARY KEY AUTOINCREMENT, name TEXT, type TEXT, icon TEXT, icon TEXT, color TEXT )";
+        String createCoursesTable = "CREATE TABLE courses(course_id TEXT UNIQUE PRIMARY KEY, gmb_id TEXT UNIQUE," +
+                " sph_id TEXT UNIQUE, named_id TEXT UNIQUE, number_id TEXT UNIQUE, fullname TEXT," +
+                " id_teacher TEXT, isFavorite INTEGER, isLK INTEGER)";
+        String createChangesTable = "CREATE TABLE changes( change_id TEXT UNIQUE PRIMARY KEY," +
+                " id_course TEXT UNIQUE, id_course_external TEXT UNIQUE, date TEXT , lessons TEXT," +
+                " type TEXT, id_course_external_before TEXT, className TEXT, className_before TEXT," +
+                " id_teacher TEXT, id_subsTeacher TEXT, room TEXT, room_before TEXT, description TEXT)";
+        String createFeaturesTable = "CREATE TABLE features(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT," +
+                " type TEXT, icon TEXT, color TEXT )";
 
         db.execSQL(createCoursesTable);
         db.execSQL(createChangesTable);
@@ -197,6 +199,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     /**
      * Get a course by named_id
+     *
      * @param namedId External named id to look for
      * @return Course with specified named id or null if none was found
      */
@@ -212,6 +215,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     /**
      * Get favorite Courses
+     *
      * @return List of favorite courses in db
      */
     public List<Course> getFavoriteCourses() {

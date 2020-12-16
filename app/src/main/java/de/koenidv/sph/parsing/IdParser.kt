@@ -99,7 +99,7 @@ class IdParser {
      */
     fun getCourseIdWithSph(courseSphId: String, teacherId: String, isLK: Boolean?, allCourses: List<Course>? = null): String {
         // Extract some useful information from the external course id
-        val values = Regex("""([A-Z]{1,8})(?:[a-z]+)?(\d{2,3})""").find(courseSphId)!!.groupValues
+        val values = Regex("""([A-Z]{1,8})(?:[a-zäöü]+)?(\d{2,3})""").find(courseSphId.replace("-", ""))!!.groupValues
         val classType = values[1].toLowerCase(Locale.ROOT) // Get class type (i.e. G from Q3Gvac03)
         val sphIndex = values[2].toInt().toString() // Get sph's index (i.e. 3 from Q3Gvac03)
 
