@@ -280,7 +280,7 @@ class RawParser {
 
                 // todo create new courses with teacher_id instead of using old ones: might not be available
                 // todo ! Info (instead of Informatik) for example will not be recognized
-                courseWithNamedId = DatabaseHelper(SphPlanner.applicationContext()).getCourseByNamedId(courseName)
+                courseWithNamedId = DatabaseHelper.getInstance().getCourseByNamedId(courseName)
                 if (courseWithNamedId != null) {
                     courseWithNamedId.number_id = courseId
                     courses.add(courseWithNamedId)

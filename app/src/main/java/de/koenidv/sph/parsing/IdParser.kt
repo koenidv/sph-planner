@@ -1,7 +1,6 @@
 package de.koenidv.sph.parsing
 
 import android.annotation.SuppressLint
-import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.database.DatabaseHelper
 import de.koenidv.sph.objects.Change
 import de.koenidv.sph.objects.Course
@@ -60,7 +59,7 @@ class IdParser {
         var coursesWithSameId: List<Course>
         // Get courses with same subject from dataset or database
         coursesWithSameId = allCourses?.filter { it.courseId.startsWith(classType + "_") }
-                ?: DatabaseHelper(SphPlanner.applicationContext()).getCourseByInternalPrefix(classType + "_")
+                ?: DatabaseHelper.getInstance().getCourseByInternalPrefix(classType + "_")
         coursesWithSameId = coursesWithSameId.filter { it.isLK == courseGmbId.toLowerCase(Locale.ROOT).contains("lk") }
         var checkForNewIndex = coursesWithSameId.isNotEmpty()
         var courseToCheck: Course
@@ -83,7 +82,7 @@ class IdParser {
         // Make sure there isn't another course with the same id
         // This might happen if a teacher has both a GK and LK with the same subject
         while ((allCourses?.filter { it.courseId == classType + "_" + teacherId + "_" + index }
-                        ?: DatabaseHelper(SphPlanner.applicationContext()).getCourseByInternalPrefix(classType + "_" + teacherId + "_" + index)).isNotEmpty()) {
+                        ?: DatabaseHelper.getInstance().getCourseByInternalPrefix(classType + "_" + teacherId + "_" + index)).isNotEmpty()) {
             index++
         }
         // Return id, example: m_bar_1 or ch_cas_2
@@ -107,7 +106,7 @@ class IdParser {
         // Check if there's already a matching course using sph's index
         // ! This is still very vague
         var filteredCourses = allCourses?.filter { it.courseId == classType + "_" + teacherId + "_" + sphIndex }
-                ?: DatabaseHelper(SphPlanner.applicationContext()).getCourseByInternalPrefix(classType + "_" + teacherId + "_" + sphIndex)
+                ?: DatabaseHelper.getInstance().getCourseByInternalPrefix(classType + "_" + teacherId + "_" + sphIndex)
         // The list should only contain 0 or 1 elements (unique id)
         // Apart from classType and teacherId, isLK is the only property we can trust
         if (filteredCourses.isNotEmpty()) {
@@ -122,7 +121,7 @@ class IdParser {
         // sph index is not the same as internal index or course has not been seen yet
         // Check if there's a matching course with any index
         filteredCourses = allCourses?.filter { it.courseId == classType + "_" + teacherId + "_" }
-                ?: DatabaseHelper(SphPlanner.applicationContext()).getCourseByInternalPrefix(classType + "_" + teacherId + "_")
+                ?: DatabaseHelper.getInstance().getCourseByInternalPrefix(classType + "_" + teacherId + "_")
         if (isLK != null) filteredCourses = filteredCourses.filter { it.isLK == isLK }
 
         // If there are multiple courses with the same subject by the same teacher which are all LK/GK,
@@ -134,7 +133,7 @@ class IdParser {
         // If a matching course hasn't been seen before, we'll create a new id
         // Check if there are any courses with the same prefix and use the next index
         filteredCourses = allCourses?.filter { it.courseId == classType + "_" + teacherId + "_" }
-                ?: DatabaseHelper(SphPlanner.applicationContext()).getCourseByInternalPrefix(classType + "_" + teacherId + "_")
+                ?: DatabaseHelper.getInstance().getCourseByInternalPrefix(classType + "_" + teacherId + "_")
         return classType + "_" + teacherId + "_" + filteredCourses.size + 1
     }
 
