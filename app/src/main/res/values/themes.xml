@@ -19,6 +19,51 @@
         <item name="actionBarStyle">@style/Theme.SPH.ActionBar</item>
     </style>
 
+    <style name="Theme.SPH.Electric" parent="Theme.SPH">
+        <!-- Primary -->
+        <item name="colorPrimary">@color/purple_500</item>
+        <item name="colorPrimaryVariant">@color/purple_700</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <!-- Secondary -->
+        <item name="colorSecondary">@color/purple_500</item>
+        <item name="colorSecondaryVariant">@color/purple_700</item>
+        <item name="colorOnSecondary">@color/white</item>
+    </style>
+
+    <style name="Theme.SPH.Summer" parent="Theme.SPH">
+        <!-- Primary -->
+        <item name="colorPrimary">@color/orange_a400</item>
+        <item name="colorPrimaryVariant">@color/orange_a700</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <!-- Secondary -->
+        <item name="colorSecondary">@color/orange_a400</item>
+        <item name="colorSecondaryVariant">@color/orange_a700</item>
+        <item name="colorOnSecondary">@color/white</item>
+    </style>
+
+    <style name="Theme.SPH.Autumn" parent="Theme.SPH">
+        <!-- Primary -->
+        <item name="colorPrimary">@color/pink_a400</item>
+        <item name="colorPrimaryVariant">@color/pink_a700</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <!-- Secondary -->
+        <item name="colorSecondary">@color/pink_a400</item>
+        <item name="colorSecondaryVariant">@color/pink_a700</item>
+        <item name="colorOnSecondary">@color/white</item>
+    </style>
+
+    <style name="Theme.SPH.Monochrome" parent="Theme.SPH">
+        <!-- Primary -->
+        <item name="colorPrimary">@color/grey_800_dark</item>
+        <item name="colorPrimaryVariant">@color/black</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <!-- Secondary -->
+        <item name="colorSecondary">@color/grey_800_dark</item>
+        <item name="colorSecondaryVariant">@color/black</item>
+        <item name="colorOnSecondary">@color/white</item>
+    </style>
+
+
     <style name="Theme.SPH.Sheet" parent="Theme.MaterialComponents.DayNight.BottomSheetDialog">
         <item name="android:windowIsFloating">false</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
