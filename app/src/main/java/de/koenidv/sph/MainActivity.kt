@@ -34,6 +34,7 @@ class MainActivity : AppCompatActivity() {
         if (prefs.contains("forceDark"))
             if (prefs.getBoolean("forceDark", true)) AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
             else AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+        else AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
 
         setContentView(R.layout.activity_main)
         val navView = findViewById<BottomNavigationView>(R.id.nav_view)

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/itemLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:paddingStart="16dp"
+    android:paddingTop="12dp"
+    android:paddingEnd="16dp"
+    android:paddingBottom="12dp"
+    android:background="?attr/selectableItemBackground">
+
+    <TextView
+        android:id="@+id/iconTextView"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_gravity="fill_vertical"
+        android:background="@drawable/rounded_rectangle"
+        android:gravity="center"
+        android:padding="4dp"
+        android:text="T"
+        android:textColor="@color/white" />
+
+    <TextView
+        android:id="@+id/nameTextView"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_gravity="fill_vertical"
+        android:drawableEnd="@drawable/ic_chevron_right"
+        android:drawableTint="?attr/colorOnSurface"
+        android:gravity="center_vertical"
+        android:paddingStart="16dp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textSize="16sp"
+        tools:text="Name" />
+</LinearLayout>

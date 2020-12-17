@@ -19,20 +19,20 @@
             app:singleSelection="true">
 
             <Button
-                android:id="@+id/themeDarkButton"
-                style="?attr/materialButtonOutlinedStyle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/menu_option_theme_dark" />
-
-            <Button
                 android:id="@+id/themeLightButton"
                 style="?attr/materialButtonOutlinedStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/menu_option_theme_light" />
+
+            <Button
+                android:id="@+id/themeDarkButton"
+                style="?attr/materialButtonOutlinedStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/menu_option_theme_dark" />
 
             <Button
                 android:id="@+id/themeSystemButton"
@@ -50,7 +50,8 @@
             android:layout_height="wrap_content"
             app:selectionRequired="true"
             app:singleSelection="true"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:layout_marginTop="8dp">
 
             <Button
                 android:id="@+id/accentElectricButton"

@@ -5,14 +5,11 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.provider.ContactsContract;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.Nullable;
-
-import de.koenidv.sph.MainActivity;
 import de.koenidv.sph.SphPlanner;
 import de.koenidv.sph.objects.Course;
 
@@ -39,12 +36,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String createCoursesTable = "CREATE TABLE courses(course_id TEXT UNIQUE PRIMARY KEY, gmb_id TEXT UNIQUE," +
                 " sph_id TEXT UNIQUE, named_id TEXT UNIQUE, number_id TEXT UNIQUE, fullname TEXT," +
                 " id_teacher TEXT, isFavorite INTEGER, isLK INTEGER)";
-        String createChangesTable = "CREATE TABLE changes( change_id TEXT UNIQUE PRIMARY KEY," +
+        String createChangesTable = "CREATE TABLE changes(change_id TEXT UNIQUE PRIMARY KEY," +
                 " id_course TEXT UNIQUE, id_course_external TEXT UNIQUE, date TEXT , lessons TEXT," +
                 " type TEXT, id_course_external_before TEXT, className TEXT, className_before TEXT," +
                 " id_teacher TEXT, id_subsTeacher TEXT, room TEXT, room_before TEXT, description TEXT)";
-        String createTilesTable = "CREATE TABLE Tiles( name TEXT PRIMARY KEY," +
-                " location TEXT, type TEXT, icon TEXT, color TEXT )";
+        String createTilesTable = "CREATE TABLE tiles(name TEXT PRIMARY KEY," +
+                " location TEXT, type TEXT, icon TEXT, color INT)";
 
         db.execSQL(createCoursesTable);
         db.execSQL(createChangesTable);

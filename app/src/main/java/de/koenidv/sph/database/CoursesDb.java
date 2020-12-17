@@ -10,28 +10,21 @@ import java.util.List;
 import de.koenidv.sph.objects.Course;
 
 
-
-public class CourseDbHelper {
+public class CoursesDb {
 
     private final DatabaseHelper dbhelper = DatabaseHelper.getInstance();
 
-    private static CourseDbHelper instance;
+    private static CoursesDb instance;
 
-    private CourseDbHelper() {
+    private CoursesDb() {
     }
 
-    public static CourseDbHelper getInstance() {
-        if (CourseDbHelper.instance == null) {
-            CourseDbHelper.instance = new CourseDbHelper();
+    public static CoursesDb getInstance() {
+        if (CoursesDb.instance == null) {
+            CoursesDb.instance = new CoursesDb();
         }
-        return CourseDbHelper.instance;
+        return CoursesDb.instance;
     }
-
-
-
-
-
-
 
 
     /**
@@ -99,8 +92,8 @@ public class CourseDbHelper {
 
 
         // Check if row exists and insert or update accordingly
-        Cursor cursor =db.rawQuery("SELECT * FROM courses WHERE course_id = '" + course.getCourseId() + "'", null);
-        if ( cursor.getCount()== 0)
+        Cursor cursor = db.rawQuery("SELECT * FROM courses WHERE course_id = '" + course.getCourseId() + "'", null);
+        if (cursor.getCount() == 0)
             db.insert("courses", null, cv);
         else
             db.update("courses", cv, "course_id = '" + course.getCourseId() + "'", null);

@@ -6,5 +6,5 @@ data class Tile(
         val location: String?,
         val type: String?,
         val icon: String?,
-        val color: String?
+        val color: Int?
 )

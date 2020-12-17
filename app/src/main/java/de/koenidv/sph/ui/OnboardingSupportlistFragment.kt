@@ -15,6 +15,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import de.koenidv.sph.MainActivity
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
+import de.koenidv.sph.database.TilesDb
 import de.koenidv.sph.networking.NetworkManager
 import de.koenidv.sph.parsing.RawParser
 
@@ -35,12 +36,18 @@ class OnboardingSupportlistFragment : Fragment() {
 
         // Get supported features
         NetworkManager().loadSiteWithToken("https://start.schulportal.hessen.de/index.php", object : StringRequestListener {
-            override fun onResponse(response: String?) {
-                // todo handle maintenance.. again
+            override fun onResponse(response: String) {
+                if (response.contains("Wartungsarbeiten")) {
+                    onError(null)
+                    return
+                }
 
-                val featureList = RawParser().parseFeatureList(response!!)
+                val featureList = RawParser().parseFeatureList(response)
                 // Get string list of supported features
                 val features = featureList.map { it.name }
+
+                // Save features in case we need them later
+                TilesDb.getInstance().save(featureList)
 
                 // Supported tags
                 val schoolTested = requireContext().resources.getStringArray(R.array.tested_schools).contains(prefs.getString("schoolid", ""))

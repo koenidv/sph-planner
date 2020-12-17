@@ -1,6 +1,7 @@
 package de.koenidv.sph.parsing
 
 import android.annotation.SuppressLint
+import android.graphics.Color
 import android.util.Log
 import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.database.DatabaseHelper
@@ -340,7 +341,9 @@ class RawParser {
         var locationTemp : String
         var type = "unknown"
         var icon : String
-        var color : String
+        var colorTemp : String
+        var colorSplits : List<String>
+        var color : Int
         for (content in rawContents) {
             id = content.substring(content.indexOf("id=\"") + 4)
             id = id.substring(0, id.indexOf("\""))
@@ -352,8 +355,15 @@ class RawParser {
                 locationTemp = content.substring(content.indexOf("<div class=\"textheight\"> <a href=\"") + 34)
                 locationTemp = "https://start.schulportal.hessen.de/" + locationTemp.substring(0, locationTemp.indexOf("\""))
 
-                icon = "" // todo get icon fa-class
-                color = "" // todo parse rgba string to color
+                // todo why the hell do they use fa AND glyphicon
+                icon = Regex(""".*((fa|glyphicon)-\S*)\s+logo"""").find(content)!!.groupValues[1]
+                /*
+                SPH spits out rgb() on desktop but hex values on mobile. interesting
+                colorTemp = content.substring(content.indexOf("background-color: rgb(") + 22)
+                colorSplits = colorTemp.substring(0, colorTemp.indexOf(")")).split(", ")
+                color = Color.rgb(colorSplits[0].toInt(), colorSplits[1].toInt(), colorSplits[2].toInt())
+                */
+                color = Color.parseColor(content.substring(content.indexOf("background-color: #") + 18, content.indexOf("background-color: #") + 25))
 
                 tiles.add(Tile(name, locationTemp, type, icon, color))
 

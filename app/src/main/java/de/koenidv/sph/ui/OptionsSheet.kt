@@ -108,15 +108,15 @@ class OptionsSheet internal constructor() : BottomSheetDialogFragment() {
             dismiss()
         }*/
 
-        // todo creds
+
         view.findViewById<View>(R.id.logoutButton).setOnClickListener {
-            // todo check if we still need
+            // todo check if we still need something
             // todo delete dbs
 
             // Ask if user actually wants to log out
             AlertDialog.Builder(context)
-                    .setTitle(R.string.menu_open_sph_warning_title)
-                    .setMessage(R.string.menu_open_sph_warning_description)
+                    .setTitle(R.string.menu_option_logout)
+                    .setMessage(R.string.menu_option_logout_question)
                     .setPositiveButton(R.string.yes) { _, _ ->
                         run {
                             prefs.edit().clear().apply()
@@ -198,12 +198,16 @@ class OptionsSheet internal constructor() : BottomSheetDialogFragment() {
             }
         }
 
-        view.findViewById<View>(R.id.feedbackButton).setOnClickListener { v: View? ->
+        view.findViewById<View>(R.id.feedbackButton).setOnClickListener {
             // Get app version
             val version: String
             version = try {
                 val pInfo = SphPlanner.applicationContext().packageManager.getPackageInfo(SphPlanner.applicationContext().packageName, 0)
-                pInfo.longVersionCode.toString()
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                    pInfo.longVersionCode.toString()
+                } else {
+                    pInfo.versionCode.toString()
+                }
             } catch (nme: PackageManager.NameNotFoundException) {
                 "?"
             }
@@ -232,7 +236,7 @@ class OptionsSheet internal constructor() : BottomSheetDialogFragment() {
             }
             dismiss()
         }
-        view.findViewById<View>(R.id.doneButton).setOnClickListener { v: View? ->
+        view.findViewById<View>(R.id.doneButton).setOnClickListener {
             // Dismiss the sheet
             dismiss()
         }
