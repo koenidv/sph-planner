@@ -1,4 +1,4 @@
-package com.koenidv.gmbplanner
+package de.koenidv.sph.ui
 
 import android.app.AlertDialog
 import android.content.ActivityNotFoundException
@@ -14,11 +14,10 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.appcompat.content.res.AppCompatResources.getDrawable
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.google.android.material.button.MaterialButtonToggleGroup
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
-import de.koenidv.sph.ui.SignInActivity
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
@@ -33,7 +32,7 @@ class OptionsSheet internal constructor() : BottomSheetDialogFragment() {
     private var refreshedShort: String? = null
     private var refreshedInfo: String? = null
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val view: View = inflater.inflate(R.layout.sheet_options, container, false)
         val prefs = SphPlanner.applicationContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
         val timeFormatter: DateFormat = SimpleDateFormat(getString(R.string.dateformat_hours), Locale.GERMAN)
@@ -82,7 +81,7 @@ class OptionsSheet internal constructor() : BottomSheetDialogFragment() {
                 titleTextView.text = appnameTitle
                 authorTextView.visibility = View.VISIBLE
                 refreshTextView.text = refreshedInfo
-                refreshTextView.setCompoundDrawablesRelativeWithIntrinsicBounds(null, null, resources.getDrawable(R.drawable.ic_refresh), null)
+                refreshTextView.setCompoundDrawablesRelativeWithIntrinsicBounds(null, null, getDrawable(requireContext(), R.drawable.ic_refresh), null)
                 expandButton.setImageResource(R.drawable.ic_less)
             } else {
                 expandLayout.visibility = View.GONE
@@ -111,29 +110,24 @@ class OptionsSheet internal constructor() : BottomSheetDialogFragment() {
 
         // todo creds
         view.findViewById<View>(R.id.logoutButton).setOnClickListener {
-            // Show a bottom sheet to edit credentials
-            prefs.edit().clear().apply()
             // todo check if we still need
             // todo delete dbs
-            startActivity(Intent(context, SignInActivity().javaClass).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP))
-            requireActivity().finish()
+
+            // Ask if user actually wants to log out
+            AlertDialog.Builder(context)
+                    .setTitle(R.string.menu_open_sph_warning_title)
+                    .setMessage(R.string.menu_open_sph_warning_description)
+                    .setPositiveButton(R.string.yes) { _, _ ->
+                        run {
+                            prefs.edit().clear().apply()
+                            startActivity(Intent(context, OnboardingActivity().javaClass).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP))
+                            requireActivity().finish()
+                        }
+                    }
+                    .setNegativeButton(R.string.cancel) { _, _ -> super.dismiss() }
+                    .show()
         }
 
-        // Dark mode toggle group
-        if (Build.VERSION.SDK_INT < 29) {
-            // Display force dark switch if below Android 10
-            val darkToggleGroup: MaterialButtonToggleGroup = view.findViewById(R.id.darkmodeToggleGroup)
-            darkToggleGroup.visibility = View.VISIBLE
-            if (prefs.getBoolean("forceDark", true)) darkToggleGroup.check(R.id.darkButton) else darkToggleGroup.check(R.id.lightButton)
-            darkToggleGroup.addOnButtonCheckedListener { group: MaterialButtonToggleGroup?, checkedId: Int, isChecked: Boolean ->
-                if (isChecked) {
-                    prefs.edit().putBoolean("forceDark", checkedId == R.id.darkButton).apply()
-                    dismiss()
-                    // Send broadcast to recreate
-                    //LocalBroadcastManager.getInstance(context).sendBroadcast(Intent("recreate"))
-                }
-            }
-        }
 
         // Background update toggle group
         /*val backgroundToggleGroup: MaterialButtonToggleGroup = view.findViewById(R.id.backgroundToggleGroup)
@@ -170,6 +164,14 @@ class OptionsSheet internal constructor() : BottomSheetDialogFragment() {
         }*/
 
         /*
+         * "Choose a theme" - Open a bottom sheet to let the user choose a theme combination
+         */
+        view.findViewById<View>(R.id.chooseThemeButton).setOnClickListener {
+            ThemeSheet().show(parentFragmentManager, "themeSheet")
+            dismiss()
+        }
+
+        /*
          * "Open SPH" - Open sph in a browser with automatical oder manual login
          */
         view.findViewById<View>(R.id.openSphButton).setOnClickListener {
@@ -201,7 +203,7 @@ class OptionsSheet internal constructor() : BottomSheetDialogFragment() {
             val version: String
             version = try {
                 val pInfo = SphPlanner.applicationContext().packageManager.getPackageInfo(SphPlanner.applicationContext().packageName, 0)
-                pInfo.versionCode.toString()
+                pInfo.longVersionCode.toString()
             } catch (nme: PackageManager.NameNotFoundException) {
                 "?"
             }

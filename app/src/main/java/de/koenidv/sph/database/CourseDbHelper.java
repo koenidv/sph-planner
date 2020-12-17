@@ -13,12 +13,11 @@ import de.koenidv.sph.objects.Course;
 
 public class CourseDbHelper {
 
-    private DatabaseHelper dbhelper = DatabaseHelper.getInstance();
+    private final DatabaseHelper dbhelper = DatabaseHelper.getInstance();
 
     private static CourseDbHelper instance;
 
     private CourseDbHelper() {
-
     }
 
     public static CourseDbHelper getInstance() {

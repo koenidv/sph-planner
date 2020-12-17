@@ -77,32 +77,6 @@
                 android:layout_height="wrap_content"
                 android:text="@string/info_thanks" />
 
-            <com.google.android.material.button.MaterialButtonToggleGroup
-                android:id="@+id/darkmodeToggleGroup"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                app:selectionRequired="true"
-                app:singleSelection="true"
-                tools:visibility="visible">
-
-                <Button
-                    android:id="@+id/darkButton"
-                    style="?attr/materialButtonOutlinedStyle"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/menu_option_theme_dark" />
-
-                <Button
-                    android:id="@+id/lightButton"
-                    style="?attr/materialButtonOutlinedStyle"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/menu_option_theme_light" />
-
-            </com.google.android.material.button.MaterialButtonToggleGroup>
 
             <View
                 android:id="@+id/divider"
@@ -182,6 +156,15 @@
 
         </com.google.android.material.button.MaterialButtonToggleGroup>
         -->
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/chooseThemeButton"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="@string/menu_option_choosetheme"
+            android:textColor="@color/titleText" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/openSphButton"

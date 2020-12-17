@@ -4,13 +4,13 @@
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/purple_500</item>
         <item name="colorPrimaryVariant">@color/purple_700</item>
-        <item name="colorOnPrimary">@color/black</item>
+        <item name="colorOnPrimary">@color/white</item>
         <item name="backgroundColor">@color/black</item>
         <item name="android:windowBackground">?attr/backgroundColor</item>
         <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/purple_500</item>
         <item name="colorSecondaryVariant">@color/purple_700</item>
-        <item name="colorOnSecondary">@color/black</item>
+        <item name="colorOnSecondary">@color/white</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">@color/black</item>
         <!-- Customize your theme here. -->
@@ -18,13 +18,26 @@
         <item name="actionBarStyle">@style/Theme.SPH.ActionBar</item>
     </style>
 
+    <!-- Override only for 30s theme-->
+    <style name="Theme.SPH.Monochrome" parent="Theme.SPH">
+        <!-- Primary -->
+        <item name="colorPrimary">@color/white</item>
+        <item name="colorPrimaryVariant">@color/grey_100</item>
+        <item name="colorOnPrimary">@color/black</item>
+        <!-- Secondary -->
+        <item name="colorSecondary">@color/white</item>
+        <item name="colorSecondaryVariant">@color/grey_100</item>
+        <item name="colorOnSecondary">@color/black</item>
+    </style>
+
+
     <style name="Theme.SPH.Sheet" parent="Theme.MaterialComponents.DayNight.BottomSheetDialog">
         <item name="android:windowIsFloating">false</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowSoftInputMode">adjustResize</item>
         <item name="bottomSheetStyle">@style/Theme.SPH.ModalStyle</item>
-        <item name="colorAccent">@color/colorAccent</item>
-        <item name="colorPrimary">@color/textColor</item>
+        <item name="colorAccent">@color/white</item>
+        <item name="colorPrimary">@color/white</item>
         <item name="android:windowContentTransitions">true</item>
     </style>
 

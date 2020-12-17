@@ -5,12 +5,13 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.koenidv.gmbplanner.OptionsSheet
-import de.koenidv.sph.ui.SignInActivity
+import de.koenidv.sph.ui.OnboardingActivity
+import de.koenidv.sph.ui.OptionsSheet
 
 //  Created by koenidv on 05.12.2020.
 
@@ -21,11 +22,18 @@ class MainActivity : AppCompatActivity() {
         val prefs = getSharedPreferences("sharedPrefs", MODE_PRIVATE)
         if (!prefs.getBoolean("credsVerified", false)
                 || !prefs.getBoolean("introComplete", false)) {
-            startActivity(Intent(this, SignInActivity().javaClass).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP))
+            startActivity(Intent(this, OnboardingActivity().javaClass).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP))
             finish()
         }
 
         super.onCreate(savedInstanceState)
+
+        // Apply custom accent color theme
+        if (prefs.contains("themeRes")) setTheme(prefs.getInt("themeRes", R.style.Theme_SPH_Electric))
+        // Apply custom dark / light theme
+        if (prefs.contains("forceDark"))
+            if (prefs.getBoolean("forceDark", true)) AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            else AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
 
         setContentView(R.layout.activity_main)
         val navView = findViewById<BottomNavigationView>(R.id.nav_view)

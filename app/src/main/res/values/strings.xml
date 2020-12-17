@@ -12,6 +12,8 @@
     <string name="remove">Remove</string>
     <string name="not_now">Not now</string>
     <string name="continuenow">Continue</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
     <string name="emoji_check" translatable="false">✔</string>
     <string name="emoji_cross" translatable="false">❌</string>
 
@@ -44,9 +46,16 @@
     <string name="info_author">Florian König 2020</string>
     <string name="info_thanks">Special thanks to Ryan etc</string>
     <string name="menu_option_logout">Logout</string>
+    <string name="menu_option_logout_question">Are you sure you want to log out?</string>
     <string name="menu_option_courses">Discovered courses</string>
-    <string name="menu_option_theme_dark">Dark theme</string>
-    <string name="menu_option_theme_light">Light theme</string>
+    <string name="menu_option_choosetheme">Choose a theme</string>
+    <string name="menu_option_theme_light">Light</string>
+    <string name="menu_option_theme_dark">Dark</string>
+    <string name="menu_option_theme_system">System</string>
+    <string name="menu_option_accent_electric">Electric</string>
+    <string name="menu_option_accent_summer">Summer</string>
+    <string name="menu_option_accent_autumn">Autumn</string>
+    <string name="menu_option_accent_monochrome">1930s</string>
     <string name="menu_open_sph">Open SPH</string>
     <string name="menu_open_sph_warning_title">Log in automatically?</string>
     <string name="menu_open_sph_warning_description">Your service provider or attackers might be able to see your credentials if you log in automatically.</string>
