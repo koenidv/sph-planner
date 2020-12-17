@@ -43,12 +43,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 " id_course TEXT UNIQUE, id_course_external TEXT UNIQUE, date TEXT , lessons TEXT," +
                 " type TEXT, id_course_external_before TEXT, className TEXT, className_before TEXT," +
                 " id_teacher TEXT, id_subsTeacher TEXT, room TEXT, room_before TEXT, description TEXT)";
-        String createFeaturesTable = "CREATE TABLE features(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT," +
-                " type TEXT, icon TEXT, color TEXT )";
+        String createTilesTable = "CREATE TABLE Tiles( name TEXT PRIMARY KEY," +
+                " location TEXT, type TEXT, icon TEXT, color TEXT )";
 
         db.execSQL(createCoursesTable);
         db.execSQL(createChangesTable);
-        db.execSQL(createFeaturesTable);
+        db.execSQL(createTilesTable);
     }
 
     //upgrade Database
