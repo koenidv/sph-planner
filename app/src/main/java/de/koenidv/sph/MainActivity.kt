@@ -6,6 +6,7 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
@@ -58,10 +59,16 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Ignore item, there's only one
-        // Show a bottom sheet with information and options
-        val optionsSheet = OptionsSheet()
-        optionsSheet.show(supportFragmentManager, "optionsSheet")
+        if (item.itemId == R.id.optionsItem) {
+            // Show a bottom sheet with information and options
+            val optionsSheet = OptionsSheet()
+            optionsSheet.show(supportFragmentManager, "optionsSheet")
+        }
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        val navController = findNavController(R.id.nav_host_fragment)
+        return navController.navigateUp() || super.onSupportNavigateUp()
     }
 }

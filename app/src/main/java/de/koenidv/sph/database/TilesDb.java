@@ -31,18 +31,18 @@ public class TilesDb {
 
         List<Tile> returnList = new ArrayList<>();
 
-        String queryString = "SELECT * FROM courses";
+        String queryString = "SELECT * FROM tiles";
 
         SQLiteDatabase db = dbhelper.getReadableDatabase();
 
         Cursor cursor = db.rawQuery(queryString, null);
         if (cursor.moveToFirst()) {
             do {
-                String name = cursor.getString(1);
-                String location = cursor.getString(2);
-                String type = cursor.getString(3);
-                String icon = cursor.getString(4);
-                int color = cursor.getInt(5);
+                String name = cursor.getString(0);
+                String location = cursor.getString(1);
+                String type = cursor.getString(2);
+                String icon = cursor.getString(3);
+                int color = cursor.getInt(4);
 
                 Tile newTile = new Tile(name, location, type, icon, color);
 
@@ -82,7 +82,7 @@ public class TilesDb {
         if (cursor.getCount() == 0) {
             db.insert("tiles", null, cv);
         } else {
-            db.update("courses", cv, "course_id = '" + tile.getName() + "'", null);
+            db.update("tiles", cv, "name = '" + tile.getName() + "'", null);
         }
         cursor.close();
     }

@@ -27,5 +27,24 @@
         android:id="@+id/nav_links"
         android:name="de.koenidv.sph.ui.LinksFragment"
         android:label="@string/title_links"
-        tools:layout="@layout/fragment_dashboard" />
+        tools:layout="@layout/fragment_dashboard">
+        <action
+            android:id="@+id/webviewAction"
+            app:destination="@id/frag_webview"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_close_exit"
+            app:popEnterAnim="@anim/fragment_open_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/frag_webview"
+        android:name="de.koenidv.sph.ui.WebViewFragment"
+        android:label="@string/title_links"
+        tools:layout="@layout/fragment_webview">
+        <argument
+            android:name="url"
+            app:argType="string" />
+    </fragment>
+
 </navigation>

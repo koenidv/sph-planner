@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.webkit.CookieManager
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.ProgressBar
 import androidx.fragment.app.Fragment
 import de.koenidv.sph.R
 import de.koenidv.sph.networking.TokenManager
@@ -27,7 +28,6 @@ class MessagesFragment : Fragment() {
         val domain = "https://start.schulportal.hessen.de"
 
         webView.webViewClient = WebViewClient()
-        webView.settings.javaScriptEnabled = true
         webView.settings.domStorageEnabled = true
         webView.settings.builtInZoomControls = true
         cookieManager.removeSessionCookies(null)
@@ -39,6 +39,8 @@ class MessagesFragment : Fragment() {
             override fun onTokenGenerated(success: Int, token: String) {
                 cookieManager.setCookie(domain, "sid=$token")
                 webView.loadUrl(domain)
+                webView.visibility = View.VISIBLE
+                view.findViewById<ProgressBar>(R.id.webviewLoading)?.visibility = View.GONE
             }
         })
 
