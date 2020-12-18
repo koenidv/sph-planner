@@ -61,7 +61,7 @@ class TokenManager {
                                             .putLong("token_last_success", Date().time)
                                             .apply()
                                 } else if (response.contains("Login - Schulportal Hessen")) {
-                                    // Login not successfull
+                                    // Login not successful
                                     callback.onTokenGenerated(NetworkManager().FAILED_INVALID_CREDENTIALS, "")
                                     prefs.edit().putLong("token_last_success", 0).apply()
                                 } else if (response.contains("Wartungsarbeiten")) {

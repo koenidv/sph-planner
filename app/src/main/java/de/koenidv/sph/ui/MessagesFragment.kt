@@ -1,5 +1,6 @@
 package de.koenidv.sph.ui
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -28,6 +29,10 @@ class MessagesFragment : Fragment() {
         val domain = "https://start.schulportal.hessen.de"
 
         webView.webViewClient = WebViewClient()
+        // js might introduce xss vulns
+        // this is just a demo, sph won't work without js
+        @SuppressLint("SetJavaScriptEnabled")
+        webView.settings.javaScriptEnabled = true
         webView.settings.domStorageEnabled = true
         webView.settings.builtInZoomControls = true
         cookieManager.removeSessionCookies(null)

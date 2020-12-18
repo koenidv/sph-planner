@@ -80,17 +80,4 @@ class WebViewFragment : Fragment() {
 
         return view
     }
-
-
-    companion object {
-
-        @JvmStatic
-        fun newInstance(url: String) = WebViewFragment().apply {
-            arguments = Bundle().apply {
-                putString("url", url)
-            }
-        }
-    }
-
-
 }

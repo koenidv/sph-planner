@@ -9,7 +9,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import de.koenidv.sph.R
-import de.koenidv.sph.networking.NetworkManager
 
 
 class HomeFragment : Fragment() {
@@ -25,14 +24,7 @@ class HomeFragment : Fragment() {
 
         val loginButton = view.findViewById<Button>(R.id.signinButton)
         loginButton.setOnClickListener {
-            /*TokenManager().generateAccessToken {
-                Toast.makeText(applicationContext(), "Success", Toast.LENGTH_LONG).show()
-            }*/
-            NetworkManager().createIndex(object : NetworkManager.DoneListener {
-                override fun onComplete(success: Boolean) {
-                    Toast.makeText(context, "Success?", Toast.LENGTH_LONG).show()
-                }
-            })
+            Toast.makeText(requireContext(), "Heute nicht, Kartoffel", Toast.LENGTH_SHORT).show()
         }
 
         loginButton.setOnLongClickListener {

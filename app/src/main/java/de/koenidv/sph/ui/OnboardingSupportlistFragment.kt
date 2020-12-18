@@ -46,9 +46,6 @@ class OnboardingSupportlistFragment : Fragment() {
                 // Get string list of supported features
                 val features = featureList.map { it.name }
 
-                // Save features in case we need them later
-                TilesDb.getInstance().save(featureList)
-
                 // Supported tags
                 val schoolTested = requireContext().resources.getStringArray(R.array.tested_schools).contains(prefs.getString("schoolid", ""))
                 var allFeatures = true
@@ -120,14 +117,51 @@ class OnboardingSupportlistFragment : Fragment() {
                 if (someFeatures) {
                     warningText.visibility = View.VISIBLE
                     // todo start indexing
-                    //indexLoading.visibility = View.VISIBLE
-                    nextFab.visibility = View.VISIBLE
-                    // todo only activate after indexing is complete
-                    prefs.edit().putBoolean("introComplete", true).apply()
+                    indexLoading.visibility = View.VISIBLE
                 }
+
+
+                /*
+                 * Start indexing
+                 */
+
+                // Resolve tile urls
+                var tilesResolved = 0
+                for (feature in featureList) {
+                    NetworkManager().resolveUrl(feature.location, onComplete = { success: Int, resolvedUrl: String ->
+                        kotlin.run {
+                            // Save new url to object
+                            // todo handle errors
+                            if (success == NetworkManager().SUCCESS
+                                    || success == NetworkManager().FAILED_UNKNOWN // If sph redirected back to home
+                            )
+                                feature.location = resolvedUrl
+                            // Save number of tiles resolved
+                            tilesResolved++
+                            // If this was the last tile
+                            if (tilesResolved == featureList.size) {
+                                // Save features in case we need them later
+                                TilesDb.getInstance().save(featureList)
+
+                                // Now index courses
+                                NetworkManager().createCourseIndex {
+                                    if (it == NetworkManager().SUCCESS) {
+                                        indexLoading.visibility = View.GONE
+                                        nextFab.visibility = View.VISIBLE
+                                        prefs.edit().putBoolean("introComplete", true).apply()
+                                    }
+                                    // todo handle errors
+                                }
+                            }
+                        }
+                    })
+                }
+
+
             }
 
             override fun onError(anError: ANError?) {
+                // Display network error
                 featuresLoading.visibility = View.GONE
                 titleText.text = getString(R.string.onboard_supported_error_network)
                 warningText.visibility = View.VISIBLE
@@ -140,8 +174,8 @@ class OnboardingSupportlistFragment : Fragment() {
 
         })
 
-
-        nextFab.setOnClickListener { startActivity(Intent(context, MainActivity().javaClass)) }
+        // Continue button
+        nextFab.setOnClickListener { startActivity(Intent(context, MainActivity().javaClass)); requireActivity().finish() }
 
 
         return view

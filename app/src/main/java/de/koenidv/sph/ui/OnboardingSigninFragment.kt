@@ -16,6 +16,7 @@ import com.androidnetworking.AndroidNetworking
 import com.androidnetworking.common.Priority
 import com.androidnetworking.error.ANError
 import com.androidnetworking.interfaces.StringRequestListener
+import com.facebook.stetho.okhttp3.StethoInterceptor
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.google.android.material.textfield.TextInputLayout
 import com.toptoche.searchablespinnerlibrary.SearchableSpinner
@@ -59,7 +60,7 @@ class OnboardingSigninFragment : Fragment() {
 
             // Load school names and ids to display them in a spinner
             // Hide loading icon and show contents once done
-            AndroidNetworking.initialize(SphPlanner.applicationContext(), OkHttpClient())
+            AndroidNetworking.initialize(SphPlanner.applicationContext(), OkHttpClient.Builder().addNetworkInterceptor(StethoInterceptor()).build())
             AndroidNetworking.get("https://start.schulportal.hessen.de/")
                     .setPriority(Priority.LOW)
                     .build()
