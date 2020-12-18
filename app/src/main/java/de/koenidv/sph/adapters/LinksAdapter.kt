@@ -42,19 +42,23 @@ class LinksAdapter(private val dataset: List<Tile>, private val onClick: (Tile) 
 
             // Set data
             nameText.text = tile.name
+            var icon = tile.icon.replace("fa-", "")
+            if (icon.startsWith("glyphicon-")) icon = icon.substring(icon.lastIndexOf("-") + 1)
+            // replace some icons that we know don't work
+            icon = icon.replace("mail-bulk", "comment-alt") // This does not even work on desktop
+                    .replace("video-camera", "play") // This does work but looks horrible (Edupool)
+                    .replace("project-diagram", "sitemap")
+
+            iconText.text = icon
 
             // Set icon background color
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                (iconText.background as StateListDrawable).colorFilter = BlendModeColorFilter(tile.color
-                        ?: -16777216, BlendMode.SRC_ATOP)
+                (iconText.background as StateListDrawable).colorFilter = BlendModeColorFilter(tile.color, BlendMode.SRC_ATOP)
             } else {
                 @Suppress("DEPRECATION") // not in < Q
                 (iconText.background as StateListDrawable)
-                        .setColorFilter(tile.color
-                                ?: -16777216, PorterDuff.Mode.SRC_ATOP)
+                        .setColorFilter(tile.color, PorterDuff.Mode.SRC_ATOP)
             }
-            // todo use fontawesome and glyphicon
-            iconText.text = tile.name.take(1)
         }
     }
 

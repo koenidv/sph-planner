@@ -4,9 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.webkit.CookieManager
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -32,10 +30,11 @@ class WebViewFragment : Fragment() {
         val cookieManager = CookieManager.getInstance()
         cookieManager.acceptCookie()
 
+        // Get passed url argument
         val domain = arguments?.getString("url")
                 ?: "https://start.schulportal.hessen.de"
 
-
+        // Set a client for the WebView
         webView.webViewClient = object : WebViewClient() {
             override fun onPageFinished(webview: WebView?, url: String?) {
                 // Check if login was successfull on page load
@@ -61,6 +60,17 @@ class WebViewFragment : Fragment() {
         cookieManager.removeSessionCookies(null)
         cookieManager.setAcceptThirdPartyCookies(webView, true)
 
+        // Enable using back button for webView
+        webView.setOnKeyListener { _, _, keyEvent ->
+            if (keyEvent.keyCode == KeyEvent.KEYCODE_BACK && !webView.canGoBack()) {
+                // Ignore this listener if webView can't go back
+                false
+            } else if (keyEvent.keyCode == KeyEvent.KEYCODE_BACK && keyEvent.action == MotionEvent.ACTION_UP) {
+                // Go back in webView and ignore button press
+                webView.goBack()
+                true
+            } else true // Ignore this listener if any other button was pressed
+        }
 
         // Generate access token, save as cookie and load once done
         TokenManager().generateAccessToken(object : TokenManager.TokenGeneratedListener {
@@ -72,11 +82,6 @@ class WebViewFragment : Fragment() {
                 view.findViewById<ProgressBar>(R.id.webviewLoading).visibility = View.GONE
             }
         })
-
-
-        // Only update counter if sign-in was successfull
-        // prefs.edit().putLong("token_lastuse", Date().time).apply()
-
 
         return view
     }

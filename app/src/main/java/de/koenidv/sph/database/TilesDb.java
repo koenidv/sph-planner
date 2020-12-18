@@ -12,11 +12,11 @@ import de.koenidv.sph.objects.Tile;
 public class TilesDb {
 
     private final DatabaseHelper dbhelper = DatabaseHelper.getInstance();
+    private final SQLiteDatabase db = dbhelper.getReadableDatabase();
 
     private static TilesDb instance;
 
     private TilesDb() {
-
     }
 
     public static TilesDb getInstance() {
@@ -33,8 +33,6 @@ public class TilesDb {
 
         String queryString = "SELECT * FROM tiles";
 
-        SQLiteDatabase db = dbhelper.getReadableDatabase();
-
         Cursor cursor = db.rawQuery(queryString, null);
         if (cursor.moveToFirst()) {
             do {
@@ -50,7 +48,36 @@ public class TilesDb {
             } while (cursor.moveToNext());
         }
         cursor.close();
-        db.close();
+        return returnList;
+    }
+
+    /**
+     * Get a List of Tiles with a specific type
+     *
+     * @param type Feature type to query for
+     * @return List of all Tiles in the db with the given type
+     */
+    public List<Tile> getTilesByType(String type) {
+        List<Tile> returnList = new ArrayList<>();
+
+        String queryString = "SELECT * FROM tiles WHERE type = '" + type + "'";
+
+        Cursor cursor = db.rawQuery(queryString, null);
+        if (cursor.moveToFirst()) {
+            do {
+                String name = cursor.getString(0);
+                String location = cursor.getString(1);
+                String tiletype = cursor.getString(2);
+                String icon = cursor.getString(3);
+                int color = cursor.getInt(4);
+
+                Tile newTile = new Tile(name, location, tiletype, icon, color);
+
+                returnList.add(newTile);
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
         return returnList;
     }
 
@@ -68,13 +95,12 @@ public class TilesDb {
 
 
     public void save(Tile tile) {
-        SQLiteDatabase db = DatabaseHelper.getInstance().getWritableDatabase();
         ContentValues cv = new ContentValues();
 
         cv.put("name", tile.getName());
         if (tile.getLocation() != null) cv.put("location", tile.getLocation());
         if (tile.getType() != null) cv.put("type", tile.getType());
-        if (tile.getColor() != null) cv.put("color", tile.getColor());
+        cv.put("color", tile.getColor());
         if (tile.getIcon() != null) cv.put("icon", tile.getIcon());
 
 

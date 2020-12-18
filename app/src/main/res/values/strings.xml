@@ -46,7 +46,7 @@
     <string name="info_author">Florian König 2020</string>
     <string name="info_thanks">Special thanks to Ryan etc</string>
     <string name="menu_option_logout">Logout</string>
-    <string name="menu_option_logout_question">Are you sure you want to log out?</string>
+    <string name="menu_option_logout_question">Are you sure you want to log out?\nAll local data will be removed.</string>
     <string name="menu_option_courses">Discovered courses</string>
     <string name="menu_option_choosetheme">Choose a theme</string>
     <string name="menu_option_theme_light">Light</string>
@@ -70,6 +70,8 @@
     <string name="last_refreshed_hourly">Updated within an hour</string>
     <string name="last_refreshed_other">Updated a while ago</string>
 
+    <!-- Explore tab -->
+    <string name="tile_startpage">Start</string>
 
     <!-- Feedback -->
     <string name="feedback_subject" translatable="false">[SPHplanner] Feedback</string>
@@ -77,5 +79,4 @@
 
     <!-- Usabilty -->
     <string name="imagedescr_expand">Expand</string>
-    <!-- TODO: Remove or change this placeholder text -->
 </resources>

@@ -3,6 +3,7 @@ package de.koenidv.sph.parsing
 import android.annotation.SuppressLint
 import android.graphics.Color
 import android.util.Log
+import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.database.DatabaseHelper
 import de.koenidv.sph.objects.Change
@@ -17,7 +18,7 @@ class RawParser {
     // todo documentation
     @Suppress("LocalVariableName")
     @SuppressLint("DefaultLocale")
-    fun parseChanges(rawResponse : String): List<Change> {
+    fun parseChanges(rawResponse: String): List<Change> {
         val changes = mutableListOf<Change>()
 
         // todo check if response is valid
@@ -157,7 +158,7 @@ class RawParser {
      * @param rawResponse Html repsonse from SPH
      * @return List of all found courses
      */
-    fun parseCoursesFromTimetable(rawResponse : String) : List<Course> {
+    fun parseCoursesFromTimetable(rawResponse: String): List<Course> {
         val courses = mutableListOf<Course>()
 
         // Split response into every entry
@@ -165,8 +166,8 @@ class RawParser {
         lessons[lessons.size - 1] = lessons.last().substring(0, lessons.last().indexOf("</div>"))
         lessons.removeFirst() // Remove first element, it's not a lesson
 
-        var courseGmbId : String
-        var teacherId : String
+        var courseGmbId: String
+        var teacherId: String
         var courseInternalId: String
         // Add course from each lesson if not yet added
         for (lesson in lessons) {
@@ -209,7 +210,7 @@ class RawParser {
      * @param rawResponse Html repsonse from SPH
      * @return List of all found courses
      */
-    fun parseCoursesFromStudygroups(rawResponse : String) : List<Course> {
+    fun parseCoursesFromStudygroups(rawResponse: String): List<Course> {
         val courses = mutableListOf<Course>()
         // Remove stuff we don't need
         // There are multiple tables in this page, we'll just take the first one
@@ -225,17 +226,17 @@ class RawParser {
         val rawContents = rawContent.split("<tr").toMutableList()
         rawContents.removeFirst()
 
-        var namedId : String
-        var sphId : String
-        var teacherId : String
-        var internalId : String
+        var namedId: String
+        var sphId: String
+        var teacherId: String
+        var internalId: String
 
         // Get data from each table row and save the courses
         for (entry in rawContents) {
             namedId = entry.substring(Utility().ordinalIndexOf(entry, "<td>", 1) + 4, entry.indexOf("<small>") - 1).trim()
             sphId = entry.substring(entry.indexOf("<small>") + 8, entry.indexOf("</small>") - 1)
             teacherId = entry.substring(Utility().ordinalIndexOf(entry, "<td>", 2))
-                    teacherId = teacherId.substring(teacherId.indexOf("(") + 1, teacherId.indexOf(")")).toLowerCase(Locale.ROOT)
+            teacherId = teacherId.substring(teacherId.indexOf("(") + 1, teacherId.indexOf(")")).toLowerCase(Locale.ROOT)
             internalId = IdParser().getCourseIdWithSph(sphId, teacherId, entry.contains("LK"))
 
             courses.add(Course(
@@ -269,9 +270,9 @@ class RawParser {
         rawContents.removeFirst() // Trash
         rawContents.removeFirst() // Overview link
 
-        var courseName : String
-        var courseId : String
-        var courseWithNamedId : Course?
+        var courseName: String
+        var courseId: String
+        var courseWithNamedId: Course?
         // Get values from list
         for (entry in rawContents) {
             if (entry.contains("a=sus_view&id=")) {
@@ -304,7 +305,7 @@ class RawParser {
         val rawContents = rawResponse.replace("\n", "").split("<a class=\"list-group-item\"").toMutableList()
         rawContents.removeFirst()
 
-        var id : String
+        var id: String
         for (content in rawContents) {
             id = content.substring(content.indexOf("data-id=") + 9, content.indexOf("data-id=") + 13)
             if (!id.startsWith("200") && !id.contains("\"")) { // 5-digit ids starting with 200 for companies or 3 only 3 digits
@@ -336,14 +337,15 @@ class RawParser {
                 .split("<li class").toMutableList()
         rawContents.removeFirst()
 
-        var id : String
-        var name : String
-        var locationTemp : String
-        var type = "unknown"
-        var icon : String
-        var colorTemp : String
-        var colorSplits : List<String>
-        var color : Int
+        // Name-type map
+        val nametypeMap = Utility().parseStringArray(R.array.tiles_name_type)
+
+        var id: String
+        var name: String
+        var locationTemp: String
+        var type: String
+        var icon: String
+        var color: Int
         for (content in rawContents) {
             id = content.substring(content.indexOf("id=\"") + 4)
             id = id.substring(0, id.indexOf("\""))
@@ -355,7 +357,6 @@ class RawParser {
                 locationTemp = content.substring(content.indexOf("<div class=\"textheight\"> <a href=\"") + 34)
                 locationTemp = "https://start.schulportal.hessen.de/" + locationTemp.substring(0, locationTemp.indexOf("\""))
 
-                // todo why the hell do they use fa AND glyphicon
                 icon = Regex(""".*((fa|glyphicon)-\S*)\s+logo"""").find(content)!!.groupValues[1]
                 /*
                 SPH spits out rgb() on desktop but hex values on mobile. interesting
@@ -364,6 +365,8 @@ class RawParser {
                 color = Color.rgb(colorSplits[0].toInt(), colorSplits[1].toInt(), colorSplits[2].toInt())
                 */
                 color = Color.parseColor(content.substring(content.indexOf("background-color: #") + 18, content.indexOf("background-color: #") + 25))
+
+                type = nametypeMap[name] ?: "other"
 
                 tiles.add(Tile(name, locationTemp, type, icon, color))
 

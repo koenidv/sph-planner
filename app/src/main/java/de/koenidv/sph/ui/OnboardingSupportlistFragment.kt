@@ -42,6 +42,9 @@ class OnboardingSupportlistFragment : Fragment() {
                     return
                 }
 
+                // todo get real name from result
+                // todo all indexing in NetworkManager
+
                 val featureList = RawParser().parseFeatureList(response)
                 // Get string list of supported features
                 val features = featureList.map { it.name }
@@ -60,16 +63,16 @@ class OnboardingSupportlistFragment : Fragment() {
                 if (!features.contains("Mein Unterricht")) {
                     allFeatures = false
                     usableFeatures = false
-                    someFeatures = true
                     featurelistText = featurelistText.replace("%mycourses", crossmarkText)
                 } else {
+                    someFeatures = true
                     featurelistText = featurelistText.replace("%mycourses", checkmarkText)
                 }
                 if (!features.contains("Nachrichten")) {
                     allFeatures = false
-                    someFeatures = true
                     featurelistText = featurelistText.replace("%messages", crossmarkText)
                 } else {
+                    someFeatures = true
                     featurelistText = featurelistText.replace("%messages", checkmarkText)
                 }
                 if (!features.contains("Lerngruppen")) {
@@ -82,17 +85,17 @@ class OnboardingSupportlistFragment : Fragment() {
                 if (!features.contains("Stundenplan")) {
                     allFeatures = false
                     usableFeatures = false
-                    someFeatures = true
                     featurelistText = featurelistText.replace("%timetable", crossmarkText)
                 } else {
+                    someFeatures = true
                     featurelistText = featurelistText.replace("%timetable", checkmarkText)
                 }
                 if (!features.contains("Vertretungsplan") && !features.contains("Testphase Vertretungsplan")) {
                     allFeatures = false
                     usableFeatures = false
-                    someFeatures = true
                     featurelistText = featurelistText.replace("%changes", crossmarkText)
                 } else {
+                    someFeatures = true
                     featurelistText = featurelistText.replace("%changes", checkmarkText)
                 }
 
@@ -118,45 +121,45 @@ class OnboardingSupportlistFragment : Fragment() {
                     warningText.visibility = View.VISIBLE
                     // todo start indexing
                     indexLoading.visibility = View.VISIBLE
-                }
 
 
-                /*
+                    /*
                  * Start indexing
                  */
 
-                // Resolve tile urls
-                var tilesResolved = 0
-                for (feature in featureList) {
-                    NetworkManager().resolveUrl(feature.location, onComplete = { success: Int, resolvedUrl: String ->
-                        kotlin.run {
-                            // Save new url to object
-                            // todo handle errors
-                            if (success == NetworkManager().SUCCESS
-                                    || success == NetworkManager().FAILED_UNKNOWN // If sph redirected back to home
-                            )
-                                feature.location = resolvedUrl
-                            // Save number of tiles resolved
-                            tilesResolved++
-                            // If this was the last tile
-                            if (tilesResolved == featureList.size) {
-                                // Save features in case we need them later
-                                TilesDb.getInstance().save(featureList)
+                    // Resolve tile urls
+                    var tilesResolved = 0
+                    for (feature in featureList) {
+                        NetworkManager().resolveUrl(feature.location, onComplete = { success: Int, resolvedUrl: String ->
+                            kotlin.run {
+                                // Save new url to object
+                                // todo handle errors
+                                if (success == NetworkManager().SUCCESS
+                                        || success == NetworkManager().FAILED_UNKNOWN // If sph redirected back to home
+                                )
+                                    feature.location = resolvedUrl
+                                // Save number of tiles resolved
+                                tilesResolved++
+                                // If this was the last tile
+                                if (tilesResolved == featureList.size) {
+                                    // Save features in case we need them later
+                                    TilesDb.getInstance().save(featureList)
 
-                                // Now index courses
-                                NetworkManager().createCourseIndex {
-                                    if (it == NetworkManager().SUCCESS) {
-                                        indexLoading.visibility = View.GONE
-                                        nextFab.visibility = View.VISIBLE
-                                        prefs.edit().putBoolean("introComplete", true).apply()
+                                    // Now index courses
+                                    NetworkManager().createCourseIndex {
+                                        if (it == NetworkManager().SUCCESS) {
+                                            indexLoading.visibility = View.GONE
+                                            nextFab.visibility = View.VISIBLE
+                                            prefs.edit().putBoolean("introComplete", true).apply()
+                                        }
+                                        // todo handle errors
                                     }
-                                    // todo handle errors
                                 }
                             }
-                        }
-                    })
-                }
+                        })
+                    }
 
+                }
 
             }
 

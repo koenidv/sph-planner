@@ -1,11 +1,14 @@
 package de.koenidv.sph.networking
 
+import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
 import com.androidnetworking.AndroidNetworking
 import com.androidnetworking.common.Priority
 import com.androidnetworking.error.ANError
 import com.androidnetworking.interfaces.OkHttpResponseListener
 import com.androidnetworking.interfaces.StringRequestListener
 import com.facebook.stetho.okhttp3.StethoInterceptor
+import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.SphPlanner.Companion.applicationContext
 import de.koenidv.sph.database.DatabaseHelper
 import de.koenidv.sph.parsing.RawParser
@@ -13,6 +16,7 @@ import okhttp3.Cookie
 import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Response
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 //  Created by koenidv on 11.12.2020.
@@ -29,9 +33,13 @@ class NetworkManager {
     // todo use lambdas
     // todo handle errors
     fun createCourseIndex(onComplete: (success: Int) -> Unit) {
+        val prefs = applicationContext().getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
         // Remove old courses, it'll just lead to isses
         val dbHelper = DatabaseHelper.getInstance()
         dbHelper.clear()
+        // Set courses last updated to 0 in case this gets cancelled
+        prefs.edit().putLong("courses_last_updated", 0).apply()
+
 
         // Firstly, load courses from timetable so we have an overview
         loadSiteWithToken("https://start.schulportal.hessen.de/stundenplan.php", object : StringRequestListener {
@@ -49,6 +57,8 @@ class NetworkManager {
                             override fun onResponse(response: String?) {
                                 dbHelper.save(RawParser().parseCoursesFromPostsoverview(response!!))
                                 onComplete(SUCCESS)
+                                // Remember when we last updated the courses
+                                prefs.edit().putLong("courses_last_updated", Date().time).apply()
                             }
 
                             override fun onError(anError: ANError?) {
@@ -141,7 +151,11 @@ class NetworkManager {
                             }
 
                             override fun onError(anError: ANError?) {
-                                TODO("Not yet implemented")
+                                // Running in emulator will cause an ssl errora
+                                // Network error will also happen if there is a timeout or no connection
+                                // Not a huge deal though, the unresolved url will work as well. For now.
+                                Log.e(SphPlanner.TAG, anError!!.errorDetail + ": " + url)
+                                onComplete(FAILED_UNKNOWN, url)
                             }
 
                         })

@@ -3,4 +3,12 @@
     <string-array name="tested_schools">
         <item>5146</item>
     </string-array>
+    <string-array name="tiles_name_type">
+        <item>Mein Unterricht|mycourses</item>
+        <item>Nachrichten|messages</item>
+        <item>Stundenplan|timetable</item>
+        <item>Testphase Vertretungsplan|changes</item>
+        <item>Vertretungsplan|changes</item>
+        <item>Lerngruppen|studygroups</item>
+    </string-array>
 </resources>

@@ -54,7 +54,7 @@
     <string name="onboard_supported_featurelist">%mycourses Mein Unterricht\n%messages Nachrichten\n%studygroups Lerngruppen\n%timetable Stundenplan\n%changes Vertretungsplan</string>
     <string name="onboard_supported_error_network">Ein Netzwerkfehler ist aufgetreten.\nTippe, um es erneut zu versuchen.</string>
     <string name="onboard_supported_features_partly_manual">✔ Deine Schule unterstützt einige der Funktionen, die wir benötigen, du musst allerdings einige Daten manuell hinzufügen.</string>
-    <string name="menu_option_logout_question">Bist du sicher, dass du dich abmelden möchtest?</string>
+    <string name="menu_option_logout_question">Bist du sicher, dass du dich abmelden möchtest?\nAlle lokalen Daten werden gelöscht.</string>
     <string name="menu_option_choosetheme">Design ändern</string>
     <string name="menu_option_theme_system">System</string>
     <string name="menu_option_accent_electric">Elektrisch</string>
@@ -63,5 +63,6 @@
     <string name="menu_option_accent_monochrome">1930er</string>
     <string name="yes">Ja</string>
     <string name="no">Nein</string>
+    <string name="tile_startpage">Startseite</string>
 
 </resources>

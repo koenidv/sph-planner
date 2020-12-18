@@ -5,6 +5,6 @@ data class Tile(
         var name: String,
         var location: String,
         var type: String?,
-        var icon: String?,
-        var color: Int?
+        var icon: String,
+        var color: Int
 )
