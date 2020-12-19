@@ -1,6 +1,7 @@
 package de.koenidv.sph.ui
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,7 +12,9 @@ import android.webkit.WebViewClient
 import android.widget.ProgressBar
 import androidx.fragment.app.Fragment
 import de.koenidv.sph.R
+import de.koenidv.sph.networking.NetworkManager
 import de.koenidv.sph.networking.TokenManager
+import java.util.*
 
 // Created by koenidv on 18.12.2020.
 class MessagesFragment : Fragment() {
@@ -40,17 +43,16 @@ class MessagesFragment : Fragment() {
         WebView.setWebContentsDebuggingEnabled(true)
 
         // Generate access token, save as cookie and load once done
-        TokenManager().generateAccessToken(object : TokenManager.TokenGeneratedListener {
-            override fun onTokenGenerated(success: Int, token: String) {
+        TokenManager().generateAccessToken { success: Int, token: String? ->
+            if (success == NetworkManager().SUCCESS) {
                 cookieManager.setCookie(domain, "sid=$token")
                 webView.loadUrl(domain)
                 webView.visibility = View.VISIBLE
                 view.findViewById<ProgressBar>(R.id.webviewLoading)?.visibility = View.GONE
+                if (context != null)
+                    requireContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE).edit().putLong("token_lastuse", Date().time).apply()
             }
-        })
-
-        // Only update counter if sign-in was successfull
-        // prefs.edit().putLong("token_lastuse", Date().time).apply()
+        }
 
 
         return view

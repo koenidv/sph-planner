@@ -130,7 +130,6 @@ class OnboardingSigninFragment : Fragment() {
                     signinButton.extend()
                 } else {
                     signinButton.isEnabled = false
-                    //signinButton.shrink()
                 }
             }
             // Sign in using keyboard mime action
@@ -166,9 +165,9 @@ class OnboardingSigninFragment : Fragment() {
 
                 // Check if credentials are valid
                 // We'll only get a token if login was successfull
-                TokenManager().generateAccessToken(object : TokenManager.TokenGeneratedListener {
-                    override fun onTokenGenerated(success: Int, token: String) {
-                        if (success == NetworkManager().SUCCESS) {
+                TokenManager().generateAccessToken(true) { success: Int, token: String? ->
+                    run {
+                        if (success == NetworkManager().SUCCESS && token != null && token != "") {
                             // todo User signed in successfully - NOW DO SOMETHING WITH IT :)
                             prefs.edit().putBoolean("credsVerified", true).apply()
                             // Move to next onboarding fragment
@@ -200,13 +199,11 @@ class OnboardingSigninFragment : Fragment() {
                             }
                         }
                     }
-
-                }, true)
+                }
             }
             return view
         }
     }
-
 }
 
 // Adapter for school id spinner

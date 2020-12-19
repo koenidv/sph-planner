@@ -88,10 +88,4 @@ class TokenManager {
             }
         }
     }
-
-    interface TokenGeneratedListener {
-        fun onTokenGenerated(success: Int, token: String)
-    }
-
-
 }

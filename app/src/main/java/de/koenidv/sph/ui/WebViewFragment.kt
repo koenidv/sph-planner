@@ -12,6 +12,7 @@ import android.widget.ProgressBar
 import androidx.fragment.app.Fragment
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
+import de.koenidv.sph.networking.NetworkManager
 import de.koenidv.sph.networking.TokenManager
 import java.util.*
 
@@ -73,15 +74,16 @@ class WebViewFragment : Fragment() {
         }
 
         // Generate access token, save as cookie and load once done
-        TokenManager().generateAccessToken(object : TokenManager.TokenGeneratedListener {
-            override fun onTokenGenerated(success: Int, token: String) {
+        TokenManager().generateAccessToken { success: Int, token: String? ->
+            if (success == NetworkManager().SUCCESS) {
                 cookieManager.setCookie(domain, "sid=$token")
                 webView.loadUrl(domain)
-                // Show WebView and hide token loading ProgressBar
                 webView.visibility = View.VISIBLE
-                view.findViewById<ProgressBar>(R.id.webviewLoading).visibility = View.GONE
+                view.findViewById<ProgressBar>(R.id.webviewLoading)?.visibility = View.GONE
+                if (context != null)
+                    requireContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE).edit().putLong("token_lastuse", Date().time).apply()
             }
-        })
+        }
 
         return view
     }
