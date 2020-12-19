@@ -43,10 +43,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 " id_teacher TEXT, id_subsTeacher TEXT, room TEXT, room_before TEXT, description TEXT)";
         String createTilesTable = "CREATE TABLE tiles(name TEXT PRIMARY KEY," +
                 " location TEXT, type TEXT, icon TEXT, color INTEGER)";
+        String createPostTable = "CREATE TABLE post(postid TEXT PRIMARY KEY, id_course TEXT, date INTEGER, title TEXT, description TEXT, unread INTEGER)";
+        String createPostAttachmentTable="CREATE TABLE post(attachmentid TEXT PRIMARY KEY, courseid TEXT,post_id TEXT, name TEXT, date INTEGER,url TEXT , deviceLocation TEXT)";
+
 
         db.execSQL(createCoursesTable);
         db.execSQL(createChangesTable);
         db.execSQL(createTilesTable);
+        db.execSQL(createPostTable);
+        db.execSQL(createPostAttachmentTable);
     }
 
     //upgrade Database

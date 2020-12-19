@@ -8,5 +8,6 @@ data class Post(
         var id_course : String, // Course to be attached to, i.e. m_bar_1
         var date : Date, // The post's date, should be day only, no time
         var title : String, // The post's title, i.e. "Entscheidungsregel aufstellen"
-        var description : String? // The post's content, nullable
+        var description : String?, // The post's content, nullable
+        var unread : Boolean // if the post is unread
 )
