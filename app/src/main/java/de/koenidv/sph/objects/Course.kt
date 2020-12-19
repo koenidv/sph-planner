@@ -10,7 +10,8 @@ data class Course(
         var fullname: String? = null, // i.e. Mathe todo: Set in init()
         var id_teacher: String, // i.e. bar
         var isFavorite: Boolean? = null, // i.e. true (is member of course)
-        var isLK: Boolean? = null) { // i.e. false (not intensified course)
+        var isLK: Boolean? = null, // i.e. false (not intensified course)
+        var color: Int? = null) { // Android color int for this course
 
 
     /**

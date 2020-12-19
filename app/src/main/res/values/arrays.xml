@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Do not translate this -->
     <string-array name="tested_schools">
         <item>5146</item>
     </string-array>
@@ -10,5 +11,24 @@
         <item>Testphase Vertretungsplan|changes</item>
         <item>Vertretungsplan|changes</item>
         <item>Lerngruppen|studygroups</item>
+    </string-array>
+    <string-array name="course_colors">
+        <item>default|#5e2037</item>
+        <item>Deutsch|#eb4034</item>
+        <item>Englisch|#ff6a33</item>
+        <item>Latein|#3d3d3d</item>
+        <item>Französisch|#b70ad1</item>
+        <item>Geschichte|#eba21a</item>
+        <item>Informatik|#02cc74</item>
+        <item>Kunst|#b08a00</item>
+        <item>Musik|#b08a00</item>
+        <item>Mathematik|#0050c0</item>
+        <item>Physik|#e60e7a</item>
+        <item>Biologie|#1aab26</item>
+        <item>Chemie|#7600ba</item>
+        <item>Erdkunde|#5c2701</item>
+        <item>Politik|#5a0d94</item>
+        <item>Sport|#25003b</item>
+        <item>Religion|#00291d</item>
     </string-array>
 </resources>

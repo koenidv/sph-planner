@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import de.koenidv.sph.R
+import de.koenidv.sph.networking.NetworkManager
 
 
 class HomeFragment : Fragment() {
@@ -24,6 +25,7 @@ class HomeFragment : Fragment() {
 
         val loginButton = view.findViewById<Button>(R.id.signinButton)
         loginButton.setOnClickListener {
+            NetworkManager().createCourseIndex {}
             Toast.makeText(requireContext(), "Heute nicht, Kartoffel", Toast.LENGTH_SHORT).show()
         }
 

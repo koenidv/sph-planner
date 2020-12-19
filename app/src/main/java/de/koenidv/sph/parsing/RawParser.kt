@@ -3,9 +3,10 @@ package de.koenidv.sph.parsing
 import android.annotation.SuppressLint
 import android.graphics.Color
 import android.util.Log
+import androidx.core.graphics.toColorInt
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
-import de.koenidv.sph.database.DatabaseHelper
+import de.koenidv.sph.database.CoursesDb
 import de.koenidv.sph.objects.Change
 import de.koenidv.sph.objects.Course
 import de.koenidv.sph.objects.Tile
@@ -230,6 +231,7 @@ class RawParser {
         var sphId: String
         var teacherId: String
         var internalId: String
+        val nameColorMap = Utility().parseStringArray(R.array.course_colors)
 
         // Get data from each table row and save the courses
         for (entry in rawContents) {
@@ -246,7 +248,9 @@ class RawParser {
                     id_teacher = teacherId,
                     fullname = namedId.substring(0, namedId.indexOf(" ")),
                     isFavorite = true,
-                    isLK = entry.contains("LK")
+                    isLK = entry.contains("LK"),
+                    color = (nameColorMap[namedId.substring(0, namedId.indexOf(" "))]
+                            ?: nameColorMap["default"])!!.toColorInt()
             ))
         }
 
@@ -282,7 +286,7 @@ class RawParser {
 
                 // todo create new courses with teacher_id instead of using old ones: might not be available
                 // todo ! Info (instead of Informatik) for example will not be recognized
-                courseWithNamedId = DatabaseHelper.getInstance().getCourseByNamedId(courseName)
+                courseWithNamedId = CoursesDb.getInstance().getCourseByNamedId(courseName)
                 if (courseWithNamedId != null) {
                     courseWithNamedId.number_id = courseId
                     courses.add(courseWithNamedId)

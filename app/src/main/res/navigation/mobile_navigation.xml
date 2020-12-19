@@ -15,7 +15,7 @@
         android:id="@+id/nav_courses"
         android:name="de.koenidv.sph.ui.CoursesFragment"
         android:label="@string/title_courses"
-        tools:layout="@layout/fragment_dashboard" />
+        tools:layout="@layout/fragment_courses" />
 
     <fragment
         android:id="@+id/nav_messages"
@@ -27,7 +27,7 @@
         android:id="@+id/nav_links"
         android:name="de.koenidv.sph.ui.LinksFragment"
         android:label="@string/title_links"
-        tools:layout="@layout/fragment_dashboard">
+        tools:layout="@layout/fragment_courses">
         <action
             android:id="@+id/webviewAction"
             app:destination="@id/frag_webview"

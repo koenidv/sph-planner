@@ -12,7 +12,6 @@ import de.koenidv.sph.objects.Tile;
 public class TilesDb {
 
     private final DatabaseHelper dbhelper = DatabaseHelper.getInstance();
-    private final SQLiteDatabase db = dbhelper.getReadableDatabase();
 
     private static TilesDb instance;
 
@@ -28,8 +27,8 @@ public class TilesDb {
 
 
     public List<Tile> getAllTiles() {
-
         List<Tile> returnList = new ArrayList<>();
+        final SQLiteDatabase db = dbhelper.getReadableDatabase();
 
         String queryString = "SELECT * FROM tiles";
 
@@ -48,6 +47,7 @@ public class TilesDb {
             } while (cursor.moveToNext());
         }
         cursor.close();
+        db.close();
         return returnList;
     }
 
@@ -59,6 +59,7 @@ public class TilesDb {
      */
     public List<Tile> getTilesByType(String type) {
         List<Tile> returnList = new ArrayList<>();
+        final SQLiteDatabase db = dbhelper.getReadableDatabase();
 
         String queryString = "SELECT * FROM tiles WHERE type = '" + type + "'";
 
@@ -78,6 +79,7 @@ public class TilesDb {
         }
 
         cursor.close();
+        db.close();
         return returnList;
     }
 
@@ -95,6 +97,7 @@ public class TilesDb {
 
 
     public void save(Tile tile) {
+        final SQLiteDatabase db = dbhelper.getReadableDatabase();
         ContentValues cv = new ContentValues();
 
         cv.put("name", tile.getName());
@@ -111,6 +114,7 @@ public class TilesDb {
             db.update("tiles", cv, "name = '" + tile.getName() + "'", null);
         }
         cursor.close();
+        db.close();
     }
 
 

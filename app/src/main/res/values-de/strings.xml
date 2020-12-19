@@ -64,5 +64,6 @@
     <string name="yes">Ja</string>
     <string name="no">Nein</string>
     <string name="tile_startpage">Startseite</string>
+    <string name="course_appendix_lk">-LK</string>
 
 </resources>

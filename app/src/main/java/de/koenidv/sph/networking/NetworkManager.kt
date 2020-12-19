@@ -10,7 +10,7 @@ import com.androidnetworking.interfaces.StringRequestListener
 import com.facebook.stetho.okhttp3.StethoInterceptor
 import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.SphPlanner.Companion.applicationContext
-import de.koenidv.sph.database.DatabaseHelper
+import de.koenidv.sph.database.CoursesDb
 import de.koenidv.sph.parsing.RawParser
 import okhttp3.Cookie
 import okhttp3.HttpUrl
@@ -20,6 +20,7 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 
 //  Created by koenidv on 11.12.2020.
+@Suppress("PropertyName")
 class NetworkManager {
 
     val FAILED_UNKNOWN = -1
@@ -35,8 +36,8 @@ class NetworkManager {
     fun createCourseIndex(onComplete: (success: Int) -> Unit) {
         val prefs = applicationContext().getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
         // Remove old courses, it'll just lead to isses
-        val dbHelper = DatabaseHelper.getInstance()
-        dbHelper.clear()
+        val coursesDb = CoursesDb.getInstance()
+        coursesDb.clear()
         // Set courses last updated to 0 in case this gets cancelled
         prefs.edit().putLong("courses_last_updated", 0).apply()
 
@@ -44,18 +45,18 @@ class NetworkManager {
         // Firstly, load courses from timetable so we have an overview
         loadSiteWithToken("https://start.schulportal.hessen.de/stundenplan.php", object : StringRequestListener {
             override fun onResponse(response: String?) {
-                dbHelper.save(RawParser().parseCoursesFromTimetable(response!!))
+                coursesDb.save(RawParser().parseCoursesFromTimetable(response!!))
 
                 // Secondly, load those courses from study groups to find out where the user belongs
                 loadSiteWithToken("https://start.schulportal.hessen.de/lerngruppen.php", object : StringRequestListener {
                     override fun onResponse(response: String?) {
-                        dbHelper.setNulledNotFavorite()
-                        dbHelper.save(RawParser().parseCoursesFromStudygroups(response!!))
+                        coursesDb.setNulledNotFavorite()
+                        coursesDb.save(RawParser().parseCoursesFromStudygroups(response!!))
 
                         // Lastly, load courses again from posts overview to get number ids
                         loadSiteWithToken("https://start.schulportal.hessen.de/meinunterricht.php", object : StringRequestListener {
                             override fun onResponse(response: String?) {
-                                dbHelper.save(RawParser().parseCoursesFromPostsoverview(response!!))
+                                coursesDb.save(RawParser().parseCoursesFromPostsoverview(response!!))
                                 onComplete(SUCCESS)
                                 // Remember when we last updated the courses
                                 prefs.edit().putLong("courses_last_updated", Date().time).apply()
@@ -161,9 +162,5 @@ class NetworkManager {
                         })
             }
         })
-    }
-
-    interface DoneListener {
-        fun onComplete(success: Boolean)
     }
 }

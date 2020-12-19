@@ -68,27 +68,7 @@ public class CoursesDb {
         cv.put("id_teacher", course.getId_teacher()); // Will never be null
         if (course.isFavorite() != null) cv.put("isFavorite", course.isFavorite());
         if (course.isLK() != null) cv.put("isLK", course.isLK());
-
-
-        /* Aaaah nevermind
-
-        StringBuilder keys = new StringBuilder();
-        StringBuilder createValues = new StringBuilder();
-        StringBuilder updateValues = new StringBuilder();
-
-        String prefix = "";
-        for (String key : cv.keySet()) {
-            keys.append(prefix).append(key);
-            createValues.append(prefix).append("'").append(cv.get(key)).append("'");
-            updateValues.append(prefix).append(key).append("='").append(cv.get(key)).append("'");
-            prefix = ",";
-        }
-
-        // Create row or ignore if it already exists
-        db.rawQuery("INSERT OR IGNORE INTO courses (" + keys.toString() + ") VALUES (" + createValues.toString() + ")", null);
-        // Update row with our data
-        db.rawQuery("UPDATE courses SET " + updateValues.toString() + " WHERE course_id='" + course.getCourseId() + "'", null);
-         */
+        if (course.getColor() != null) cv.put("color", course.getColor());
 
 
         // Check if row exists and insert or update accordingly
@@ -134,8 +114,9 @@ public class CoursesDb {
                 String id_teacher = cursor.getString(6);
                 boolean isFavorite = cursor.getInt(7) == 1;
                 boolean isLK = cursor.getInt(8) == 1;
+                int color = cursor.getInt(9);
 
-                Course newCourse = new Course(CourseId, gmb_id, sph_id, named_id, number_id, fullname, id_teacher, isFavorite, isLK);
+                Course newCourse = new Course(CourseId, gmb_id, sph_id, named_id, number_id, fullname, id_teacher, isFavorite, isLK, color);
                 returnList.add(newCourse);
             } while (cursor.moveToNext());
         }
@@ -244,8 +225,9 @@ public class CoursesDb {
         String id_teacher = cursor.getString(6);
         boolean isFavorite = cursor.getInt(7) == 1;
         boolean isLK = cursor.getInt(8) == 1;
+        int color = cursor.getInt(9);
 
-        Course newCourse = new Course(CourseId, gmb_id, sph_id, named_id, number_id, fullname, id_teacher, isFavorite, isLK);
+        Course newCourse = new Course(CourseId, gmb_id, sph_id, named_id, number_id, fullname, id_teacher, isFavorite, isLK, color);
 
         cursor.close();
         db.close();
@@ -264,8 +246,9 @@ public class CoursesDb {
         String id_teacher = cursor.getString(6);
         boolean isFavorite = cursor.getInt(7) == 1;
         boolean isLK = cursor.getInt(8) == 1;
+        int color = cursor.getInt(9);
 
-        return new Course(CourseId, gmb_id, sph_id, named_id, number_id, fullname, id_teacher, isFavorite, isLK);
+        return new Course(CourseId, gmb_id, sph_id, named_id, number_id, fullname, id_teacher, isFavorite, isLK, color);
     }
 
 }

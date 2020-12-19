@@ -1,7 +1,7 @@
 package de.koenidv.sph.parsing
 
 import android.annotation.SuppressLint
-import de.koenidv.sph.database.DatabaseHelper
+import de.koenidv.sph.database.CoursesDb
 import de.koenidv.sph.objects.Change
 import de.koenidv.sph.objects.Course
 import java.text.SimpleDateFormat
@@ -46,20 +46,20 @@ class IdParser {
      * @return Internal id for this course
      */
     fun getCourseIdWithGmb(courseGmbId: String, teacherId: String, allCourses: List<Course>? = null): String {
-        val classType: String
+        val courseDb = CoursesDb.getInstance()
 
         // GMB id might in some cases not include a dash
-        if (courseGmbId.contains("-"))
-            classType = courseGmbId.substring(0, courseGmbId.indexOf("-")).take(8)
+        val classType: String = if (courseGmbId.contains("-"))
+            courseGmbId.substring(0, courseGmbId.indexOf("-")).take(8)
         else
-            classType = courseGmbId.take(8)
+            courseGmbId.take(8)
 
         // Check if a course with the same internal id but different data already exists
         var index = 1
         var coursesWithSameId: List<Course>
         // Get courses with same subject from dataset or database
         coursesWithSameId = allCourses?.filter { it.courseId.startsWith(classType + "_") }
-                ?: DatabaseHelper.getInstance().getCourseByInternalPrefix(classType + "_")
+                ?: CoursesDb.getInstance().getCourseByInternalPrefix(classType + "_")
         coursesWithSameId = coursesWithSameId.filter { it.isLK == courseGmbId.toLowerCase(Locale.ROOT).contains("lk") }
         var checkForNewIndex = coursesWithSameId.isNotEmpty()
         var courseToCheck: Course
@@ -82,7 +82,7 @@ class IdParser {
         // Make sure there isn't another course with the same id
         // This might happen if a teacher has both a GK and LK with the same subject
         while ((allCourses?.filter { it.courseId == classType + "_" + teacherId + "_" + index }
-                        ?: DatabaseHelper.getInstance().getCourseByInternalPrefix(classType + "_" + teacherId + "_" + index)).isNotEmpty()) {
+                        ?: courseDb.getCourseByInternalPrefix(classType + "_" + teacherId + "_" + index)).isNotEmpty()) {
             index++
         }
         // Return id, example: m_bar_1 or ch_cas_2
@@ -98,6 +98,8 @@ class IdParser {
      * @return Internal id for this course
      */
     fun getCourseIdWithSph(courseSphId: String, teacherId: String, isLK: Boolean?, allCourses: List<Course>? = null): String {
+        val courseDb = CoursesDb.getInstance()
+
         // Extract some useful information from the external course id
         val values = Regex("""([A-Z]{1,8})(?:[a-zäöü]+)?(\d{2,3})""").find(courseSphId.replace("-", ""))!!.groupValues
         val classType = values[1].toLowerCase(Locale.ROOT) // Get class type (i.e. G from Q3Gvac03)
@@ -106,7 +108,7 @@ class IdParser {
         // Check if there's already a matching course using sph's index
         // ! This is still very vague
         var filteredCourses = allCourses?.filter { it.courseId == classType + "_" + teacherId + "_" + sphIndex }
-                ?: DatabaseHelper.getInstance().getCourseByInternalPrefix(classType + "_" + teacherId + "_" + sphIndex)
+                ?: courseDb.getCourseByInternalPrefix(classType + "_" + teacherId + "_" + sphIndex)
         // The list should only contain 0 or 1 elements (unique id)
         // Apart from classType and teacherId, isLK is the only property we can trust
         if (filteredCourses.isNotEmpty()) {
@@ -121,7 +123,7 @@ class IdParser {
         // sph index is not the same as internal index or course has not been seen yet
         // Check if there's a matching course with any index
         filteredCourses = allCourses?.filter { it.courseId == classType + "_" + teacherId + "_" }
-                ?: DatabaseHelper.getInstance().getCourseByInternalPrefix(classType + "_" + teacherId + "_")
+                ?: courseDb.getCourseByInternalPrefix(classType + "_" + teacherId + "_")
         if (isLK != null) filteredCourses = filteredCourses.filter { it.isLK == isLK }
 
         // If there are multiple courses with the same subject by the same teacher which are all LK/GK,
@@ -133,7 +135,7 @@ class IdParser {
         // If a matching course hasn't been seen before, we'll create a new id
         // Check if there are any courses with the same prefix and use the next index
         filteredCourses = allCourses?.filter { it.courseId == classType + "_" + teacherId + "_" }
-                ?: DatabaseHelper.getInstance().getCourseByInternalPrefix(classType + "_" + teacherId + "_")
+                ?: courseDb.getCourseByInternalPrefix(classType + "_" + teacherId + "_")
         return classType + "_" + teacherId + "_" + filteredCourses.size + 1
     }
 
@@ -166,8 +168,7 @@ class IdParser {
         var index = 1
 
         // todo will not work, use allChanges.none { ... }
-        while (allChanges.contains(internalCourseId + "_change" + formatter.format(date) + "_$index")
-        )
+        while (internalCourseId + "_change" + formatter.format(date) + "_$index" in allChanges)
             index++
 
         return internalCourseId + "_change" + formatter.format(date) + "_$index"

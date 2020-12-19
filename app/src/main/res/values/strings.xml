@@ -39,6 +39,9 @@
     <string name="onboard_supported_warning">Please report any issues you might experience via the options menu!</string>
     <string name="onboard_supported_error_network">There was a network error.\nTap to retry.</string>
 
+    <!-- Courses -->
+    <string name="course_appendix_lk" />
+
     <!-- Options sheet -->
     <string name="info_menuaction">Options</string>
     <string name="info_greeting">Hey %name</string>

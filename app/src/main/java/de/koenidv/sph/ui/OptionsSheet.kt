@@ -18,6 +18,7 @@ import androidx.appcompat.content.res.AppCompatResources.getDrawable
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
+import de.koenidv.sph.database.DatabaseHelper
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
@@ -110,16 +111,19 @@ class OptionsSheet internal constructor() : BottomSheetDialogFragment() {
 
 
         view.findViewById<View>(R.id.logoutButton).setOnClickListener {
-            // todo check if we still need something
-            // todo delete dbs
-
             // Ask if user actually wants to log out
             AlertDialog.Builder(context)
                     .setTitle(R.string.menu_option_logout)
                     .setMessage(R.string.menu_option_logout_question)
                     .setPositiveButton(R.string.yes) { _, _ ->
                         run {
+                            // Clear SharedPrefs
+                            // todo check if we still need something
                             prefs.edit().clear().apply()
+                            // todo Delete database
+                            // requireContext().deleteDatabase("database")
+                            DatabaseHelper.newInstance()
+                            // Switch to OnboardingActivity
                             startActivity(Intent(context, OnboardingActivity().javaClass).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP))
                             requireActivity().finish()
                         }
@@ -206,6 +210,7 @@ class OptionsSheet internal constructor() : BottomSheetDialogFragment() {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                     pInfo.longVersionCode.toString()
                 } else {
+                    @Suppress("DEPRECATION")
                     pInfo.versionCode.toString()
                 }
             } catch (nme: PackageManager.NameNotFoundException) {
