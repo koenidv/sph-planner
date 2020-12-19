@@ -34,8 +34,8 @@ class OnboardingSupportlistFragment : Fragment() {
 
         // Get supported features
         NetworkManager().loadSiteWithToken("https://start.schulportal.hessen.de/index.php", onComplete = { success: Int, response: String? ->
-            // todo handle success != 0
 
+            // todo handle success != 0
             if (success != NetworkManager().SUCCESS) {
                 // Display network error
                 // Might display if sph is being maintained
@@ -126,15 +126,15 @@ class OnboardingSupportlistFragment : Fragment() {
             titleText.visibility = View.VISIBLE
             featuresText.text = featurelistText
             featuresText.visibility = View.VISIBLE
-            if (someFeatures) {
+            if (someFeatures) { // todo show contact options othwerwise
                 warningText.visibility = View.VISIBLE
                 // todo start indexing
                 indexLoading.visibility = View.VISIBLE
 
 
                 /*
-             * Start indexing
-             */
+                 * Start indexing
+                 */
 
                 // Resolve tile urls
                 var tilesResolved = 0

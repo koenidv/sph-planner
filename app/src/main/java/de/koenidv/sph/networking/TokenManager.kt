@@ -2,12 +2,14 @@ package de.koenidv.sph.networking
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Log
 import android.widget.Toast
 import com.androidnetworking.AndroidNetworking
 import com.androidnetworking.common.Priority
 import com.androidnetworking.error.ANError
 import com.androidnetworking.interfaces.StringRequestListener
 import com.facebook.stetho.okhttp3.StethoInterceptor
+import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.SphPlanner.Companion.applicationContext
 import okhttp3.OkHttpClient
 import java.util.*
@@ -25,9 +27,15 @@ class TokenManager {
      */
     fun generateAccessToken(forceNewToken: Boolean = false, onComplete: (success: Int, token: String?) -> Unit) {
 
+
+        Log.d(SphPlanner.TAG, "Time since last success: " + (Date().time - prefs.getLong("token_last_success", 0)).toString())
+        // todo still 15min?
+
         // Return existing, signed-in token if it was used within 15 Minutes
         // Else get a new token
-        if (Date().time - prefs.getLong("token_last_success", 0) <= 15 * 60 * 1000 && !forceNewToken) {
+        if (Date().time - prefs.getLong("token_last_success", 0) <= 15 * 60 * 1000
+                && Date().time - prefs.getLong("token_last_success", 0) > 0
+                && !forceNewToken) {
             onComplete(NetworkManager().SUCCESS, prefs.getString("token", "")!!)
         } else {
             // Get a new token

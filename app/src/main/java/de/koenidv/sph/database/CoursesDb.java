@@ -94,7 +94,7 @@ public class CoursesDb {
      *
      * @return all Courses
      */
-    public List<Course> getAllCourses() {
+    public List<Course> getAll() {
 
         List<Course> returnList = new ArrayList<>();
 
@@ -131,7 +131,7 @@ public class CoursesDb {
      * @param condition will sort for courses which match condition
      * @return List of all matching courses
      */
-    public List<Course> getCourseByInternalPrefix(String condition) {
+    public List<Course> getByInternalPrefix(String condition) {
         List<Course> returnList = new ArrayList<>();
         //Filter Course from Database
         String queryString = "SELECT * FROM courses WHERE course_id LIKE \"" + condition + "%\" ORDER BY course_id ASC";
@@ -155,7 +155,7 @@ public class CoursesDb {
      * @param namedId External named id to look for
      * @return Course with specified named id or null if none was found
      */
-    public Course getCourseByNamedId(String namedId) {
+    public Course getByNamedId(String namedId) {
         Cursor cursor = dbhelper.getReadableDatabase().rawQuery("SELECT * FROM courses WHERE named_id='" + namedId + "'", null);
         // Return first row
         cursor.moveToFirst();
@@ -170,7 +170,7 @@ public class CoursesDb {
      *
      * @return List of favorite courses in db
      */
-    public List<Course> getFavoriteCourses() {
+    public List<Course> getFavorites() {
         List<Course> returnList = new ArrayList<>();
         Cursor cursor = dbhelper.getReadableDatabase().rawQuery("SELECT * FROM courses WHERE isFavorite=1", null);
 
@@ -182,14 +182,32 @@ public class CoursesDb {
         }
         cursor.close();
         return returnList;
+    }
 
+    /**
+     * Get all courses that have a number id
+     *
+     * @return List of all courses where number_id is not null
+     */
+    public List<Course> getWithNumberId() {
+        List<Course> returnList = new ArrayList<>();
+        Cursor cursor = dbhelper.getReadableDatabase().rawQuery("SELECT * FROM courses WHERE number_id IS NOT NULL", null);
+
+        // Add each row to returnList
+        if (cursor.moveToFirst()) {
+            do {
+                returnList.add(cursorToCourse(cursor));
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        return returnList;
     }
 
     /**
      * @param course course which should be deleted
      * @return True, if course was deleted
      */
-    public boolean deleteCourse(Course course) {
+    public boolean delete(Course course) {
 
         String queryString = "DELETE FROM courses WHERE course_id =" + course.getCourseId();
         SQLiteDatabase db = dbhelper.getReadableDatabase();
@@ -209,7 +227,7 @@ public class CoursesDb {
 
     }
 
-    public Course getCourseByGmb_id(String Gmb_id) {
+    public Course getByGmbId(String Gmb_id) {
         String queryString = "SELECT * FROM courses WHERE gmb_id = " + Gmb_id;
         SQLiteDatabase db = dbhelper.getReadableDatabase();
 
@@ -236,7 +254,7 @@ public class CoursesDb {
     }
 
 
-    Course cursorToCourse(Cursor cursor) {
+    private Course cursorToCourse(Cursor cursor) {
         String CourseId = cursor.getString(0);
         String gmb_id = cursor.getString(1);
         String sph_id = cursor.getString(2);

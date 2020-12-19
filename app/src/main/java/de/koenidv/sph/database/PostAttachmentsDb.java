@@ -5,8 +5,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 
-import androidx.annotation.RequiresApi;
-
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Path;
@@ -15,28 +13,28 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import de.koenidv.sph.objects.Post;
+import androidx.annotation.RequiresApi;
 import de.koenidv.sph.objects.PostAttachment;
 
-public class PostAttachmentDb {
+public class PostAttachmentsDb {
 
     private final DatabaseHelper dbhelper = DatabaseHelper.getInstance();
 
-    private static PostAttachmentDb instance;
+    private static PostAttachmentsDb instance;
 
-    private PostAttachmentDb() {
+    private PostAttachmentsDb() {
     }
 
-    public static PostAttachmentDb getInstance() {
-        if (PostAttachmentDb.instance == null) {
-            PostAttachmentDb.instance = new PostAttachmentDb();
+    public static PostAttachmentsDb getInstance() {
+        if (PostAttachmentsDb.instance == null) {
+            PostAttachmentsDb.instance = new PostAttachmentsDb();
         }
-        return PostAttachmentDb.instance;
+        return PostAttachmentsDb.instance;
     }
 
-    public void save(List<PostAttachment> PostAttachments) {
-        for (PostAttachment postAttachment : PostAttachments) {
-            save(PostAttachments);
+    public void save(List<PostAttachment> postAttachments) {
+        for (PostAttachment postAttachment : postAttachments) {
+            save(postAttachment);
         }
     }
 
@@ -45,22 +43,22 @@ public class PostAttachmentDb {
         final SQLiteDatabase db = dbhelper.getReadableDatabase();
         ContentValues cv = new ContentValues();
 
-        cv.put("attachmentId",postAttachment.getAttachmentId());
-        cv.put("id_course",postAttachment.getId_course());
-        cv.put("id_post",postAttachment.getId_post());
-        cv.put("name",postAttachment.getName());
-        cv.put("date",postAttachment.getDate().getTime());
-        cv.put("url",postAttachment.getUrl().toString());
-        if(postAttachment.getDeviceLocation()!=null)cv.put("deviceLocation",postAttachment.getDeviceLocation().toString());
+        cv.put("attachment_id", postAttachment.getAttachmentId());
+        cv.put("id_course", postAttachment.getId_course());
+        cv.put("id_post", postAttachment.getId_post());
+        cv.put("name", postAttachment.getName());
+        cv.put("date", postAttachment.getDate().getTime());
+        cv.put("url", postAttachment.getUrl().toString());
+        if (postAttachment.getDeviceLocation() != null)
+            cv.put("deviceLocation", postAttachment.getDeviceLocation().toString());
+        cv.put("size", postAttachment.getFileSize());
 
 
-
-
-        Cursor cursor = db.rawQuery("SELECT * FROM postAttachment WHERE name = '" + postAttachment.getAttachmentId() + "'", null);
+        Cursor cursor = db.rawQuery("SELECT * FROM postAttachments WHERE attachment_id = '" + postAttachment.getAttachmentId() + "'", null);
         if (cursor.getCount() == 0) {
-            db.insert("tiles", null, cv);
+            db.insert("postAttachments", null, cv);
         } else {
-            db.update("tiles", cv, "name = '" + postAttachment.getAttachmentId() + "'", null);
+            db.update("postAttachments", cv, "attachment_id = '" + postAttachment.getAttachmentId() + "'", null);
         }
         cursor.close();
         db.close();
@@ -71,7 +69,7 @@ public class PostAttachmentDb {
         List<PostAttachment> returnList = new ArrayList<>();
         final SQLiteDatabase db = dbhelper.getReadableDatabase();
 
-        String queryString = "SELECT * FROM post WHERE course_id = '" + course_id + "'";
+        String queryString = "SELECT * FROM postAttachments WHERE course_id = '" + course_id + "'";
 
         Cursor cursor = db.rawQuery(queryString, null);
         if (cursor.moveToFirst()) {
@@ -83,9 +81,10 @@ public class PostAttachmentDb {
                 Date date = new Date(cursor.getInt(4));
                 URL url = new URL(cursor.getString(5));
                 Path deviceLocation = Paths.get(cursor.getString(6));
+                String size = cursor.getString(7);
 
 
-                PostAttachment newPostAttachment = new PostAttachment(attachmentId, id_course, id_post, name, date,url,deviceLocation);
+                PostAttachment newPostAttachment = new PostAttachment(attachmentId, id_course, id_post, name, date, url, deviceLocation, size);
 
                 returnList.add(newPostAttachment);
             } while (cursor.moveToNext());
@@ -101,7 +100,7 @@ public class PostAttachmentDb {
         List<PostAttachment> returnList = new ArrayList<>();
         final SQLiteDatabase db = dbhelper.getReadableDatabase();
 
-        String queryString = "SELECT * FROM post WHERE postid = '" + postid + "'";
+        String queryString = "SELECT * FROM postAttachments WHERE postid = '" + postid + "'";
 
         Cursor cursor = db.rawQuery(queryString, null);
         if (cursor.moveToFirst()) {
@@ -113,9 +112,9 @@ public class PostAttachmentDb {
                 Date date = new Date(cursor.getInt(4));
                 URL url = new URL(cursor.getString(5));
                 Path deviceLocation = Paths.get(cursor.getString(6));
+                String size = cursor.getString(7);
 
-
-                PostAttachment newPostAttachment = new PostAttachment(attachmentId, id_course, id_post, name, date,url,deviceLocation);
+                PostAttachment newPostAttachment = new PostAttachment(attachmentId, id_course, id_post, name, date, url, deviceLocation, size);
 
                 returnList.add(newPostAttachment);
             } while (cursor.moveToNext());

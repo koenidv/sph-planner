@@ -25,7 +25,7 @@ class HomeFragment : Fragment() {
 
         val loginButton = view.findViewById<Button>(R.id.signinButton)
         loginButton.setOnClickListener {
-            NetworkManager().createCourseIndex {}
+            NetworkManager().loadAndSavePosts { }
             Toast.makeText(requireContext(), "Heute nicht, Kartoffel", Toast.LENGTH_SHORT).show()
         }
 

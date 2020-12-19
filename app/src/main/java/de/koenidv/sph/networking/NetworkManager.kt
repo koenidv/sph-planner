@@ -13,6 +13,9 @@ import com.facebook.stetho.okhttp3.StethoInterceptor
 import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.SphPlanner.Companion.applicationContext
 import de.koenidv.sph.database.CoursesDb
+import de.koenidv.sph.database.PostAttachmentsDb
+import de.koenidv.sph.database.PostsDb
+import de.koenidv.sph.objects.*
 import de.koenidv.sph.parsing.RawParser
 import okhttp3.Cookie
 import okhttp3.HttpUrl
@@ -69,12 +72,48 @@ class NetworkManager {
         })
     }
 
+    /**
+     * Load and save Posts, PostAtachments and PostTasks for a list of courses
+     * @param coursesToLoad Courses that should be loaded, all courses with NumberIds when null
+     */
+    fun loadAndSavePosts(coursesToLoad: List<Course>? = null, onComplete: (success: Int) -> Unit) {
+        // Use all courses with number_id if nothing was specified
+        val courses = coursesToLoad ?: CoursesDb.getInstance().withNumberId
+        // Save all errors in a list, only return one later
+        val errors = mutableListOf<Int>()
+        // Get all current posts for comparison
+        val allPosts = PostsDb.getInstance().all
+
+        // Load every course
+        for (course in courses) {
+            loadSiteWithToken("https://start.schulportal.hessen.de/meinunterricht.php?a=sus_view&id=" + course.number_id,
+                    onComplete = { success: Int, result: String? ->
+                        if (success == SUCCESS) {
+                            // Parse data
+                            RawParser().parsePosts(course.courseId, result!!, allPosts,
+                                    onParsed = { posts: List<Post>,
+                                                 attachments: List<PostAttachment>,
+                                                 tasks: List<PostTask>,
+                                                 links: List<PostLink> ->
+                                        // Write all that parsed stuff to the database
+                                        PostsDb.getInstance().save(posts)
+                                        PostAttachmentsDb.getInstance().save(attachments)
+                                        // todo last post from spo_kmb_4 missing
+                                        // todo Save tasks
+                                        // todo Save links
+                                    })
+                        } else {
+                            errors.add(success)
+                        }
+                    })
+        }
+    }
 
     /**
      * Loads a url within the sph and handles authentication
      * @param url URL to load
      */
-    fun loadSiteWithToken(url: String, onComplete: (success: Int, resolvedUrl: String?) -> Unit) {
+    fun loadSiteWithToken(url: String, onComplete: (success: Int, result: String?) -> Unit) {
 
         // Getting an access token
         TokenManager().generateAccessToken { success: Int, token: String? ->
@@ -100,11 +139,13 @@ class NetworkManager {
                         .getAsString(object : StringRequestListener {
                             override fun onResponse(response: String) {
                                 val prefs = applicationContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
-                                if (!response.contains("Login - Schulportal Hessen")) {
+                                if (!response.contains("Login - Schulportal Hessen")
+                                        && !response.contains("Fehler - Schulportal Hessen")) {
                                     // Getting site was successful
                                     onComplete(SUCCESS, response)
                                     prefs.edit().putLong("token_last_success", Date().time).apply()
-                                } else if (response.contains("Login - Schulportal Hessen")) {
+                                } else if (response.contains("Login - Schulportal Hessen")
+                                        || response.contains("Fehler - Schulportal Hessen")) {
                                     // Signin was not successful
                                     onComplete(FAILED_INVALID_CREDENTIALS, null)
                                     prefs.edit().putLong("token_last_success", 0).apply()
@@ -134,6 +175,10 @@ class NetworkManager {
         }
     }
 
+    /**
+     * Loads an url to resolve it
+     * @return resolved url or given url if there was an error
+     */
     fun resolveUrl(url: String, onComplete: (success: Int, resolvedUrl: String) -> Unit) {
         // Getting an access token
         TokenManager().generateAccessToken { success: Int, token: String? ->

@@ -7,9 +7,11 @@ import androidx.core.graphics.toColorInt
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.database.CoursesDb
-import de.koenidv.sph.objects.Change
-import de.koenidv.sph.objects.Course
-import de.koenidv.sph.objects.Tile
+import de.koenidv.sph.objects.*
+import org.jsoup.Jsoup
+import org.jsoup.select.Elements
+import java.net.URL
+import java.net.URLEncoder
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -285,8 +287,11 @@ class RawParser {
                 courseName = entry.substring(entry.indexOf("</span>") + 7, entry.indexOf("</a>")).trim()
 
                 // todo create new courses with teacher_id instead of using old ones: might not be available
-                // todo ! Info (instead of Informatik) for example will not be recognized
-                courseWithNamedId = CoursesDb.getInstance().getCourseByNamedId(courseName)
+                /* todo don't use brute method to recognize wrongly named courses:
+                 * Info (instead of Informatik) for example will not be recognized
+                 * for Q34, sometimes 13 is replaced with Q34 */
+
+                courseWithNamedId = CoursesDb.getInstance().getByNamedId(courseName.replace("Info GK Q34", "Informatik GK 13"))
                 if (courseWithNamedId != null) {
                     courseWithNamedId.number_id = courseId
                     courses.add(courseWithNamedId)
@@ -381,5 +386,158 @@ class RawParser {
         }
 
         return tiles
+    }
+
+    /**
+     * Parse Posts, PostAttachments, PostTasks and PostLinks from raw course posts site
+     * @param courseId Course which the posts belong to
+     * @param rawResponse Raw html response from sph
+     * @param currentPosts Current list of posts (all or this course) to check if a post is unread
+     */
+    fun parsePosts(courseId: String, rawResponse: String, currentPosts: List<Post> = listOf(),
+                   onParsed: (posts: List<Post>,
+                              attachments: List<PostAttachment>,
+                              tasks: List<PostTask>,
+                              links: List<PostLink>) -> Unit) {
+        val posts = mutableListOf<Post>()
+        val attachments = mutableListOf<PostAttachment>()
+        val tasks = mutableListOf<PostTask>()
+        val links = mutableListOf<PostLink>()
+        val attachIds = mutableListOf<String>()
+        // Extract table using jsoup
+        val doc = Jsoup.parse(rawResponse)
+        val rawPosts = doc.select("div#old tbody").select("tr")
+
+        val currentPostIds = currentPosts.map { it.postId }
+
+        // Extract data from table rows
+        var sphPostId: String
+        var postId: String
+        var date: Date
+        var cells: Elements
+        // Post-specific
+        var postTitle: String
+        var postDescription: String?
+        // Task-specific
+        var taskId: String
+        var taskDescription: String
+        var taskDone: Boolean
+        // Attachment-specific
+        var attachIndex: Int
+        var attachId: String
+        var attachName: String
+        var attachUrl: URL
+        var attachSize: String
+        // For getting the date
+        val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.GERMAN)
+        val internalDateFormat = SimpleDateFormat("2020-MM-dd", Locale.ROOT)
+
+        // Parse data for every row
+        for (row in rawPosts) {
+            cells = row.select("td")
+            // Cells: 0: Some metadata, 1: Content, 2: Attendance (encrypted)
+            sphPostId = row.select("tr[data-entry]").attr("data-entry")
+            date = dateFormat.parse(cells[0].childNodes()[1].toString())!!
+            postId = courseId + "_post-" + internalDateFormat.format(date) + "_" + sphPostId
+
+            /*
+             * Posts
+             */
+
+            // Check if current post was already in the db and if so, use it again
+            // This is mainly to set the unread attribute
+            if (currentPostIds.contains(postId)) {
+                posts.add(currentPosts[currentPostIds.indexOf(postId)])
+            } else {
+                // Get information from html
+                postTitle = cells[1].select("b")[0].text()
+                // Description might include html. We'll just get the text for now. Todo parse lists
+                postDescription = try {
+                    //Jsoup.clean(cells[1].select("i[title=\"Ausführlicher Inhalt\"]").parents()[0].toString(), Whitelist.basic())
+                    cells[1].select("i[title=\"Ausführlicher Inhalt\"]").parents()[0].text()
+                } catch (iobe: IndexOutOfBoundsException) {
+                    // No description available
+                    null
+                }
+                // Add new post to posts list
+                posts.add(Post(
+                        postId,
+                        courseId,
+                        date,
+                        postTitle,
+                        postDescription,
+                        true // We know it's unread because it wasn't in the current posts list
+                ))
+                // todo check if post includes link
+            }
+
+            /*
+             * Tasks
+             */
+
+            // If post contains a task
+            if (cells[1].toString().contains("<span class=\"homework\">")) {
+                // There can only be one task per post, it seems
+                taskId = courseId + "_task-" + internalDateFormat.format(date) + "_1"
+                taskDone = cells[1].toString().contains("<span class=\"done")
+                taskDescription = cells[1].select("span.homework").nextAll("span.markup")[0].text()
+                // Add new task to tasks list
+                tasks.add(PostTask(
+                        taskId,
+                        courseId,
+                        postId,
+                        taskDescription,
+                        date,
+                        taskDone
+                ))
+                // todo check if homework includes link
+            }
+
+            /*
+             * Attachments
+             */
+
+            // Todo dont replace old files, localpath will be lost
+
+            // If post contains attachments
+            if (cells[1].select("div.files").size != 0) {
+                // For every file attachment
+                for (file in cells[1].select("div.files div.file")) {
+                    // Get a not before used attachment id
+                    attachIndex = 1
+                    do {
+                        attachId = courseId + "_attach-" + internalDateFormat.format(date) + "_" + attachIndex
+                    } while (attachIds.contains(attachId))
+
+                    // Get file info
+                    attachName = file.toString().substring(file.toString().indexOf("</span>") + 7,
+                            file.toString().indexOf("<small>"))
+                            .replace("_", " ").replace("-", " ").removeSuffix(".pdf")
+                    attachSize = file.select("small").text()
+
+                    // Parse file url
+                    attachUrl = URL(
+                            "https://start.schulportal.hessen.de/meinunterricht.php?a=downloadFile&id="
+                                    + doc.select("h1[data-book]")[0].attr("data-book") // NumberId of this course
+                                    + "&e=" + sphPostId
+                                    + "&f=" + URLEncoder.encode(file.attr("data-file"), "utf-8"))
+
+                    // Add new Attachment to lst
+                    attachments.add(PostAttachment(
+                            attachId,
+                            courseId,
+                            postId,
+                            attachName,
+                            date,
+                            attachUrl,
+                            null,
+                            attachSize
+                    ))
+                }
+            }
+
+        }
+
+        onParsed(posts, attachments, tasks, links)
     }
 }

@@ -80,8 +80,6 @@ class WebViewFragment : Fragment() {
                 webView.loadUrl(domain)
                 webView.visibility = View.VISIBLE
                 view.findViewById<ProgressBar>(R.id.webviewLoading)?.visibility = View.GONE
-                if (context != null)
-                    requireContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE).edit().putLong("token_lastuse", Date().time).apply()
             }
         }
 

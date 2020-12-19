@@ -22,7 +22,7 @@ class CoursesFragment : Fragment() {
         val coursesRecycler = view.findViewById<RecyclerView>(R.id.coursesRecycler)
 
         // Get favorite tiles and sort by isLK and fullname
-        val courses = CoursesDb.getInstance().favoriteCourses.sortedBy { it.fullname }.sortedByDescending { it.isLK }
+        val courses = CoursesDb.getInstance().favorites.sortedBy { it.fullname }.sortedByDescending { it.isLK }
         // Set up courses recycler
         val coursesAdapter = CoursesAdapter(courses) {
             Toast.makeText(requireContext(), "Coming soon to a screen near your thumb.", Toast.LENGTH_SHORT).show()
