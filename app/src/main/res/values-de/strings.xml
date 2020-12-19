@@ -57,9 +57,9 @@
     <string name="menu_option_logout_question">Bist du sicher, dass du dich abmelden möchtest?\nAlle lokalen Daten werden gelöscht.</string>
     <string name="menu_option_choosetheme">Design ändern</string>
     <string name="menu_option_theme_system">System</string>
-    <string name="menu_option_accent_electric">Elektrisch</string>
+    <string name="menu_option_accent_electric">Energie</string>
     <string name="menu_option_accent_summer">Sommer</string>
-    <string name="menu_option_accent_autumn">Herbst</string>
+    <string name="menu_option_accent_autumn">Verliebt</string>
     <string name="menu_option_accent_monochrome">1930er</string>
     <string name="yes">Ja</string>
     <string name="no">Nein</string>

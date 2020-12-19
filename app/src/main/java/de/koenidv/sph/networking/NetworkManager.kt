@@ -1,6 +1,8 @@
 package de.koenidv.sph.networking
 
+import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.androidnetworking.AndroidNetworking
 import com.androidnetworking.common.Priority
@@ -31,8 +33,6 @@ class NetworkManager {
     val FAILED_CANCELLED = 4
 
     // todo save last refresh for checks
-    // todo use lambdas
-    // todo handle errors
     fun createCourseIndex(onComplete: (success: Int) -> Unit) {
         val prefs = applicationContext().getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
         // Remove old courses, it'll just lead to isses
@@ -43,42 +43,29 @@ class NetworkManager {
 
 
         // Firstly, load courses from timetable so we have an overview
-        loadSiteWithToken("https://start.schulportal.hessen.de/stundenplan.php", object : StringRequestListener {
-            override fun onResponse(response: String?) {
-                coursesDb.save(RawParser().parseCoursesFromTimetable(response!!))
-
+        loadSiteWithToken("https://start.schulportal.hessen.de/stundenplan.php", onComplete = { successTimetable: Int, responseTimetable: String? ->
+            if (successTimetable == SUCCESS) {
+                // Save parsed courses from timetable
+                coursesDb.save(RawParser().parseCoursesFromTimetable(responseTimetable!!))
                 // Secondly, load those courses from study groups to find out where the user belongs
-                loadSiteWithToken("https://start.schulportal.hessen.de/lerngruppen.php", object : StringRequestListener {
-                    override fun onResponse(response: String?) {
+                loadSiteWithToken("https://start.schulportal.hessen.de/lerngruppen.php", onComplete = { successStudygroups: Int, responseStudygroups: String? ->
+                    if (successStudygroups == SUCCESS) {
+                        // Save parsed courses from study groups
                         coursesDb.setNulledNotFavorite()
-                        coursesDb.save(RawParser().parseCoursesFromStudygroups(response!!))
-
+                        coursesDb.save(RawParser().parseCoursesFromStudygroups(responseStudygroups!!))
                         // Lastly, load courses again from posts overview to get number ids
-                        loadSiteWithToken("https://start.schulportal.hessen.de/meinunterricht.php", object : StringRequestListener {
-                            override fun onResponse(response: String?) {
-                                coursesDb.save(RawParser().parseCoursesFromPostsoverview(response!!))
-                                onComplete(SUCCESS)
+                        loadSiteWithToken("https://start.schulportal.hessen.de/meinunterricht.php", onComplete = { successOverview: Int, responseOverview: String? ->
+                            if (successOverview == SUCCESS) {
+                                // Save parsed courses from posts overview
+                                coursesDb.save(RawParser().parseCoursesFromPostsoverview(responseOverview!!))
                                 // Remember when we last updated the courses
                                 prefs.edit().putLong("courses_last_updated", Date().time).apply()
                             }
-
-                            override fun onError(anError: ANError?) {
-                                onComplete(FAILED_UNKNOWN)
-                            }
+                            onComplete(successOverview)
                         })
-                    }
-
-                    override fun onError(anError: ANError?) {
-                        onComplete(FAILED_UNKNOWN)
-
-                    }
+                    } else onComplete(successStudygroups)
                 })
-
-            }
-
-            override fun onError(anError: ANError?) {
-                onComplete(FAILED_UNKNOWN)
-            }
+            } else onComplete(successTimetable)
         })
     }
 
@@ -86,18 +73,16 @@ class NetworkManager {
     /**
      * Loads a url within the sph and handles authentication
      * @param url URL to load
-     * @param listener Listen for results
-     * todo check if request was successfull (signed in)
      */
-    fun loadSiteWithToken(url: String, listener: StringRequestListener) {
+    fun loadSiteWithToken(url: String, onComplete: (success: Int, resolvedUrl: String?) -> Unit) {
 
         // Getting an access token
-        TokenManager().generateAccessToken(object : TokenManager.TokenGeneratedListener {
-            override fun onTokenGenerated(success: Int, token: String) {
+        TokenManager().generateAccessToken { success: Int, token: String? ->
+            if (success == SUCCESS) {
                 // Setting sid cookie
                 CookieStore.saveFromResponse(
                         HttpUrl.parse("https://schulportal.hessen.de")!!,
-                        listOf(Cookie.Builder().domain("schulportal.hessen.de").name("sid").value(token).build()))
+                        listOf(Cookie.Builder().domain("schulportal.hessen.de").name("sid").value(token!!).build()))
 
                 // Adding an Network Interceptor for Debugging purpose :
                 val okHttpClient = OkHttpClient.Builder()
@@ -112,20 +97,51 @@ class NetworkManager {
                         .setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.27 Safari/537.36")
                         .setPriority(Priority.LOW)
                         .build()
-                        .getAsString(listener)
-            }
-        })
+                        .getAsString(object : StringRequestListener {
+                            override fun onResponse(response: String) {
+                                val prefs = applicationContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
+                                if (!response.contains("Login - Schulportal Hessen")) {
+                                    // Getting site was successful
+                                    onComplete(SUCCESS, response)
+                                    prefs.edit().putLong("token_last_success", Date().time).apply()
+                                } else if (response.contains("Login - Schulportal Hessen")) {
+                                    // Signin was not successful
+                                    onComplete(FAILED_INVALID_CREDENTIALS, null)
+                                    prefs.edit().putLong("token_last_success", 0).apply()
+                                } else if (response.contains("Wartungsarbeiten")) {
+                                    // Maintenance work
+                                    onComplete(FAILED_MAINTENANCE, null)
+                                }
+                            }
 
+                            override fun onError(error: ANError) {
+                                when (error.errorDetail) {
+                                    "connectionError" -> {
+                                        // This will also be called if reqest timed out
+                                        onComplete(NetworkManager().FAILED_NO_NETWORK, null)
+                                    }
+                                    "requestCancelledError" -> {
+                                        onComplete(NetworkManager().FAILED_CANCELLED, null)
+                                    }
+                                    else -> {
+                                        Toast.makeText(applicationContext(), error.toString(), Toast.LENGTH_LONG).show()
+                                    }
+                                }
+                            }
+
+                        })
+            } else onComplete(success, null)
+        }
     }
 
     fun resolveUrl(url: String, onComplete: (success: Int, resolvedUrl: String) -> Unit) {
         // Getting an access token
-        TokenManager().generateAccessToken(object : TokenManager.TokenGeneratedListener {
-            override fun onTokenGenerated(success: Int, token: String) {
+        TokenManager().generateAccessToken { success: Int, token: String? ->
+            if (success == SUCCESS) {
                 // Setting sid cookie
                 CookieStore.saveFromResponse(
                         HttpUrl.parse("https://schulportal.hessen.de")!!,
-                        listOf(Cookie.Builder().domain("schulportal.hessen.de").name("sid").value(token).build()))
+                        listOf(Cookie.Builder().domain("schulportal.hessen.de").name("sid").value(token!!).build()))
 
                 // Adding an Network Interceptor for Debugging purpose :
                 val okHttpClient = OkHttpClient.Builder()
@@ -160,7 +176,7 @@ class NetworkManager {
                             }
 
                         })
-            }
-        })
+            } else onComplete(success, url)
+        }
     }
 }

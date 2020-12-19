@@ -4,6 +4,12 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <queries>
+        <intent>
+            <action android:name="android.content.Intent.ACTION_SENDTO" />
+        </intent>
+    </queries>
+
     <application
         android:name=".SphPlanner"
         android:allowBackup="true"

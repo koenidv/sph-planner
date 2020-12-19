@@ -9,8 +9,6 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import com.androidnetworking.error.ANError
-import com.androidnetworking.interfaces.StringRequestListener
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import de.koenidv.sph.MainActivity
 import de.koenidv.sph.R
@@ -35,136 +33,13 @@ class OnboardingSupportlistFragment : Fragment() {
         val nextFab = view.findViewById<FloatingActionButton>(R.id.nextFab)
 
         // Get supported features
-        NetworkManager().loadSiteWithToken("https://start.schulportal.hessen.de/index.php", object : StringRequestListener {
-            override fun onResponse(response: String) {
-                if (response.contains("Wartungsarbeiten")) {
-                    onError(null)
-                    return
-                }
+        NetworkManager().loadSiteWithToken("https://start.schulportal.hessen.de/index.php", onComplete = { success: Int, response: String? ->
+            // todo handle success != 0
 
-                // todo get real name from result
-                // todo all indexing in NetworkManager
-
-                val featureList = RawParser().parseFeatureList(response)
-                // Get string list of supported features
-                val features = featureList.map { it.name }
-
-                // Supported tags
-                val schoolTested = requireContext().resources.getStringArray(R.array.tested_schools).contains(prefs.getString("schoolid", ""))
-                var allFeatures = true
-                var usableFeatures = true
-                var manualFeatures = false
-                var someFeatures = false
-                var featurelistText = getString(R.string.onboard_supported_featurelist)
-                val checkmarkText = getString(R.string.emoji_check)
-                val crossmarkText = getString(R.string.emoji_cross)
-
-                // todo Better check for compatibility
-                if (!features.contains("Mein Unterricht")) {
-                    allFeatures = false
-                    usableFeatures = false
-                    featurelistText = featurelistText.replace("%mycourses", crossmarkText)
-                } else {
-                    someFeatures = true
-                    featurelistText = featurelistText.replace("%mycourses", checkmarkText)
-                }
-                if (!features.contains("Nachrichten")) {
-                    allFeatures = false
-                    featurelistText = featurelistText.replace("%messages", crossmarkText)
-                } else {
-                    someFeatures = true
-                    featurelistText = featurelistText.replace("%messages", checkmarkText)
-                }
-                if (!features.contains("Lerngruppen")) {
-                    allFeatures = false
-                    manualFeatures = true
-                    featurelistText = featurelistText.replace("%studygroups", crossmarkText)
-                } else {
-                    featurelistText = featurelistText.replace("%studygroups", checkmarkText)
-                }
-                if (!features.contains("Stundenplan")) {
-                    allFeatures = false
-                    usableFeatures = false
-                    featurelistText = featurelistText.replace("%timetable", crossmarkText)
-                } else {
-                    someFeatures = true
-                    featurelistText = featurelistText.replace("%timetable", checkmarkText)
-                }
-                if (!features.contains("Vertretungsplan") && !features.contains("Testphase Vertretungsplan")) {
-                    allFeatures = false
-                    usableFeatures = false
-                    featurelistText = featurelistText.replace("%changes", crossmarkText)
-                } else {
-                    someFeatures = true
-                    featurelistText = featurelistText.replace("%changes", checkmarkText)
-                }
-
-                // Get title text from supported tags
-                val featureTitleText: String
-                featureTitleText = when {
-                    schoolTested -> getString(R.string.onboard_supported_schooltested)
-                    allFeatures -> getString(R.string.onboard_supported_features_full)
-                    usableFeatures && manualFeatures -> getString(R.string.onboard_supported_features_partly_manual)
-                    usableFeatures && !manualFeatures -> getString(R.string.onboard_supported_features_partly_hidden)
-                    someFeatures && !usableFeatures -> getString(R.string.onboard_supported_features_partly_not)
-                    else -> getString(R.string.onboard_supported_features_none)
-                }
-
-                // Set contents and visibilites
-
-                featuresLoading.visibility = View.GONE
-                titleText.text = featureTitleText
-                titleText.visibility = View.VISIBLE
-                featuresText.text = featurelistText
-                featuresText.visibility = View.VISIBLE
-                if (someFeatures) {
-                    warningText.visibility = View.VISIBLE
-                    // todo start indexing
-                    indexLoading.visibility = View.VISIBLE
-
-
-                    /*
-                 * Start indexing
-                 */
-
-                    // Resolve tile urls
-                    var tilesResolved = 0
-                    for (feature in featureList) {
-                        NetworkManager().resolveUrl(feature.location, onComplete = { success: Int, resolvedUrl: String ->
-                            kotlin.run {
-                                // Save new url to object
-                                // todo handle errors
-                                if (success == NetworkManager().SUCCESS
-                                        || success == NetworkManager().FAILED_UNKNOWN // If sph redirected back to home
-                                )
-                                    feature.location = resolvedUrl
-                                // Save number of tiles resolved
-                                tilesResolved++
-                                // If this was the last tile
-                                if (tilesResolved == featureList.size) {
-                                    // Save features in case we need them later
-                                    TilesDb.getInstance().save(featureList)
-
-                                    // Now index courses
-                                    NetworkManager().createCourseIndex {
-                                        if (it == NetworkManager().SUCCESS) {
-                                            indexLoading.visibility = View.GONE
-                                            nextFab.visibility = View.VISIBLE
-                                            prefs.edit().putBoolean("introComplete", true).apply()
-                                        }
-                                        // todo handle errors
-                                    }
-                                }
-                            }
-                        })
-                    }
-
-                }
-
-            }
-
-            override fun onError(anError: ANError?) {
+            if (success != NetworkManager().SUCCESS) {
                 // Display network error
+                // Might display if sph is being maintained
+                // Credentials should be valid as we just checked them in the last onboarding step
                 featuresLoading.visibility = View.GONE
                 titleText.text = getString(R.string.onboard_supported_error_network)
                 warningText.visibility = View.VISIBLE
@@ -173,8 +48,126 @@ class OnboardingSupportlistFragment : Fragment() {
                     val ft = parentFragmentManager.beginTransaction()
                     ft.detach(this@OnboardingSupportlistFragment).attach(this@OnboardingSupportlistFragment).commit()
                 }
+                return@loadSiteWithToken
             }
 
+            // todo get real name from result
+            // todo all indexing in NetworkManager
+
+            val featureList = RawParser().parseFeatureList(response!!)
+            // Get string list of supported features
+            val features = featureList.map { it.name }
+
+            // Supported tags
+            val schoolTested = requireContext().resources.getStringArray(R.array.tested_schools).contains(prefs.getString("schoolid", ""))
+            var allFeatures = true
+            var usableFeatures = true
+            var manualFeatures = false
+            var someFeatures = false
+            var featurelistText = getString(R.string.onboard_supported_featurelist)
+            val checkmarkText = getString(R.string.emoji_check)
+            val crossmarkText = getString(R.string.emoji_cross)
+
+            // todo Better check for compatibility
+            if (!features.contains("Mein Unterricht")) {
+                allFeatures = false
+                usableFeatures = false
+                featurelistText = featurelistText.replace("%mycourses", crossmarkText)
+            } else {
+                someFeatures = true
+                featurelistText = featurelistText.replace("%mycourses", checkmarkText)
+            }
+            if (!features.contains("Nachrichten")) {
+                allFeatures = false
+                featurelistText = featurelistText.replace("%messages", crossmarkText)
+            } else {
+                someFeatures = true
+                featurelistText = featurelistText.replace("%messages", checkmarkText)
+            }
+            if (!features.contains("Lerngruppen")) {
+                allFeatures = false
+                manualFeatures = true
+                featurelistText = featurelistText.replace("%studygroups", crossmarkText)
+            } else {
+                featurelistText = featurelistText.replace("%studygroups", checkmarkText)
+            }
+            if (!features.contains("Stundenplan")) {
+                allFeatures = false
+                usableFeatures = false
+                featurelistText = featurelistText.replace("%timetable", crossmarkText)
+            } else {
+                someFeatures = true
+                featurelistText = featurelistText.replace("%timetable", checkmarkText)
+            }
+            if (!features.contains("Vertretungsplan") && !features.contains("Testphase Vertretungsplan")) {
+                allFeatures = false
+                usableFeatures = false
+                featurelistText = featurelistText.replace("%changes", crossmarkText)
+            } else {
+                someFeatures = true
+                featurelistText = featurelistText.replace("%changes", checkmarkText)
+            }
+
+            // Get title text from supported tags
+            val featureTitleText: String
+            featureTitleText = when {
+                schoolTested -> getString(R.string.onboard_supported_schooltested)
+                allFeatures -> getString(R.string.onboard_supported_features_full)
+                usableFeatures && manualFeatures -> getString(R.string.onboard_supported_features_partly_manual)
+                usableFeatures && !manualFeatures -> getString(R.string.onboard_supported_features_partly_hidden)
+                someFeatures && !usableFeatures -> getString(R.string.onboard_supported_features_partly_not)
+                else -> getString(R.string.onboard_supported_features_none)
+            }
+
+            // Set contents and visibilites
+
+            featuresLoading.visibility = View.GONE
+            titleText.text = featureTitleText
+            titleText.visibility = View.VISIBLE
+            featuresText.text = featurelistText
+            featuresText.visibility = View.VISIBLE
+            if (someFeatures) {
+                warningText.visibility = View.VISIBLE
+                // todo start indexing
+                indexLoading.visibility = View.VISIBLE
+
+
+                /*
+             * Start indexing
+             */
+
+                // Resolve tile urls
+                var tilesResolved = 0
+                for (feature in featureList) {
+                    NetworkManager().resolveUrl(feature.location, onComplete = { successUrl: Int, resolvedUrl: String ->
+                        kotlin.run {
+                            // Save new url to object
+                            // todo handle errors
+                            if (successUrl == NetworkManager().SUCCESS
+                                    || successUrl == NetworkManager().FAILED_UNKNOWN // If sph redirected back to home
+                            )
+                                feature.location = resolvedUrl
+                            // Save number of tiles resolved
+                            tilesResolved++
+                            // If this was the last tile
+                            if (tilesResolved == featureList.size) {
+                                // Save features in case we need them later
+                                TilesDb.getInstance().save(featureList)
+
+                                // Now index courses
+                                NetworkManager().createCourseIndex {
+                                    if (it == NetworkManager().SUCCESS) {
+                                        indexLoading.visibility = View.GONE
+                                        nextFab.visibility = View.VISIBLE
+                                        prefs.edit().putBoolean("introComplete", true).apply()
+                                    }
+                                    // todo handle errors
+                                }
+                            }
+                        }
+                    })
+                }
+            }
         })
 
         // Continue button

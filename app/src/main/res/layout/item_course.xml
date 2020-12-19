@@ -22,6 +22,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/roboto_slab"
             android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:textColor="@color/white"
             android:textSize="18sp" />
 
         <TextView

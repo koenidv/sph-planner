@@ -23,12 +23,12 @@ class TokenManager {
      * Returns an signed-in access token
      * todo: Documentation
      */
-    fun generateAccessToken(callback: TokenGeneratedListener, forceNewToken : Boolean = false) {
+    fun generateAccessToken(forceNewToken: Boolean = false, onComplete: (success: Int, token: String?) -> Unit) {
 
         // Return existing, signed-in token if it was used within 15 Minutes
         // Else get a new token
         if (Date().time - prefs.getLong("token_last_success", 0) <= 15 * 60 * 1000 && !forceNewToken) {
-            callback.onTokenGenerated(NetworkManager().SUCCESS, prefs.getString("token", "")!!)
+            onComplete(NetworkManager().SUCCESS, prefs.getString("token", "")!!)
         } else {
             // Get a new token
             if (prefs.getString("user", "") != null && prefs.getString("password", "") != null) {
@@ -56,17 +56,17 @@ class TokenManager {
                                 if (CookieStore.getCookie("schulportal.hessen.de", "sid") != null
                                         && !response.contains("Login - Schulportal Hessen")) {
                                     // Login success
-                                    callback.onTokenGenerated(NetworkManager().SUCCESS, CookieStore.getCookie("schulportal.hessen.de", "sid")!!)
+                                    onComplete(NetworkManager().SUCCESS, CookieStore.getCookie("schulportal.hessen.de", "sid")!!)
                                     prefs.edit().putString("token", CookieStore.getCookie("schulportal.hessen.de", "sid"))
                                             .putLong("token_last_success", Date().time)
                                             .apply()
                                 } else if (response.contains("Login - Schulportal Hessen")) {
                                     // Login not successful
-                                    callback.onTokenGenerated(NetworkManager().FAILED_INVALID_CREDENTIALS, "")
+                                    onComplete(NetworkManager().FAILED_INVALID_CREDENTIALS, null)
                                     prefs.edit().putLong("token_last_success", 0).apply()
                                 } else if (response.contains("Wartungsarbeiten")) {
                                     // Cannot login at the moment
-                                    callback.onTokenGenerated(NetworkManager().FAILED_MAINTENANCE, "")
+                                    onComplete(NetworkManager().FAILED_MAINTENANCE, null)
                                 }
                             }
 
@@ -74,10 +74,10 @@ class TokenManager {
                                 when (error.errorDetail) {
                                     "connectionError" -> {
                                         // This will also be called if reqest timed out
-                                        callback.onTokenGenerated(NetworkManager().FAILED_NO_NETWORK, "")
+                                        onComplete(NetworkManager().FAILED_NO_NETWORK, null)
                                     }
                                     "requestCancelledError" -> {
-                                        callback.onTokenGenerated(NetworkManager().FAILED_CANCELLED, "")
+                                        onComplete(NetworkManager().FAILED_CANCELLED, null)
                                     }
                                     else -> {
                                         Toast.makeText(applicationContext(), error.toString(), Toast.LENGTH_LONG).show()
