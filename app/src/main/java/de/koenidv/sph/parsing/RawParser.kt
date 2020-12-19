@@ -459,6 +459,9 @@ class RawParser {
                     // No description available
                     null
                 }
+                // If description containes a list, add a newline to all list markers
+                if (postDescription != null && cells[1].select("i[title=\"Ausführlicher Inhalt\"]").parents()[0].toString().contains("<ul>"))
+                    postDescription = postDescription.replace(" - ", "\n•")
                 // Add new post to posts list
                 posts.add(Post(
                         postId,
@@ -479,7 +482,7 @@ class RawParser {
             if (cells[1].toString().contains("<span class=\"homework\">")) {
                 // There can only be one task per post, it seems
                 taskId = courseId + "_task-" + internalDateFormat.format(date) + "_1"
-                taskDone = cells[1].toString().contains("<span class=\"done")
+                taskDone = cells[1].toString().contains("<span class=\"done \"")
                 taskDescription = cells[1].select("span.homework").nextAll("span.markup")[0].text()
                 // Add new task to tasks list
                 tasks.add(PostTask(
@@ -535,6 +538,8 @@ class RawParser {
                     ))
                 }
             }
+
+            // todo Parse submissions
 
         }
 

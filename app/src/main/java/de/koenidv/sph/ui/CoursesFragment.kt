@@ -5,8 +5,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.navigation.Navigation
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import de.koenidv.sph.R
@@ -25,7 +25,8 @@ class CoursesFragment : Fragment() {
         val courses = CoursesDb.getInstance().favorites.sortedBy { it.fullname }.sortedByDescending { it.isLK }
         // Set up courses recycler
         val coursesAdapter = CoursesAdapter(courses) {
-            Toast.makeText(requireContext(), "Coming soon to a screen near your thumb.", Toast.LENGTH_SHORT).show()
+            Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
+                    .navigate(R.id.courseOverviewAction)
         }
         coursesRecycler.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
         coursesRecycler.adapter = coursesAdapter

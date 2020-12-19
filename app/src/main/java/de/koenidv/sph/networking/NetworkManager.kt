@@ -101,6 +101,7 @@ class NetworkManager {
                                         // todo last post from spo_kmb_4 missing
                                         // todo Save tasks
                                         // todo Save links
+                                        Toast.makeText(applicationContext(), "Heute schon, Kartoffel", Toast.LENGTH_SHORT).show()
                                     })
                         } else {
                             errors.add(success)
