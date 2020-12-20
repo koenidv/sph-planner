@@ -96,7 +96,7 @@ public class PostTaskDb {
     public List<PostTask> getByTask(String Task) {
         final SQLiteDatabase db = dbhelper.getReadableDatabase();
         // Query posts
-        String queryString = "SELECT * FROM posttask WHERE Task = '" + Task + "'";
+        String queryString = "SELECT * FROM posttask WHERE taskid = '" + Task + "'";
         Cursor cursor = db.rawQuery(queryString, null);
         // Get posts with the cursor
         return getWithCursor(cursor, db);
