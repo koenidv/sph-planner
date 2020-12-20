@@ -6,16 +6,21 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.adapters.PostsAdapter
 import de.koenidv.sph.database.PostAttachmentsDb
 import de.koenidv.sph.database.PostsDb
+import de.koenidv.sph.objects.Post
+import de.koenidv.sph.objects.PostAttachment
 import de.koenidv.sph.objects.PostTask
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 
 // Created by koenidv on 18.12.2020.
@@ -29,26 +34,47 @@ class CourseOverviewFragment : Fragment() {
 
         val postsRecycler = view.findViewById<RecyclerView>(R.id.postsRecycler)
         val postsTitleText = view.findViewById<TextView>(R.id.postsTitleTextView)
+        val postsLoading = view.findViewById<ProgressBar>(R.id.postsLoading)
 
         // Get passed course id argument
         val courseId = arguments?.getString("courseId") ?: ""
 
-        val posts = PostsDb.getInstance().getByCourseId(courseId)
-        val tasks = listOf<PostTask>()
-        val attachments = PostAttachmentsDb.getInstance().getPostByCourseId(courseId)
+        /*
+         * Posts recycler
+         * Set up with empty data and reload later
+         * Show fragment before RecyclerView is populated
+         */
 
-        if (!posts.isEmpty()) {
+        val postsLateInit = mutableListOf<Post>()
+        val tasksLateInit = mutableListOf<PostTask>()
+        val attachmentsLateInit = mutableListOf<PostAttachment>()
+
+        val postsAdapter = PostsAdapter(
+                postsLateInit,
+                tasksLateInit,
+                attachmentsLateInit
+        )
+        postsRecycler.adapter = postsAdapter
+        GlobalScope.launch {
             // Set up posts recycler
-            val postsAdapter = PostsAdapter(
-                    posts,
-                    tasks,
-                    attachments
-            )
-            postsRecycler.layoutManager = LinearLayoutManager(requireContext())
-            postsRecycler.adapter = postsAdapter
-        } else {
-            // Display no posts message
-            postsTitleText.text = getString(R.string.posts_no_data)
+            postsLateInit.addAll(PostsDb.getInstance().getByCourseId(courseId))
+            tasksLateInit.addAll(listOf<PostTask>())
+            attachmentsLateInit.addAll(PostAttachmentsDb.getInstance().getPostByCourseId(courseId))
+            // Populate recyclerview 80ms delayed to avoid visible lag
+            // Not the best solution..
+            delay(90)
+            requireActivity().runOnUiThread {
+                // Check if there are any posts for this course
+                if (postsLateInit.isNotEmpty()) {
+                    // Update RecyclerView and hide ProgessBar
+                    postsAdapter.notifyDataSetChanged()
+                    postsLoading.visibility = View.GONE
+                    postsRecycler.visibility = View.VISIBLE
+                } else {
+                    // Display no posts message
+                    postsTitleText.text = getString(R.string.posts_no_data)
+                }
+            }
         }
 
         return view

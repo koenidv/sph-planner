@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".ui.CourseOverviewFragment">
 
     <LinearLayout
@@ -21,12 +22,23 @@
             android:text="@string/posts_list_title"
             android:textSize="16sp" />
 
+        <ProgressBar
+            android:id="@+id/postsLoading"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp" />
+
         <androidx.recyclerview.widget.RecyclerView
+            android:nestedScrollingEnabled="false"
             android:id="@+id/postsRecycler"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:nestedScrollingEnabled="false" />
+            android:visibility="gone"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager">
+
+        </androidx.recyclerview.widget.RecyclerView>
 
     </LinearLayout>
 
