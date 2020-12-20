@@ -47,13 +47,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "date INTEGER,title TEXT, description TEXT, unread INTEGER)";
         String createPostAttachmentTable = "CREATE TABLE postAttachments(attachment_id TEXT PRIMARY KEY," +
                 "id_course TEXT, id_post TEXT, name TEXT, date INTEGER, url TEXT, deviceLocation TEXT, size TEXT)";
-
+        String createPostLinkTable = "CREATE TABLE postlink(id_course TEXT, id_post TEXT, name TEXT, date INTEGER, url TEXT)";
+        String createPostTaskTable = "CREATE TABLE posttask(taskid TEXT, id_course TEXT, id_post TEXT, description TEXT, date INTEGER, isdone TEXT)";
 
         db.execSQL(createCoursesTable);
         db.execSQL(createChangesTable);
         db.execSQL(createTilesTable);
         db.execSQL(createPostTable);
         db.execSQL(createPostAttachmentTable);
+        db.execSQL(createPostLinkTable);
+        db.execSQL(createPostTaskTable);
     }
 
     //upgrade Database
