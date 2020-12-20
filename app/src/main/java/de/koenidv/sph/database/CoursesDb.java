@@ -254,14 +254,16 @@ public class CoursesDb {
     }
 
     public Course getBySphId(String Sph_id) {
-        String queryString = "SELECT * FROM courses WHERE sph_id = " + Sph_id;
+        String queryString = "SELECT * FROM courses WHERE sph_id = \"" + Sph_id + "\"";
         SQLiteDatabase db = dbhelper.getReadableDatabase();
+        Course returnCourse = null;
 
         Cursor cursor = db.rawQuery(queryString, null);
-        cursor.moveToFirst();
-        Course returnCourse = cursorToCourse(cursor);
-
-        cursor.close();
+        if (cursor.getCount() != 0) {
+            cursor.moveToFirst();
+            returnCourse = cursorToCourse(cursor);
+            cursor.close();
+        }
 
         return returnCourse;
     }

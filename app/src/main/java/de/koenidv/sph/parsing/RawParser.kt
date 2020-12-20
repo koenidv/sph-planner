@@ -303,7 +303,7 @@ class RawParser {
                 // Get courses that might be the same as this one
                 similiarCourses = CoursesDb.getInstance().getByNamedId(uniformCourseName).toMutableList()
                 if (courseName.contains("""\(.*\)""".toRegex())) { // if contains text in brackets
-                    similiarCourses.add(CoursesDb.getInstance().getBySphId(courseName.substring(courseName.indexOf("("), courseName.lastIndexOf(")"))))
+                    similiarCourses.add(CoursesDb.getInstance().getBySphId(courseName.substring(courseName.indexOf("(") + 1, courseName.lastIndexOf(")"))))
                 }
 
                 // Make sure no course is in the list twice
