@@ -7,6 +7,7 @@ import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.checkbox.MaterialCheckBox
 import de.koenidv.sph.R
 import de.koenidv.sph.objects.Post
 import de.koenidv.sph.objects.PostAttachment
@@ -29,6 +30,8 @@ class PostsAdapter(private val posts: List<Post>, private val tasks: List<PostTa
         private val dateText: TextView = view.findViewById(R.id.dateTextView)
         private val titleText: TextView = view.findViewById(R.id.titleTextView)
         private val descriptionText: TextView = view.findViewById(R.id.descriptionTextView)
+        private val taskCheckBox: MaterialCheckBox = view.findViewById(R.id.taskCheckBox)
+        private val taskText: TextView = view.findViewById(R.id.taskTextView)
         private val attachmentsRecycler: RecyclerView = view.findViewById(R.id.attachmentsRecycler)
         private val dateFormat = SimpleDateFormat("d. MMM yyyy", Locale.getDefault())
 
@@ -39,6 +42,14 @@ class PostsAdapter(private val posts: List<Post>, private val tasks: List<PostTa
             titleText.text = post.title
             if (post.description != null) descriptionText.text = post.description
             else descriptionText.visibility = View.GONE
+
+            // Task
+            if (task != null) {
+                taskCheckBox.visibility = View.VISIBLE
+                taskCheckBox.isChecked = task.isDone
+                taskText.text = task.description
+                taskText.visibility = View.VISIBLE
+            }
 
             // Attachments
             if (attachments.isNullOrEmpty()) {
@@ -53,6 +64,7 @@ class PostsAdapter(private val posts: List<Post>, private val tasks: List<PostTa
                 attachmentsRecycler.setRecycledViewPool(attachmentsViewPool)
                 attachmentsRecycler.adapter = AttachmentsAdapter(attachments)
             }
+
 
             /*
             // Set background color

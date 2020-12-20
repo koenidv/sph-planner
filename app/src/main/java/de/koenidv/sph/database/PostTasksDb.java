@@ -8,24 +8,22 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import de.koenidv.sph.objects.Post;
-import de.koenidv.sph.objects.PostLink;
 import de.koenidv.sph.objects.PostTask;
 
-public class PostTaskDb {
+public class PostTasksDb {
 
     private final DatabaseHelper dbhelper = DatabaseHelper.getInstance();
 
-    private static PostTaskDb instance;
+    private static PostTasksDb instance;
 
-    private PostTaskDb() {
+    private PostTasksDb() {
     }
 
-    public static PostTaskDb getInstance() {
-        if (PostTaskDb.instance == null) {
-            PostTaskDb.instance = new PostTaskDb();
+    public static PostTasksDb getInstance() {
+        if (PostTasksDb.instance == null) {
+            PostTasksDb.instance = new PostTasksDb();
         }
-        return PostTaskDb.instance;
+        return PostTasksDb.instance;
     }
 
     public void save(List<PostTask> posttasks) {
@@ -46,7 +44,7 @@ public class PostTaskDb {
         cv.put("date", postTask.getDate().getTime() / 1000);
         cv.put("isDone",postTask.isDone());
         // Add or update post in db
-        Cursor cursor = db.rawQuery("SELECT * FROM postlink WHERE post_id = '" + postTask.getTaskId() + "'" , null);
+        Cursor cursor = db.rawQuery("SELECT * FROM postlink WHERE id_post = '" + postTask.getTaskId() + "'", null);
         if (cursor.getCount() == 0) {
             db.insert("posttask", null, cv);
         } else {

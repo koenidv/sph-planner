@@ -14,6 +14,7 @@ import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.adapters.PostsAdapter
 import de.koenidv.sph.database.PostAttachmentsDb
+import de.koenidv.sph.database.PostTasksDb
 import de.koenidv.sph.database.PostsDb
 import de.koenidv.sph.objects.Post
 import de.koenidv.sph.objects.PostAttachment
@@ -39,6 +40,10 @@ class CourseOverviewFragment : Fragment() {
         // Get passed course id argument
         val courseId = arguments?.getString("courseId") ?: ""
 
+        val posts = PostsDb.getInstance().getByCourseId(courseId)
+        val tasks = PostTasksDb.getInstance().getByCourseId(courseId)
+        val attachments = PostAttachmentsDb.getInstance().getPostByCourseId(courseId)
+
         /*
          * Posts recycler
          * Set up with empty data and reload later
@@ -57,12 +62,12 @@ class CourseOverviewFragment : Fragment() {
         postsRecycler.adapter = postsAdapter
         GlobalScope.launch {
             // Set up posts recycler
-            postsLateInit.addAll(PostsDb.getInstance().getByCourseId(courseId))
-            tasksLateInit.addAll(listOf<PostTask>())
-            attachmentsLateInit.addAll(PostAttachmentsDb.getInstance().getPostByCourseId(courseId))
-            // Populate recyclerview 80ms delayed to avoid visible lag
+            postsLateInit.addAll(posts)
+            tasksLateInit.addAll(tasks)
+            attachmentsLateInit.addAll(attachments)
+            // Populate recyclerview 100ms delayed to avoid visible lag
             // Not the best solution..
-            delay(90)
+            delay(110)
             requireActivity().runOnUiThread {
                 // Check if there are any posts for this course
                 if (postsLateInit.isNotEmpty()) {
@@ -73,6 +78,7 @@ class CourseOverviewFragment : Fragment() {
                 } else {
                     // Display no posts message
                     postsTitleText.text = getString(R.string.posts_no_data)
+                    postsLoading.visibility = View.GONE
                 }
             }
         }

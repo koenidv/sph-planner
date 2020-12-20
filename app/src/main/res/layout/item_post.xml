@@ -71,6 +71,33 @@
         app:layout_constraintTop_toBottomOf="@id/titleTextView"
         tools:text="entfallen wegen technischer Probleme des Schulportals" />
 
+    <CheckBox
+        android:id="@+id/taskCheckBox"
+        android:layout_width="32dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="4dp"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/descriptionTextView"
+        tools:visibility="visible" />
+
+    <TextView
+        android:id="@+id/taskTextView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="32dp"
+        android:gravity="fill_vertical"
+        android:minHeight="48dp"
+        android:paddingTop="8dp"
+        android:textSize="16sp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/taskCheckBox"
+        app:layout_constraintTop_toBottomOf="@id/descriptionTextView"
+        tools:text="Super dolle Hausaufgabe\nMit ganzen zwei,\nnein drei Zeilen!" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/attachmentsRecycler"
         android:layout_width="match_parent"
@@ -84,7 +111,7 @@
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/descriptionTextView"
+        app:layout_constraintTop_toBottomOf="@+id/taskTextView"
         tools:itemCount="1"
         tools:listitem="@layout/item_attachment" />
 

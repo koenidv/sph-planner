@@ -4,6 +4,8 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -26,13 +28,13 @@ public class PostsDb {
         return PostsDb.instance;
     }
 
-    public void save(List<Post> posts) {
+    public void save(@NotNull List<Post> posts) {
         for (Post post : posts) {
             save(post);
         }
     }
 
-    public void save(Post post) {
+    public void save(@NotNull Post post) {
         final SQLiteDatabase db = dbhelper.getReadableDatabase();
         ContentValues cv = new ContentValues();
 

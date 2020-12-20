@@ -14,6 +14,7 @@ import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.SphPlanner.Companion.applicationContext
 import de.koenidv.sph.database.CoursesDb
 import de.koenidv.sph.database.PostAttachmentsDb
+import de.koenidv.sph.database.PostTasksDb
 import de.koenidv.sph.database.PostsDb
 import de.koenidv.sph.objects.*
 import de.koenidv.sph.parsing.RawParser
@@ -100,8 +101,8 @@ class NetworkManager {
                                         // Write all that parsed stuff to the database
                                         PostsDb.getInstance().save(posts)
                                         PostAttachmentsDb.getInstance().save(attachments)
+                                        PostTasksDb.getInstance().save(tasks)
                                         // todo last post from spo_kmb_4 missing
-                                        // todo Save tasks
                                         // todo Save links
                                     })
                         } else {
