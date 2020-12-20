@@ -57,6 +57,7 @@ class WebViewFragment : Fragment() {
         @SuppressLint("SetJavaScriptEnabled")
         webView.settings.javaScriptEnabled = true
         webView.settings.domStorageEnabled = true
+        webView.settings.loadWithOverviewMode = true
         // todo store aes key
         cookieManager.removeSessionCookies(null)
         cookieManager.setAcceptThirdPartyCookies(webView, true)
