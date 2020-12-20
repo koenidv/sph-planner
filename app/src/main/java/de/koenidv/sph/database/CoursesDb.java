@@ -77,8 +77,8 @@ public class CoursesDb {
             db.insert("courses", null, cv);
         else
             db.update("courses", cv, "course_id = '" + course.getCourseId() + "'", null);
-        cursor.close();
 
+        cursor.close();
     }
 
     /**
@@ -86,7 +86,8 @@ public class CoursesDb {
      * Used in course indexing where we know which courses are favorites, but not which are not
      */
     public void setNulledNotFavorite() {
-        dbhelper.getReadableDatabase().execSQL("UPDATE courses SET isFavorite = 0 WHERE isFavorite IS NULL");
+        SQLiteDatabase db = dbhelper.getWritableDatabase();
+        db.execSQL("UPDATE courses SET isFavorite = 0 WHERE isFavorite IS NULL");
     }
 
     /**
@@ -121,7 +122,6 @@ public class CoursesDb {
             } while (cursor.moveToNext());
         }
         cursor.close();
-        db.close();
         return returnList;
     }
 
@@ -145,7 +145,6 @@ public class CoursesDb {
             } while (cursor.moveToNext());
         }
         cursor.close();
-        db.close();
         return returnList;
     }
 
@@ -155,14 +154,18 @@ public class CoursesDb {
      * @param namedId External named id to look for
      * @return Course with specified named id or null if none was found
      */
-    public Course getByNamedId(String namedId) {
+    public List<Course> getByNamedId(String namedId) {
         Cursor cursor = dbhelper.getReadableDatabase().rawQuery("SELECT * FROM courses WHERE named_id LIKE '" + namedId + "%'", null);
+
+        List<Course> returnList = new ArrayList<>();
         // Return first row
-        cursor.moveToFirst();
-        if (cursor.getCount() == 0) return null;
-
-        return cursorToCourse(cursor);
-
+        if (cursor.moveToFirst()) {
+            do {
+                returnList.add(cursorToCourse(cursor));
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        return returnList;
     }
 
     /**
@@ -216,11 +219,9 @@ public class CoursesDb {
 
         if (cursor.moveToFirst()) {
             cursor.close();
-            db.close();
             return true;
         } else {
             cursor.close();
-            db.close();
             return false;
         }
 
@@ -248,9 +249,21 @@ public class CoursesDb {
         Course newCourse = new Course(CourseId, gmb_id, sph_id, named_id, number_id, fullname, id_teacher, isFavorite, isLK, color);
 
         cursor.close();
-        db.close();
 
         return newCourse;
+    }
+
+    public Course getBySphId(String Sph_id) {
+        String queryString = "SELECT * FROM courses WHERE sph_id = " + Sph_id;
+        SQLiteDatabase db = dbhelper.getReadableDatabase();
+
+        Cursor cursor = db.rawQuery(queryString, null);
+        cursor.moveToFirst();
+        Course returnCourse = cursorToCourse(cursor);
+
+        cursor.close();
+
+        return returnCourse;
     }
 
 

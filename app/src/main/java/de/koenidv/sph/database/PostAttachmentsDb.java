@@ -3,7 +3,6 @@ package de.koenidv.sph.database;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.Build;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -12,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import androidx.annotation.RequiresApi;
 import de.koenidv.sph.objects.PostAttachment;
 
 public class PostAttachmentsDb {
@@ -60,7 +58,6 @@ public class PostAttachmentsDb {
             db.update("postAttachments", cv, "attachment_id = '" + postAttachment.getAttachmentId() + "'", null);
         }
         cursor.close();
-        db.close();
     }
 
     public List<PostAttachment> getPostByCourseId(String course_id) throws MalformedURLException {
@@ -90,11 +87,9 @@ public class PostAttachmentsDb {
         }
 
         cursor.close();
-        db.close();
         return returnList;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
     public List<PostAttachment> getPostByPostId(String postid) throws MalformedURLException {
         List<PostAttachment> returnList = new ArrayList<>();
         final SQLiteDatabase db = dbhelper.getReadableDatabase();
@@ -121,7 +116,6 @@ public class PostAttachmentsDb {
         }
 
         cursor.close();
-        db.close();
         return returnList;
     }
 }

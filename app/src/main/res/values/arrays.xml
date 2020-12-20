@@ -31,4 +31,17 @@
         <item>Sport|#25003b</item>
         <item>Religion|#00291d</item>
     </string-array>
+    <string-array name="namedid_replacements">
+        <item>Q34|13</item>
+        <item>Politik und Wirtschaft|Politik</item>
+        <item>PoWi|Politik</item>
+        <item>Informatik|Info</item>
+        <item>IT|Info</item>
+        <item>Medien|Info</item>
+        <item>EDV|Info</item>
+        <item>Mathematik|Mathe</item>
+        <item>Biologie|Bio</item>
+        <item>Geographie|Erdkunde</item>
+        <item>Geografie|Erdkunde</item>
+    </string-array>
 </resources>

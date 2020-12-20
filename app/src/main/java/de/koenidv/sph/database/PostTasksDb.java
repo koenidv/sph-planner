@@ -51,7 +51,6 @@ public class PostTasksDb {
             db.update("posttask", cv, "post_id = '" + postTask.getTaskId() + "'", null);
         }
         cursor.close();
-        db.close();
     }
 
     public List<PostTask> getAll() {
@@ -128,7 +127,6 @@ public class PostTasksDb {
             } while (cursor.moveToNext());
         }
         cursor.close();
-        db.close();
         return returnList;
     }
 

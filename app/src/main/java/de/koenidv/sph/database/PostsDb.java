@@ -54,7 +54,6 @@ public class PostsDb {
             db.update("posts", cv, "post_id = '" + post.getPostId() + "'", null);
         }
         cursor.close();
-        db.close();
     }
 
     public List<Post> getAll() {
@@ -102,7 +101,6 @@ public class PostsDb {
             } while (cursor.moveToNext());
         }
         cursor.close();
-        db.close();
         return returnList;
     }
 

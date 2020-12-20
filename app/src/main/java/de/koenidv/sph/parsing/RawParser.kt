@@ -3,9 +3,11 @@ package de.koenidv.sph.parsing
 import android.annotation.SuppressLint
 import android.graphics.Color
 import android.util.Log
+import android.widget.Toast
 import androidx.core.graphics.toColorInt
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
+import de.koenidv.sph.SphPlanner.Companion.applicationContext
 import de.koenidv.sph.database.CoursesDb
 import de.koenidv.sph.objects.*
 import org.jsoup.Jsoup
@@ -230,6 +232,7 @@ class RawParser {
         rawContents.removeFirst()
 
         var namedId: String
+        var uniformNamedId: String
         var sphId: String
         var teacherId: String
         var internalId: String
@@ -238,6 +241,7 @@ class RawParser {
         // Get data from each table row and save the courses
         for (entry in rawContents) {
             namedId = entry.substring(Utility().ordinalIndexOf(entry, "<td>", 1) + 4, entry.indexOf("<small>") - 1).trim()
+            uniformNamedId = CourseParser().parseNamedId(namedId)
             sphId = entry.substring(entry.indexOf("<small>") + 8, entry.indexOf("</small>") - 1)
             teacherId = entry.substring(Utility().ordinalIndexOf(entry, "<td>", 2))
             teacherId = teacherId.substring(teacherId.indexOf("(") + 1, teacherId.indexOf(")")).toLowerCase(Locale.ROOT)
@@ -246,7 +250,7 @@ class RawParser {
             courses.add(Course(
                     courseId = internalId,
                     sph_id = sphId,
-                    named_id = namedId,
+                    named_id = uniformNamedId,
                     id_teacher = teacherId,
                     fullname = namedId.substring(0, namedId.indexOf(" ")),
                     isFavorite = true,
@@ -277,13 +281,15 @@ class RawParser {
         rawContents.removeFirst() // Overview link
 
         var courseName: String
-        var courseId: String
+        var uniformCourseName: String
+        var numberId: String
         var courseWithNamedId: Course?
+        var similiarCourses: List<Course>
         // Get values from list
         for (entry in rawContents) {
             if (entry.contains("a=sus_view&id=")) {
-                courseId = entry.substring(entry.indexOf("a=sus_view&id=") + 14)
-                courseId = courseId.substring(0, courseId.indexOf("\""))
+                numberId = entry.substring(entry.indexOf("a=sus_view&id=") + 14)
+                numberId = numberId.substring(0, numberId.indexOf("\""))
                 courseName = entry.substring(entry.indexOf("</span>") + 7, entry.indexOf("</a>")).trim()
 
                 // todo create new courses with teacher_id instead of using old ones: might not be available
@@ -291,10 +297,33 @@ class RawParser {
                  * Info (instead of Informatik) for example will not be recognized
                  * for Q34, sometimes 13 is replaced with Q34 */
 
-                courseWithNamedId = CoursesDb.getInstance().getByNamedId(courseName.replace("Info GK Q34", "Informatik GK 13"))
-                if (courseWithNamedId != null) {
-                    courseWithNamedId.number_id = courseId
-                    courses.add(courseWithNamedId)
+                // Make named id from post overview uniform
+                uniformCourseName = CourseParser().parseNamedId(courseName)
+
+                // Get courses that might be the same as this one
+                similiarCourses = CoursesDb.getInstance().getByNamedId(uniformCourseName).toMutableList()
+                if (courseName.contains("""\(.*\)""".toRegex())) { // if contains text in brackets
+                    similiarCourses.add(CoursesDb.getInstance().getBySphId(courseName.substring(courseName.indexOf("("), courseName.lastIndexOf(")"))))
+                }
+
+                // Make sure no course is in the list twice
+                // This might happen because we add both by NamedId and SphId
+                similiarCourses = similiarCourses.distinct()
+
+                when {
+                    similiarCourses.size == 1 -> {
+                        // Only one similiar course, this should be it.
+                        similiarCourses[0].number_id = numberId
+                        courses.add(similiarCourses[0])
+                    }
+                    similiarCourses.isEmpty() -> {
+                        // todo create new course with this namedid & numberid
+                        Toast.makeText(applicationContext(), "No valid course", Toast.LENGTH_SHORT).show()
+                    }
+                    similiarCourses.size > 1 -> {
+                        // wetodo handle multiple similiar courses
+                        Toast.makeText(applicationContext(), "Too many courses", Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
         }
@@ -437,7 +466,6 @@ class RawParser {
             cells = row.select("td")
             // Cells: 0: Some metadata, 1: Content, 2: Attendance (encrypted)
             sphPostId = row.select("tr[data-entry]").attr("data-entry")
-            val test = cells[0].childNodes()[1].toString()
             date = dateFormat.parse(cells[0].childNodes()[1].toString())!!
             postId = courseId + "_post-" + internalDateFormat.format(date) + "_" + sphPostId
 

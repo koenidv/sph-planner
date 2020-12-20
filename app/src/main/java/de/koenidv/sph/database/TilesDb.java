@@ -47,7 +47,6 @@ public class TilesDb {
             } while (cursor.moveToNext());
         }
         cursor.close();
-        db.close();
         return returnList;
     }
 
@@ -79,7 +78,6 @@ public class TilesDb {
         }
 
         cursor.close();
-        db.close();
         return returnList;
     }
 
@@ -101,11 +99,10 @@ public class TilesDb {
         ContentValues cv = new ContentValues();
 
         cv.put("name", tile.getName());
-        if (tile.getLocation() != null) cv.put("location", tile.getLocation());
+        cv.put("location", tile.getLocation());
         if (tile.getType() != null) cv.put("type", tile.getType());
         cv.put("color", tile.getColor());
-        if (tile.getIcon() != null) cv.put("icon", tile.getIcon());
-
+        cv.put("icon", tile.getIcon());
 
         Cursor cursor = db.rawQuery("SELECT * FROM tiles WHERE name = '" + tile.getName() + "'", null);
         if (cursor.getCount() == 0) {
@@ -114,7 +111,6 @@ public class TilesDb {
             db.update("tiles", cv, "name = '" + tile.getName() + "'", null);
         }
         cursor.close();
-        db.close();
     }
 
 

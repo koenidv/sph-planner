@@ -10,6 +10,8 @@ import de.koenidv.sph.SphPlanner;
 //  Created by R-Theis on 8.12.2020.
 public class DatabaseHelper extends SQLiteOpenHelper {
 
+    // todo close db on exit
+
     private static DatabaseHelper instance;
 
     private DatabaseHelper(@Nullable Context context) {

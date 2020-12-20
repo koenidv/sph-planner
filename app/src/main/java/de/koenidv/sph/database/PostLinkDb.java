@@ -10,9 +10,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import de.koenidv.sph.objects.Post;
 import de.koenidv.sph.objects.PostLink;
-import de.koenidv.sph.objects.PostTask;
 
 public class PostLinkDb {
 
@@ -55,7 +53,6 @@ public class PostLinkDb {
             db.update("poslink", cv, "post_id = '" + postlink.getId_post() + "'AND url = '" + postlink.getUrl() +"'", null);
         }
         cursor.close();
-        db.close();
     }
 
 
@@ -65,7 +62,7 @@ public class PostLinkDb {
         String queryString = "SELECT * FROM postlist WHERE id_course = '" + course_id + "'";
         Cursor cursor = db.rawQuery(queryString, null);
         // Get posts with the cursor
-        return getWithCursor(cursor, db);
+        return getWithCursor(cursor);
     }
 
     public List<PostLink> getByPostId(String post_id) throws MalformedURLException {
@@ -74,7 +71,7 @@ public class PostLinkDb {
         String queryString = "SELECT * FROM postlist WHERE id_post = '" + post_id + "'";
         Cursor cursor = db.rawQuery(queryString, null);
         // Get posts with the cursor
-        return getWithCursor(cursor, db);
+        return getWithCursor(cursor);
     }
 
     public List<PostLink> getByDate(String date) throws MalformedURLException {
@@ -83,13 +80,11 @@ public class PostLinkDb {
         String queryString = "SELECT * FROM postlist WHERE date = '" + date + "'";
         Cursor cursor = db.rawQuery(queryString, null);
         // Get posts with the cursor
-        return getWithCursor(cursor, db);
+        return getWithCursor(cursor);
     }
 
 
-
-
-    private List<PostLink> getWithCursor(Cursor cursor, SQLiteDatabase db) throws MalformedURLException {
+    private List<PostLink> getWithCursor(Cursor cursor) throws MalformedURLException {
         List<PostLink> returnList = new ArrayList<>();
         if (cursor.moveToFirst()) {
             do {
@@ -106,7 +101,6 @@ public class PostLinkDb {
             } while (cursor.moveToNext());
         }
         cursor.close();
-        db.close();
         return returnList;
     }
 }
