@@ -303,7 +303,8 @@ class RawParser {
                 // Get courses that might be the same as this one
                 similiarCourses = CoursesDb.getInstance().getByNamedId(uniformCourseName).toMutableList()
                 if (courseName.contains("""\(.*\)""".toRegex())) { // if contains text in brackets
-                    similiarCourses.add(CoursesDb.getInstance().getBySphId(courseName.substring(courseName.indexOf("(") + 1, courseName.lastIndexOf(")"))))
+                    val courseToAdd = CoursesDb.getInstance().getBySphId(courseName.substring(courseName.indexOf("(") + 1, courseName.lastIndexOf(")")).replace("-GYM", " - GYM"))
+                    if (courseToAdd != null) similiarCourses.add(courseToAdd)
                 }
 
                 // Make sure no course is in the list twice

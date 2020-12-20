@@ -57,7 +57,10 @@ class WebViewFragment : Fragment() {
         @SuppressLint("SetJavaScriptEnabled")
         webView.settings.javaScriptEnabled = true
         webView.settings.domStorageEnabled = true
+        // Fix zoom issue
         webView.settings.loadWithOverviewMode = true
+        webView.settings.useWideViewPort = true
+        webView.setInitialScale(1)
         // todo store aes key
         cookieManager.removeSessionCookies(null)
         cookieManager.setAcceptThirdPartyCookies(webView, true)

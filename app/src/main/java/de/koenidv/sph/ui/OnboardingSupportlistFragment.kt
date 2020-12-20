@@ -155,13 +155,16 @@ class OnboardingSupportlistFragment : Fragment() {
                                 TilesDb.getInstance().save(featureList)
 
                                 // Now index courses
-                                NetworkManager().createCourseIndex {
-                                    if (it == NetworkManager().SUCCESS) {
-                                        indexLoading.visibility = View.GONE
-                                        nextFab.visibility = View.VISIBLE
-                                        prefs.edit().putBoolean("introComplete", true).apply()
+                                NetworkManager().createCourseIndex { indexsuccess ->
+                                    if (indexsuccess == NetworkManager().SUCCESS) {
+                                        NetworkManager().loadAndSavePosts { postssuccess ->
+                                            if (postssuccess == NetworkManager().SUCCESS) {
+                                                indexLoading.visibility = View.GONE
+                                                nextFab.visibility = View.VISIBLE
+                                                prefs.edit().putBoolean("introComplete", true).apply()
+                                            }   // todo handle errors
+                                        }
                                     }
-                                    // todo handle errors
                                 }
                             }
                         }

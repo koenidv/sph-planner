@@ -20,12 +20,12 @@ class CourseParser {
         var uniformId = namedId
 
         // Remove anything within brackets
-        uniformId = uniformId.replace(""""\\(.*\\)""".toRegex(), "")
+        uniformId = uniformId.replace("""\(.*\)""".toRegex(), "")
 
         // Replace keys from R.array.namedid_replacements
         val replaceMap = Utility().parseStringArray(R.array.namedid_replacements)
         replaceMap.forEach { (key, value) -> uniformId = uniformId.replace(key, value) }
 
-        return uniformId
+        return uniformId.trim()
     }
 }
