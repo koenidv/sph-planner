@@ -2,7 +2,8 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="borderColor">#dadada</color>
+    <color name="strokeColorLight">#dedede</color>
+    <color name="strokeColorDark">#202020</color>
 
     <!-- Colors for different themes -->
     <color name="purple_200">#FFBB86FC</color>

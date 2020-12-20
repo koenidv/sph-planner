@@ -11,6 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:nestedScrollingEnabled="false"
+        android:paddingTop="4dp"
         tools:itemCount="8"
         tools:listitem="@layout/item_link" />
 </androidx.core.widget.NestedScrollView>

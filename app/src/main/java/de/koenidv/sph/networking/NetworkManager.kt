@@ -83,6 +83,8 @@ class NetworkManager {
         val errors = mutableListOf<Int>()
         // Get all current posts for comparison
         val allPosts = PostsDb.getInstance().all
+        // Counter for done courses
+        var counter = 0
 
         // Load every course
         for (course in courses) {
@@ -101,10 +103,14 @@ class NetworkManager {
                                         // todo last post from spo_kmb_4 missing
                                         // todo Save tasks
                                         // todo Save links
-                                        Toast.makeText(applicationContext(), "Heute schon, Kartoffel", Toast.LENGTH_SHORT).show()
                                     })
                         } else {
                             errors.add(success)
+                        }
+                        counter++
+                        if (counter == courses.size) {
+                            // todo error handling
+                            onComplete(SUCCESS)
                         }
                     })
         }

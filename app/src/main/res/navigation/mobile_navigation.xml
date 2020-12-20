@@ -57,6 +57,10 @@
     <fragment
         android:id="@+id/courseOverviewFragment"
         android:name="de.koenidv.sph.ui.CourseOverviewFragment"
-        android:label="CourseOverviewFragment" />
+        android:label="CourseOverviewFragment">
+        <argument
+            android:name="courseId"
+            app:argType="string" />
+    </fragment>
 
 </navigation>

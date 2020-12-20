@@ -5,10 +5,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -47,10 +46,10 @@ public class PostAttachmentsDb {
         cv.put("id_course", postAttachment.getId_course());
         cv.put("id_post", postAttachment.getId_post());
         cv.put("name", postAttachment.getName());
-        cv.put("date", postAttachment.getDate().getTime());
+        cv.put("date", postAttachment.getDate().getTime() / 1000);
         cv.put("url", postAttachment.getUrl().toString());
         if (postAttachment.getDeviceLocation() != null)
-            cv.put("deviceLocation", postAttachment.getDeviceLocation().toString());
+            cv.put("deviceLocation", postAttachment.getDeviceLocation().getParent());
         cv.put("size", postAttachment.getFileSize());
 
 
@@ -64,12 +63,11 @@ public class PostAttachmentsDb {
         db.close();
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
     public List<PostAttachment> getPostByCourseId(String course_id) throws MalformedURLException {
         List<PostAttachment> returnList = new ArrayList<>();
         final SQLiteDatabase db = dbhelper.getReadableDatabase();
 
-        String queryString = "SELECT * FROM postAttachments WHERE course_id = '" + course_id + "'";
+        String queryString = "SELECT * FROM postAttachments WHERE id_course = '" + course_id + "'";
 
         Cursor cursor = db.rawQuery(queryString, null);
         if (cursor.moveToFirst()) {
@@ -78,9 +76,10 @@ public class PostAttachmentsDb {
                 String id_course = cursor.getString(1);
                 String id_post = cursor.getString(2);
                 String name = cursor.getString(3);
-                Date date = new Date(cursor.getInt(4));
+                Date date = new Date(cursor.getInt(4) * 1000L);
                 URL url = new URL(cursor.getString(5));
-                Path deviceLocation = Paths.get(cursor.getString(6));
+                //File deviceLocation = new File(cursor.getString(6));
+                File deviceLocation = null; // temporary, we don't need it yet
                 String size = cursor.getString(7);
 
 
@@ -100,7 +99,7 @@ public class PostAttachmentsDb {
         List<PostAttachment> returnList = new ArrayList<>();
         final SQLiteDatabase db = dbhelper.getReadableDatabase();
 
-        String queryString = "SELECT * FROM postAttachments WHERE postid = '" + postid + "'";
+        String queryString = "SELECT * FROM postAttachments WHERE id_post = '" + postid + "'";
 
         Cursor cursor = db.rawQuery(queryString, null);
         if (cursor.moveToFirst()) {
@@ -109,9 +108,10 @@ public class PostAttachmentsDb {
                 String id_course = cursor.getString(1);
                 String id_post = cursor.getString(2);
                 String name = cursor.getString(3);
-                Date date = new Date(cursor.getInt(4));
+                Date date = new Date(cursor.getInt(4) * 1000L);
                 URL url = new URL(cursor.getString(5));
-                Path deviceLocation = Paths.get(cursor.getString(6));
+                //File deviceLocation = new File(cursor.getString(6));
+                File deviceLocation = null; // temporary, we don't need it yet
                 String size = cursor.getString(7);
 
                 PostAttachment newPostAttachment = new PostAttachment(attachmentId, id_course, id_post, name, date, url, deviceLocation, size);

@@ -40,7 +40,10 @@
     <string name="onboard_supported_error_network">There was a network error.\nTap to retry.</string>
 
     <!-- Courses -->
-    <string name="course_appendix_lk" />
+
+    <!-- Posts -->
+    <string name="posts_list_title">Posts</string>
+    <string name="posts_no_data">No posts yet</string>
 
     <!-- Options sheet -->
     <string name="info_menuaction">Options</string>
@@ -82,4 +85,5 @@
 
     <!-- Usabilty -->
     <string name="imagedescr_expand">Expand</string>
+    <string name="course_appendix_lk">""</string>
 </resources>

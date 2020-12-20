@@ -39,7 +39,7 @@ public class PostsDb {
         // Put values into ContentValues
         cv.put("post_id", post.getPostId());
         cv.put("id_course", post.getId_course());
-        cv.put("date", post.getDate().getTime());
+        cv.put("date", post.getDate().getTime() / 1000);
         cv.put("title", post.getTitle());
         if (post.getDescription() != null) cv.put("description", post.getDescription());
         cv.put("unread", post.getUnread());
@@ -89,7 +89,7 @@ public class PostsDb {
             do {
                 String postId = cursor.getString(0);
                 String id_course = cursor.getString(1);
-                Date date = new Date(cursor.getInt(2));
+                Date date = new Date(cursor.getInt(2) * 1000L);
                 String title = cursor.getString(3);
                 String description = cursor.getString(4);
                 boolean unread = cursor.getInt(5) == 1;
@@ -102,6 +102,14 @@ public class PostsDb {
         cursor.close();
         db.close();
         return returnList;
+    }
+
+    /**
+     * Clears all posts from posts db
+     */
+    public void clear() {
+        SQLiteDatabase db = dbhelper.getWritableDatabase();
+        db.delete("posts", null, null);
     }
 
 }

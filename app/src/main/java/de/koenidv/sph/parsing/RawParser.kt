@@ -437,6 +437,7 @@ class RawParser {
             cells = row.select("td")
             // Cells: 0: Some metadata, 1: Content, 2: Attendance (encrypted)
             sphPostId = row.select("tr[data-entry]").attr("data-entry")
+            val test = cells[0].childNodes()[1].toString()
             date = dateFormat.parse(cells[0].childNodes()[1].toString())!!
             postId = courseId + "_post-" + internalDateFormat.format(date) + "_" + sphPostId
 
@@ -450,18 +451,19 @@ class RawParser {
                 posts.add(currentPosts[currentPostIds.indexOf(postId)])
             } else {
                 // Get information from html
-                postTitle = cells[1].select("b")[0].text()
+                postTitle = cells[1].select("b")[0].wholeText().trim()
+                // Correct weird stuff that sph does
+                postTitle = postTitle.replace("""&amp;amp;quot;""", "\"")
                 // Description might include html. We'll just get the text for now. Todo parse lists
                 postDescription = try {
                     //Jsoup.clean(cells[1].select("i[title=\"Ausführlicher Inhalt\"]").parents()[0].toString(), Whitelist.basic())
-                    cells[1].select("i[title=\"Ausführlicher Inhalt\"]").parents()[0].text()
+                    cells[1].select("i[title=\"Ausführlicher Inhalt\"]").parents()[0].wholeText().trim()
                 } catch (iobe: IndexOutOfBoundsException) {
                     // No description available
                     null
                 }
-                // If description containes a list, add a newline to all list markers
-                if (postDescription != null && cells[1].select("i[title=\"Ausführlicher Inhalt\"]").parents()[0].toString().contains("<ul>"))
-                    postDescription = postDescription.replace(" - ", "\n•")
+                // Correct weird stuff that sph does
+                postDescription = postDescription?.replace("&amp;amp;quot;", "\"")
                 // Add new post to posts list
                 posts.add(Post(
                         postId,
@@ -507,15 +509,17 @@ class RawParser {
                 // For every file attachment
                 for (file in cells[1].select("div.files div.file")) {
                     // Get a not before used attachment id
-                    attachIndex = 1
+                    attachIndex = 0
                     do {
+                        attachIndex++ // first index 1
                         attachId = courseId + "_attach-" + internalDateFormat.format(date) + "_" + attachIndex
                     } while (attachIds.contains(attachId))
+                    attachIds.add(attachId)
 
                     // Get file info
                     attachName = file.toString().substring(file.toString().indexOf("</span>") + 7,
                             file.toString().indexOf("<small>"))
-                            .replace("_", " ").replace("-", " ").removeSuffix(".pdf")
+                            .replace("_", " ").replace("-", " ").trim().removeSuffix(".pdf")
                     attachSize = file.select("small").text()
 
                     // Parse file url

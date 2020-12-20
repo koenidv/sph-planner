@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.RecyclerView
@@ -26,7 +27,7 @@ class CoursesFragment : Fragment() {
         // Set up courses recycler
         val coursesAdapter = CoursesAdapter(courses) {
             Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
-                    .navigate(R.id.courseOverviewAction)
+                    .navigate(R.id.courseOverviewAction, bundleOf("courseId" to it.courseId))
         }
         coursesRecycler.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
         coursesRecycler.adapter = coursesAdapter
