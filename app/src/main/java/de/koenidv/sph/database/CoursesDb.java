@@ -156,7 +156,7 @@ public class CoursesDb {
      * @return Course with specified named id or null if none was found
      */
     public Course getByNamedId(String namedId) {
-        Cursor cursor = dbhelper.getReadableDatabase().rawQuery("SELECT * FROM courses WHERE named_id='" + namedId + "'", null);
+        Cursor cursor = dbhelper.getReadableDatabase().rawQuery("SELECT * FROM courses WHERE named_id LIKE '" + namedId + "%'", null);
         // Return first row
         cursor.moveToFirst();
         if (cursor.getCount() == 0) return null;
