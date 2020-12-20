@@ -18,6 +18,8 @@ import java.util.*
 class PostsAdapter(private val posts: List<Post>, private val tasks: List<PostTask>, private val attachments: List<PostAttachment>) :
         RecyclerView.Adapter<PostsAdapter.ViewHolder>() {
 
+    val attachmentsViewPool = RecyclerView.RecycledViewPool()
+
     /**
      * Provides a reference to the type of view
      * (custom ViewHolder).
@@ -30,7 +32,7 @@ class PostsAdapter(private val posts: List<Post>, private val tasks: List<PostTa
         private val attachmentsRecycler: RecyclerView = view.findViewById(R.id.attachmentsRecycler)
         private val dateFormat = SimpleDateFormat("d. MMM yyyy", Locale.getDefault())
 
-        fun bind(post: Post, task: PostTask?, attachments: List<PostAttachment>) {
+        fun bind(post: Post, task: PostTask?, attachments: List<PostAttachment>, attachmentsViewPool: RecyclerView.RecycledViewPool) {
 
             // Set data
             dateText.text = dateFormat.format(post.date)
@@ -47,6 +49,8 @@ class PostsAdapter(private val posts: List<Post>, private val tasks: List<PostTa
                 constraintSet.applyTo(layout)
             } else {
                 // Set up attachments recycler
+                attachmentsRecycler.setHasFixedSize(true)
+                attachmentsRecycler.setRecycledViewPool(attachmentsViewPool)
                 attachmentsRecycler.adapter = AttachmentsAdapter(attachments)
             }
 
@@ -69,7 +73,6 @@ class PostsAdapter(private val posts: List<Post>, private val tasks: List<PostTa
         // Create a new view, which defines the UI of the list item
         val view = LayoutInflater.from(viewGroup.context)
                 .inflate(R.layout.item_post, viewGroup, false)
-
         return ViewHolder(view)
     }
 
@@ -80,7 +83,8 @@ class PostsAdapter(private val posts: List<Post>, private val tasks: List<PostTa
         viewHolder.bind(
                 post,
                 tasks.firstOrNull { it.id_post == post.postId }, // There will always only be one task per post
-                attachments.filter { it.id_post == post.postId }) // Filter attachments for post
+                attachments.filter { it.id_post == post.postId },
+                attachmentsViewPool) // Filter attachments for post
     }
 
     // Return the size of your dataset (invoked by the layout manager)
