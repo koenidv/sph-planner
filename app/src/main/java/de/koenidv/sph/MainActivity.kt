@@ -2,6 +2,7 @@ package de.koenidv.sph
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
@@ -52,6 +53,12 @@ class MainActivity : AppCompatActivity() {
         val navController = navHostFragment!!.navController
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration)
         NavigationUI.setupWithNavController(navView, navController)
+
+        // Save theme color to use somewhere without application context
+        // Get theme color
+        val typedValue = TypedValue()
+        theme.resolveAttribute(R.attr.colorPrimary, typedValue, true)
+        prefs.edit().putInt("themeColor", typedValue.data).apply()
 
     }
 

@@ -18,6 +18,7 @@
         <item name="bottomSheetDialogTheme">@style/Theme.SPH.Sheet</item>
         <item name="actionBarStyle">@style/Theme.SPH.ActionBar</item>
         <item name="strokeColor">@color/strokeColorLight</item>
+        <item name="strokeWidth">2dp</item>
     </style>
 
     <style name="Theme.SPH.Electric" parent="Theme.SPH">

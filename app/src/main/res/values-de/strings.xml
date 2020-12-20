@@ -67,5 +67,6 @@
     <string name="course_appendix_lk">-LK</string>
     <string name="posts_list_title">Einträge</string>
     <string name="posts_no_data">Noch keine Einträge</string>
+    <string name="load_more">Mehr zeigen</string>
 
 </resources>

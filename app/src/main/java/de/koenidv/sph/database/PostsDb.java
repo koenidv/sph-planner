@@ -105,6 +105,26 @@ public class PostsDb {
     }
 
     /**
+     * Mark all posts for a course as read
+     *
+     * @param courseId Internal Id of the course where the posts belong
+     */
+    public void markAsRead(String courseId) {
+        dbhelper.getReadableDatabase().execSQL("UPDATE posts SET unread = 0 WHERE id_course IS \"" + courseId + "\"");
+    }
+
+    /**
+     * Mark all posts with specific post ids as read
+     *
+     * @param postIds Internal Ids of the posts to mark read
+     */
+    public void markAsRead(String... postIds) {
+        for (String postId : postIds) {
+            dbhelper.getReadableDatabase().execSQL("UPDATE posts SET unread = 0 WHERE post_id = \"" + postId + "\"");
+        }
+    }
+
+    /**
      * Clears all posts from posts db
      */
     public void clear() {

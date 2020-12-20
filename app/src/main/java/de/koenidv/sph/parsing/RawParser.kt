@@ -209,7 +209,6 @@ class RawParser {
         return courses
     }
 
-
     /**
      * Parse courses from raw study groups webpage
      * @param rawResponse Html repsonse from SPH
@@ -263,7 +262,6 @@ class RawParser {
         return courses
     }
 
-
     /**
      * Parse courses from raw post overview webpage
      * @param rawResponse Html repsonse from SPH
@@ -283,7 +281,6 @@ class RawParser {
         var courseName: String
         var uniformCourseName: String
         var numberId: String
-        var courseWithNamedId: Course?
         var similiarCourses: List<Course>
         // Get values from list
         for (entry in rawContents) {
@@ -446,7 +443,7 @@ class RawParser {
         var date: Date
         var cells: Elements
         // Post-specific
-        var postTitle: String
+        var postTitle: String?
         var postDescription: String?
         // Task-specific
         var taskId: String
@@ -483,6 +480,7 @@ class RawParser {
                 postTitle = cells[1].select("b")[0].wholeText().trim()
                 // Correct weird stuff that sph does
                 postTitle = postTitle.replace("""&amp;amp;quot;""", "\"")
+                if (postTitle == "kein Thema") postTitle = null
                 // Description might include html. We'll just get the text for now. Todo parse lists
                 postDescription = try {
                     //Jsoup.clean(cells[1].select("i[title=\"Ausführlicher Inhalt\"]").parents()[0].toString(), Whitelist.basic())
@@ -514,7 +512,7 @@ class RawParser {
                 // There can only be one task per post, it seems
                 taskId = courseId + "_task-" + internalDateFormat.format(date) + "_1"
                 taskDone = cells[1].toString().contains("<span class=\"done \"")
-                taskDescription = cells[1].select("span.homework").nextAll("span.markup")[0].text()
+                taskDescription = cells[1].select("span.homework").nextAll("span.markup")[0].wholeText()
                 // Add new task to tasks list
                 tasks.add(PostTask(
                         taskId,
