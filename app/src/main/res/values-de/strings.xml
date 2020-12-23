@@ -68,5 +68,10 @@
     <string name="posts_list_title">Einträge</string>
     <string name="posts_no_data">Noch keine Einträge</string>
     <string name="load_more">Mehr zeigen</string>
+    <string name="onboard_legal_title">Bevor wir loslegen</string>
+    <string name="onboard_legal_description">Du solltest einige Dinge wissen, damit wir gut miteinander auskommen 😊</string>
+    <string name="onboard_legal_liability">Ich weiß, dass die App keine Garantie für die angezeigten Daten übernehmen kann und Fehler auftreten können.</string>
+    <string name="onboard_legal_sources">Ich verstehe, dass alle Daten aus dem Schulportal Hessen abgerufen werden und Eigentum der jeweiligen Autoren sind.</string>
+    <string name="onboard_legal_privacy">Ich habe die  <a href="http://koenidv.de/sph/datenschutz">Datenschutzerklärung</a> gelesen, verstanden und stimme ihr zu.</string>
 
 </resources>

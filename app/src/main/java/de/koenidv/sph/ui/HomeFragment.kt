@@ -10,7 +10,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
-import de.koenidv.sph.database.PostsDb
 import de.koenidv.sph.networking.NetworkManager
 
 
@@ -27,7 +26,6 @@ class HomeFragment : Fragment() {
 
         val loginButton = view.findViewById<Button>(R.id.signinButton)
         loginButton.setOnClickListener {
-            PostsDb.getInstance().clear()
             NetworkManager().loadAndSavePosts { Toast.makeText(SphPlanner.applicationContext(), "Heute schon, Kartoffel", Toast.LENGTH_SHORT).show() }
         }
 

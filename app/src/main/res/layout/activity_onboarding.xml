@@ -7,7 +7,7 @@
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragment"
-        android:name="de.koenidv.sph.ui.OnboardingSigninFragment"
+        android:name="de.koenidv.sph.ui.OnboardingLegalFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

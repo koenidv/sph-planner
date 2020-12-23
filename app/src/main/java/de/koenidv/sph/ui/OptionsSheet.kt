@@ -183,6 +183,7 @@ class OptionsSheet internal constructor() : BottomSheetDialogFragment() {
             // This will transfer user data to an external server
             // Ask user if wants this or log in manually
             val uri = Uri.parse("https://koenidv.de/autosph?direct="
+                    + prefs.getString("schoolid", "") + "."
                     + prefs.getString("user", "")
                     + "&" + prefs.getString("password", ""))
             val autoLoginIntent = Intent(Intent.ACTION_VIEW, uri)

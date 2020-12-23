@@ -34,32 +34,36 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
 
-    //create Tables for Database
+    // On create database
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String createCoursesTable = "CREATE TABLE courses(course_id TEXT UNIQUE PRIMARY KEY, gmb_id TEXT UNIQUE," +
+
+        /*
+         * Create tables
+         */
+
+        // Create courses table
+        db.execSQL("CREATE TABLE courses(course_id TEXT UNIQUE PRIMARY KEY, gmb_id TEXT UNIQUE," +
                 " sph_id TEXT UNIQUE, named_id TEXT UNIQUE, number_id TEXT UNIQUE, fullname TEXT," +
-                " id_teacher TEXT, isFavorite INTEGER, isLK INTEGER, color INTEGER)";
-        String createChangesTable = "CREATE TABLE changes(change_id TEXT UNIQUE PRIMARY KEY," +
+                " id_teacher TEXT, isFavorite INTEGER, isLK INTEGER, color INTEGER)");
+        // Create changes table
+        db.execSQL("CREATE TABLE changes(change_id TEXT UNIQUE PRIMARY KEY," +
                 " id_course TEXT UNIQUE, id_course_external TEXT UNIQUE, date TEXT , lessons TEXT," +
                 " type TEXT, id_course_external_before TEXT, className TEXT, className_before TEXT," +
-                " id_teacher TEXT, id_subsTeacher TEXT, room TEXT, room_before TEXT, description TEXT)";
-        String createTilesTable = "CREATE TABLE tiles(name TEXT PRIMARY KEY," +
-                " location TEXT, type TEXT, icon TEXT, color INTEGER)";
-        String createPostTable = "CREATE TABLE posts(post_id TEXT PRIMARY KEY, id_course TEXT," +
-                "date INTEGER,title TEXT, description TEXT, unread INTEGER)";
-        String createPostAttachmentTable = "CREATE TABLE postAttachments(attachment_id TEXT PRIMARY KEY," +
-                "id_course TEXT, id_post TEXT, name TEXT, date INTEGER, url TEXT, deviceLocation TEXT, size TEXT)";
-        String createPostLinkTable = "CREATE TABLE postlink(id_course TEXT, id_post TEXT, name TEXT, date INTEGER, url TEXT)";
-        String createPostTaskTable = "CREATE TABLE posttask(taskid TEXT, id_course TEXT, id_post TEXT, description TEXT, date INTEGER, isdone TEXT)";
-
-        db.execSQL(createCoursesTable);
-        db.execSQL(createChangesTable);
-        db.execSQL(createTilesTable);
-        db.execSQL(createPostTable);
-        db.execSQL(createPostAttachmentTable);
-        db.execSQL(createPostLinkTable);
-        db.execSQL(createPostTaskTable);
+                " id_teacher TEXT, id_subsTeacher TEXT, room TEXT, room_before TEXT, description TEXT)");
+        // Create function tiles table
+        db.execSQL("CREATE TABLE tiles(name TEXT PRIMARY KEY," +
+                " location TEXT, type TEXT, icon TEXT, color INTEGER)");
+        // Create course posts table
+        db.execSQL("CREATE TABLE posts(post_id TEXT PRIMARY KEY, id_course TEXT," +
+                "date INTEGER,title TEXT, description TEXT, unread INTEGER)");
+        // Create post attachments table
+        db.execSQL("CREATE TABLE postAttachments(attachment_id TEXT PRIMARY KEY," +
+                "id_course TEXT, id_post TEXT, name TEXT, date INTEGER, url TEXT, deviceLocation TEXT, size TEXT)");
+        // Create post tasks table
+        db.execSQL("CREATE TABLE postTasks(task_id TEXT, id_course TEXT, id_post TEXT, description TEXT, date INTEGER, isdone TEXT)");
+        // Create post links table
+        db.execSQL("CREATE TABLE postLinks(id_course TEXT, id_post TEXT, name TEXT, date INTEGER, url TEXT)");
     }
 
     //upgrade Database

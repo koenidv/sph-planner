@@ -38,9 +38,16 @@ class LinksFragment : Fragment() {
         ))
         // Set up links recycler
         val linksAdapter = LinksAdapter(tiles) {
-            // Open WebViewFragment with respective url on click
-            Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
-                    .navigate(R.id.webviewAction, bundleOf("url" to it.location))
+            // If it's SchoolMoodle and the respective app is installes, open it
+            // This should be handled differently, but there aren't really any now
+            val moodleIntent = requireContext().packageManager.getLaunchIntentForPackage("com.moodle.moodlemobile")
+            if (it.name == "SchulMoodle" && moodleIntent != null) {
+                startActivity(moodleIntent)
+            } else {
+                // Open WebViewFragment with respective url on click
+                Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
+                        .navigate(R.id.webviewAction, bundleOf("url" to it.location))
+            }
         }
         linksRecycler.layoutManager = LinearLayoutManager(requireContext())
         linksRecycler.adapter = linksAdapter

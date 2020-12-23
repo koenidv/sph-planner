@@ -37,18 +37,18 @@ public class PostTasksDb {
         ContentValues cv = new ContentValues();
 
         // Put values into ContentValues
-        cv.put("taskid", postTask.getTaskId());
+        cv.put("task_id", postTask.getTaskId());
         cv.put("id_course", postTask.getId_course());
         cv.put("id_post",postTask.getId_post());
         cv.put("description", postTask.getDescription());
         cv.put("date", postTask.getDate().getTime() / 1000);
         cv.put("isDone",postTask.isDone());
         // Add or update post in db
-        Cursor cursor = db.rawQuery("SELECT * FROM postlink WHERE id_post = '" + postTask.getTaskId() + "'", null);
+        Cursor cursor = db.rawQuery("SELECT * FROM postTasks WHERE id_post = '" + postTask.getTaskId() + "'", null);
         if (cursor.getCount() == 0) {
-            db.insert("posttask", null, cv);
+            db.insert("postTasks", null, cv);
         } else {
-            db.update("posttask", cv, "post_id = '" + postTask.getTaskId() + "'", null);
+            db.update("postTasks", cv, "post_id = '" + postTask.getTaskId() + "'", null);
         }
         cursor.close();
     }
@@ -56,7 +56,7 @@ public class PostTasksDb {
     public List<PostTask> getAll() {
         final SQLiteDatabase db = dbhelper.getReadableDatabase();
         // Query posts
-        String queryString = "SELECT * FROM posttask";
+        String queryString = "SELECT * FROM postTasks";
         Cursor cursor = db.rawQuery(queryString, null);
         // Get posts with the cursor
         return getWithCursor(cursor, db);
@@ -66,7 +66,7 @@ public class PostTasksDb {
     public List<PostTask> getByCourseId(String course_id) {
         final SQLiteDatabase db = dbhelper.getReadableDatabase();
         // Query posts
-        String queryString = "SELECT * FROM posttask WHERE id_course = '" + course_id + "'";
+        String queryString = "SELECT * FROM postTasks WHERE id_course = '" + course_id + "'";
         Cursor cursor = db.rawQuery(queryString, null);
         // Get posts with the cursor
         return getWithCursor(cursor, db);
@@ -75,7 +75,7 @@ public class PostTasksDb {
     public List<PostTask> getByPostId(String post_id) {
         final SQLiteDatabase db = dbhelper.getReadableDatabase();
         // Query posts
-        String queryString = "SELECT * FROM posttask WHERE id_post = '" + post_id + "'";
+        String queryString = "SELECT * FROM postTasks WHERE id_post = '" + post_id + "'";
         Cursor cursor = db.rawQuery(queryString, null);
         // Get posts with the cursor
         return getWithCursor(cursor, db);
@@ -84,7 +84,7 @@ public class PostTasksDb {
     public List<PostTask> getByDate(String date) {
         final SQLiteDatabase db = dbhelper.getReadableDatabase();
         // Query posts
-        String queryString = "SELECT * FROM posttask WHERE date = '" + date + "'";
+        String queryString = "SELECT * FROM postTasks WHERE date = '" + date + "'";
         Cursor cursor = db.rawQuery(queryString, null);
         // Get posts with the cursor
         return getWithCursor(cursor, db);
@@ -93,7 +93,7 @@ public class PostTasksDb {
     public List<PostTask> getByTask(String Task) {
         final SQLiteDatabase db = dbhelper.getReadableDatabase();
         // Query posts
-        String queryString = "SELECT * FROM posttask WHERE taskid = '" + Task + "'";
+        String queryString = "SELECT * FROM postTasks WHERE task_id = '" + Task + "'";
         Cursor cursor = db.rawQuery(queryString, null);
         // Get posts with the cursor
         return getWithCursor(cursor, db);
@@ -103,7 +103,7 @@ public class PostTasksDb {
     public List<PostTask> getByIsDone() {
         final SQLiteDatabase db = dbhelper.getReadableDatabase();
         // Query posts
-        String queryString = "SELECT * FROM posttask WHERE isDone = 1";
+        String queryString = "SELECT * FROM postTasks WHERE isDone = 1";
         Cursor cursor = db.rawQuery(queryString, null);
         // Get posts with the cursor
         return getWithCursor(cursor, db);

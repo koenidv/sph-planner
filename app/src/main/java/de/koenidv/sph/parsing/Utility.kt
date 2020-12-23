@@ -1,5 +1,6 @@
 package de.koenidv.sph.parsing
 
+import android.content.pm.PackageManager
 import de.koenidv.sph.SphPlanner
 
 
@@ -47,6 +48,21 @@ class Utility {
             outputMap[splitResult[0]] = splitResult[1]
         }
         return outputMap.toMap()
+    }
+
+    /**
+     * Check if an app is installed on device
+     * @param packageName Package Id of the app
+     * @return true, if app is installed, false, if not
+     * Might always return false on Api 30+
+     */
+    fun isPackageInstalled(packageName: String, packageManager: PackageManager): Boolean {
+        return try {
+            packageManager.getPackageInfo(packageName, 0)
+            true
+        } catch (e: PackageManager.NameNotFoundException) {
+            false
+        }
     }
 
 }

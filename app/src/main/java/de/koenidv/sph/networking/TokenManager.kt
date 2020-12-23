@@ -21,9 +21,10 @@ class TokenManager {
 
     val prefs: SharedPreferences = applicationContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
 
-    /*
-     * Returns an signed-in access token
-     * todo: Documentation
+    /**
+     * Creates an signed-in access token
+     * @param forceNewToken if a new token should be generated, even if an old one should still be valid
+     * @param onComplete Called when a token is ready
      */
     fun generateAccessToken(forceNewToken: Boolean = false, onComplete: (success: Int, token: String?) -> Unit) {
 
@@ -62,13 +63,15 @@ class TokenManager {
                         .getAsString(object : StringRequestListener {
                             override fun onResponse(response: String) {
                                 if (CookieStore.getCookie("schulportal.hessen.de", "sid") != null
-                                        && !response.contains("Login - Schulportal Hessen")) {
+                                        && !response.contains("Login - Schulportal Hessen")
+                                        && !response.contains("Schulauswahl - Schulportal Hessen")) {
                                     // Login success
                                     onComplete(NetworkManager().SUCCESS, CookieStore.getCookie("schulportal.hessen.de", "sid")!!)
                                     prefs.edit().putString("token", CookieStore.getCookie("schulportal.hessen.de", "sid"))
                                             .putLong("token_last_success", Date().time)
                                             .apply()
-                                } else if (response.contains("Login - Schulportal Hessen")) {
+                                } else if (response.contains("Login - Schulportal Hessen")
+                                        || response.contains("Schulauswahl - Schulportal Hessen")) {
                                     // Login not successful
                                     onComplete(NetworkManager().FAILED_INVALID_CREDENTIALS, null)
                                     prefs.edit().putLong("token_last_success", 0).apply()
@@ -94,6 +97,18 @@ class TokenManager {
                             }
                         })
             }
+        }
+    }
+
+    /**
+     * Creates an AES key for encryption / decryption
+     */
+    fun generateAesKey(forceNewKey: Boolean = false, onComplete: (success: Int, key: String?) -> Unit) {
+        if (forceNewKey || prefs.getString("token", "token") != prefs.getString("aes_for_token", "aes")) {
+
+            // Creates a (sudo-)random password that will be used
+            var password = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx-xxxxxx3xx".replace("[xy]".toRegex(), Integer.toHexString((Math.floor(Math.random() * 17)).toInt()))
+
         }
     }
 }

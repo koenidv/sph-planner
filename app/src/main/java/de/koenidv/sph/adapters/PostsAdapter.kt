@@ -69,8 +69,8 @@ class PostsAdapter(private val posts: List<Post>, private val tasks: List<PostTa
 
                 if (!task.isDone && !post.unread) {
                     // If task not done and post doesn't already have a colored background
-                    // Apply theme color with 15% opacity to background
-                    taskHighlight.setBackgroundColor(themeColor and 0x00FFFFFF or 0x26000000)
+                    // Apply theme color with 20% opacity to background
+                    taskHighlight.setBackgroundColor(themeColor and 0x00FFFFFF or 0x33000000)
                 }
             }
 

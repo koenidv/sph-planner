@@ -85,6 +85,7 @@ class CourseOverviewFragment : Fragment() {
         } else {
             postsTitleText.text = getString(R.string.posts_no_data)
             postsRecycler.visibility = View.GONE
+            loadMorePostsButton.visibility = View.GONE
         }
 
         return view

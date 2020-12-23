@@ -3,9 +3,13 @@ package de.koenidv.sph.ui
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
+import android.content.res.Configuration
+import android.os.Build.VERSION
+import android.os.Build.VERSION_CODES
 import android.os.Bundle
 import android.view.*
 import android.webkit.CookieManager
+import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.ProgressBar
@@ -38,7 +42,10 @@ class WebViewFragment : Fragment() {
         // Set a client for the WebView
         webView.webViewClient = object : WebViewClient() {
             override fun onPageFinished(webview: WebView?, url: String?) {
-                // Check if login was successfull on page load
+                // Don't show WebView until page is loaded
+                webView.visibility = View.VISIBLE
+                view.findViewById<ProgressBar>(R.id.webviewLoading)?.visibility = View.GONE
+                // Check if login was successful on page load
                 webView.evaluateJavascript(
                         "(function() { return ('<html>'+document.getElementsByTagName('html')[0].innerHTML+'</html>'); })();"
                 ) { html ->
@@ -62,8 +69,17 @@ class WebViewFragment : Fragment() {
         webView.settings.useWideViewPort = true
         webView.setInitialScale(1)
         // todo store aes key
-        cookieManager.removeSessionCookies(null)
+        // Remove previous sph cookies as they might lead to problems
+        cookieManager.setCookie(".schulportal.hessen.de", "")
         cookieManager.setAcceptThirdPartyCookies(webView, true)
+
+        // Enable force dark mode above Android 10 if dark theme is selected
+        if (VERSION.SDK_INT >= VERSION_CODES.Q
+                && webView.isForceDarkAllowed
+                && ((prefs.contains("forceDark") && prefs.getBoolean("forceDark", true))
+                        || resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES)) {
+            webView.settings.forceDark = WebSettings.FORCE_DARK_ON
+        }
 
         // Enable using back button for webView
         webView.setOnKeyListener { _, _, keyEvent ->
@@ -77,14 +93,17 @@ class WebViewFragment : Fragment() {
             } else true // Ignore this listener if any other button was pressed
         }
 
-        // Generate access token, save as cookie and load once done
-        TokenManager().generateAccessToken { success: Int, token: String? ->
-            if (success == NetworkManager().SUCCESS) {
-                cookieManager.setCookie(domain, "sid=$token")
-                webView.loadUrl(domain)
-                webView.visibility = View.VISIBLE
-                view.findViewById<ProgressBar>(R.id.webviewLoading)?.visibility = View.GONE
+        // If target is a sph page, generate access token, save as cookie and load once done
+        // else just load the page
+        if (domain.contains("schulportal.hessen.de")) {
+            TokenManager().generateAccessToken { success: Int, token: String? ->
+                if (success == NetworkManager().SUCCESS) {
+                    cookieManager.setCookie(domain, "sid=$token")
+                    webView.loadUrl(domain)
+                }
             }
+        } else {
+            webView.loadUrl(domain)
         }
 
         return view
