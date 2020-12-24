@@ -229,7 +229,7 @@ public class CoursesDb {
     }
 
     public Course getByGmbId(String Gmb_id) {
-        String queryString = "SELECT * FROM courses WHERE gmb_id = " + Gmb_id;
+        String queryString = "SELECT * FROM courses WHERE gmb_id = \"" + Gmb_id + "\"";
         SQLiteDatabase db = dbhelper.getReadableDatabase();
 
         Cursor cursor = db.rawQuery(queryString, null);

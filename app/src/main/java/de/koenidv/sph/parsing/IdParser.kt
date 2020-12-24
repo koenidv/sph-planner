@@ -40,13 +40,21 @@ class IdParser {
 
     /**
      * Returns an internal id for a gmb id and teacher id
+     * Trying to get an existing internal id for a course which is not in the db or list will mostly fail
      * @param courseGmbId External course id from gmb
      * @param teacherId The course's teacher id
      * @param allCourses List of all courses to compare to. Will use database if unspecified
      * @return Internal id for this course
      */
-    fun getCourseIdWithGmb(courseGmbId: String, teacherId: String, allCourses: List<Course>? = null): String {
+    fun getCourseIdWithGmb(courseGmbId: String, teacherId: String, forceNewId: Boolean = false, allCourses: List<Course>? = null): String {
         val courseDb = CoursesDb.getInstance()
+
+        if (!forceNewId) {
+            val existingCourse = CoursesDb.getInstance().getByGmbId(courseGmbId.toLowerCase(Locale.ROOT))
+            if (existingCourse != null) return existingCourse.courseId
+        }
+
+        // Warning: trying to get an existing internal id for a course which is not in the db will mostly fail
 
         // GMB id might in some cases not include a dash
         val classType: String = if (courseGmbId.contains("-"))
@@ -73,7 +81,7 @@ class IdParser {
             } else {
                 // Use current index if there's already an interal id for this specific course
                 courseToCheck = coursesWithSameId[index - 1]
-                if (Utility().nullOrEquals(courseToCheck.gmb_id, courseGmbId)
+                if (Utility().nullOrEquals(courseToCheck.gmb_id, courseGmbId.toLowerCase(Locale.ROOT))
                         // No real need to check this as check for gmb_id already includes it, we'll keep it here anyways
                         && Utility().nullOrEquals(courseToCheck.isLK, courseGmbId.toLowerCase(Locale.ROOT).contains("lk")))
                     checkForNewIndex = false
@@ -82,11 +90,14 @@ class IdParser {
                     index++
             }
         }
-        // Make sure there isn't another course with the same id
-        // This might happen if a teacher has both a GK and LK with the same subject
-        while ((allCourses?.filter { it.courseId == classType + "_" + teachId + "_" + index }
-                        ?: courseDb.getByInternalPrefix(classType + "_" + teachId + "_" + index)).isNotEmpty()) {
-            index++
+
+        if (forceNewId) {
+            // Make sure there isn't another course with the same id
+            // This might happen if a teacher has both a GK and LK with the same subject
+            while ((allCourses?.filter { it.courseId == classType + "_" + teachId + "_" + index }
+                            ?: courseDb.getByInternalPrefix(classType + "_" + teachId + "_" + index)).isNotEmpty()) {
+                index++
+            }
         }
         // Return id, example: m_bar_1 or ch_cas_2
         return classType + "_" + teachId + "_" + index

@@ -195,7 +195,7 @@ class RawParser {
                         .toLowerCase(Locale.ROOT)
                         .take(3)
                 // Create internal course id
-                courseInternalId = IdParser().getCourseIdWithGmb(courseGmbId, teacherId, courses)
+                courseInternalId = IdParser().getCourseIdWithGmb(courseGmbId, teacherId, true, courses)
                 // Add created course to list
                 courses.add(Course(
                         courseId = courseInternalId,
@@ -641,7 +641,7 @@ class RawParser {
                                     lesson.toString().indexOf("</b>") + 4,
                                     lesson.toString().indexOf("<small")
                             ).replace("<br>", "").trim()
-                            courseId = IdParser().getCourseIdWithGmb(gmbId, teacherId)
+                            courseId = IdParser().getCourseIdWithGmb(gmbId, teacherId, false)
 
                             // Add each lesson to the return list
                             // Individually, if rowspan is larger than 1

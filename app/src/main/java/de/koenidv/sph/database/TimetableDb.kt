@@ -32,7 +32,7 @@ class TimetableDb private constructor() {
 
         // Add lesson to the db
         // Should not throw an exception as there are no unique constraints
-        db.insert("posts", null, cv)
+        db.insert("timetable", null, cv)
     }
 
     /**
@@ -87,7 +87,7 @@ class TimetableDb private constructor() {
      */
     fun clear() {
         val db = dbhelper.writableDatabase
-        db.delete("posts", null, null)
+        db.delete("timetable", null, null)
     }
 
     companion object {

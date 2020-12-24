@@ -8,6 +8,7 @@ import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import de.koenidv.sph.R
+import de.koenidv.sph.database.TimetableDb
 import de.koenidv.sph.networking.NetworkManager
 import de.koenidv.sph.parsing.RawParser
 
@@ -28,6 +29,8 @@ class HomeFragment : Fragment() {
             //NetworkManager().loadAndSavePosts { Toast.makeText(SphPlanner.applicationContext(), "Heute schon, Kartoffel", Toast.LENGTH_SHORT).show() }
             NetworkManager().loadSiteWithToken("https://start.schulportal.hessen.de/stundenplan.php", onComplete = { success: Int, result: String? ->
                 val test = RawParser().parseTimetable(result!!)
+                TimetableDb.instance!!.clear()
+                TimetableDb.instance!!.save(test)
             })
         }
 
