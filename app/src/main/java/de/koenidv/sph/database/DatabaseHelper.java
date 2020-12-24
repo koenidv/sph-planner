@@ -61,9 +61,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("CREATE TABLE postAttachments(attachment_id TEXT PRIMARY KEY," +
                 "id_course TEXT, id_post TEXT, name TEXT, date INTEGER, url TEXT, deviceLocation TEXT, size TEXT)");
         // Create post tasks table
-        db.execSQL("CREATE TABLE postTasks(task_id TEXT, id_course TEXT, id_post TEXT, description TEXT, date INTEGER, isdone TEXT)");
+        db.execSQL("CREATE TABLE postTasks(task_id TEXT, id_course TEXT, id_post TEXT, description TEXT, date INTEGER, isdone INTEGER)");
         // Create post links table
         db.execSQL("CREATE TABLE postLinks(id_course TEXT, id_post TEXT, name TEXT, date INTEGER, url TEXT)");
+        // Create timetable table
+        db.execSQL("CREATE TABLE timetable(id_course TEXT, day INTEGER, hour INTEGER, room TEXT)");
     }
 
     //upgrade Database

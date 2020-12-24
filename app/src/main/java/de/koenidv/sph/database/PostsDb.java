@@ -35,7 +35,7 @@ public class PostsDb {
     }
 
     public void save(@NotNull Post post) {
-        final SQLiteDatabase db = dbhelper.getReadableDatabase();
+        final SQLiteDatabase db = dbhelper.getWritableDatabase();
         ContentValues cv = new ContentValues();
 
         // Put values into ContentValues

@@ -576,4 +576,108 @@ class RawParser {
 
         onParsed(posts, attachments, tasks, links)
     }
+
+    /**
+     * Parse all lessons from timetable
+     * @param rawResponse Raw timetable site from sph
+     * @return List of courses
+     */
+    fun parseTimetable(rawResponse: String): List<Lesson> {
+        val returnList = mutableListOf<Lesson>()
+        // Extract table using jsoup
+        val doc = Jsoup.parse(rawResponse)
+        val table = doc.select("div.plan tbody")[0]
+        // Table is split up into rows of hours (one or multiple)
+        // There is one row for each hour, even if there aren't any lesson
+        // However, there isn't a cell if values overlap from the previous hour
+        // And there also insn't any attribute to let us know which day the lesson is on, if a cell has been skipped
+        // The rowspan attribute (number of hours) will be the same for all entries within a cell
+        // Remember the number of rows to skip for each day..
+        val hoursSkipped = mutableListOf(0, 0, 0, 0, 0)
+        var rowspanRaw: String
+        var rowspan: Int
+        var rowspanInner: Int
+        var currentHour = 1
+        var currentDay: Int
+        var currentDayRaw: Int
+        var cells: Elements
+        var lessons: Elements
+        var gmbId: String
+        var courseId: String
+        var teacherId: String
+        var room: String
+
+        // For each hour
+        for (row in table.select("tr")) {
+            cells = row.select("td")
+            // First column is always a description, including time
+            // todo get lesson times
+            currentDay = -1
+            currentDayRaw = 1
+            // For every day, also skip non-existent columns
+            while (currentDay <= 4) {
+                // Skip first column
+                if (currentDay != -1) {
+                    // Only if this hour was not overridden by last hour
+                    if (hoursSkipped[currentDay] == 0) {
+                        // Remember if this overrides the next hour
+                        rowspanRaw = cells[currentDayRaw].attr("rowspan") ?: "1"
+                        if (rowspanRaw == "") rowspanRaw = "1"
+                        rowspan = rowspanRaw.toInt() - 1
+                        hoursSkipped[currentDay] = rowspan
+
+                        // Find lessons within this cell
+                        lessons = cells[currentDayRaw].select("div.stunde")
+                        currentDayRaw++
+
+                        // Add each lesson
+                        for (lesson in lessons) {
+                            rowspanInner = 0
+
+                            // Extract data
+                            gmbId = lesson.select("b").text().trim()
+                            teacherId = lesson.select("small").text().trim()
+                            room = lesson.toString().substring(
+                                    lesson.toString().indexOf("</b>") + 4,
+                                    lesson.toString().indexOf("<small")
+                            ).replace("<br>", "").trim()
+                            courseId = IdParser().getCourseIdWithGmb(gmbId, teacherId)
+
+                            // Add each lesson to the return list
+                            // Individually, if rowspan is larger than 1
+                            while (rowspanInner <= rowspan) {
+                                // Check for duplicate courses with different rooms
+                                if (returnList.any {
+                                            it.idCourse == courseId
+                                                    && it.day == currentDay
+                                                    && it.hour == currentHour + rowspanInner
+                                        }) {
+                                    // Course was already added, but with a different room
+                                    // Update the course with this room added
+                                    returnList.find {
+                                        it.idCourse == courseId
+                                                && it.day == currentDay
+                                                && it.hour == currentHour + rowspanInner
+                                    }!!.room += ", $room"
+                                } else {
+                                    // Just add the lesson to the list
+                                    returnList.add(Lesson(
+                                            courseId,
+                                            currentDay,
+                                            currentHour + rowspanInner,
+                                            room
+                                    ))
+                                }
+                                rowspanInner++
+                            }
+                        }
+                    } else hoursSkipped[currentDay]--
+                }
+                currentDay++
+            }
+            currentHour++
+        }
+
+        return returnList
+    }
 }

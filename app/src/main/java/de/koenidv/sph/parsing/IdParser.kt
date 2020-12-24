@@ -50,9 +50,12 @@ class IdParser {
 
         // GMB id might in some cases not include a dash
         val classType: String = if (courseGmbId.contains("-"))
-            courseGmbId.substring(0, courseGmbId.indexOf("-")).take(8)
+            courseGmbId.substring(0, courseGmbId.indexOf("-")).take(8).toLowerCase(Locale.ROOT)
         else
-            courseGmbId.take(8)
+            courseGmbId.take(8).toLowerCase(Locale.ROOT)
+
+        // Make everything lowercase
+        val teachId = teacherId.toLowerCase(Locale.ROOT)
 
         // Check if a course with the same internal id but different data already exists
         var index = 1
@@ -81,12 +84,12 @@ class IdParser {
         }
         // Make sure there isn't another course with the same id
         // This might happen if a teacher has both a GK and LK with the same subject
-        while ((allCourses?.filter { it.courseId == classType + "_" + teacherId + "_" + index }
-                        ?: courseDb.getByInternalPrefix(classType + "_" + teacherId + "_" + index)).isNotEmpty()) {
+        while ((allCourses?.filter { it.courseId == classType + "_" + teachId + "_" + index }
+                        ?: courseDb.getByInternalPrefix(classType + "_" + teachId + "_" + index)).isNotEmpty()) {
             index++
         }
         // Return id, example: m_bar_1 or ch_cas_2
-        return classType + "_" + teacherId + "_" + index
+        return classType + "_" + teachId + "_" + index
     }
 
     /**
@@ -107,23 +110,23 @@ class IdParser {
 
         // Check if there's already a matching course using sph's index
         // ! This is still very vague
-        var filteredCourses = allCourses?.filter { it.courseId == classType + "_" + teacherId + "_" + sphIndex }
-                ?: courseDb.getByInternalPrefix(classType + "_" + teacherId + "_" + sphIndex)
+        var filteredCourses = allCourses?.filter { it.courseId == classType + "_" + teacherId.toLowerCase(Locale.ROOT) + "_" + sphIndex }
+                ?: courseDb.getByInternalPrefix(classType + "_" + teacherId.toLowerCase(Locale.ROOT) + "_" + sphIndex)
         // The list should only contain 0 or 1 elements (unique id)
         // Apart from classType and teacherId, isLK is the only property we can trust
         if (filteredCourses.isNotEmpty()) {
             return if (isLK != null && filteredCourses[0].isLK == isLK) {
-                classType + "_" + teacherId + "_" + sphIndex
+                classType + "_" + teacherId.toLowerCase(Locale.ROOT) + "_" + sphIndex
             } else {
                 // Just assume it's correct if nothing is specified for isLK
-                classType + "_" + teacherId + "_" + sphIndex
+                classType + "_" + teacherId.toLowerCase(Locale.ROOT) + "_" + sphIndex
             }
         }
 
         // sph index is not the same as internal index or course has not been seen yet
         // Check if there's a matching course with any index
-        filteredCourses = allCourses?.filter { it.courseId == classType + "_" + teacherId + "_" }
-                ?: courseDb.getByInternalPrefix(classType + "_" + teacherId + "_")
+        filteredCourses = allCourses?.filter { it.courseId == classType + "_" + teacherId.toLowerCase(Locale.ROOT) + "_" }
+                ?: courseDb.getByInternalPrefix(classType + "_" + teacherId.toLowerCase(Locale.ROOT) + "_")
         if (isLK != null) filteredCourses = filteredCourses.filter { it.isLK == isLK }
 
         // If there are multiple courses with the same subject by the same teacher which are all LK/GK,
@@ -134,9 +137,9 @@ class IdParser {
 
         // If a matching course hasn't been seen before, we'll create a new id
         // Check if there are any courses with the same prefix and use the next index
-        filteredCourses = allCourses?.filter { it.courseId == classType + "_" + teacherId + "_" }
-                ?: courseDb.getByInternalPrefix(classType + "_" + teacherId + "_")
-        return classType + "_" + teacherId + "_" + filteredCourses.size + 1
+        filteredCourses = allCourses?.filter { it.courseId == classType + "_" + teacherId.toLowerCase(Locale.ROOT) + "_" }
+                ?: courseDb.getByInternalPrefix(classType + "_" + teacherId.toLowerCase(Locale.ROOT) + "_")
+        return classType + "_" + teacherId.toLowerCase(Locale.ROOT) + "_" + filteredCourses.size + 1
     }
 
     /**
