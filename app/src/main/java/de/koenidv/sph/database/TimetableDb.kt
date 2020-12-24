@@ -36,29 +36,28 @@ class TimetableDb private constructor() {
     }
 
     /**
-     * Get lessons for a specific day
-     * @param day 0: Monday,.. 4: Friday
-     * @param favorites If only favorite courses should be returned
+     * Get lessons for every day as a List of days (1) with hours (2) with simultaneous lessons (3)
+     * @param favorites If only favorite courses should be returned (default: true)
      * @return List of lessons matching the requirements
      */
-    fun getDay(day: Int, favorites: Boolean): List<List<Lesson>> {
+    fun get(favorites: Boolean = true): List<List<List<Lesson>>> {
         val db = dbhelper.readableDatabase
         // Get lessons matching the request
         val query: String = if (favorites) {
-            ("SELECT * from timetable "
-                    + "INNER JOIN courses ON timetable.id_course = courses.course_id "
-                    + "WHERE timetable.day = " + day + " AND courses.isFavorite = 1")
+            "SELECT * from timetable " +
+                    "INNER JOIN courses ON timetable.id_course = courses.course_id " +
+                    "WHERE courses.isFavorite = 1"
         } else {
-            ("SELECT * from timetable "
-                    + "WHERE day = " + day)
+            "SELECT * from timetable"
         }
         val unorderedList = getWithCursor(db.rawQuery(query, null)).toMutableList()
-        // Map each lesson hour to a list
-        val orderedList = mutableListOf<MutableList<Lesson>>()
-        unorderedList.map { orderedList[it.hour].add(it) }
+        // Create a list for each day containing as many lesson lists as the timetable has maximum hours per day
+        val orderedList: List<List<MutableList<Lesson>>> = List(5) { day: Int ->
+            List(unorderedList.filter { it.day == day }.maxOf { it.hour }) { mutableListOf() }
+        }
+        // Map each lesson to the corresponding day / hour list
+        unorderedList.map { orderedList[it.day][it.hour - 1].add(it) }
 
-
-        // todo probably won't work
         return orderedList
     }
 
@@ -85,6 +84,7 @@ class TimetableDb private constructor() {
     /**
      * Clears all lessons from timetable db
      */
+    @Suppress("unused")
     fun clear() {
         val db = dbhelper.writableDatabase
         db.delete("timetable", null, null)
