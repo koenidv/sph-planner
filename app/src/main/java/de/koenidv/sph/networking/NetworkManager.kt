@@ -12,10 +12,7 @@ import com.androidnetworking.interfaces.StringRequestListener
 import com.facebook.stetho.okhttp3.StethoInterceptor
 import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.SphPlanner.Companion.applicationContext
-import de.koenidv.sph.database.CoursesDb
-import de.koenidv.sph.database.PostAttachmentsDb
-import de.koenidv.sph.database.PostTasksDb
-import de.koenidv.sph.database.PostsDb
+import de.koenidv.sph.database.*
 import de.koenidv.sph.objects.*
 import de.koenidv.sph.parsing.RawParser
 import okhttp3.Cookie
@@ -36,8 +33,30 @@ class NetworkManager {
     val FAILED_MAINTENANCE = 3
     val FAILED_CANCELLED = 4
 
+
+    fun indexAll(onComplete: (success: Int) -> Unit) {
+        // todo include tiles
+        // Firstly, create a index of all courses
+        createCourseIndex { courses ->
+            if (courses == SUCCESS) {
+                // Load and parse timetable
+                loadAndSaveTimetable { lessons ->
+                    if (lessons == SUCCESS)
+                    // Load all posts, tasks, attachments and links from all courses
+                        NetworkManager().loadAndSavePosts { posts ->
+                            if (posts == SUCCESS) {
+                                onComplete(SUCCESS)
+                            }
+                            // todo handle errors
+                        }
+                }
+            }
+        }
+    }
+
+
     // todo save last refresh for checks
-    fun createCourseIndex(onComplete: (success: Int) -> Unit) {
+    private fun createCourseIndex(onComplete: (success: Int) -> Unit) {
         val prefs = applicationContext().getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
         // Remove old courses, it'll just lead to isses
         val coursesDb = CoursesDb.getInstance()
@@ -74,10 +93,24 @@ class NetworkManager {
     }
 
     /**
+     * Load and save timetable from sph
+     * This will replace any current lessons in the timetable
+     */
+    private fun loadAndSaveTimetable(onComplete: (success: Int) -> Unit) {
+        NetworkManager().loadSiteWithToken("https://start.schulportal.hessen.de/stundenplan.php", onComplete = { success: Int, result: String? ->
+            if (success == SUCCESS) {
+                TimetableDb.instance!!.clear()
+                TimetableDb.instance!!.save(RawParser().parseTimetable(result!!))
+            }
+            onComplete(success)
+        })
+    }
+
+    /**
      * Load and save Posts, PostAtachments and PostTasks for a list of courses
      * @param coursesToLoad Courses that should be loaded, all courses with NumberIds when null
      */
-    fun loadAndSavePosts(coursesToLoad: List<Course>? = null, onComplete: (success: Int) -> Unit) {
+    internal fun loadAndSavePosts(coursesToLoad: List<Course>? = null, onComplete: (success: Int) -> Unit) {
         // Use all courses with number_id if nothing was specified
         val courses = coursesToLoad ?: CoursesDb.getInstance().withNumberId
         // Save all errors in a list, only return one later

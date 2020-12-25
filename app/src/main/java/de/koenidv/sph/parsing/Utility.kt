@@ -1,6 +1,7 @@
 package de.koenidv.sph.parsing
 
 import android.content.pm.PackageManager
+import android.util.TypedValue
 import de.koenidv.sph.SphPlanner
 
 
@@ -64,5 +65,11 @@ class Utility {
             false
         }
     }
+
+    /**
+     * Convert px to dp
+     */
+    fun dpToPx(dp: Float): Float =
+            TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, SphPlanner.applicationContext().resources.displayMetrics)
 
 }

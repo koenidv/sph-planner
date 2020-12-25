@@ -5,5 +5,6 @@ data class Lesson(
         var idCourse: String,
         var day: Int, // 0: Monday, 4: Friday
         var hour: Int, // First lesson, second, ..
-        var room: String
+        var room: String,
+        var isDisplayed: Boolean? = null // Temporary value for timetableAdapter
 )

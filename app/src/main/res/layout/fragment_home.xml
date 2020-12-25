@@ -6,33 +6,32 @@
     android:layout_height="match_parent"
     tools:context=".ui.HomeFragment">
 
-    <TextView
-        android:id="@+id/idText"
-        android:layout_width="match_parent"
+    <Button
+        android:id="@+id/surpriseButton"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        android:textAlignment="center"
-        android:textSize="20sp"
-        android:autoLink="web"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:text="Der beste Button Deutschlands"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/timetableFragment"
+        tools:ignore="HardcodedText" />
 
-    <Button
-        android:id="@+id/signinButton"
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/timetableFragment"
+        android:name="de.koenidv.sph.TimetableFragment"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        android:text="Refresh posts"
+        android:background="@drawable/card_background"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/idText" />
+        app:layout_constraintTop_toTopOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
