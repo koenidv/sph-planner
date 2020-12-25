@@ -17,21 +17,46 @@
         android:text="Der beste Button Deutschlands"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/timetableFragment"
+        app:layout_constraintTop_toBottomOf="@+id/timetableLayout"
         tools:ignore="HardcodedText" />
 
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/timetableFragment"
-        android:name="de.koenidv.sph.TimetableFragment"
-        android:layout_width="0dp"
+    <LinearLayout
+        android:id="@+id/timetableLayout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:background="@drawable/card_background"
+        android:layout_marginTop="16dp"
+        android:background="?attr/selectableItemBackground"
+        android:orientation="vertical"
+        android:padding="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/timetableTitleTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableEnd="@drawable/ic_chevron_right"
+            android:drawableTint="@android:color/tab_indicator_text"
+            android:fontFamily="@font/roboto_slab"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:text="@string/timetable_personal_title"
+            android:textSize="16sp" />
+
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/timetableFragment"
+            android:name="de.koenidv.sph.ui.TimetableViewFragment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/card_background"
+            android:transitionName="timetable"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/timetableTitleTextView" />
+
+    </LinearLayout>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

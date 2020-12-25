@@ -5,6 +5,7 @@ import android.graphics.BlendModeColorFilter
 import android.graphics.PorterDuff
 import android.graphics.drawable.StateListDrawable
 import android.os.Build
+import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,55 +13,77 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import de.koenidv.sph.R
-import de.koenidv.sph.objects.Course
+import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.objects.TimetableEntry
 import de.koenidv.sph.parsing.Utility
 
 //  Created by koenidv on 18.12.2020.
-class LessonsAdapter(private val dataset: List<List<TimetableEntry>>, private val onClick: (Course) -> Unit) :
+class LessonsAdapter(private var dataset: List<List<TimetableEntry>>,
+                     private var expanded: Boolean = false,
+                     private var multiple: Boolean = false, private var maxConcurrent: Int = 1,
+                     private val onClick: (List<TimetableEntry>) -> Unit) :
         RecyclerView.Adapter<LessonsAdapter.ViewHolder>() {
 
     /**
      * Provides a reference to the type of view
      * (custom ViewHolder).
      */
-    class ViewHolder(view: View, val onClick: (Course) -> Unit) : RecyclerView.ViewHolder(view) {
+    class ViewHolder(view: View, val onClick: (List<TimetableEntry>) -> Unit) : RecyclerView.ViewHolder(view) {
         val layout: LinearLayout = view.findViewById(R.id.itemLayout)
-        private val nameText: TextView = view.findViewById(R.id.courseNameTextView)
-        private var currentCourse: Course? = null
+        private val textView: TextView = view.findViewById(R.id.courseNameTextView)
+        private var currentEntry: List<TimetableEntry>? = null
 
         init {
             // Set onClickListener from attribute
             layout.setOnClickListener {
-                currentCourse?.let {
+                currentEntry?.let {
                     onClick(it)
                 }
             }
         }
 
-        fun bind(entry: TimetableEntry, hourcount: Int) {
-            currentCourse = entry.course
+        fun bind(entries: List<TimetableEntry>, hourcount: Int, expanded: Boolean, multiple: Boolean, maxConcurrent: Int = 1) {
+            if (!multiple) currentEntry = entries
 
             // Set data
-            nameText.text = entry.course?.fullname
-
-            // Enlarge if same as next lesson
-            if (hourcount > 1) {
-                val params = layout.layoutParams
-                params.height = Utility().dpToPx(hourcount * 32f + 4f).toInt()
-                layout.layoutParams = params
+            var title = ""
+            if (!multiple) {
+                title = entries[0].course?.fullname
+                        ?: entries[0].lesson.idCourse // todo short names
+                if (expanded) title += "\n<br><small>${entries[0].lesson.room}</small>" // todo don't use html here
+            } else {
+                entries.forEach {
+                    title += "${it.lesson.idCourse.substring(0, it.lesson.idCourse.indexOf("_"))} (${it.course?.id_teacher})" // todo course names
+                    if (expanded) title += "\n<br><small>${it.lesson.room}</small>" // todo don't use html here
+                    title += "\n<br>"
+                }
             }
 
+            textView.text = Html.fromHtml(title)
+
+            // Set size
+            // Enlarge to show rooms
+            // Or span multiple hours if consecutive lessons are the same
+            val params = layout.layoutParams
+            val height = if (expanded && !multiple) 64f else if (multiple) maxConcurrent * 36f else 32f
+            val extrapadding = (hourcount - 1) * 4f
+            params.height = Utility().dpToPx(hourcount * height + extrapadding).toInt()
+            layout.layoutParams = params
+
+            val color: Int = if (!multiple) {
+                (entries[0].course?.color
+                        ?: 6168631)
+            } else {
+                SphPlanner.applicationContext().getColor(R.color.grey_800)
+            }
             // Set background color with 40% opacity
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 (layout.background as StateListDrawable).colorFilter = BlendModeColorFilter(
-                        (entry.course?.color
-                                ?: 6168631) and 0x00FFFFFF or 0x66000000, BlendMode.SRC_ATOP)
+                        color and 0x00FFFFFF or 0x66000000, BlendMode.SRC_ATOP)
             } else {
                 @Suppress("DEPRECATION") // not in < Q
                 (layout.background as StateListDrawable)
-                        .setColorFilter((entry.course?.color
-                                ?: 6168631) and 0x00FFFFFF or 0x66000000, PorterDuff.Mode.SRC_ATOP)
+                        .setColorFilter(color and 0x00FFFFFF or 0x66000000, PorterDuff.Mode.SRC_ATOP)
             }
         }
     }
@@ -77,9 +100,11 @@ class LessonsAdapter(private val dataset: List<List<TimetableEntry>>, private va
     // Replaces the contents of a view (invoked by the layout manager)
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
         // Bind data to ViewHolder
-        if (dataset[position].isNotEmpty()
+        // sph will not mix different rowspans, therefore we can just check the first item
+        if (!dataset.getOrNull(position).isNullOrEmpty()
                 && dataset[position][0].lesson.isDisplayed != true) {
 
+            // todo better check for same lessons (includes..)
             // Check if the next lessons are the same
             // Hide them if they are
             var hourcount = 1
@@ -95,20 +120,41 @@ class LessonsAdapter(private val dataset: List<List<TimetableEntry>>, private va
                 nextLesson = dataset.getOrNull(position + hourcount)?.getOrNull(0)?.lesson
             }
 
-            // Bind lesson to view
-            viewHolder.bind(dataset[position][0], hourcount)
+            // Make sure ViewHolder is visible after layout changed
+            viewHolder.layout.visibility = View.VISIBLE
 
-        } else if (dataset[position].isNotEmpty()
-                && dataset[position][0].lesson.isDisplayed == true)
-        // Lesson is hidden
+            // Bind lesson to view
+            viewHolder.bind(dataset[position], hourcount, expanded, multiple, maxConcurrent)
+
+        } else if (!dataset.getOrNull(position).isNullOrEmpty()
+                && dataset[position][0].lesson.isDisplayed == true) {
+            // Lesson is already displayed
             viewHolder.layout.visibility = View.GONE
-        else
-        // No lesson for this hour
+        } else {
+            // No lesson for this hour
             viewHolder.layout.visibility = View.INVISIBLE
-        // Todo support concurrent lessons
+            // We still need to apply the correct size
+            val params = viewHolder.layout.layoutParams
+            val height = if (expanded) 64f else 32f
+            params.height = Utility().dpToPx(height).toInt()
+            viewHolder.layout.layoutParams = params
+        }
+        // todo check for rooms if expanded, don't if not
     }
 
     // Return the size of your dataset (invoked by the layout manager)
     override fun getItemCount() = dataset.size
+
+    fun setExpanded(expanded: Boolean) {
+        this.expanded = expanded
+        notifyDataSetChanged()
+    }
+
+    fun setDataAndMultiple(newDataset: List<List<TimetableEntry>>, multiple: Boolean, maxConcurrent: Int) {
+        this.dataset = newDataset
+        this.multiple = multiple
+        this.maxConcurrent = maxConcurrent
+        notifyDataSetChanged()
+    }
 
 }

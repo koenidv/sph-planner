@@ -1,79 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/timetableRecyclerLayout"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:paddingStart="6dp"
-    android:paddingTop="8dp"
-    android:paddingEnd="6dp"
-    android:paddingBottom="4dp">
+    android:layout_height="match_parent"
+    tools:context=".ui.TimetableFragment">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/mondayRecycler"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginStart="2dp"
-        android:layout_marginEnd="2dp"
-        android:layout_weight="1"
-        android:isScrollContainer="false"
-        android:overScrollMode="never"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        tools:itemCount="6"
-        tools:listitem="@layout/item_lesson" />
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/tuesdayRecycler"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginStart="2dp"
-        android:layout_marginEnd="2dp"
-        android:layout_weight="1"
-        android:isScrollContainer="false"
-        android:overScrollMode="never"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        tools:itemCount="8"
-        tools:listitem="@layout/item_lesson" />
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/timetableFilterSwitch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:padding="16dp"
+            android:text="@string/timetable_personal_filter" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/wednesdayRecycler"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginStart="2dp"
-        android:layout_marginEnd="2dp"
-        android:layout_weight="1"
-        android:isScrollContainer="false"
-        android:overScrollMode="never"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        tools:itemCount="8"
-        tools:listitem="@layout/item_lesson" />
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/timetableFragment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:tag="timetable"
+            android:transitionName="timetable" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/thursdayRecycler"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginStart="2dp"
-        android:layout_marginEnd="2dp"
-        android:layout_weight="1"
-        android:isScrollContainer="false"
-        android:overScrollMode="never"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        tools:itemCount="10"
-        tools:listitem="@layout/item_lesson" />
+    </LinearLayout>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/fridayRecycler"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginStart="2dp"
-        android:layout_marginEnd="2dp"
-        android:layout_weight="1"
-        android:isScrollContainer="false"
-        android:overScrollMode="never"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        tools:itemCount="6"
-        tools:listitem="@layout/item_lesson" />
-
-</LinearLayout>
+</androidx.core.widget.NestedScrollView>

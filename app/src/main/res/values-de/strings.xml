@@ -73,5 +73,8 @@
     <string name="onboard_legal_liability">Ich weiß, dass die App keine Garantie für die angezeigten Daten übernehmen kann und Fehler auftreten können.</string>
     <string name="onboard_legal_sources">Ich verstehe, dass alle Daten aus dem Schulportal Hessen abgerufen werden und Eigentum der jeweiligen Autoren sind.</string>
     <string name="onboard_legal_privacy">Ich habe die  <a href="http://koenidv.de/sph/datenschutz">Datenschutzerklärung</a> gelesen, verstanden und stimme ihr zu.</string>
+    <string name="timetable_personal_title">Dein Stundenplan</string>
+    <string name="timetable_personal_filter">Nur eigene Kurse zeigen</string>
+    <string name="timetable_title">Stundenplan</string>
 
 </resources>

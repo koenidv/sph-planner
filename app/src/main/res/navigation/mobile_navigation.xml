@@ -9,7 +9,15 @@
         android:id="@+id/nav_home"
         android:name="de.koenidv.sph.ui.HomeFragment"
         android:label="@string/title_overview"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_home">
+        <action
+            android:id="@+id/timetableFromHomeAction"
+            app:destination="@id/frag_timetable"
+            app:enterAnim="@anim/fragment_fade_enter"
+            app:exitAnim="@anim/fragment_fade_exit"
+            app:popEnterAnim="@anim/fragment_fade_enter"
+            app:popExitAnim="@anim/fragment_fade_exit" />
+    </fragment>
 
     <fragment
         android:id="@+id/nav_courses"
@@ -17,8 +25,8 @@
         android:label="@string/title_courses"
         tools:layout="@layout/fragment_courses">
         <action
-            android:id="@+id/courseOverviewAction"
-            app:destination="@id/courseOverviewFragment"
+            android:id="@+id/postsFromCoursesAction"
+            app:destination="@id/frag_posts"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_close_exit"
             app:popEnterAnim="@anim/fragment_open_enter"
@@ -37,8 +45,15 @@
         android:label="@string/title_links"
         tools:layout="@layout/fragment_courses">
         <action
-            android:id="@+id/webviewAction"
+            android:id="@+id/webviewFromExploreAction"
             app:destination="@id/frag_webview"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_close_exit"
+            app:popEnterAnim="@anim/fragment_open_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+        <action
+            android:id="@+id/timetableFromExploreAction"
+            app:destination="@id/frag_timetable"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_close_exit"
             app:popEnterAnim="@anim/fragment_open_enter"
@@ -55,12 +70,16 @@
             app:argType="string" />
     </fragment>
     <fragment
-        android:id="@+id/courseOverviewFragment"
+        android:id="@+id/frag_posts"
         android:name="de.koenidv.sph.ui.CourseOverviewFragment"
-        android:label="CourseOverviewFragment">
+        android:label="@string/posts_list_title">
         <argument
             android:name="courseId"
             app:argType="string" />
     </fragment>
+    <fragment
+        android:id="@+id/frag_timetable"
+        android:name="de.koenidv.sph.ui.TimetableFragment"
+        android:label="@string/timetable_title" />
 
 </navigation>

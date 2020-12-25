@@ -27,12 +27,10 @@ class CoursesFragment : Fragment() {
         // Set up courses recycler
         val coursesAdapter = CoursesAdapter(courses) {
             Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
-                    .navigate(R.id.courseOverviewAction, bundleOf("courseId" to it.courseId))
+                    .navigate(R.id.postsFromCoursesAction, bundleOf("courseId" to it.courseId))
         }
         coursesRecycler.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
         coursesRecycler.adapter = coursesAdapter
-
-
 
 
         return view

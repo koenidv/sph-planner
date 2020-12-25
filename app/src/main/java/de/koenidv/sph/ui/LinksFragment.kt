@@ -46,7 +46,7 @@ class LinksFragment : Fragment() {
             } else {
                 // Open WebViewFragment with respective url on click
                 Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
-                        .navigate(R.id.webviewAction, bundleOf("url" to it.location))
+                        .navigate(R.id.webviewFromExploreAction, bundleOf("url" to it.location))
             }
         }
         linksRecycler.layoutManager = LinearLayoutManager(requireContext())

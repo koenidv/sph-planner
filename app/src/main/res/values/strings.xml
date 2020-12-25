@@ -52,6 +52,11 @@
     <string name="posts_list_title">Posts</string>
     <string name="posts_no_data">No posts yet</string>
 
+    <!-- Timetable -->
+    <string name="timetable_personal_title">Your timetable</string>
+    <string name="timetable_personal_filter">Only show own courses</string>
+    <string name="timetable_title">Timetable</string>
+
     <!-- Options sheet -->
     <string name="info_menuaction">Options</string>
     <string name="info_greeting">Hey %name</string>
