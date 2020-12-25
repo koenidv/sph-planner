@@ -1,9 +1,11 @@
 package de.koenidv.sph.ui
 
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
@@ -12,6 +14,7 @@ import de.koenidv.sph.R
 import de.koenidv.sph.adapters.LessonsAdapter
 import de.koenidv.sph.database.TimetableDb
 import de.koenidv.sph.objects.TimetableEntry
+import de.koenidv.sph.parsing.Utility
 
 
 // Created on 24.12.2020 by koenidv.
@@ -35,6 +38,7 @@ class TimetableViewFragment : Fragment() {
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_view_timetable, container, false)
+        val prefs = requireContext().getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
 
         // Get favorites if viewAll is false, all lessons otherwise
         timetable = TimetableDb.instance!!.get(!viewAll)
@@ -61,11 +65,24 @@ class TimetableViewFragment : Fragment() {
         }
 
         // Set up lessons adapters
-        monday.adapter = LessonsAdapter(timetable[0], expanded, viewAll, onClick = onClick)
-        tuesday.adapter = LessonsAdapter(timetable[1], expanded, viewAll, onClick = onClick)
-        wednesday.adapter = LessonsAdapter(timetable[2], expanded, viewAll, onClick = onClick)
-        thursday.adapter = LessonsAdapter(timetable[3], expanded, viewAll, onClick = onClick)
-        friday.adapter = LessonsAdapter(timetable[4], expanded, viewAll, onClick = onClick)
+        if (!timetable.isNullOrEmpty()) {
+            monday.adapter = LessonsAdapter(timetable[0], expanded, viewAll, onClick = onClick)
+            tuesday.adapter = LessonsAdapter(timetable[1], expanded, viewAll, onClick = onClick)
+            wednesday.adapter = LessonsAdapter(timetable[2], expanded, viewAll, onClick = onClick)
+            thursday.adapter = LessonsAdapter(timetable[3], expanded, viewAll, onClick = onClick)
+            friday.adapter = LessonsAdapter(timetable[4], expanded, viewAll, onClick = onClick)
+        }
+
+        // Highlight today's recycler with the theme color at 15% opacity
+        val tintList = ColorStateList(arrayOf(intArrayOf(android.R.attr.state_enabled)),
+                intArrayOf(prefs.getInt("themeColor", 0) and 0x00FFFFFF or 0x26000000))
+        when (Utility().getCurrentDayAdjusted()) {
+            0 -> monday.backgroundTintList = tintList
+            1 -> tuesday.backgroundTintList = tintList
+            2 -> wednesday.backgroundTintList = tintList
+            3 -> thursday.backgroundTintList = tintList
+            else -> friday.backgroundTintList = tintList
+        }
 
         return view
     }

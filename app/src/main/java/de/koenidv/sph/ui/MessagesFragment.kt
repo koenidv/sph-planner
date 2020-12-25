@@ -20,7 +20,7 @@ class MessagesFragment : Fragment() {
         // But first, use a very bad but simple workaround to set explore tab as active tab
 
         Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
-                .navigate(R.id.nav_links)
+                .navigate(R.id.nav_explore)
         Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
                 .navigate(R.id.frag_webview, bundleOf("url" to "https://start.schulportal.hessen.de"))
 

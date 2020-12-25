@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Schulportal</string>
     <string name="title_overview">Übersicht</string>
     <string name="title_courses">Meine Kurse</string>
     <string name="title_messages">Nachrichten</string>
-    <string name="title_links">Erkunden</string>
+    <string name="title_explore">Erkunden</string>
     <string name="cancel">Abbrechen</string>
     <string name="save">Speichern</string>
     <string name="done">Fertig</string>
@@ -76,5 +76,38 @@
     <string name="timetable_personal_title">Dein Stundenplan</string>
     <string name="timetable_personal_filter">Nur eigene Kurse zeigen</string>
     <string name="timetable_title">Stundenplan</string>
+    <!-- Translatable Arrays -->
+    <!-- Only translate values (after "|"), not the keys! -->
+    <!-- Spanish, Russian, Korean ? -->
+    <string-array name="courseId_fullName">
+        <item>d|Deutsch</item>
+        <item>e|Englisch</item>
+        <item>l|Latein</item>
+        <item>f|Französisch</item>
+        <item>g|Geschichte</item>
+        <item>info|Informatik</item>
+        <item>ku|Kunst</item>
+        <item>mu|Musik</item>
+        <item>m|Mathematik</item>
+        <item>ph|Physik</item>
+        <item>bio|Biologie</item>
+        <item>ch|Chemie</item>
+        <item>ek|Erdkunde</item>
+        <item>powi|Politik</item>
+        <item>spo|Sport</item>
+        <item>rka|Religion</item>
+        <item>rev|Religion</item>
+        <item>rfrr|Religion</item>
+        <item>ethi|Ethik</item>
+    </string-array>
+    <string-array name="courseId_shortName_override" tools:ignore="InconsistentArrays">
+        <item>f|Franz</item>
+        <item>g|Geschi</item>
+        <item>info|Info</item>
+        <item>m|Mathe</item>
+        <item>bio|Bio</item>
+        <item>rka|Reli</item>
+        <item>rev|Reli</item>
+    </string-array>
 
 </resources>

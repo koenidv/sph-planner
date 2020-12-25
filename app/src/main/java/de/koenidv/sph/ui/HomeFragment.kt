@@ -30,7 +30,7 @@ class HomeFragment : Fragment() {
 
         val surpriseButton = view.findViewById<Button>(R.id.surpriseButton)
         surpriseButton.setOnClickListener {
-            NetworkManager().loadAndSavePosts { Toast.makeText(SphPlanner.applicationContext(), "Heute schon, Kartoffel", Toast.LENGTH_SHORT).show() }
+            NetworkManager().indexAll { Toast.makeText(SphPlanner.applicationContext(), "Heute schon, Kartoffel", Toast.LENGTH_SHORT).show() }
         }
 
         val timetable = view.findViewById<FragmentContainerView>(R.id.timetableFragment)

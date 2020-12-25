@@ -51,7 +51,8 @@ dependencies {
     implementation 'androidx.navigation:navigation-ui-ktx:2.3.2'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'com.github.azygous13:SearchableSpinner:v1.4' // Only for login, really
-    implementation("org.jsoup:jsoup:1.13.1")
+    implementation 'org.jsoup:jsoup:1.13.1' // Parse html
+    implementation 'me.saket:better-link-movement-method:2.2.0' // Open links in-app
 
     testImplementation 'junit:junit:4.13.1'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'

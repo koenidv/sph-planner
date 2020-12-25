@@ -44,6 +44,7 @@ class TimetableDb private constructor() {
      */
     fun get(favorites: Boolean = true): List<List<List<TimetableEntry>>> {
         val db = dbhelper.readableDatabase
+        // todo get courses with lessons query
         val courses = if (favorites)
             CoursesDb.getInstance().favorites
         else
@@ -58,6 +59,8 @@ class TimetableDb private constructor() {
             "SELECT * from timetable"
         }
         val unorderedList = getWithCursor(db.rawQuery(query, null)).toMutableList()
+        // If there are no courses, return an empty list
+        if (unorderedList.isNullOrEmpty()) return listOf()
         // Create a list for each day containing as many lesson lists as the timetable has maximum hours per day
         val orderedList: List<List<MutableList<TimetableEntry>>> = List(5) { day: Int ->
             List(unorderedList.filter { it.day == day }.maxOf { it.hour }) { mutableListOf() }

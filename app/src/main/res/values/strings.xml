@@ -1,9 +1,9 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">SPHplanner</string>
     <string name="title_overview">Overview</string>
     <string name="title_courses">My Courses</string>
     <string name="title_messages">Messages</string>
-    <string name="title_links">Explore</string>
+    <string name="title_explore">Explore</string>
 
     <!-- General purpose -->
     <string name="cancel">Cancel</string>
@@ -94,6 +94,37 @@
     <!-- Feedback -->
     <string name="feedback_subject" translatable="false">[SPHplanner] Feedback</string>
     <string name="feedback_body" translatable="false">\n\nApp version: %app\nAndroid version: %android</string>
+
+    <!-- Translatable Arrays -->
+    <!-- Only translate values (after "|"), not the keys! -->
+    <!-- Spanish, Russian, Korean ? -->
+    <string-array name="courseId_fullName">
+        <item>d|German</item>
+        <item>e|English</item>
+        <item>l|Latin</item>
+        <item>f|French</item>
+        <item>g|History</item>
+        <item>info|Computer Science</item>
+        <item>ku|Arts</item>
+        <item>mu|Music</item>
+        <item>m|Maths</item>
+        <item>ph|Physics</item>
+        <item>bio|Biology</item>
+        <item>ch|Chemistry</item>
+        <item>ek|Geography</item>
+        <item>powi|Politics</item>
+        <item>spo|Sports</item>
+        <item>rka|Religion</item>
+        <item>rev|Religion</item>
+        <item>rfrr|Religion</item>
+        <item>ethi|Ethics</item>
+    </string-array>
+    <string-array name="courseId_shortName_override" tools:ignore="InconsistentArrays">
+        <item>info|CS</item>
+        <item>bio|Bio</item>
+        <item>ch|Chem</item>
+        <item>ek|Geo</item>
+    </string-array>
 
     <!-- Usabilty -->
     <string name="imagedescr_expand">Expand</string>

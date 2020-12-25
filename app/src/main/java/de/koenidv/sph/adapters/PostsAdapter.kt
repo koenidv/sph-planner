@@ -16,13 +16,16 @@ import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.objects.Post
 import de.koenidv.sph.objects.PostAttachment
 import de.koenidv.sph.objects.PostTask
+import me.saket.bettermovementmethod.BetterLinkMovementMethod
 import java.text.SimpleDateFormat
 import java.util.*
 
 //  Created by koenidv on 20.12.2020.
-class PostsAdapter(private val posts: List<Post>, private val tasks: List<PostTask>, private val attachments: List<PostAttachment>) :
+class PostsAdapter(private val posts: List<Post>, private val tasks: List<PostTask>, private val attachments: List<PostAttachment>,
+                   private val linkMethod: BetterLinkMovementMethod?) :
         RecyclerView.Adapter<PostsAdapter.ViewHolder>() {
 
+    val prefs = SphPlanner.applicationContext().getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
     val attachmentsViewPool = RecyclerView.RecycledViewPool()
 
     /**
@@ -42,7 +45,8 @@ class PostsAdapter(private val posts: List<Post>, private val tasks: List<PostTa
         private val dateFormat = SimpleDateFormat("d. MMM yyyy", Locale.getDefault())
 
         fun bind(post: Post, task: PostTask?, attachments: List<PostAttachment>,
-                 attachmentsViewPool: RecyclerView.RecycledViewPool) {
+                 attachmentsViewPool: RecyclerView.RecycledViewPool,
+                 movementMethod: BetterLinkMovementMethod?) {
 
             val themeColor = SphPlanner.applicationContext()
                     .getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
@@ -88,18 +92,10 @@ class PostsAdapter(private val posts: List<Post>, private val tasks: List<PostTa
                 attachmentsRecycler.adapter = AttachmentsAdapter(attachments)
             }
 
+            // Use better link movement to open links in-app
+            descriptionText.movementMethod = movementMethod
+            taskText.movementMethod = movementMethod
 
-            /*
-            // Set background color
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                (layout.background as StateListDrawable).colorFilter = BlendModeColorFilter(course.color
-                        ?: 6168631, BlendMode.SRC_ATOP)
-            } else {
-                @Suppress("DEPRECATION") // not in < Q
-                (layout.background as StateListDrawable)
-                        .setColorFilter(course.color ?: 6168631, PorterDuff.Mode.SRC_ATOP)
-            }
-            */
         }
     }
 
@@ -119,10 +115,9 @@ class PostsAdapter(private val posts: List<Post>, private val tasks: List<PostTa
                 post,
                 tasks.firstOrNull { it.id_post == post.postId }, // There will always only be one task per post
                 attachments.filter { it.id_post == post.postId },
-                attachmentsViewPool) // Filter attachments for post
+                attachmentsViewPool, linkMethod) // Filter attachments for post
     }
 
     // Return the size of your dataset (invoked by the layout manager)
     override fun getItemCount() = posts.size
-
 }

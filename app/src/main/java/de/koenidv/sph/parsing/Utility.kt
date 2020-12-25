@@ -3,6 +3,7 @@ package de.koenidv.sph.parsing
 import android.content.pm.PackageManager
 import android.util.TypedValue
 import de.koenidv.sph.SphPlanner
+import java.util.*
 
 
 //  Created by koenidv on 11.12.2020.
@@ -71,5 +72,18 @@ class Utility {
      */
     fun dpToPx(dp: Float): Float =
             TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, SphPlanner.applicationContext().resources.displayMetrics)
+
+
+    /**
+     * Get today, after 5pm tomorrow and monday on weekends
+     * @return 0: monday,.. 4: friday
+     */
+    fun getCurrentDayAdjusted(): Int {
+        // Get today or tomorrow after 5pm
+        var weekDay = Calendar.getInstance()[Calendar.DAY_OF_WEEK] - 2
+        if (Calendar.getInstance()[Calendar.HOUR_OF_DAY] > 16) weekDay++
+        if (weekDay < 0 || weekDay > 4) weekDay = 0
+        return weekDay
+    }
 
 }

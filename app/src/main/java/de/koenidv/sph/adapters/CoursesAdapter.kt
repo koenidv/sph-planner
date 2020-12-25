@@ -49,10 +49,11 @@ class CoursesAdapter(private val dataset: List<Course>, private val onClick: (Co
             //infoText.visibility = View.VISIBLE
 
 
-            // Set background color
+            // Set background color, about 70% opacity
+            val opacity: Int = 0xb4000000.toInt()
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                (layout.background as StateListDrawable).colorFilter = BlendModeColorFilter(course.color
-                        ?: 6168631, BlendMode.SRC_ATOP)
+                (layout.background as StateListDrawable).colorFilter = BlendModeColorFilter((course.color
+                        ?: 6168631) and 0x00FFFFFF or opacity, BlendMode.SRC_ATOP)
             } else {
                 @Suppress("DEPRECATION") // not in < Q
                 (layout.background as StateListDrawable)

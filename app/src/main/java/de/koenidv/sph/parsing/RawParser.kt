@@ -251,7 +251,7 @@ class RawParser {
                     sph_id = sphId,
                     named_id = uniformNamedId,
                     id_teacher = teacherId,
-                    fullname = namedId.substring(0, namedId.indexOf(" ")),
+                    fullname = CourseParser().getFullnameFromInternald(internalId),
                     isFavorite = true,
                     isLK = entry.contains("LK"),
                     color = (nameColorMap[namedId.substring(0, namedId.indexOf(" "))]

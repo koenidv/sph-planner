@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.objects.TimetableEntry
+import de.koenidv.sph.parsing.CourseParser
 import de.koenidv.sph.parsing.Utility
 
 //  Created by koenidv on 18.12.2020.
@@ -48,24 +49,28 @@ class LessonsAdapter(private var dataset: List<List<TimetableEntry>>,
             // Set data
             var title = ""
             if (!multiple) {
-                title = entries[0].course?.fullname
-                        ?: entries[0].lesson.idCourse // todo short names
-                if (expanded) title += "\n<br><small>${entries[0].lesson.room}</small>" // todo don't use html here
+                title = CourseParser().getShortnameFromInternald(entries[0].lesson.idCourse)
+                if (expanded) title += "<br><small>${entries[0].lesson.room}</small>"
             } else {
                 entries.forEach {
-                    title += "${it.lesson.idCourse.substring(0, it.lesson.idCourse.indexOf("_"))} (${it.course?.id_teacher})" // todo course names
-                    if (expanded) title += "\n<br><small>${it.lesson.room}</small>" // todo don't use html here
-                    title += "\n<br>"
+                    title += "${CourseParser().getShortnameFromInternald(it.lesson.idCourse)} (${it.course?.id_teacher})"
+                    if (expanded) title += "<br><small>${it.lesson.room}<br></small>"
+                    title += "<br>"
                 }
             }
 
-            textView.text = Html.fromHtml(title)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                textView.text = Html.fromHtml(title, Html.FROM_HTML_MODE_LEGACY)
+            } else {
+                @Suppress("DEPRECATION")
+                textView.text = Html.fromHtml(title)
+            }
 
             // Set size
             // Enlarge to show rooms
             // Or span multiple hours if consecutive lessons are the same
             val params = layout.layoutParams
-            val height = if (expanded && !multiple) 64f else if (multiple) maxConcurrent * 36f else 32f
+            val height = if (expanded && !multiple) 64f else if (multiple) maxConcurrent * 32f else 32f
             val extrapadding = (hourcount - 1) * 4f
             params.height = Utility().dpToPx(hourcount * height + extrapadding).toInt()
             layout.layoutParams = params
@@ -105,19 +110,24 @@ class LessonsAdapter(private var dataset: List<List<TimetableEntry>>,
                 && dataset[position][0].lesson.isDisplayed != true) {
 
             // todo better check for same lessons (includes..)
-            // Check if the next lessons are the same
+            // Check if the next lessons and changes are the same
+            // Ignore rooms if not expanded
+            // Ignore changes if concurrent courses are shown
             // Hide them if they are
             var hourcount = 1
             val thisLesson = dataset[position][0].lesson
             var nextLesson = dataset.getOrNull(position + hourcount)?.getOrNull(0)?.lesson
+            var nextChanges = dataset.getOrNull(position + hourcount)?.getOrNull(0)?.changes
             while (nextLesson != null
                     && nextLesson.idCourse == thisLesson.idCourse
-                    && nextLesson.room == thisLesson.room) {
+                    && (!expanded || nextLesson.room == thisLesson.room)
+                    && (multiple || dataset[position][0].changes == nextChanges)) {
                 // Hide next lesson
                 dataset[position + hourcount][0].lesson.isDisplayed = true
                 // Get the next, next lessen
                 hourcount++
                 nextLesson = dataset.getOrNull(position + hourcount)?.getOrNull(0)?.lesson
+                nextChanges = dataset.getOrNull(position + hourcount)?.getOrNull(0)?.changes
             }
 
             // Make sure ViewHolder is visible after layout changed
