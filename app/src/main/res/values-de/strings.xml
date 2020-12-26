@@ -121,5 +121,6 @@
     </string-array>
     <string name="attachments_title">Dateien &amp; Links</string>
     <string name="attachments_downloading_size">%s werden heruntergeladen</string>
+    <string name="attachments_namereplace_picture">Bild</string>
 
 </resources>

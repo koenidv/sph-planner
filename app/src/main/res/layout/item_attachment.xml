@@ -23,17 +23,33 @@
         <TextView
             android:id="@+id/nameTextView"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
+            android:autoSizeMaxTextSize="14sp"
+            android:autoSizeTextType="uniform"
             android:maxLines="3"
             android:textAppearance="@style/TextAppearance.AppCompat.Body1"
             android:textSize="12sp"
+            app:layout_constraintBottom_toTopOf="@+id/iconTextView"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0"
+            tools:targetApi="o"
             tools:text="AB 1 - Super Berechnungen" />
+
+        <TextView
+            android:id="@+id/iconTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            android:fontFamily="@font/font_awesome"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:text="icons" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

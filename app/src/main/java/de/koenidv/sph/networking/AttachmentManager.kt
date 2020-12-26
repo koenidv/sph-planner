@@ -139,4 +139,20 @@ class AttachmentManager {
             else -> "*/*"
         }
     }
+
+    /**
+     * Get an font awesome icon for each filetype
+     */
+    fun getIconForFiletype(filetype: String): String {
+        return when (filetype) {
+            "pdf" -> "file-pdf"
+            "doc", "docx" -> "file-word"
+            "ppt", "pptx" -> "file-powerpoint"
+            "xls", "xlsx" -> "file-excel"
+            "jpg", "jpeg", "png", "gif" -> "file-image"
+            "zip", "rar" -> "file-archive"
+            "txt" -> "file-alt"
+            else -> "file ($filetype)"
+        }
+    }
 }
