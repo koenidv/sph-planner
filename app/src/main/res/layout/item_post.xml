@@ -25,8 +25,6 @@
         app:strokeColor="?attr/strokeColor"
         app:strokeWidth="2dp">
 
-        <!-- todo stroke color as attr -->
-
         <!-- tasks, files -->
 
     </com.google.android.material.card.MaterialCardView>

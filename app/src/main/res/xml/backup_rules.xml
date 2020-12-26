@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<full-backup-content>
+    <!-- Don't backup the database -->
+    <!-- We need to make sure to restore the app when SharedPrefs are backed up, but databases are not -->
+    <exclude domain="database" />
+</full-backup-content>

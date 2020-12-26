@@ -14,9 +14,14 @@ import androidx.recyclerview.widget.RecyclerView
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.objects.Course
+import de.koenidv.sph.objects.Post
+import de.koenidv.sph.objects.PostTask
 
 //  Created by koenidv on 18.12.2020.
-class CoursesAdapter(private val dataset: List<Course>, private val onClick: (Course) -> Unit) :
+class CoursesAdapter(private val courses: List<Course>,
+                     private val unreadPosts: List<Post>,
+                     private val tasks: List<PostTask>,
+                     private val onClick: (Course) -> Unit) :
         RecyclerView.Adapter<CoursesAdapter.ViewHolder>() {
 
     /**
@@ -38,16 +43,36 @@ class CoursesAdapter(private val dataset: List<Course>, private val onClick: (Co
             }
         }
 
-        fun bind(course: Course) {
+        fun bind(course: Course, openPosts: Int, openTasks: Int) {
             currentCourse = course
+
+            /*
+             * Text
+             */
 
             // Set data
             var name = course.fullname
             if (course.isLK == true) name += SphPlanner.applicationContext().getString(R.string.course_appendix_lk)
             nameText.text = name
-            //infoText.text = "1 neuer Eintrag\nSchnitt: 1,8\n" + course.named_id
-            //infoText.visibility = View.VISIBLE
+            // Create info text
+            var infotext = ""
+            if (openTasks > 0) {
+                if (infotext != "") infotext += "\n"
+                infotext += SphPlanner.applicationContext().resources.getQuantityString(R.plurals.course_info_undone_tasks, openTasks, openTasks)
+            }
+            if (openPosts > 0) {
+                if (infotext != "") infotext += "\n"
+                infotext += SphPlanner.applicationContext().resources.getQuantityString(R.plurals.course_info_unread_posts, openPosts, openPosts)
+            }
+            // Set info text if it is not empty
+            if (infotext != "") {
+                infoText.text = infotext
+                infoText.visibility = View.VISIBLE
+            }
 
+            /*
+             * Background color
+             */
 
             // Set background color, about 70% opacity
             val opacity: Int = 0xb4000000.toInt()
@@ -73,11 +98,17 @@ class CoursesAdapter(private val dataset: List<Course>, private val onClick: (Co
 
     // Replaces the contents of a view (invoked by the layout manager)
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
+        val courseId = courses[position].courseId
+        // Get the size of unread courses within this course
+        val openPosts = unreadPosts.filter { it.id_course == courseId && it.unread }.size
+        // Get the size of not yet done tasks within this course
+        val openTasks = tasks.filter { it.id_course == courseId && !it.isDone }.size
+
         // Bind data to ViewHolder
-        viewHolder.bind(dataset[position])
+        viewHolder.bind(courses[position], openPosts, openTasks)
     }
 
     // Return the size of your dataset (invoked by the layout manager)
-    override fun getItemCount() = dataset.size
+    override fun getItemCount() = courses.size
 
 }

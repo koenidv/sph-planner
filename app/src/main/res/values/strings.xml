@@ -44,9 +44,20 @@
     <string name="onboard_supported_featurelist">%mycourses My Courses\n%messages Messages\n%studygroups Study Groups\n%timetable Timetable\n%changes Changes</string>
     <string name="onboard_supported_warning">Please report any issues you might experience via the options menu!</string>
     <string name="onboard_supported_error_network">There was a network error.\nTap to retry.</string>
+    <!--<string name="onboard_supported_features_full">"✔ Your school supports all the features we need, but we didn't test it yet.\nPlease contact us <a href="https://instagram.com/halbunsichtbar">on Instagram</a>, <a href="mailto:koenidv@gmail.com">by email</a> or via the options menu!"</string>
+        <string name="onboard_supported_features_partly_not">❌ Your school does not support all the features we need. Please get in touch <a href="https://instagram.com/halbunsichtbar">on Instagram</a> or <a href="mailto:koenidv@gmail.com">via email</a> to see how you can help us support your school!</string>-->
+
 
     <!-- Courses -->
     <string name="course_appendix_lk">""</string>
+    <plurals name="course_info_undone_tasks">
+        <item quantity="one">%d undone task</item>
+        <item quantity="other">%d undone tasks</item>
+    </plurals>
+    <plurals name="course_info_unread_posts">
+        <item quantity="one">%d new post</item>
+        <item quantity="other">%d new posts</item>
+    </plurals>
 
     <!-- Posts -->
     <string name="posts_list_title">Posts</string>

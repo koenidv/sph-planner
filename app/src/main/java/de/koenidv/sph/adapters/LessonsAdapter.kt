@@ -46,6 +46,10 @@ class LessonsAdapter(private var dataset: List<List<TimetableEntry>>,
         fun bind(entries: List<TimetableEntry>, hourcount: Int, expanded: Boolean, multiple: Boolean, maxConcurrent: Int = 1) {
             if (!multiple) currentEntry = entries
 
+            /*
+             * Text
+             */
+
             // Set data
             var title = ""
             if (!multiple) {
@@ -66,6 +70,10 @@ class LessonsAdapter(private var dataset: List<List<TimetableEntry>>,
                 textView.text = Html.fromHtml(title)
             }
 
+            /*
+             * Size
+             */
+
             // Set size
             // Enlarge to show rooms
             // Or span multiple hours if consecutive lessons are the same
@@ -74,6 +82,16 @@ class LessonsAdapter(private var dataset: List<List<TimetableEntry>>,
             val extrapadding = (hourcount - 1) * 4f
             params.height = Utility().dpToPx(hourcount * height + extrapadding).toInt()
             layout.layoutParams = params
+
+            /*
+             * Changes
+             */
+
+            // todo display changes
+
+            /*
+             * Background color
+             */
 
             val color: Int = if (!multiple) {
                 (entries[0].course?.color
@@ -109,25 +127,25 @@ class LessonsAdapter(private var dataset: List<List<TimetableEntry>>,
         if (!dataset.getOrNull(position).isNullOrEmpty()
                 && dataset[position][0].lesson.isDisplayed != true) {
 
-            // todo better check for same lessons (includes..)
             // Check if the next lessons and changes are the same
             // Ignore rooms if not expanded
             // Ignore changes if concurrent courses are shown
             // Hide them if they are
             var hourcount = 1
-            val thisLesson = dataset[position][0].lesson
-            var nextLesson = dataset.getOrNull(position + hourcount)?.getOrNull(0)?.lesson
-            var nextChanges = dataset.getOrNull(position + hourcount)?.getOrNull(0)?.changes
-            while (nextLesson != null
-                    && nextLesson.idCourse == thisLesson.idCourse
-                    && (!expanded || nextLesson.room == thisLesson.room)
-                    && (multiple || dataset[position][0].changes == nextChanges)) {
+            val firstEntry = dataset[position][0]
+            while (dataset.getOrNull(position + hourcount)?.find {
+                        // Same lessons require the same course
+                        // We can just check for the first entry as sph will not mix different rowspans
+                        it.lesson.idCourse == firstEntry.lesson.idCourse
+                                // Check room only if expanded, else it won't be shown
+                                && (!expanded || it.lesson.room == firstEntry.lesson.room)
+                                // Check changes only for first item, we're not going to show changes on concurrent lessons
+                                && (multiple || it.changes == firstEntry.changes)
+                    } != null) {
                 // Hide next lesson
                 dataset[position + hourcount][0].lesson.isDisplayed = true
                 // Get the next, next lessen
                 hourcount++
-                nextLesson = dataset.getOrNull(position + hourcount)?.getOrNull(0)?.lesson
-                nextChanges = dataset.getOrNull(position + hourcount)?.getOrNull(0)?.changes
             }
 
             // Make sure ViewHolder is visible after layout changed
@@ -149,7 +167,6 @@ class LessonsAdapter(private var dataset: List<List<TimetableEntry>>,
             params.height = Utility().dpToPx(height).toInt()
             viewHolder.layout.layoutParams = params
         }
-        // todo check for rooms if expanded, don't if not
     }
 
     // Return the size of your dataset (invoked by the layout manager)

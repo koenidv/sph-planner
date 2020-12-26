@@ -48,9 +48,11 @@
     <string name="onboard_supported_schooltested">✔ Wir haben die App mit deiner Schule getestet und sie sollte funktionieren.</string>
     <string name="onboard_supported_warning">Bitte teile uns mögliche Fehler über die Option im Menü mit!</string>
     <string name="onboard_supported_features_none">❌ Sorry, deine Schule untersützt die benötigten Funktionen nicht.</string>
-    <string name="onboard_supported_features_partly_not">❌ Deine Schule unterstützt nicht alle benötigten Funktionen. Bitte nimm mit uns Konakt auf,  um herauszufinden, wie du uns dabei helfen kannst, deine Schule zu untersützen!</string>
+    <string name="onboard_supported_features_partly_not">"❌ Deine Schule unterstützt nicht alle benötigten Funktionen. Bitte nimm mit uns Konakt auf, um herauszufinden, wie du uns dabei helfen kannst, deine Schule zu untersützen!"</string>
     <string name="onboard_supported_features_partly_hidden">✔ Deine Schule unterstützt einige der Funktionen, die wir benötigen.</string>
     <string name="onboard_supported_features_full">"✔ Deine Schule untersützt alle benötigten Funktionen, aber wir haben sie noch nicht getestet.\nBitte kontaktiere uns über die Option im Menü!"</string>
+    <!--<string name="onboard_supported_features_partly_not">"❌ Deine Schule unterstützt nicht alle benötigten Funktionen. Bitte nimm mit uns <a href="https://instagram.com/halbunsichtbar">über Instagram</a> oder <a href="mailto:koenidv@gmail.com">E-Mail</a> Konakt auf, um herauszufinden, wie du uns dabei helfen kannst, deine Schule zu untersützen!"</string>
+    <string name="onboard_supported_features_full">"✔ Deine Schule untersützt alle benötigten Funktionen, aber wir haben sie noch nicht getestet.\nBitte kontaktiere uns über <a href="https://instagram.com/halbunsichtbar">Instagram</a>, <a href="mailto:koenidv@gmail.com">E-Mail</a> oder die Option im Menü!"</string>-->
     <string name="onboard_supported_featurelist">%mycourses Mein Unterricht\n%messages Nachrichten\n%studygroups Lerngruppen\n%timetable Stundenplan\n%changes Vertretungsplan</string>
     <string name="onboard_supported_error_network">Ein Netzwerkfehler ist aufgetreten.\nTippe, um es erneut zu versuchen.</string>
     <string name="onboard_supported_features_partly_manual">✔ Deine Schule unterstützt einige der Funktionen, die wir benötigen, du musst allerdings einige Daten manuell hinzufügen.</string>
@@ -76,6 +78,14 @@
     <string name="timetable_personal_title">Dein Stundenplan</string>
     <string name="timetable_personal_filter">Nur eigene Kurse zeigen</string>
     <string name="timetable_title">Stundenplan</string>
+    <plurals name="course_info_undone_tasks">
+        <item quantity="one">Eine offene Aufgabe</item>
+        <item quantity="other">%d offene Aufgaben</item>
+    </plurals>
+    <plurals name="course_info_unread_posts">
+        <item quantity="one">Ein neuer Eintrag</item>
+        <item quantity="other">%d neue Einträge</item>
+    </plurals>
     <!-- Translatable Arrays -->
     <!-- Only translate values (after "|"), not the keys! -->
     <!-- Spanish, Russian, Korean ? -->

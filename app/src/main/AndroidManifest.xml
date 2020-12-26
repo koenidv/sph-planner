@@ -6,6 +6,7 @@
 
     <queries>
         <intent>
+            <!-- Email query permission for api 30+ -->
             <action android:name="android.content.Intent.ACTION_SENDTO" />
         </intent>
     </queries>
@@ -17,6 +18,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
+        android:fullBackupContent="@xml/backup_rules"
         android:theme="@style/Theme.SPH">
         <activity
             android:name=".ui.OnboardingActivity"
