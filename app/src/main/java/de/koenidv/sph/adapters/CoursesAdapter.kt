@@ -102,7 +102,7 @@ class CoursesAdapter(private val courses: List<Course>,
         // Get the size of unread courses within this course
         val openPosts = unreadPosts.filter { it.id_course == courseId && it.unread }.size
         // Get the size of not yet done tasks within this course
-        val openTasks = tasks.filter { it.id_course == courseId && !it.isDone }.size
+        val openTasks = tasks.filter { it.id_course == courseId && !it.isDone }.distinct().size
 
         // Bind data to ViewHolder
         viewHolder.bind(courses[position], openPosts, openTasks)

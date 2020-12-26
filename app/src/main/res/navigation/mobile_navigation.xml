@@ -61,6 +61,13 @@
             app:exitAnim="@anim/fragment_close_exit"
             app:popEnterAnim="@anim/fragment_open_enter"
             app:popExitAnim="@anim/fragment_close_exit" />
+        <action
+            android:id="@+id/attachmentsFromExploreAction"
+            app:destination="@id/attachmentsFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_close_exit"
+            app:popEnterAnim="@anim/fragment_open_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
     </fragment>
 
     <fragment
@@ -93,5 +100,10 @@
         android:id="@+id/frag_timetable"
         android:name="de.koenidv.sph.ui.TimetableFragment"
         android:label="@string/timetable_title" />
+    <fragment
+        android:id="@+id/attachmentsFragment"
+        android:name="de.koenidv.sph.ui.AttachmentsFragment"
+        android:label="fragment_attachments"
+        tools:layout="@layout/fragment_attachments" />
 
 </navigation>

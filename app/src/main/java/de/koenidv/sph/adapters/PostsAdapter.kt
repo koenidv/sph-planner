@@ -9,6 +9,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
+import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.checkbox.MaterialCheckBox
@@ -95,6 +96,9 @@ class PostsAdapter(private val posts: List<Post>,
                 // Set up attachments recycler
                 attachmentsRecycler.setHasFixedSize(true)
                 attachmentsRecycler.setRecycledViewPool(attachmentsViewPool)
+                // Add a pagerSnapHelper for nice scrolling with many attachments
+                if (attachmentsRecycler.onFlingListener == null)
+                    PagerSnapHelper().attachToRecyclerView(attachmentsRecycler)
                 attachmentsRecycler.adapter = AttachmentsAdapter(attachments, onAttachmentClick)
             }
 

@@ -17,7 +17,7 @@
         <!-- Customize your theme here. -->
         <item name="bottomSheetDialogTheme">@style/Theme.SPH.Sheet</item>
         <item name="actionBarStyle">@style/Theme.SPH.ActionBar</item>
-        <item name="strokeColor">@color/strokeColorLight</item>
+        <item name="customStrokeColor">@color/strokeColorLight</item>
         <item name="strokeWidth">2dp</item>
     </style>
 
@@ -56,11 +56,11 @@
 
     <style name="Theme.SPH.Monochrome" parent="Theme.SPH">
         <!-- Primary -->
-        <item name="colorPrimary">@color/grey_800_dark</item>
+        <item name="colorPrimary">@color/grey_850</item>
         <item name="colorPrimaryVariant">@color/black</item>
         <item name="colorOnPrimary">@color/white</item>
         <!-- Secondary -->
-        <item name="colorSecondary">@color/grey_800_dark</item>
+        <item name="colorSecondary">@color/grey_850</item>
         <item name="colorSecondaryVariant">@color/black</item>
         <item name="colorOnSecondary">@color/white</item>
     </style>

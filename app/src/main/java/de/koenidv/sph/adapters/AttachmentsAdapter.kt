@@ -36,7 +36,8 @@ class AttachmentsAdapter(private val attachments: List<PostAttachment>,
                     onAttachmentClick(it)
                     // Add dot icon if there wasn't a donwloaded check before
                     @SuppressLint("SetTextI18n")
-                    if (!iconText.text.contains("check-circle"))
+                    if (!iconText.text.contains("check-circle")
+                            && !iconText.text.contains("dot-circle"))
                         iconText.text = "dot-circle ${iconText.text}"
                 }
             }

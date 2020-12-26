@@ -12,7 +12,7 @@
     app:cardBackgroundColor="?attr/backgroundColor"
     app:cardCornerRadius="4dp"
     app:cardElevation="0dp"
-    app:strokeColor="?attr/strokeColor"
+    app:strokeColor="?attr/customStrokeColor"
     app:strokeWidth="2dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout

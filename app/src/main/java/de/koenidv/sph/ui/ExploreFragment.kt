@@ -22,6 +22,7 @@ class ExploreFragment : Fragment() {
                               container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
         val view = inflater.inflate(R.layout.fragment_explore, container, false)
+        val nav = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
 
         /*
          * Collections
@@ -33,11 +34,11 @@ class ExploreFragment : Fragment() {
         // Set on click listeners, open respective fragment
         timetableCard.setOnClickListener {
             // Open timetable
-            Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
-                    .navigate(R.id.timetableFromExploreAction)
+            nav.navigate(R.id.timetableFromExploreAction)
         }
         attachmentsCard.setOnClickListener {
             // Open attachments
+            nav.navigate(R.id.attachmentsFromExploreAction)
         }
 
 
@@ -68,8 +69,7 @@ class ExploreFragment : Fragment() {
                 startActivity(moodleIntent)
             } else {
                 // Open WebViewFragment with respective url on click
-                Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
-                        .navigate(R.id.webviewFromExploreAction, bundleOf("url" to it.location))
+                nav.navigate(R.id.webviewFromExploreAction, bundleOf("url" to it.location))
             }
         }
         linksRecycler.layoutManager = LinearLayoutManager(requireContext())

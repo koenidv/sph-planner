@@ -27,7 +27,7 @@
                 app:cardCornerRadius="4dp"
                 app:cardElevation="0dp"
                 app:layout_columnWeight="1"
-                app:strokeColor="?attr/strokeColor"
+                app:strokeColor="?attr/customStrokeColor"
                 app:strokeWidth="2dp">
 
                 <TextView
@@ -54,7 +54,7 @@
                 app:cardCornerRadius="4dp"
                 app:cardElevation="0dp"
                 app:layout_columnWeight="1"
-                app:strokeColor="?attr/strokeColor"
+                app:strokeColor="?attr/customStrokeColor"
                 app:strokeWidth="2dp">
 
                 <TextView

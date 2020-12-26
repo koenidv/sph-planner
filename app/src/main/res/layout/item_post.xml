@@ -22,7 +22,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:strokeColor="?attr/strokeColor"
+        app:strokeColor="?attr/customStrokeColor"
         app:strokeWidth="2dp">
 
         <!-- tasks, files -->

@@ -23,7 +23,7 @@
     <string name="onboard_legal_description">You should know a few things so that we\'ll along well 😊</string>
     <string name="onboard_legal_liability">I know that the app is not liable for any data shown and any mistake made.</string>
     <string name="onboard_legal_sources">I understand that all data is provided by Schulportal Hessen and courtesy of the respective author.</string>
-    <string name="onboard_legal_privacy">I have read, understood and agree to the app\'s <a href="http://koenidv.de/sph/datenschutz">privacy policy</a>.</string>
+    <string name="onboard_legal_privacy">I have read and understood and agree to the app\'s <a href="http://koenidv.de/sph/datenschutz">privacy policy</a>.</string>
     <string name="onboard_welcome_title">Hey</string>
     <string name="onboard_welcome_description">"You need an account with Hesse's education portal to use this app."</string>
     <string name="onboard_welcome_error_connection">You need to be online to sign in.\nTap to retry.</string>
