@@ -17,7 +17,7 @@
         <item name="bottomSheetDialogTheme">@style/Theme.SPH.Sheet</item>
         <item name="actionBarStyle">@style/Theme.SPH.ActionBar</item>
         <item name="customStrokeColor">@color/strokeColorDark</item>
-        <item name="strokeWidth">2dp</item>
+        <item name="customStrokeWidth">2dp</item>
     </style>
 
     <!-- Override only for 30s theme-->

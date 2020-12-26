@@ -12,6 +12,7 @@
     <string name="remove">Remove</string>
     <string name="not_now">Not now</string>
     <string name="continuenow">Continue</string>
+    <string name="error">Error</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="load_more">Show more</string>
@@ -72,6 +73,15 @@
     <string name="attachments_title">Files &amp; Links</string>
     <string name="attachments_namereplace_picture">Picture</string>
     <string name="attachments_downloading_size">Downlaoding %s</string>
+    <string name="attachments_options_download">Download</string>
+    <string name="attachments_options_download_complete">Download complete</string>
+    <string name="attachments_options_delete">Remove from device</string>
+    <string name="attachments_options_delete_complete">File removed</string>
+    <string name="attachments_options_pin">Pin</string>
+    <string name="attachments_options_pin_complete">Pinned</string>
+    <string name="attachments_options_unpin">Unpin</string>
+    <string name="attachments_options_unpin_complete">No longer pinned</string>
+    <string name="attachments_options_share">Share</string>
 
     <!-- Options sheet -->
     <string name="info_menuaction">Options</string>

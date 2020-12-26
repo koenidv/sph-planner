@@ -12,9 +12,7 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.RecyclerView
-import com.androidnetworking.AndroidNetworking
 import com.google.android.material.button.MaterialButton
-import com.google.android.material.snackbar.Snackbar
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.adapters.PostsAdapter
@@ -22,7 +20,6 @@ import de.koenidv.sph.database.PostAttachmentsDb
 import de.koenidv.sph.database.PostTasksDb
 import de.koenidv.sph.database.PostsDb
 import de.koenidv.sph.networking.AttachmentManager
-import de.koenidv.sph.networking.NetworkManager
 import me.saket.bettermovementmethod.BetterLinkMovementMethod
 
 
@@ -74,23 +71,8 @@ class CourseOverviewFragment : Fragment() {
                     taskstoShow,
                     attachmentsToShow,
                     movementMethod,
-                    onAttachmentClick = { attachment ->
-                        // Prepare downloading snackbar
-                        val snackbar = Snackbar.make(requireActivity().findViewById(R.id.nav_host_fragment),
-                                getString(R.string.attachments_downloading_size, attachment.fileSize),
-                                Snackbar.LENGTH_INDEFINITE)
-                        // Add option to cancel the download
-                        snackbar.setAction(R.string.cancel) {
-                            AndroidNetworking.cancel(attachment.attachmentId)
-                        }
-                        // Show the snackbar
-                        snackbar.show()
-                        // Let AttachmentManager handle downloading and opening the file
-                        AttachmentManager().handleAttachment(attachment) { opened ->
-                            // Hide snackbar when the file has been opened
-                            if (opened == NetworkManager().SUCCESS) snackbar.dismiss()
-                        }
-                    }
+                    AttachmentManager().onAttachmentClick(requireActivity()),
+                    AttachmentManager().onAttachmentLongClick(requireActivity())
             )
             postsRecycler.adapter = postsAdapter
 

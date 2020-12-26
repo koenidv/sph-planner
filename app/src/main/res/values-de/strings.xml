@@ -122,5 +122,15 @@
     <string name="attachments_title">Dateien &amp; Links</string>
     <string name="attachments_downloading_size">%s werden heruntergeladen</string>
     <string name="attachments_namereplace_picture">Bild</string>
+    <string name="error">Fehler</string>
+    <string name="attachments_options_download">Herunterladen</string>
+    <string name="attachments_options_download_complete">Heruntergeladen</string>
+    <string name="attachments_options_delete">Vom Gerät entfernen</string>
+    <string name="attachments_options_delete_complete">Datei entfernt</string>
+    <string name="attachments_options_pin">Anpinnen</string>
+    <string name="attachments_options_pin_complete">Angepinnt</string>
+    <string name="attachments_options_unpin">Loslösen</string>
+    <string name="attachments_options_unpin_complete">Losgelöst</string>
+    <string name="attachments_options_share">Teilen</string>
 
 </resources>

@@ -420,7 +420,10 @@ class RawParser {
      * @param rawResponse Raw html response from sph
      * @param currentPosts Current list of posts (all or this course) to check if a post is unread
      */
-    fun parsePosts(courseId: String, rawResponse: String, currentPosts: List<Post> = listOf(),
+    fun parsePosts(courseId: String,
+                   rawResponse: String,
+                   currentPosts: List<Post> = listOf(),
+                   markAsRead: Boolean = false,
                    onParsed: (posts: List<Post>,
                               attachments: List<PostAttachment>,
                               tasks: List<PostTask>,
@@ -498,7 +501,7 @@ class RawParser {
                         date,
                         postTitle,
                         postDescription,
-                        true // We know it's unread because it wasn't in the current posts list
+                        !markAsRead // We know it's unread because it wasn't in the current posts list
                 ))
                 // todo check if post includes link
             }

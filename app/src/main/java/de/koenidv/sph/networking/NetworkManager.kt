@@ -43,7 +43,7 @@ class NetworkManager {
                 loadAndSaveTimetable { lessons ->
                     if (lessons == SUCCESS)
                     // Load all posts, tasks, attachments and links from all courses
-                        NetworkManager().loadAndSavePosts { posts ->
+                        NetworkManager().loadAndSavePosts(markAsRead = true) { posts ->
                             if (posts == SUCCESS) {
                                 onComplete(SUCCESS)
                             }
@@ -110,7 +110,7 @@ class NetworkManager {
      * Load and save Posts, PostAtachments and PostTasks for a list of courses
      * @param coursesToLoad Courses that should be loaded, all courses with NumberIds when null
      */
-    internal fun loadAndSavePosts(coursesToLoad: List<Course>? = null, onComplete: (success: Int) -> Unit) {
+    private fun loadAndSavePosts(coursesToLoad: List<Course>? = null, markAsRead: Boolean = false, onComplete: (success: Int) -> Unit) {
         // Use all courses with number_id if nothing was specified
         val courses = coursesToLoad ?: CoursesDb.getInstance().withNumberId
         // Save all errors in a list, only return one later
@@ -126,7 +126,10 @@ class NetworkManager {
                     onComplete = { success: Int, result: String? ->
                         if (success == SUCCESS) {
                             // Parse data
-                            RawParser().parsePosts(course.courseId, result!!, allPosts,
+                            RawParser().parsePosts(course.courseId,
+                                    result!!,
+                                    allPosts,
+                                    markAsRead,
                                     onParsed = { posts: List<Post>,
                                                  attachments: List<PostAttachment>,
                                                  tasks: List<PostTask>,
@@ -136,7 +139,6 @@ class NetworkManager {
                                         PostsDb.getInstance().save(posts)
                                         PostAttachmentsDb.getInstance().save(attachments)
                                         PostTasksDb.getInstance().save(tasks)
-                                        // todo last post from spo_kmb_4 missing
                                         // todo Save links
                                     })
                         } else {

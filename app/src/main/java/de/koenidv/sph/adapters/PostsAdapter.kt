@@ -27,7 +27,8 @@ class PostsAdapter(private val posts: List<Post>,
                    private val tasks: List<PostTask>,
                    private val attachments: List<PostAttachment>,
                    private val linkMethod: BetterLinkMovementMethod?,
-                   private val onAttachmentClick: (PostAttachment) -> Unit) :
+                   private val onAttachmentClick: (PostAttachment, View) -> Unit,
+                   private val onAttachmentLongClick: (PostAttachment, View) -> Unit) :
         RecyclerView.Adapter<PostsAdapter.ViewHolder>() {
 
     val prefs: SharedPreferences = SphPlanner.applicationContext().getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
@@ -49,11 +50,13 @@ class PostsAdapter(private val posts: List<Post>,
         private val attachmentsRecycler: RecyclerView = view.findViewById(R.id.attachmentsRecycler)
         private val dateFormat = SimpleDateFormat("d. MMM yyyy", Locale.getDefault())
 
-        fun bind(post: Post, task: PostTask?,
+        fun bind(post: Post,
+                 task: PostTask?,
                  attachments: List<PostAttachment>,
                  attachmentsViewPool: RecyclerView.RecycledViewPool,
                  movementMethod: BetterLinkMovementMethod?,
-                 onAttachmentClick: (PostAttachment) -> Unit) {
+                 onAttachmentClick: (PostAttachment, View) -> Unit,
+                 onAttachmentLongClick: (PostAttachment, View) -> Unit) {
 
             val themeColor = SphPlanner.applicationContext()
                     .getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
@@ -99,7 +102,7 @@ class PostsAdapter(private val posts: List<Post>,
                 // Add a pagerSnapHelper for nice scrolling with many attachments
                 if (attachmentsRecycler.onFlingListener == null)
                     PagerSnapHelper().attachToRecyclerView(attachmentsRecycler)
-                attachmentsRecycler.adapter = AttachmentsAdapter(attachments, onAttachmentClick)
+                attachmentsRecycler.adapter = AttachmentsAdapter(attachments, onAttachmentClick, onAttachmentLongClick)
             }
 
             // Use better link movement to open links in-app
@@ -127,7 +130,8 @@ class PostsAdapter(private val posts: List<Post>,
                 attachments.filter { it.id_post == post.postId }, // Filter attachments for post
                 attachmentsViewPool,
                 linkMethod,
-                onAttachmentClick)
+                onAttachmentClick,
+                onAttachmentLongClick)
     }
 
     // Return the size of your dataset (invoked by the layout manager)

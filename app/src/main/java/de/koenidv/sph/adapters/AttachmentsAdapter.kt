@@ -1,6 +1,5 @@
 package de.koenidv.sph.adapters
 
-import android.annotation.SuppressLint
 import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
@@ -16,14 +15,15 @@ import java.io.File
 
 //  Created by koenidv on 20.12.2020.
 class AttachmentsAdapter(private val attachments: List<PostAttachment>,
-                         private val onAttachmentClick: (PostAttachment) -> Unit) :
+                         private val onAttachmentClick: (PostAttachment, View) -> Unit,
+                         private val onAttachmentLongClick: (PostAttachment, View) -> Unit) :
         RecyclerView.Adapter<AttachmentsAdapter.ViewHolder>() {
 
     /**
      * Provides a reference to the type of view
      * (custom ViewHolder).
      */
-    class ViewHolder(view: View, onAttachmentClick: (PostAttachment) -> Unit) : RecyclerView.ViewHolder(view) {
+    class ViewHolder(view: View, onAttachmentClick: (PostAttachment, View) -> Unit, onAttachmentLongClick: (PostAttachment, View) -> Unit) : RecyclerView.ViewHolder(view) {
         private val nameText: TextView = view.findViewById(R.id.nameTextView)
         private val iconText: TextView = view.findViewById(R.id.iconTextView)
         private val card: MaterialCardView = view.findViewById(R.id.attachmentCard)
@@ -33,13 +33,14 @@ class AttachmentsAdapter(private val attachments: List<PostAttachment>,
         init {
             card.setOnClickListener {
                 currentAttachment?.let {
-                    onAttachmentClick(it)
-                    // Add dot icon if there wasn't a donwloaded check before
-                    @SuppressLint("SetTextI18n")
-                    if (!iconText.text.contains("check-circle")
-                            && !iconText.text.contains("dot-circle"))
-                        iconText.text = "dot-circle ${iconText.text}"
+                    onAttachmentClick(it, view)
                 }
+            }
+            card.setOnLongClickListener {
+                currentAttachment?.let {
+                    onAttachmentLongClick(it, view)
+                }
+                true
             }
         }
 
@@ -71,7 +72,7 @@ class AttachmentsAdapter(private val attachments: List<PostAttachment>,
         val view = LayoutInflater.from(viewGroup.context)
                 .inflate(R.layout.item_attachment, viewGroup, false)
 
-        return ViewHolder(view, onAttachmentClick)
+        return ViewHolder(view, onAttachmentClick, onAttachmentLongClick)
     }
 
     // Replaces the contents of a view (invoked by the layout manager)
