@@ -4,9 +4,6 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -45,11 +42,9 @@ public class PostAttachmentsDb {
         cv.put("id_post", postAttachment.getId_post());
         cv.put("name", postAttachment.getName());
         cv.put("date", postAttachment.getDate().getTime() / 1000);
-        cv.put("url", postAttachment.getUrl().toString());
-        if (postAttachment.getDeviceLocation() != null)
-            cv.put("deviceLocation", postAttachment.getDeviceLocation().getParent());
+        cv.put("url", postAttachment.getUrl());
         cv.put("size", postAttachment.getFileSize());
-
+        cv.put("type", postAttachment.getFileType());
 
         Cursor cursor = db.rawQuery("SELECT * FROM postAttachments WHERE attachment_id = '" + postAttachment.getAttachmentId() + "'", null);
         if (cursor.getCount() == 0) {
@@ -60,7 +55,7 @@ public class PostAttachmentsDb {
         cursor.close();
     }
 
-    public List<PostAttachment> getPostByCourseId(String course_id) throws MalformedURLException {
+    public List<PostAttachment> getPostByCourseId(String course_id) {
         List<PostAttachment> returnList = new ArrayList<>();
         final SQLiteDatabase db = dbhelper.getReadableDatabase();
 
@@ -74,13 +69,11 @@ public class PostAttachmentsDb {
                 String id_post = cursor.getString(2);
                 String name = cursor.getString(3);
                 Date date = new Date(cursor.getInt(4) * 1000L);
-                URL url = new URL(cursor.getString(5));
-                //File deviceLocation = new File(cursor.getString(6));
-                File deviceLocation = null; // temporary, we don't need it yet
-                String size = cursor.getString(7);
+                String url = cursor.getString(5);
+                String size = cursor.getString(6);
+                String type = cursor.getString(7);
 
-
-                PostAttachment newPostAttachment = new PostAttachment(attachmentId, id_course, id_post, name, date, url, deviceLocation, size);
+                PostAttachment newPostAttachment = new PostAttachment(attachmentId, id_course, id_post, name, date, url, size, type);
 
                 returnList.add(newPostAttachment);
             } while (cursor.moveToNext());
@@ -90,7 +83,7 @@ public class PostAttachmentsDb {
         return returnList;
     }
 
-    public List<PostAttachment> getPostByPostId(String postid) throws MalformedURLException {
+    public List<PostAttachment> getPostByPostId(String postid) {
         List<PostAttachment> returnList = new ArrayList<>();
         final SQLiteDatabase db = dbhelper.getReadableDatabase();
 
@@ -104,12 +97,11 @@ public class PostAttachmentsDb {
                 String id_post = cursor.getString(2);
                 String name = cursor.getString(3);
                 Date date = new Date(cursor.getInt(4) * 1000L);
-                URL url = new URL(cursor.getString(5));
-                //File deviceLocation = new File(cursor.getString(6));
-                File deviceLocation = null; // temporary, we don't need it yet
-                String size = cursor.getString(7);
+                String url = cursor.getString(5);
+                String size = cursor.getString(6);
+                String type = cursor.getString(7);
 
-                PostAttachment newPostAttachment = new PostAttachment(attachmentId, id_course, id_post, name, date, url, deviceLocation, size);
+                PostAttachment newPostAttachment = new PostAttachment(attachmentId, id_course, id_post, name, date, url, size, type);
 
                 returnList.add(newPostAttachment);
             } while (cursor.moveToNext());

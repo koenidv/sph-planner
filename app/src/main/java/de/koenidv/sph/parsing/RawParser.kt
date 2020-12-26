@@ -12,7 +12,6 @@ import de.koenidv.sph.database.CoursesDb
 import de.koenidv.sph.objects.*
 import org.jsoup.Jsoup
 import org.jsoup.select.Elements
-import java.net.URL
 import java.net.URLEncoder
 import java.text.SimpleDateFormat
 import java.util.*
@@ -453,7 +452,8 @@ class RawParser {
         var attachIndex: Int
         var attachId: String
         var attachName: String
-        var attachUrl: URL
+        var attachType: String
+        var attachUrl: String
         var attachSize: String
         // For getting the date
         val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.GERMAN)
@@ -546,15 +546,17 @@ class RawParser {
                     // Get file info
                     attachName = file.toString().substring(file.toString().indexOf("</span>") + 7,
                             file.toString().indexOf("<small>"))
-                            .replace("_", " ").replace("-", " ").trim().removeSuffix(".pdf")
+                            .replace("_", " ").replace("-", " ").trim()
                     attachSize = file.select("small").text()
+                    attachSize = attachSize.substring(1, attachSize.length - 1) // Remove brackets
+                    attachType = attachName.substring(attachName.lastIndexOf(".") + 1)
+                    attachName = attachName.substring(0, attachName.lastIndexOf("."))
 
                     // Parse file url
-                    attachUrl = URL(
-                            "https://start.schulportal.hessen.de/meinunterricht.php?a=downloadFile&id="
-                                    + doc.select("h1[data-book]")[0].attr("data-book") // NumberId of this course
-                                    + "&e=" + sphPostId
-                                    + "&f=" + URLEncoder.encode(file.attr("data-file"), "utf-8"))
+                    attachUrl = ("https://start.schulportal.hessen.de/meinunterricht.php?a=downloadFile&id="
+                            + doc.select("h1[data-book]")[0].attr("data-book") // NumberId of this course
+                            + "&e=" + sphPostId
+                            + "&f=" + URLEncoder.encode(file.attr("data-file"), "utf-8"))
 
                     // Add new Attachment to lst
                     attachments.add(PostAttachment(
@@ -564,13 +566,14 @@ class RawParser {
                             attachName,
                             date,
                             attachUrl,
-                            null,
-                            attachSize
+                            attachSize,
+                            attachType
                     ))
                 }
             }
 
             // todo Parse submissions
+            // todo Don't replace existing attachments
 
         }
 

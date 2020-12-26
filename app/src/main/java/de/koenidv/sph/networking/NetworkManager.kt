@@ -181,15 +181,16 @@ class NetworkManager {
                         .getAsString(object : StringRequestListener {
                             override fun onResponse(response: String) {
                                 val prefs = applicationContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
-                                if (!response.contains("Login - Schulportal Hessen")
-                                        && !response.contains("Fehler - Schulportal Hessen")
-                                        && !response.contains("Schulauswahl - Schulportal Hessen")) {
+                                val responseLine = response.replace("\n", "")
+                                if (!responseLine.contains("Login - Schulportal Hessen")
+                                        && !responseLine.contains("Fehler - Schulportal Hessen")
+                                        && !responseLine.contains("Schulauswahl - Schulportal Hessen")) {
                                     // Getting site was successful
                                     onComplete(SUCCESS, response)
                                     prefs.edit().putLong("token_last_success", Date().time).apply()
-                                } else if (response.contains("Login - Schulportal Hessen")
-                                        || response.contains("Fehler - Schulportal Hessen")
-                                        || response.contains("Schulauswahl - Schulportal Hessen")) {
+                                } else if (responseLine.contains("Login - Schulportal Hessen")
+                                        || responseLine.contains("Fehler - Schulportal Hessen")
+                                        || responseLine.contains("Schulauswahl - Schulportal Hessen")) {
                                     // Signin was not successful
                                     onComplete(FAILED_INVALID_CREDENTIALS, null)
                                     prefs.edit().putLong("token_last_success", 0).apply()

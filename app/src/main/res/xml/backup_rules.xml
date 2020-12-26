@@ -3,4 +3,5 @@
     <!-- Don't backup the database -->
     <!-- We need to make sure to restore the app when SharedPrefs are backed up, but databases are not -->
     <exclude domain="database" />
+    <exclude domain="file" />
 </full-backup-content>

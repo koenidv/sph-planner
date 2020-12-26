@@ -59,7 +59,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "date INTEGER,title TEXT, description TEXT, unread INTEGER)");
         // Create post attachments table
         db.execSQL("CREATE TABLE postAttachments(attachment_id TEXT PRIMARY KEY," +
-                "id_course TEXT, id_post TEXT, name TEXT, date INTEGER, url TEXT, deviceLocation TEXT, size TEXT)");
+                "id_course TEXT, id_post TEXT, name TEXT, date INTEGER, url TEXT, size TEXT, type TEXT)");
         // Create post tasks table
         db.execSQL("CREATE TABLE postTasks(task_id TEXT, id_course TEXT, id_post TEXT, description TEXT, date INTEGER, isdone INTEGER)");
         // Create post links table

@@ -1,5 +1,6 @@
 package de.koenidv.sph.adapters
 
+import android.content.SharedPreferences
 import android.content.res.ColorStateList
 import android.view.LayoutInflater
 import android.view.View
@@ -21,12 +22,15 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 //  Created by koenidv on 20.12.2020.
-class PostsAdapter(private val posts: List<Post>, private val tasks: List<PostTask>, private val attachments: List<PostAttachment>,
-                   private val linkMethod: BetterLinkMovementMethod?) :
+class PostsAdapter(private val posts: List<Post>,
+                   private val tasks: List<PostTask>,
+                   private val attachments: List<PostAttachment>,
+                   private val linkMethod: BetterLinkMovementMethod?,
+                   private val onAttachmentClick: (PostAttachment) -> Unit) :
         RecyclerView.Adapter<PostsAdapter.ViewHolder>() {
 
-    val prefs = SphPlanner.applicationContext().getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
-    val attachmentsViewPool = RecyclerView.RecycledViewPool()
+    val prefs: SharedPreferences = SphPlanner.applicationContext().getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
+    private val attachmentsViewPool = RecyclerView.RecycledViewPool()
 
     /**
      * Provides a reference to the type of view
@@ -44,9 +48,11 @@ class PostsAdapter(private val posts: List<Post>, private val tasks: List<PostTa
         private val attachmentsRecycler: RecyclerView = view.findViewById(R.id.attachmentsRecycler)
         private val dateFormat = SimpleDateFormat("d. MMM yyyy", Locale.getDefault())
 
-        fun bind(post: Post, task: PostTask?, attachments: List<PostAttachment>,
+        fun bind(post: Post, task: PostTask?,
+                 attachments: List<PostAttachment>,
                  attachmentsViewPool: RecyclerView.RecycledViewPool,
-                 movementMethod: BetterLinkMovementMethod?) {
+                 movementMethod: BetterLinkMovementMethod?,
+                 onAttachmentClick: (PostAttachment) -> Unit) {
 
             val themeColor = SphPlanner.applicationContext()
                     .getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
@@ -89,7 +95,7 @@ class PostsAdapter(private val posts: List<Post>, private val tasks: List<PostTa
                 // Set up attachments recycler
                 attachmentsRecycler.setHasFixedSize(true)
                 attachmentsRecycler.setRecycledViewPool(attachmentsViewPool)
-                attachmentsRecycler.adapter = AttachmentsAdapter(attachments)
+                attachmentsRecycler.adapter = AttachmentsAdapter(attachments, onAttachmentClick)
             }
 
             // Use better link movement to open links in-app
@@ -114,8 +120,10 @@ class PostsAdapter(private val posts: List<Post>, private val tasks: List<PostTa
         viewHolder.bind(
                 post,
                 tasks.firstOrNull { it.id_post == post.postId }, // There will always only be one task per post
-                attachments.filter { it.id_post == post.postId },
-                attachmentsViewPool, linkMethod) // Filter attachments for post
+                attachments.filter { it.id_post == post.postId }, // Filter attachments for post
+                attachmentsViewPool,
+                linkMethod,
+                onAttachmentClick)
     }
 
     // Return the size of your dataset (invoked by the layout manager)

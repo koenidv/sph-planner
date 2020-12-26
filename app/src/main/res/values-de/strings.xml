@@ -120,5 +120,6 @@
         <item>rev|Reli</item>
     </string-array>
     <string name="attachments_title">Dateien &amp; Links</string>
+    <string name="attachments_downloading_size">%s werden heruntergeladen</string>
 
 </resources>

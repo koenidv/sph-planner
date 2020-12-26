@@ -70,6 +70,7 @@
 
     <!-- Attachments -->
     <string name="attachments_title">Files &amp; Links</string>
+    <string name="attachments_downloading_size">Downlaoding %s</string>
 
     <!-- Options sheet -->
     <string name="info_menuaction">Options</string>
