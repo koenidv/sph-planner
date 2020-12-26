@@ -68,6 +68,9 @@
     <string name="timetable_personal_filter">Only show own courses</string>
     <string name="timetable_title">Timetable</string>
 
+    <!-- Attachments -->
+    <string name="attachments_title">Files &amp; Links</string>
+
     <!-- Options sheet -->
     <string name="info_menuaction">Options</string>
     <string name="info_greeting">Hey %name</string>

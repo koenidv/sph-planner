@@ -119,5 +119,6 @@
         <item>rka|Reli</item>
         <item>rev|Reli</item>
     </string-array>
+    <string name="attachments_title">Dateien &amp; Links</string>
 
 </resources>

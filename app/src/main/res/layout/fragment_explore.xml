@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.ExploreFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <androidx.gridlayout.widget.GridLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            app:columnCount="2">
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/timetableCardView"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_margin="8dp"
+                android:background="?attr/selectableItemBackground"
+                app:cardBackgroundColor="?attr/backgroundColor"
+                app:cardCornerRadius="4dp"
+                app:cardElevation="0dp"
+                app:layout_columnWeight="1"
+                app:strokeColor="?attr/strokeColor"
+                app:strokeWidth="2dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:autoSizeMaxTextSize="16sp"
+                    android:autoSizeTextType="uniform"
+                    android:gravity="center"
+                    android:padding="8dp"
+                    android:text="@string/timetable_title"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                    android:textSize="16sp"
+                    tools:targetApi="o" />
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/attachmentsCardView"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_margin="8dp"
+                android:background="?attr/selectableItemBackground"
+                app:cardBackgroundColor="?attr/backgroundColor"
+                app:cardCornerRadius="4dp"
+                app:cardElevation="0dp"
+                app:layout_columnWeight="1"
+                app:strokeColor="?attr/strokeColor"
+                app:strokeWidth="2dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:autoSizeMaxTextSize="16sp"
+                    android:autoSizeTextType="uniform"
+                    android:gravity="center"
+                    android:padding="8dp"
+                    android:text="@string/attachments_title"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                    android:textSize="16sp"
+                    tools:targetApi="o" />
+
+            </com.google.android.material.card.MaterialCardView>
+
+        </androidx.gridlayout.widget.GridLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/linksRecycler"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:nestedScrollingEnabled="false"
+            android:paddingTop="4dp"
+            tools:itemCount="8"
+            tools:listitem="@layout/item_link" />
+
+    </LinearLayout>
+</ScrollView>

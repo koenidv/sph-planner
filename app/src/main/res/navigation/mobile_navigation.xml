@@ -44,7 +44,7 @@
 
     <fragment
         android:id="@+id/nav_explore"
-        android:name="de.koenidv.sph.ui.LinksFragment"
+        android:name="de.koenidv.sph.ui.ExploreFragment"
         android:label="@string/title_explore"
         tools:layout="@layout/fragment_courses">
         <action

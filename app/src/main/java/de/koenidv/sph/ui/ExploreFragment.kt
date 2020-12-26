@@ -10,17 +10,40 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.card.MaterialCardView
 import de.koenidv.sph.R
 import de.koenidv.sph.adapters.LinksAdapter
 import de.koenidv.sph.database.TilesDb
 import de.koenidv.sph.objects.Tile
 
 
-class LinksFragment : Fragment() {
+class ExploreFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
-        val view = inflater.inflate(R.layout.fragment_links, container, false)
+        val view = inflater.inflate(R.layout.fragment_explore, container, false)
+
+        /*
+         * Collections
+         */
+
+        val timetableCard = view.findViewById<MaterialCardView>(R.id.timetableCardView)
+        val attachmentsCard = view.findViewById<MaterialCardView>(R.id.attachmentsCardView)
+
+        // Set on click listeners, open respective fragment
+        timetableCard.setOnClickListener {
+            // Open timetable
+            Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
+                    .navigate(R.id.timetableFromExploreAction)
+        }
+        attachmentsCard.setOnClickListener {
+            // Open attachments
+        }
+
+
+        /*
+         * Links
+         */
 
         val linksRecycler = view.findViewById<RecyclerView>(R.id.linksRecycler)
 
