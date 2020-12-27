@@ -1,11 +1,11 @@
 package de.koenidv.sph.ui
 
-import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
@@ -73,15 +73,17 @@ class TimetableViewFragment : Fragment() {
             friday.adapter = LessonsAdapter(timetable[4], expanded, viewAll, onClick = onClick)
         }
 
-        // Highlight today's recycler with the theme color at 15% opacity
-        val tintList = ColorStateList(arrayOf(intArrayOf(android.R.attr.state_enabled)),
-                intArrayOf(prefs.getInt("themeColor", 0) and 0x00FFFFFF or 0x26000000))
+        // Highlight today's recycler with the theme color at ~15% opacity
+        val background = ContextCompat.getDrawable(requireContext(), R.drawable.rounded_rectangle)
+        // Sometimes uses a different color if quickly fragments are quickly switched
+        background?.setTint(prefs.getInt("themeColor", 0))
+        background?.alpha = 40
         when (Utility().getCurrentDayAdjusted()) {
-            0 -> monday.backgroundTintList = tintList
-            1 -> tuesday.backgroundTintList = tintList
-            2 -> wednesday.backgroundTintList = tintList
-            3 -> thursday.backgroundTintList = tintList
-            else -> friday.backgroundTintList = tintList
+            0 -> monday.background = background
+            1 -> tuesday.background = background
+            2 -> wednesday.background = background
+            3 -> thursday.background = background
+            else -> friday.background = background
         }
 
         return view

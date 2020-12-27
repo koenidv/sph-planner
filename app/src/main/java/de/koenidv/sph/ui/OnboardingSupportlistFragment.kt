@@ -64,9 +64,10 @@ class OnboardingSupportlistFragment : Fragment() {
             // Get string list of supported features
             val features = featureList.map { it.name }
 
+            if (context == null) return@loadSiteWithToken
+
             // Supported tags
-            val schoolTested = context?.resources?.getStringArray(R.array.tested_schools)?.contains(prefs.getString("schoolid", ""))
-                    ?: false
+            val schoolTested = requireContext().resources.getStringArray(R.array.tested_schools).contains(prefs.getString("schoolid", ""))
             var allFeatures = true
             var usableFeatures = true
             var manualFeatures = false

@@ -30,6 +30,7 @@ class LessonsAdapter(private var dataset: List<List<TimetableEntry>>,
      * (custom ViewHolder).
      */
     class ViewHolder(view: View, val onClick: (List<TimetableEntry>) -> Unit) : RecyclerView.ViewHolder(view) {
+        val outerlayout: LinearLayout = view.findViewById(R.id.outerLayout)
         val layout: LinearLayout = view.findViewById(R.id.itemLayout)
         private val textView: TextView = view.findViewById(R.id.courseNameTextView)
         private var currentEntry: List<TimetableEntry>? = null
@@ -77,11 +78,9 @@ class LessonsAdapter(private var dataset: List<List<TimetableEntry>>,
             // Set size
             // Enlarge to show rooms
             // Or span multiple hours if consecutive lessons are the same
-            val params = layout.layoutParams
             val height = if (expanded && !multiple) 64f else if (multiple) maxConcurrent * 32f else 32f
             val extrapadding = (hourcount - 1) * 4f
-            params.height = Utility().dpToPx(hourcount * height + extrapadding).toInt()
-            layout.layoutParams = params
+            layout.layoutParams.height = Utility().dpToPx(hourcount * height + extrapadding).toInt()
 
             /*
              * Changes
@@ -149,23 +148,28 @@ class LessonsAdapter(private var dataset: List<List<TimetableEntry>>,
             }
 
             // Make sure ViewHolder is visible after layout changed
-            viewHolder.layout.visibility = View.VISIBLE
+            viewHolder.outerlayout.visibility = View.VISIBLE
+
+            // Remove padding if this is the last visible element
+            if (position == dataset.size - hourcount)
+                viewHolder.outerlayout.setPadding(0, 0, 0, 0)
+            // Make sure a recycled item does have padding
+            else if (viewHolder.outerlayout.paddingBottom == 0)
+                viewHolder.outerlayout.setPadding(0, 0, 0, Utility().dpToPx(4f).toInt())
 
             // Bind lesson to view
             viewHolder.bind(dataset[position], hourcount, expanded, multiple, maxConcurrent)
 
         } else if (!dataset.getOrNull(position).isNullOrEmpty()
                 && dataset[position][0].lesson.isDisplayed == true) {
-            // Lesson is already displayed
-            viewHolder.layout.visibility = View.GONE
+            // Lesson is already displayed, hide completely
+            viewHolder.outerlayout.visibility = View.GONE
         } else {
             // No lesson for this hour
-            viewHolder.layout.visibility = View.INVISIBLE
+            viewHolder.outerlayout.visibility = View.INVISIBLE
             // We still need to apply the correct size
-            val params = viewHolder.layout.layoutParams
             val height = if (expanded) 64f else 32f
-            params.height = Utility().dpToPx(height).toInt()
-            viewHolder.layout.layoutParams = params
+            viewHolder.layout.layoutParams.height = Utility().dpToPx(height).toInt()
         }
     }
 
