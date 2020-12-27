@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.transition.TransitionInflater
 import com.google.android.material.switchmaterial.SwitchMaterial
 import de.koenidv.sph.R
+import de.koenidv.sph.SphPlanner
 
 class TimetableFragment : Fragment() {
 
@@ -22,6 +23,9 @@ class TimetableFragment : Fragment() {
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_timetable, container, false)
+
+        // Update open in browser url
+        SphPlanner.openInBrowserUrl = getString(R.string.url_timetable)
 
         // Show timetable
         val ft = parentFragmentManager.beginTransaction()

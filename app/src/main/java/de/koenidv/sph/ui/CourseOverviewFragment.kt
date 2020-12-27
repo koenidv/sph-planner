@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
@@ -16,11 +17,9 @@ import com.google.android.material.button.MaterialButton
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.adapters.PostsAdapter
-import de.koenidv.sph.database.FileAttachmentsDb
-import de.koenidv.sph.database.LinkAttachmentsDb
-import de.koenidv.sph.database.PostTasksDb
-import de.koenidv.sph.database.PostsDb
+import de.koenidv.sph.database.*
 import de.koenidv.sph.networking.AttachmentManager
+import de.koenidv.sph.objects.Course
 import me.saket.bettermovementmethod.BetterLinkMovementMethod
 
 
@@ -40,6 +39,13 @@ class CourseOverviewFragment : Fragment() {
 
         // Get passed course id argument
         val courseId = arguments?.getString("courseId") ?: ""
+        val course: Course? = CoursesDb.getInstance().getByInternalId(courseId)
+
+        // Set action bar title
+        val appendix = if (course?.isLK == true) getString(R.string.course_appendix_lk) else ""
+        (activity as AppCompatActivity).supportActionBar?.title = course?.fullname + appendix
+        // Set open in browser url
+        SphPlanner.openInBrowserUrl = getString(R.string.url_course_overview).replace("%numberid", course?.number_id.toString())
 
         val posts = PostsDb.getInstance().getByCourseId(courseId)
         val tasks = PostTasksDb.getInstance().getByCourseId(courseId)
@@ -71,6 +77,7 @@ class CourseOverviewFragment : Fragment() {
                     true
                 } else false
             }
+            // todo on long click, attachment bottom sheet
 
             val postsAdapter = PostsAdapter(
                     postsToShow,

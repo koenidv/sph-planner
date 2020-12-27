@@ -75,7 +75,7 @@ public class PostsDb {
         return getWithCursor(cursor, db);
     }
 
-    public List<Post> getByIsUnread() {
+    public List<Post> getUnread() {
         final SQLiteDatabase db = dbhelper.getReadableDatabase();
         // Query posts
         String queryString = "SELECT * FROM posts WHERE unread = 1";

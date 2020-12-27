@@ -168,7 +168,7 @@ class OnboardingSigninFragment : Fragment() {
                 TokenManager().generateAccessToken(true) { success: Int, token: String? ->
                     run {
                         if (success == NetworkManager().SUCCESS && token != null && token != "") {
-                            // todo User signed in successfully - NOW DO SOMETHING WITH IT :)
+                            // User signed in successfully - NOW DO SOMETHING WITH IT :)
                             prefs.edit().putBoolean("credsVerified", true).apply()
                             // Move to next onboarding fragment
                             val ft = parentFragmentManager.beginTransaction()

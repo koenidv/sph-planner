@@ -51,7 +51,13 @@ class OnboardingSupportlistFragment : Fragment() {
                 return@loadSiteWithToken
             }
 
-            // todo get real name from result
+            // Get real name from result
+            // Could also get it from username, but we're not processing that heh
+            var realName = response?.substring(response.indexOf("<span class=\"glyphicon glyphicon-user\"></span>"))
+            realName = realName?.substring(realName.indexOf(", ") + 2)
+            realName = realName?.substring(0, realName.indexOf(" "))
+            if (realName != null) prefs.edit().putString("real_name", realName).apply()
+
             // todo all indexing in NetworkManager
 
             val featureList = RawParser().parseFeatureList(response!!)

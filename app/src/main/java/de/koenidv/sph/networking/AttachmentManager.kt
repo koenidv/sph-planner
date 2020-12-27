@@ -144,8 +144,6 @@ class AttachmentManager {
                     doneSnackbar.show()
                 }
 
-                // todo pin, unpin
-
                 // Pin
                 pin?.setOnClickListener {
                     // Mark attachment as pinned
@@ -393,7 +391,6 @@ class AttachmentManager {
 
     /**
      * Share an attached file
-     * todo doesn't work yet
      */
     private fun shareAttachmentFile(attachment: FileAttachment, activity: Activity) {
         // Get a uri to the file
@@ -432,8 +429,8 @@ class AttachmentManager {
         return when (fileType.toLowerCase(Locale.ROOT)) {
             "pdf" -> "application/pdf"
             "doc", "docx", "odt" -> "application/msword"
-            "ppt", "pptx" -> "application/vnd-ms-powerpoint"
-            "xls", "xlsx" -> "application/vnd-ms-excel"
+            "ppt", "pptx" -> "application/vnd.ms-powerpoint"
+            "xls", "xlsx" -> "application/vnd.ms-excel"
             "zip" -> "application/zip"
             "txt" -> "text/plain"
             "jpg", "jpeg", "png" -> "image/jpeg"

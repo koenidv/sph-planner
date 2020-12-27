@@ -53,10 +53,29 @@ public class PostTasksDb {
         cursor.close();
     }
 
+    /**
+     * Gets all tasks
+     *
+     * @return List of all PostTasks
+     */
     public List<PostTask> getAll() {
         final SQLiteDatabase db = dbhelper.getReadableDatabase();
         // Query posts
         String queryString = "SELECT * FROM postTasks";
+        Cursor cursor = db.rawQuery(queryString, null);
+        // Get posts with the cursor
+        return getWithCursor(cursor, db);
+    }
+
+    /**
+     * Gets all undone tasks
+     *
+     * @return List of all undone tasks
+     */
+    public List<PostTask> getUndone() {
+        final SQLiteDatabase db = dbhelper.getReadableDatabase();
+        // Query posts
+        String queryString = "SELECT * FROM postTasks WHERE isdone=0";
         Cursor cursor = db.rawQuery(queryString, null);
         // Get posts with the cursor
         return getWithCursor(cursor, db);

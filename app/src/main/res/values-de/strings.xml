@@ -133,5 +133,10 @@
     <string name="attachments_options_unpin_complete">Losgelöst</string>
     <string name="attachments_options_share">Teilen</string>
     <string name="attachments_options_open">Öffnen</string>
+    <string name="greeting_general">Hey %name</string>
+    <string name="greeting_morning">Guten Morgen, %name</string>
+    <string name="greeting_evening">Guten Abend, %name</string>
+    <string name="greeting_night">Schlaf gut, %name</string>
+    <string name="greeting_friday_weekend">Bald ist Wochenende!</string>
 
 </resources>

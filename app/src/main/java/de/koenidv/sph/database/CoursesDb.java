@@ -125,6 +125,30 @@ public class CoursesDb {
         return returnList;
     }
 
+
+    /**
+     * Get a course by its internal id
+     *
+     * @param courseId Internal id of the course to find
+     * @return Course with internal id or null
+     */
+    public Course getByInternalId(String courseId) {
+        List<Course> returnList = new ArrayList<>();
+        // Query course from Database
+        SQLiteDatabase db = dbhelper.getReadableDatabase();
+        String queryString = "SELECT * FROM courses WHERE course_id = \"" + courseId + "\"";
+        Cursor cursor = db.rawQuery(queryString, null);
+        // Return result or null if there's none
+        if (cursor.moveToFirst()) {
+            Course toReturn = cursorToCourse(cursor);
+            cursor.close();
+            return toReturn;
+        } else {
+            cursor.close();
+            return null;
+        }
+    }
+
     /**
      * search for courses
      *

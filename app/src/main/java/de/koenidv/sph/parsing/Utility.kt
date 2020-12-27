@@ -2,6 +2,8 @@ package de.koenidv.sph.parsing
 
 import android.content.pm.PackageManager
 import android.util.TypedValue
+import androidx.appcompat.app.AppCompatActivity
+import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
 import java.util.*
 
@@ -84,6 +86,27 @@ class Utility {
         if (Calendar.getInstance()[Calendar.HOUR_OF_DAY] > 16) weekDay++
         if (weekDay < 0 || weekDay > 4) weekDay = 0
         return weekDay
+    }
+
+    /**
+     * Returns a contextual greeting for the user
+     */
+    fun getGreeting(): String {
+        val prefs = SphPlanner.applicationContext().getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
+        val dayOfWeek = Calendar.getInstance().get(Calendar.DAY_OF_WEEK)
+        val hourOfDay = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+        val greeting = when {
+            dayOfWeek == Calendar.FRIDAY ->
+                SphPlanner.applicationContext().getString(R.string.greeting_friday_weekend)
+            hourOfDay > 21 ->
+                SphPlanner.applicationContext().getString(R.string.greeting_night)
+            hourOfDay > 17 ->
+                SphPlanner.applicationContext().getString(R.string.greeting_evening)
+            hourOfDay < 8 ->
+                SphPlanner.applicationContext().getString(R.string.greeting_morning)
+            else -> SphPlanner.applicationContext().getString(R.string.greeting_general)
+        }
+        return greeting.replace("%name", prefs.getString("real_name", "").toString())
     }
 
 }

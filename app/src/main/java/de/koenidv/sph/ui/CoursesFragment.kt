@@ -28,9 +28,9 @@ class CoursesFragment : Fragment() {
         val courses = CoursesDb.getInstance().favorites.sortedBy { it.fullname }.sortedByDescending { it.isLK }
         // Get unread posts to show if there are any unread posts per course
         // PostsDb, PostTasksDb, etc will only include favorites, we can't see posts from other courses
-        val unreadposts = PostsDb.getInstance().byIsUnread
+        val unreadposts = PostsDb.getInstance().unread
         // Get tasks to show if there are any undone tasks per course
-        val tasks = PostTasksDb.getInstance().all
+        val tasks = PostTasksDb.getInstance().undone
         // Set up courses recycler
         val coursesAdapter = CoursesAdapter(courses, unreadposts, tasks) {
             Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)

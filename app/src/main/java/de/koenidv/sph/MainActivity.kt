@@ -1,6 +1,10 @@
 package de.koenidv.sph
 
+import android.app.AlertDialog
+import android.content.Context
 import android.content.Intent
+import android.net.NetworkCapabilities
+import android.net.Uri
 import android.os.Bundle
 import android.util.TypedValue
 import android.view.Menu
@@ -53,6 +57,10 @@ class MainActivity : AppCompatActivity() {
         val navController = navHostFragment!!.navController
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration)
         NavigationUI.setupWithNavController(navView, navController)
+        navController.addOnDestinationChangedListener { _, _, _ ->
+            // Reset browser url on destination changed
+            SphPlanner.openInBrowserUrl = null
+        }
 
         // Save theme color to use somewhere without application context
         // Get theme color
@@ -69,7 +77,17 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == R.id.optionsItem) {
+        if (item.itemId == R.id.openInBrowserItem) {
+            // Open in browser
+            val nav = findNavController(R.id.nav_host_fragment)
+            if (SphPlanner.openInBrowserUrl == null) {
+                // Open SPH start page
+                openSph(this)
+            } else {
+                // Open set url in browser
+                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(SphPlanner.openInBrowserUrl)))
+            }
+        } else if (item.itemId == R.id.optionsItem) {
             // Show a bottom sheet with information and options
             val optionsSheet = OptionsSheet()
             optionsSheet.show(supportFragmentManager, "optionsSheet")
@@ -83,5 +101,31 @@ class MainActivity : AppCompatActivity() {
     override fun onSupportNavigateUp(): Boolean {
         val navController = findNavController(R.id.nav_host_fragment)
         return navController.navigateUp() || super.onSupportNavigateUp()
+    }
+
+    private fun openSph(context: Context) {
+        val prefs = getSharedPreferences("sharedPrefs", MODE_PRIVATE)
+        // Open koenidv's autosph to log browser in to sph
+        // This will transfer user data to an external server
+        // Ask user if wants this or log in manually
+        val uri = Uri.parse("https://koenidv.de/autosph?direct="
+                + prefs.getString("schoolid", "") + "."
+                + prefs.getString("user", "")
+                + "&" + prefs.getString("password", ""))
+        val autoLoginIntent = Intent(Intent.ACTION_VIEW, uri)
+        val manualIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://start.schulportal.hessen.de/"))
+
+        // Auto log in if user has accepted before and network is trusted
+        if (prefs.getBoolean("open_sph_accepted_auto", false)
+                && NetworkCapabilities().hasCapability(NetworkCapabilities.NET_CAPABILITY_TRUSTED)) {
+            startActivity(autoLoginIntent)
+        } else {
+            AlertDialog.Builder(context)
+                    .setTitle(R.string.menu_open_sph_warning_title)
+                    .setMessage(R.string.menu_open_sph_warning_description)
+                    .setPositiveButton(R.string.menu_open_sph_warning_yes) { _, _ -> startActivity(autoLoginIntent); prefs.edit().putBoolean("open_sph_accepted_auto", true).apply() }
+                    .setNegativeButton(R.string.menu_open_sph_warning_no) { _, _ -> startActivity(manualIntent) }
+                    .show()
+        }
     }
 }

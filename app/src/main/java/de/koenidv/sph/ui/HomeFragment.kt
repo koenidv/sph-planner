@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentContainerView
 import androidx.navigation.Navigation
@@ -14,6 +15,7 @@ import androidx.navigation.fragment.FragmentNavigatorExtras
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.networking.NetworkManager
+import de.koenidv.sph.parsing.Utility
 
 
 class HomeFragment : Fragment() {
@@ -24,6 +26,9 @@ class HomeFragment : Fragment() {
 
         val view = inflater.inflate(R.layout.fragment_home, container, false)
         //val prefs = requireContext().getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
+
+        // Set action bar title
+        (activity as AppCompatActivity).supportActionBar?.title = Utility().getGreeting()
 
         // Only for demonstration
 

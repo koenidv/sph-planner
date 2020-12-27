@@ -5,6 +5,7 @@ import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
@@ -12,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.card.MaterialCardView
 import de.koenidv.sph.R
+import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.adapters.ExploreLinksAdapter
 import de.koenidv.sph.database.FunctionTilesDb
 import de.koenidv.sph.objects.FunctionTile
@@ -70,6 +72,9 @@ class ExploreFragment : Fragment() {
             } else {
                 // Open WebViewFragment with respective url on click
                 nav.navigate(R.id.webviewFromExploreAction, bundleOf("url" to it.location))
+                // Set action bar title
+                (activity as AppCompatActivity).supportActionBar?.title = it.name
+                SphPlanner.openInBrowserUrl = it.location
             }
         }
         linksRecycler.layoutManager = LinearLayoutManager(requireContext())

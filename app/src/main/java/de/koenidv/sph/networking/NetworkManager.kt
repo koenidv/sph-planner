@@ -67,7 +67,7 @@ class NetworkManager {
 
 
         // Firstly, load courses from timetable so we have an overview
-        loadSiteWithToken("https://start.schulportal.hessen.de/stundenplan.php", onComplete = { successTimetable: Int, responseTimetable: String? ->
+        loadSiteWithToken(applicationContext().getString(R.string.url_timetable), onComplete = { successTimetable: Int, responseTimetable: String? ->
             if (successTimetable == SUCCESS) {
                 // Save parsed courses from timetable
                 coursesDb.save(RawParser().parseCoursesFromTimetable(responseTimetable!!))
@@ -98,7 +98,7 @@ class NetworkManager {
      * This will replace any current lessons in the timetable
      */
     private fun loadAndSaveTimetable(onComplete: (success: Int) -> Unit) {
-        NetworkManager().loadSiteWithToken("https://start.schulportal.hessen.de/stundenplan.php", onComplete = { success: Int, result: String? ->
+        NetworkManager().loadSiteWithToken(applicationContext().getString(R.string.url_timetable), onComplete = { success: Int, result: String? ->
             if (success == SUCCESS) {
                 TimetableDb.instance!!.clear()
                 TimetableDb.instance!!.save(RawParser().parseTimetable(result!!))
@@ -123,7 +123,7 @@ class NetworkManager {
 
         // Load every course
         for (course in courses) {
-            loadSiteWithToken("https://start.schulportal.hessen.de/meinunterricht.php?a=sus_view&id=" + course.number_id,
+            loadSiteWithToken(applicationContext().getString(R.string.url_course_overview).replace("%numberid", course.number_id.toString()),
                     onComplete = { success: Int, result: String? ->
                         if (success == SUCCESS) {
                             // Parse data
@@ -136,7 +136,6 @@ class NetworkManager {
                                                  tasks: List<PostTask>,
                                                  links: List<LinkAttachment> ->
                                         // Write all that parsed stuff to the database
-                                        // todo remove old entries for each course
                                         PostsDb.getInstance().save(posts)
                                         PostTasksDb.getInstance().save(tasks)
                                         FileAttachmentsDb.getInstance().save(files)

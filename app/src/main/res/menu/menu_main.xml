@@ -3,8 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/openInBrowserItem"
+        android:icon="@drawable/ic_open"
+        android:title="@string/open_in_browser"
+        app:showAsAction="ifRoom" />
+    <item
         android:id="@+id/optionsItem"
         android:icon="@drawable/ic_settings"
         android:title="@string/info_menuaction"
-        app:showAsAction="always" />
+        app:showAsAction="ifRoom" />
 </menu>

@@ -83,10 +83,12 @@ class TokenManager {
                                     onComplete(NetworkManager().FAILED_MAINTENANCE, null)
                                 } else if (response.contains("Login failed!")) {
                                     Log.d(TAG, "Login failed :/")
+                                    // todo Message: Retry in a few minutes
                                 }
                             }
 
                             override fun onError(error: ANError) {
+                                // todo handle 500
                                 when (error.errorDetail) {
                                     "connectionError" -> {
                                         // This will also be called if reqest timed out

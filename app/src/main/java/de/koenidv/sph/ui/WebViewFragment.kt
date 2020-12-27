@@ -13,6 +13,7 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.ProgressBar
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
@@ -45,6 +46,10 @@ class WebViewFragment : Fragment() {
                 // Don't show WebView until page is loaded
                 webView.visibility = View.VISIBLE
                 view.findViewById<ProgressBar>(R.id.webviewLoading)?.visibility = View.GONE
+                // Set action bar title
+                (activity as AppCompatActivity).supportActionBar?.title = webView?.title
+                // Update open in browser url
+                SphPlanner.openInBrowserUrl = webView?.url
                 // Check if login was successful on page load
                 webView.evaluateJavascript(
                         "(function() { return ('<html>'+document.getElementsByTagName('html')[0].innerHTML+'</html>'); })();"

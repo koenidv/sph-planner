@@ -5,6 +5,10 @@
     <string name="title_messages">Messages</string>
     <string name="title_explore">Explore</string>
 
+    <!-- URLs -->
+    <string name="url_course_overview" translatable="false">"https://start.schulportal.hessen.de/meinunterricht.php?a=sus_view&amp;id=%numberid"</string>
+    <string name="url_timetable" translatable="false">"https://start.schulportal.hessen.de/stundenplan.php"</string>
+
     <!-- General purpose -->
     <string name="cancel">Cancel</string>
     <string name="save">Save</string>
@@ -16,6 +20,7 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="load_more">Show more</string>
+    <string name="open_in_browser">Open in browser</string>
     <string name="emoji_check" translatable="false">✔</string>
     <string name="emoji_cross" translatable="false">❌</string>
 
@@ -48,6 +53,12 @@
     <!--<string name="onboard_supported_features_full">"✔ Your school supports all the features we need, but we didn't test it yet.\nPlease contact us <a href="https://instagram.com/halbunsichtbar">on Instagram</a>, <a href="mailto:koenidv@gmail.com">by email</a> or via the options menu!"</string>
         <string name="onboard_supported_features_partly_not">❌ Your school does not support all the features we need. Please get in touch <a href="https://instagram.com/halbunsichtbar">on Instagram</a> or <a href="mailto:koenidv@gmail.com">via email</a> to see how you can help us support your school!</string>-->
 
+    <!-- Greetings -->
+    <string name="greeting_general">Hey %name</string>
+    <string name="greeting_morning">Good morning, %name</string>
+    <string name="greeting_evening">Good evening, %name</string>
+    <string name="greeting_night">Sleep well, %name</string>
+    <string name="greeting_friday_weekend">Weekend\'s coming up!</string>
 
     <!-- Courses -->
     <string name="course_appendix_lk">""</string>

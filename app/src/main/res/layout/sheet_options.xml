@@ -166,15 +166,6 @@
             android:text="@string/menu_option_choosetheme"
             android:textColor="@color/titleText" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/openSphButton"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="@string/menu_open_sph"
-            android:textColor="@color/titleText" />
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

@@ -19,7 +19,9 @@ import java.util.*
 //  Created by koenidv on 08.12.2020.
 class RawParser {
 
-    // todo documentation
+    /**
+     * Parse changes from raw changes sph site
+     */
     @Suppress("LocalVariableName")
     @SuppressLint("DefaultLocale")
     fun parseChanges(rawResponse: String): List<Change> {
@@ -289,9 +291,6 @@ class RawParser {
                 courseName = entry.substring(entry.indexOf("</span>") + 7, entry.indexOf("</a>")).trim()
 
                 // todo create new courses with teacher_id instead of using old ones: might not be available
-                /* todo don't use brute method to recognize wrongly named courses:
-                 * Info (instead of Informatik) for example will not be recognized
-                 * for Q34, sometimes 13 is replaced with Q34 */
 
                 // Make named id from post overview uniform
                 uniformCourseName = CourseParser().parseNamedId(courseName)
@@ -318,7 +317,7 @@ class RawParser {
                         Toast.makeText(applicationContext(), "No valid course", Toast.LENGTH_SHORT).show()
                     }
                     similiarCourses.size > 1 -> {
-                        // wetodo handle multiple similiar courses
+                        // todo handle multiple similiar courses
                         Toast.makeText(applicationContext(), "Too many courses", Toast.LENGTH_SHORT).show()
                     }
                 }
@@ -487,9 +486,8 @@ class RawParser {
                 // Correct weird stuff that sph does
                 postTitle = postTitle.replace("""&amp;amp;quot;""", "\"")
                 if (postTitle == "kein Thema") postTitle = null
-                // Description might include html. We'll just get the text for now. Todo parse lists
+                // Description might include html. We'll just get the text for now.
                 postDescription = try {
-                    //Jsoup.clean(cells[1].select("i[title=\"Ausführlicher Inhalt\"]").parents()[0].toString(), Whitelist.basic())
                     cells[1].select("i[title=\"Ausführlicher Inhalt\"]").parents()[0].wholeText().trim()
                 } catch (iobe: IndexOutOfBoundsException) {
                     // No description available
