@@ -14,6 +14,7 @@ import de.koenidv.sph.SphPlanner.Companion.applicationContext
 import okhttp3.OkHttpClient
 import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlin.math.floor
 
 
 //  Created by koenidv on 05.12.2020.
@@ -108,7 +109,7 @@ class TokenManager {
         if (forceNewKey || prefs.getString("token", "token") != prefs.getString("aes_for_token", "aes")) {
 
             // Creates a (sudo-)random password that will be used
-            var password = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx-xxxxxx3xx".replace("[xy]".toRegex(), Integer.toHexString((Math.floor(Math.random() * 17)).toInt()))
+            var password = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx-xxxxxx3xx".replace("[xy]".toRegex(), Integer.toHexString((floor(Math.random() * 17)).toInt()))
 
         }
     }

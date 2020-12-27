@@ -192,7 +192,7 @@ class IdParser {
      * Get a not before used attachment id
      */
     fun getFileAttachmentId(courseId: String, date: Date, allIds: List<String>): String {
-        val internalDateFormat = SimpleDateFormat("2020-MM-dd", Locale.ROOT)
+        val internalDateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT)
         var fileIndex = 0
         var fileId: String
         do {
@@ -200,5 +200,19 @@ class IdParser {
             fileId = courseId + "_attach-" + internalDateFormat.format(date) + "_" + fileIndex
         } while (allIds.contains(fileId))
         return fileId
+    }
+
+    /**
+     * Get a brand new, never before seen id for a link attachment
+     */
+    fun getNewLinkAttachmentId(courseId: String, date: Date, allIds: List<String>): String {
+        val internalDateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT)
+        var fileIndex = 0
+        var linkId: String
+        do {
+            fileIndex++ // first index 1
+            linkId = courseId + "_link-" + internalDateFormat.format(date) + "_" + fileIndex
+        } while (allIds.contains(linkId))
+        return linkId
     }
 }

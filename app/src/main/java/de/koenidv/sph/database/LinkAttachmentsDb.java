@@ -4,12 +4,11 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import de.koenidv.sph.objects.Attachment;
 import de.koenidv.sph.objects.LinkAttachment;
 
 public class LinkAttachmentsDb {
@@ -39,38 +38,81 @@ public class LinkAttachmentsDb {
         ContentValues cv = new ContentValues();
 
         // Put values into ContentValues
+        cv.put("attachment_id", postlink.getAttachment_id());
         cv.put("id_course", postlink.getId_course());
         cv.put("id_post", postlink.getId_post());
         cv.put("name", postlink.getName());
         cv.put("date", postlink.getDate().getTime() / 1000);
-        cv.put("url", postlink.getUrl().toString());
+        cv.put("url", postlink.getUrl());
         cv.put("pinned", postlink.getPinned());
         if (postlink.getLastUse() != null)
             cv.put("lastUse", postlink.getLastUse().getTime() / 1000);
 
         // Add or update post in db
-        Cursor cursor = db.rawQuery("SELECT * FROM linkAttachments WHERE post_id = '" + postlink.getId_post() + "'AND url = '" + postlink.getUrl() + "'", null);
+        Cursor cursor = db.rawQuery("SELECT * FROM linkAttachments WHERE attachment_id = \"" + postlink.getAttachment_id() + "\"", null);
         if (cursor.getCount() == 0) {
             db.insert("linkAttachments", null, cv);
         } else {
             // Don't update pinned attribute
             cv.remove("pinned");
-            db.update("linkAttachments", cv, "post_id = '" + postlink.getId_post() + "'AND url = '" + postlink.getUrl() + "'", null);
+            db.update("linkAttachments", cv, "attachment_id = \"" + postlink.getAttachment_id() + "\"", null);
         }
         cursor.close();
     }
 
+    /**
+     * Updates an attached link's last use to the current date
+     *
+     * @param attachmentId Id of the link to change
+     */
+    public void used(String attachmentId) {
+        dbhelper.getWritableDatabase().execSQL("UPDATE linkAttachments SET lastUse="
+                + new Date().getTime() / 1000 + " WHERE attachment_id=\"" + attachmentId + "\"");
+    }
 
-    public List<LinkAttachment> getByCourseId(String course_id) throws MalformedURLException {
+    /**
+     * Mark an attached link as (not) pinned
+     *
+     * @param attachmentId Id of the attachment to change
+     * @param pinned       Whether the link is pinned
+     */
+    public void setPinned(String attachmentId, boolean pinned) {
+        dbhelper.getWritableDatabase().execSQL("UPDATE linkAttachments SET pinned="
+                + (pinned ? 1 : 0) + " WHERE attachment_id=\"" + attachmentId + "\"");
+    }
+
+    /**
+     * Check if an attached file in the db is pinned
+     *
+     * @param attachmentId Id of the file to check
+     * @return true, if the attachment is pinned
+     */
+    public boolean isPinned(String attachmentId) {
+        Cursor cursor = dbhelper.getReadableDatabase().rawQuery(
+                "SELECT pinned FROM linkAttachments WHERE attachment_id=\""
+                        + attachmentId + "\"", null);
+        cursor.moveToFirst();
+        boolean isPinned = cursor.getInt(0) == 1;
+        cursor.close();
+        return isPinned;
+    }
+
+    /**
+     * Get a list of pinned attachments with links for a course
+     *
+     * @param course_id Course to find attached links for
+     * @return List of pinned Attachments with LinkAttachments
+     */
+    public List<Attachment> getPinnedByCourseId(String course_id) {
         final SQLiteDatabase db = dbhelper.getReadableDatabase();
         // Query posts
-        String queryString = "SELECT * FROM linkAttachments WHERE id_course = '" + course_id + "'";
+        String queryString = "SELECT * FROM linkAttachments WHERE pinned=1 AND id_course = '" + course_id + "'";
         Cursor cursor = db.rawQuery(queryString, null);
         // Get posts with the cursor
         return getWithCursor(cursor);
     }
 
-    public List<LinkAttachment> getByPostId(String post_id) throws MalformedURLException {
+    public List<Attachment> getByPostId(String post_id) {
         final SQLiteDatabase db = dbhelper.getReadableDatabase();
         // Query posts
         String queryString = "SELECT * FROM linkAttachments WHERE id_post = '" + post_id + "'";
@@ -79,7 +121,7 @@ public class LinkAttachmentsDb {
         return getWithCursor(cursor);
     }
 
-    public List<LinkAttachment> getByDate(String date) throws MalformedURLException {
+    public List<Attachment> getByDate(String date) {
         final SQLiteDatabase db = dbhelper.getReadableDatabase();
         // Query posts
         String queryString = "SELECT * FROM linkAttachments WHERE date = '" + date + "'";
@@ -89,23 +131,24 @@ public class LinkAttachmentsDb {
     }
 
 
-    private List<LinkAttachment> getWithCursor(Cursor cursor) throws MalformedURLException {
-        List<LinkAttachment> returnList = new ArrayList<>();
+    private List<Attachment> getWithCursor(Cursor cursor) {
+        List<Attachment> returnList = new ArrayList<>();
         if (cursor.moveToFirst()) {
             do {
 
-                String id_course = cursor.getString(0);
-                String id_post = cursor.getString(1);
-                String name = cursor.getString(2);
+                String attachment_id = cursor.getString(0);
+                String id_course = cursor.getString(1);
+                String id_post = cursor.getString(2);
+                String name = cursor.getString(3);
                 Date date = new Date(cursor.getInt(4) * 1000L);
-                URL url = new URL(cursor.getString(5));
+                String url = cursor.getString(5);
                 boolean pinned = cursor.getInt(6) == 1;
                 Date lastUse = null;
                 if (!cursor.isNull(7)) lastUse = new Date(cursor.getInt(7) * 1000);
 
-                LinkAttachment newPostLink = new LinkAttachment(id_course, id_post, name, date, url, pinned, lastUse);
+                Attachment newAttachment = new Attachment(new LinkAttachment(attachment_id, id_course, id_post, name, date, url, pinned, lastUse));
 
-                returnList.add(newPostLink);
+                returnList.add(newAttachment);
             } while (cursor.moveToNext());
         }
         cursor.close();
