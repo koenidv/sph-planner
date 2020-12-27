@@ -12,7 +12,9 @@ data class PostAttachment(
         var url: String, // External url where the file can be loaded
         // Local path is attachmentId.fileType
         var fileSize: String, // Size of the file
-        var fileType: String // File extension
+        var fileType: String, // File extension
+        var pinned: Boolean, // Whether the file is pinned by user
+        var lastUse: Date? // Last usage of this file
 ) {
     fun localPath() = "${attachmentId}.${fileType}"
 }

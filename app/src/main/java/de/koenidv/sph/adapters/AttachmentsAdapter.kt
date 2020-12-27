@@ -57,10 +57,14 @@ class AttachmentsAdapter(private val attachments: List<PostAttachment>,
                 name = SphPlanner.applicationContext().getString(R.string.attachments_namereplace_picture)
             nameText.text = name
 
-            // Set downloaded and filetype icons
+            // Set pinned, downloaded and filetype icons
             var icon = ""
+            // Add pinned icon if the attachment is pinned
+            if (attachment.pinned) icon += "thumbtack "
+            // Add checkmark if file is saved locally
             if (File(SphPlanner.applicationContext().filesDir.toString() + "/" + attachment.localPath()).exists())
                 icon += "check-circle "
+            // Set file icon according to file type
             icon += AttachmentManager().getIconForFiletype(type)
             iconText.text = icon
         }

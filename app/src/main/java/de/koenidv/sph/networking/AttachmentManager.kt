@@ -19,6 +19,7 @@ import com.google.android.material.snackbar.Snackbar
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner.Companion.TAG
 import de.koenidv.sph.SphPlanner.Companion.applicationContext
+import de.koenidv.sph.database.PostAttachmentsDb
 import de.koenidv.sph.objects.PostAttachment
 import okhttp3.Cookie
 import okhttp3.HttpUrl
@@ -69,6 +70,7 @@ class AttachmentManager {
     /**
      * Returns a lambda to handle long clicks on an attachment item
      */
+    @SuppressLint("SetTextI18n")
     fun onAttachmentLongClick(activity: Activity): (PostAttachment, View) -> Unit =
             { attachment, view ->
                 val sheet = BottomSheetDialog(activity)
@@ -91,8 +93,10 @@ class AttachmentManager {
                     download?.visibility = View.GONE
                 else delete?.visibility = View.GONE
 
-                // todo Check if attachment is pinned
-                if (false) pin?.visibility = View.GONE
+                // Check if the attachment is pinned in the database
+                // Might have changed since it was loaded into the recyclerview
+                if (PostAttachmentsDb.getInstance().isPinned(attachment.attachmentId))
+                    pin?.visibility = View.GONE
                 else unpin?.visibility = View.GONE
 
                 // Set option logic
@@ -138,14 +142,38 @@ class AttachmentManager {
                         doneSnackbar.setText(R.string.attachments_options_delete_complete)
                     else
                         doneSnackbar.setText(R.string.error)
-                    // Show result
-                    doneSnackbar.show()
                     // Remove downloaded icon from icon textview
                     icon.text = icon.text.toString().replace("check-circle ", "")
                     sheet.dismiss()
+                    // Show result
+                    doneSnackbar.show()
                 }
 
                 // todo pin, unpin
+
+                // Pin
+                pin?.setOnClickListener {
+                    // Mark attachment as pinned
+                    PostAttachmentsDb.getInstance().setPinned(attachment.attachmentId, true)
+                    // Update the icon textview accordingly
+                    icon.text = "thumbtack  ${icon.text}"
+                    // Hide the bottom sheet dialog
+                    sheet.dismiss()
+                    // Show success
+                    doneSnackbar.setText(R.string.attachments_options_pin_complete).show()
+                }
+
+                // Unpin
+                unpin?.setOnClickListener {
+                    // Mark attachment as not pinned
+                    PostAttachmentsDb.getInstance().setPinned(attachment.attachmentId, false)
+                    // Update the icon textview accordingly
+                    icon.text = icon.text.toString().replace("thumbtack ", "")
+                    // Hide the bottom sheet dialog
+                    sheet.dismiss()
+                    // Show success
+                    doneSnackbar.setText(R.string.attachments_options_unpin_complete).show()
+                }
 
                 // Share a file
                 share?.setOnClickListener {
@@ -171,7 +199,6 @@ class AttachmentManager {
                             if (it == NetworkManager().SUCCESS) {
                                 // If downloading & opening was successful
                                 // Add check icon to show file has been downloaded
-                                @SuppressLint("SetTextI18n")
                                 icon.text = "check-circle ${icon.text}"
                                 // Dismiss snackbar
                                 snackbar.dismiss()
@@ -235,13 +262,10 @@ class AttachmentManager {
                 AndroidNetworking.download(file.url, applicationContext().filesDir.toString(), file.localPath())
                         .setPriority(Priority.HIGH)
                         .setTag(file.attachmentId)
+                        // There's no real need to cache the downloaded file
+                        // as we're saving it to local storage, just a waste of space
+                        .doNotCacheResponse()
                         .build()
-                        .setAnalyticsListener { timeTakenInMillis, bytesSent, bytesReceived, isFromCache ->
-                            Log.d(TAG, " timeTakenInMillis : $timeTakenInMillis")
-                            Log.d(TAG, " bytesSent : $bytesSent")
-                            Log.d(TAG, " bytesReceived : $bytesReceived")
-                            Log.d(TAG, " isFromCache : $isFromCache")
-                        }
                         .setDownloadProgressListener { bytesDownloaded, totalBytes ->
                             val progress = (10000 / totalBytes * bytesDownloaded) / 100
                             Log.d(TAG, "Downloading: $progress")
@@ -295,6 +319,8 @@ class AttachmentManager {
             fileIntent.setDataAndType(path, "*/*")
             applicationContext().startActivity(fileIntent)
         }
+        // Update last use date
+        PostAttachmentsDb.getInstance().used(attachment.attachmentId)
     }
 
     /**
@@ -324,6 +350,8 @@ class AttachmentManager {
             // Start intent chooser
             try {
                 applicationContext().startActivity(chooser)
+                // Update last use date
+                PostAttachmentsDb.getInstance().used(attachment.attachmentId)
             } catch (ane: ActivityNotFoundException) {
             }
         }

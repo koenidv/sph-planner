@@ -570,7 +570,11 @@ class RawParser {
                             date,
                             attachUrl,
                             attachSize,
-                            attachType
+                            attachType,
+                            // Set post as not pinned
+                            // This will not overwrite if the attachment was pinned before
+                            false,
+                            null
                     ))
                 }
             }

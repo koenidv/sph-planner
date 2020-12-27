@@ -157,10 +157,10 @@ class NetworkManager {
      * Loads a url within the sph and handles authentication
      * @param url URL to load
      */
-    fun loadSiteWithToken(url: String, onComplete: (success: Int, result: String?) -> Unit) {
+    fun loadSiteWithToken(url: String, forceNewToken: Boolean = false, onComplete: (success: Int, result: String?) -> Unit) {
 
         // Getting an access token
-        TokenManager().generateAccessToken { success: Int, token: String? ->
+        TokenManager().generateAccessToken(forceNewToken) { success: Int, token: String? ->
             if (success == SUCCESS) {
                 // Setting sid cookie
                 CookieStore.saveFromResponse(

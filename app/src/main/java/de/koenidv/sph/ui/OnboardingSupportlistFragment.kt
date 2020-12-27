@@ -33,7 +33,7 @@ class OnboardingSupportlistFragment : Fragment() {
         val nextFab = view.findViewById<FloatingActionButton>(R.id.nextFab)
 
         // Get supported features
-        NetworkManager().loadSiteWithToken("https://start.schulportal.hessen.de/index.php", onComplete = { success: Int, response: String? ->
+        NetworkManager().loadSiteWithToken("https://start.schulportal.hessen.de/index.php", true, onComplete = { success: Int, response: String? ->
 
             // todo handle success != 0
             if (success != NetworkManager().SUCCESS) {
