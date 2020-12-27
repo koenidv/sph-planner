@@ -10,59 +10,59 @@ import com.google.android.material.card.MaterialCardView
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.networking.AttachmentManager
-import de.koenidv.sph.objects.PostAttachment
+import de.koenidv.sph.objects.FileAttachment
 import java.io.File
 
 //  Created by koenidv on 20.12.2020.
-class AttachmentsAdapter(private val attachments: List<PostAttachment>,
-                         private val onAttachmentClick: (PostAttachment, View) -> Unit,
-                         private val onAttachmentLongClick: (PostAttachment, View) -> Unit) :
-        RecyclerView.Adapter<AttachmentsAdapter.ViewHolder>() {
+class FilesAdapter(private val files: List<FileAttachment>,
+                   private val onAttachmentClick: (FileAttachment, View) -> Unit,
+                   private val onAttachmentLongClick: (FileAttachment, View) -> Unit) :
+        RecyclerView.Adapter<FilesAdapter.ViewHolder>() {
 
     /**
      * Provides a reference to the type of view
      * (custom ViewHolder).
      */
-    class ViewHolder(view: View, onAttachmentClick: (PostAttachment, View) -> Unit, onAttachmentLongClick: (PostAttachment, View) -> Unit) : RecyclerView.ViewHolder(view) {
+    class ViewHolder(view: View, onAttachmentClick: (FileAttachment, View) -> Unit, onAttachmentLongClick: (FileAttachment, View) -> Unit) : RecyclerView.ViewHolder(view) {
         private val nameText: TextView = view.findViewById(R.id.nameTextView)
         private val iconText: TextView = view.findViewById(R.id.iconTextView)
         private val card: MaterialCardView = view.findViewById(R.id.attachmentCard)
-        var currentAttachment: PostAttachment? = null
+        var currentFile: FileAttachment? = null
 
         // Setup onClickListener
         init {
             card.setOnClickListener {
-                currentAttachment?.let {
+                currentFile?.let {
                     onAttachmentClick(it, view)
                 }
             }
             card.setOnLongClickListener {
-                currentAttachment?.let {
+                currentFile?.let {
                     onAttachmentLongClick(it, view)
                 }
                 true
             }
         }
 
-        fun bind(attachment: PostAttachment) {
+        fun bind(file: FileAttachment) {
 
-            // Set current attachment for onClick
-            currentAttachment = attachment
+            // Set current file for onClick
+            currentFile = file
 
             // Set name
-            var name = attachment.name
-            val type = attachment.fileType
-            // Replace attachment name if its an image and the name consists of only digits and whitespaces
+            var name = file.name
+            val type = file.fileType
+            // Replace mAttachment name if its an image and the name consists of only digits and whitespaces
             if (listOf("jpg", "jpeg", "png", "gif").contains(type) && TextUtils.isDigitsOnly(name.replace(" ", "")))
                 name = SphPlanner.applicationContext().getString(R.string.attachments_namereplace_picture)
             nameText.text = name
 
             // Set pinned, downloaded and filetype icons
             var icon = ""
-            // Add pinned icon if the attachment is pinned
-            if (attachment.pinned) icon += "thumbtack "
+            // Add pinned icon if the mAttachment is pinned
+            if (file.pinned) icon += "thumbtack "
             // Add checkmark if file is saved locally
-            if (File(SphPlanner.applicationContext().filesDir.toString() + "/" + attachment.localPath()).exists())
+            if (File(SphPlanner.applicationContext().filesDir.toString() + "/" + file.localPath()).exists())
                 icon += "check-circle "
             // Set file icon according to file type
             icon += AttachmentManager().getIconForFiletype(type)
@@ -82,9 +82,9 @@ class AttachmentsAdapter(private val attachments: List<PostAttachment>,
     // Replaces the contents of a view (invoked by the layout manager)
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
         // Bind data to ViewHolder
-        viewHolder.bind(attachments[position])
+        viewHolder.bind(files[position])
     }
 
     // Return the size of your dataset (invoked by the layout manager)
-    override fun getItemCount() = attachments.size
+    override fun getItemCount() = files.size
 }

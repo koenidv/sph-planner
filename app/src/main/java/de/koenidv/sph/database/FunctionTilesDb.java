@@ -7,27 +7,27 @@ import android.database.sqlite.SQLiteDatabase;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.koenidv.sph.objects.Tile;
+import de.koenidv.sph.objects.FunctionTile;
 
-public class TilesDb {
+public class FunctionTilesDb {
 
     private final DatabaseHelper dbhelper = DatabaseHelper.getInstance();
 
-    private static TilesDb instance;
+    private static FunctionTilesDb instance;
 
-    private TilesDb() {
+    private FunctionTilesDb() {
     }
 
-    public static TilesDb getInstance() {
-        if (TilesDb.instance == null) {
-            TilesDb.instance = new TilesDb();
+    public static FunctionTilesDb getInstance() {
+        if (FunctionTilesDb.instance == null) {
+            FunctionTilesDb.instance = new FunctionTilesDb();
         }
-        return TilesDb.instance;
+        return FunctionTilesDb.instance;
     }
 
 
-    public List<Tile> getAllTiles() {
-        List<Tile> returnList = new ArrayList<>();
+    public List<FunctionTile> getAllFunctions() {
+        List<FunctionTile> returnList = new ArrayList<>();
         final SQLiteDatabase db = dbhelper.getReadableDatabase();
 
         String queryString = "SELECT * FROM tiles";
@@ -41,9 +41,9 @@ public class TilesDb {
                 String icon = cursor.getString(3);
                 int color = cursor.getInt(4);
 
-                Tile newTile = new Tile(name, location, type, icon, color);
+                FunctionTile newFunctionTile = new FunctionTile(name, location, type, icon, color);
 
-                returnList.add(newTile);
+                returnList.add(newFunctionTile);
             } while (cursor.moveToNext());
         }
         cursor.close();
@@ -56,8 +56,8 @@ public class TilesDb {
      * @param type Feature type to query for
      * @return List of all Tiles in the db with the given type
      */
-    public List<Tile> getTilesByType(String type) {
-        List<Tile> returnList = new ArrayList<>();
+    public List<FunctionTile> getFunctionsByType(String type) {
+        List<FunctionTile> returnList = new ArrayList<>();
         final SQLiteDatabase db = dbhelper.getReadableDatabase();
 
         String queryString = "SELECT * FROM tiles WHERE type = '" + type + "'";
@@ -71,9 +71,9 @@ public class TilesDb {
                 String icon = cursor.getString(3);
                 int color = cursor.getInt(4);
 
-                Tile newTile = new Tile(name, location, tiletype, icon, color);
+                FunctionTile newFunctionTile = new FunctionTile(name, location, tiletype, icon, color);
 
-                returnList.add(newTile);
+                returnList.add(newFunctionTile);
             } while (cursor.moveToNext());
         }
 
@@ -82,33 +82,33 @@ public class TilesDb {
     }
 
     /**
-     * Adds or updates feature tiles in the database
+     * Adds or updates feature functionTiles in the database
      * Will override everything with the same name if it's not null
      *
-     * @param tiles List of tiles to be added or updated
+     * @param functionTiles List of functionTiles to be added or updated
      */
-    public void save(List<Tile> tiles) {
-        for (Tile tile : tiles) {
-            save(tile);
+    public void save(List<FunctionTile> functionTiles) {
+        for (FunctionTile functionTile : functionTiles) {
+            save(functionTile);
         }
     }
 
 
-    public void save(Tile tile) {
+    public void save(FunctionTile functionTile) {
         final SQLiteDatabase db = dbhelper.getReadableDatabase();
         ContentValues cv = new ContentValues();
 
-        cv.put("name", tile.getName());
-        cv.put("location", tile.getLocation());
-        if (tile.getType() != null) cv.put("type", tile.getType());
-        cv.put("color", tile.getColor());
-        cv.put("icon", tile.getIcon());
+        cv.put("name", functionTile.getName());
+        cv.put("location", functionTile.getLocation());
+        if (functionTile.getType() != null) cv.put("type", functionTile.getType());
+        cv.put("color", functionTile.getColor());
+        cv.put("icon", functionTile.getIcon());
 
-        Cursor cursor = db.rawQuery("SELECT * FROM tiles WHERE name = '" + tile.getName() + "'", null);
+        Cursor cursor = db.rawQuery("SELECT * FROM tiles WHERE name = '" + functionTile.getName() + "'", null);
         if (cursor.getCount() == 0) {
             db.insert("tiles", null, cv);
         } else {
-            db.update("tiles", cv, "name = '" + tile.getName() + "'", null);
+            db.update("tiles", cv, "name = '" + functionTile.getName() + "'", null);
         }
         cursor.close();
     }

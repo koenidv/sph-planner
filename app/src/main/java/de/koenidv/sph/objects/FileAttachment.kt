@@ -3,7 +3,7 @@ package de.koenidv.sph.objects
 import java.util.*
 
 //  Created by koenidv on 07.12.2020.
-data class PostAttachment(
+data class FileAttachment(
         var attachmentId: String, // i.e. m_bar_1_attach-2020-12-07_1
         var id_course: String, // Course to be attached to, i.e. m_bar_48 (48 is sph post id)
         var id_post: String,// Post to be attached to, i.e. m_bar_1_post-2020-12-07_48

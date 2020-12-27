@@ -131,13 +131,13 @@ class NetworkManager {
                                     allPosts,
                                     markAsRead,
                                     onParsed = { posts: List<Post>,
-                                                 attachments: List<PostAttachment>,
+                                                 files: List<FileAttachment>,
                                                  tasks: List<PostTask>,
-                                                 links: List<PostLink> ->
+                                                 links: List<LinkAttachment> ->
                                         // Write all that parsed stuff to the database
                                         // todo remove old entries for each course
                                         PostsDb.getInstance().save(posts)
-                                        PostAttachmentsDb.getInstance().save(attachments)
+                                        FileAttachmentsDb.getInstance().save(files)
                                         PostTasksDb.getInstance().save(tasks)
                                         // todo Save links
                                     })

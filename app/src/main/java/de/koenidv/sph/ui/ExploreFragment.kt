@@ -12,9 +12,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.card.MaterialCardView
 import de.koenidv.sph.R
-import de.koenidv.sph.adapters.LinksAdapter
-import de.koenidv.sph.database.TilesDb
-import de.koenidv.sph.objects.Tile
+import de.koenidv.sph.adapters.ExploreLinksAdapter
+import de.koenidv.sph.database.FunctionTilesDb
+import de.koenidv.sph.objects.FunctionTile
 
 
 class ExploreFragment : Fragment() {
@@ -49,11 +49,11 @@ class ExploreFragment : Fragment() {
         val linksRecycler = view.findViewById<RecyclerView>(R.id.linksRecycler)
 
         // Get all tiles that are not displayed within the app itself
-        val tiles = TilesDb.getInstance().getTilesByType("other").sortedBy { it.name }.toMutableList()
+        val tiles = FunctionTilesDb.getInstance().getFunctionsByType("other").sortedBy { it.name }.toMutableList()
         // Add start page item at the end of the list. Might remove this later
         val colorValue = TypedValue()
         requireContext().theme.resolveAttribute(R.attr.colorPrimary, colorValue, true)
-        tiles.add(Tile(
+        tiles.add(FunctionTile(
                 getString(R.string.tile_startpage),
                 "https://start.schulportal.hessen.de/index.php",
                 "start",
@@ -61,7 +61,7 @@ class ExploreFragment : Fragment() {
                 colorValue.data
         ))
         // Set up links recycler
-        val linksAdapter = LinksAdapter(tiles) {
+        val linksAdapter = ExploreLinksAdapter(tiles) {
             // If it's SchoolMoodle and the respective app is installes, open it
             // This should be handled differently, but there aren't really any now
             val moodleIntent = requireContext().packageManager.getLaunchIntentForPackage("com.moodle.moodlemobile")

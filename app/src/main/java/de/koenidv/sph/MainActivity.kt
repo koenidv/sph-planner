@@ -73,6 +73,9 @@ class MainActivity : AppCompatActivity() {
             // Show a bottom sheet with information and options
             val optionsSheet = OptionsSheet()
             optionsSheet.show(supportFragmentManager, "optionsSheet")
+            // Reset token timer
+            getSharedPreferences("sharedPrefs", MODE_PRIVATE).edit()
+                    .putLong("token_last_success", 0).apply()
         }
         return super.onOptionsItemSelected(item)
     }

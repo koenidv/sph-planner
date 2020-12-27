@@ -1,7 +1,7 @@
 package de.koenidv.sph.objects
 
 //  Created by koenidv on 16.12.2020.
-data class Tile(
+data class FunctionTile(
         var name: String,
         var location: String,
         var type: String?,

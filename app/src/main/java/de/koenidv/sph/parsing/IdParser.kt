@@ -181,11 +181,24 @@ class IdParser {
         val formatter = SimpleDateFormat("yyyy-MM-dd")
         var index = 1
 
-        // todo will not work, use allChanges.none { ... }
-        while (internalCourseId + "_change" + formatter.format(date) + "_$index" in allChanges)
+        // Up index while there's already an existing same change id
+        while (allChanges.none { it.changeId == (internalCourseId + "_change" + formatter.format(date) + "_$index") })
             index++
 
         return internalCourseId + "_change" + formatter.format(date) + "_$index"
     }
 
+    /**
+     * Get a not before used attachment id
+     */
+    fun getFileAttachmentId(courseId: String, date: Date, allIds: List<String>): String {
+        val internalDateFormat = SimpleDateFormat("2020-MM-dd", Locale.ROOT)
+        var fileIndex = 0
+        var fileId: String
+        do {
+            fileIndex++ // first index 1
+            fileId = courseId + "_attach-" + internalDateFormat.format(date) + "_" + fileIndex
+        } while (allIds.contains(fileId))
+        return fileId
+    }
 }

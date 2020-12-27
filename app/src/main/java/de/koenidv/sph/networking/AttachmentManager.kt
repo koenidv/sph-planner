@@ -19,8 +19,8 @@ import com.google.android.material.snackbar.Snackbar
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner.Companion.TAG
 import de.koenidv.sph.SphPlanner.Companion.applicationContext
-import de.koenidv.sph.database.PostAttachmentsDb
-import de.koenidv.sph.objects.PostAttachment
+import de.koenidv.sph.database.FileAttachmentsDb
+import de.koenidv.sph.objects.FileAttachment
 import okhttp3.Cookie
 import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
@@ -34,7 +34,7 @@ class AttachmentManager {
     /**
      * Returns a lambda to handle clicks on an attachment item
      */
-    fun onAttachmentClick(activity: Activity): (PostAttachment, View) -> Unit =
+    fun onAttachmentClick(activity: Activity): (FileAttachment, View) -> Unit =
             { attachment, view ->
                 // Prepare downloading snackbar
                 val snackbar = Snackbar.make(activity.findViewById(R.id.nav_host_fragment),
@@ -71,7 +71,7 @@ class AttachmentManager {
      * Returns a lambda to handle long clicks on an attachment item
      */
     @SuppressLint("SetTextI18n")
-    fun onAttachmentLongClick(activity: Activity): (PostAttachment, View) -> Unit =
+    fun onAttachmentLongClick(activity: Activity): (FileAttachment, View) -> Unit =
             { attachment, view ->
                 val sheet = BottomSheetDialog(activity)
                 sheet.setContentView(R.layout.sheet_manage_attachment)
@@ -95,7 +95,7 @@ class AttachmentManager {
 
                 // Check if the attachment is pinned in the database
                 // Might have changed since it was loaded into the recyclerview
-                if (PostAttachmentsDb.getInstance().isPinned(attachment.attachmentId))
+                if (FileAttachmentsDb.getInstance().isPinned(attachment.attachmentId))
                     pin?.visibility = View.GONE
                 else unpin?.visibility = View.GONE
 
@@ -154,7 +154,7 @@ class AttachmentManager {
                 // Pin
                 pin?.setOnClickListener {
                     // Mark attachment as pinned
-                    PostAttachmentsDb.getInstance().setPinned(attachment.attachmentId, true)
+                    FileAttachmentsDb.getInstance().setPinned(attachment.attachmentId, true)
                     // Update the icon textview accordingly
                     icon.text = "thumbtack  ${icon.text}"
                     // Hide the bottom sheet dialog
@@ -166,7 +166,7 @@ class AttachmentManager {
                 // Unpin
                 unpin?.setOnClickListener {
                     // Mark attachment as not pinned
-                    PostAttachmentsDb.getInstance().setPinned(attachment.attachmentId, false)
+                    FileAttachmentsDb.getInstance().setPinned(attachment.attachmentId, false)
                     // Update the icon textview accordingly
                     icon.text = icon.text.toString().replace("thumbtack ", "")
                     // Hide the bottom sheet dialog
@@ -220,7 +220,7 @@ class AttachmentManager {
     /**
      * Handles downloading and opening attachment items
      */
-    private fun handleAttachment(attachment: PostAttachment, onComplete: (success: Int) -> Unit) {
+    private fun handleAttachment(attachment: FileAttachment, onComplete: (success: Int) -> Unit) {
         // Check if file already exists
         val file = File(applicationContext().filesDir.toString() + "/" + attachment.localPath())
 
@@ -242,9 +242,9 @@ class AttachmentManager {
 
     /**
      * Download a file attachment
-     * @param file PostAttachment to download
+     * @param file FileAttachment to download
      */
-    private fun downloadFile(file: PostAttachment, onComplete: (success: Int) -> Unit) {
+    private fun downloadFile(file: FileAttachment, onComplete: (success: Int) -> Unit) {
         // Get an access token
         TokenManager().generateAccessToken { success: Int, token: String? ->
             if (success == NetworkManager().SUCCESS) {
@@ -302,7 +302,7 @@ class AttachmentManager {
     /**
      * Open a file included in a postAttachment
      */
-    private fun openAttachmentFile(attachment: PostAttachment) {
+    private fun openAttachmentFile(attachment: FileAttachment) {
         val fileToOpen = File(applicationContext().filesDir.toString() + "/" + attachment.localPath())
         val path = FileProvider.getUriForFile(applicationContext(), applicationContext().packageName + ".provider", fileToOpen)
 
@@ -320,14 +320,14 @@ class AttachmentManager {
             applicationContext().startActivity(fileIntent)
         }
         // Update last use date
-        PostAttachmentsDb.getInstance().used(attachment.attachmentId)
+        FileAttachmentsDb.getInstance().used(attachment.attachmentId)
     }
 
     /**
      * Share an attached file
      * todo doesn't work yet
      */
-    private fun shareAttachmentFile(attachment: PostAttachment, activity: Activity) {
+    private fun shareAttachmentFile(attachment: FileAttachment, activity: Activity) {
         // Get a uri to the file
         val fileToShare = File(applicationContext().filesDir.toString() + "/" + attachment.localPath())
         val uri = FileProvider.getUriForFile(applicationContext(), applicationContext().packageName + ".provider", fileToShare)
@@ -351,7 +351,7 @@ class AttachmentManager {
             try {
                 applicationContext().startActivity(chooser)
                 // Update last use date
-                PostAttachmentsDb.getInstance().used(attachment.attachmentId)
+                FileAttachmentsDb.getInstance().used(attachment.attachmentId)
             } catch (ane: ActivityNotFoundException) {
             }
         }

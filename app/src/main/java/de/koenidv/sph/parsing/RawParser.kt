@@ -362,8 +362,8 @@ class RawParser {
      * @param rawResponse Html repsonse from SPH
      * @return List of all found tiles with temporary urls as location
      */
-    fun parseFeatureList(rawResponse: String): List<Tile> {
-        val tiles = mutableListOf<Tile>()
+    fun parseFeatureList(rawResponse: String): List<FunctionTile> {
+        val functions = mutableListOf<FunctionTile>()
         val ids = mutableListOf<String>()
 
         // Split String into list items and remove stuff we don't need
@@ -403,7 +403,7 @@ class RawParser {
 
                 type = nametypeMap[name] ?: "other"
 
-                tiles.add(Tile(name, locationTemp, type, icon, color))
+                functions.add(FunctionTile(name, locationTemp, type, icon, color))
 
                 // Remember tile id
                 ids.add(id)
@@ -411,7 +411,7 @@ class RawParser {
 
         }
 
-        return tiles
+        return functions
     }
 
     /**
@@ -425,13 +425,13 @@ class RawParser {
                    currentPosts: List<Post> = listOf(),
                    markAsRead: Boolean = false,
                    onParsed: (posts: List<Post>,
-                              attachments: List<PostAttachment>,
+                              attachments: List<FileAttachment>,
                               tasks: List<PostTask>,
-                              links: List<PostLink>) -> Unit) {
+                              linkAttachments: List<LinkAttachment>) -> Unit) {
         val posts = mutableListOf<Post>()
-        val attachments = mutableListOf<PostAttachment>()
+        val files = mutableListOf<FileAttachment>()
         val tasks = mutableListOf<PostTask>()
-        val links = mutableListOf<PostLink>()
+        val links = mutableListOf<LinkAttachment>()
         val attachIds = mutableListOf<String>()
         // Extract table using jsoup
         val doc = Jsoup.parse(rawResponse)
@@ -451,13 +451,12 @@ class RawParser {
         var taskId: String
         var taskDescription: String
         var taskDone: Boolean
-        // Attachment-specific
-        var attachIndex: Int
-        var attachId: String
-        var attachName: String
-        var attachType: String
-        var attachUrl: String
-        var attachSize: String
+        // File attachment-specific
+        var fileId: String
+        var fileName: String
+        var fileType: String
+        var fileUrl: String
+        var fileSize: String
         // For getting the date
         val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.GERMAN)
         val internalDateFormat = SimpleDateFormat("2020-MM-dd", Locale.ROOT)
@@ -538,39 +537,34 @@ class RawParser {
             if (cells[1].select("div.files").size != 0) {
                 // For every file attachment
                 for (file in cells[1].select("div.files div.file")) {
-                    // Get a not before used attachment id
-                    attachIndex = 0
-                    do {
-                        attachIndex++ // first index 1
-                        attachId = courseId + "_attach-" + internalDateFormat.format(date) + "_" + attachIndex
-                    } while (attachIds.contains(attachId))
-                    attachIds.add(attachId)
+                    fileId = IdParser().getFileAttachmentId(courseId, date, attachIds)
+                    attachIds.add(fileId)
 
                     // Get file info
-                    attachName = file.toString().substring(file.toString().indexOf("</span>") + 7,
+                    fileName = file.toString().substring(file.toString().indexOf("</span>") + 7,
                             file.toString().indexOf("<small>"))
                             .replace("_", " ").replace("-", " ").trim()
-                    attachSize = file.select("small").text()
-                    attachSize = attachSize.substring(1, attachSize.length - 1) // Remove brackets
-                    attachType = attachName.substring(attachName.lastIndexOf(".") + 1)
-                    attachName = attachName.substring(0, attachName.lastIndexOf("."))
+                    fileSize = file.select("small").text()
+                    fileSize = fileSize.substring(1, fileSize.length - 1) // Remove brackets
+                    fileType = fileName.substring(fileName.lastIndexOf(".") + 1)
+                    fileName = fileName.substring(0, fileName.lastIndexOf("."))
 
                     // Parse file url
-                    attachUrl = ("https://start.schulportal.hessen.de/meinunterricht.php?a=downloadFile&id="
+                    fileUrl = ("https://start.schulportal.hessen.de/meinunterricht.php?a=downloadFile&id="
                             + doc.select("h1[data-book]")[0].attr("data-book") // NumberId of this course
                             + "&e=" + sphPostId
                             + "&f=" + URLEncoder.encode(file.attr("data-file"), "utf-8"))
 
                     // Add new Attachment to lst
-                    attachments.add(PostAttachment(
-                            attachId,
+                    files.add(FileAttachment(
+                            fileId,
                             courseId,
                             postId,
-                            attachName,
+                            fileName,
                             date,
-                            attachUrl,
-                            attachSize,
-                            attachType,
+                            fileUrl,
+                            fileSize,
+                            fileType,
                             // Set post as not pinned
                             // This will not overwrite if the attachment was pinned before
                             false,
@@ -584,7 +578,7 @@ class RawParser {
 
         }
 
-        onParsed(posts, attachments, tasks, links)
+        onParsed(posts, files, tasks, links)
     }
 
     /**

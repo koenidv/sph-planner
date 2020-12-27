@@ -15,8 +15,8 @@ import com.google.android.material.card.MaterialCardView
 import com.google.android.material.checkbox.MaterialCheckBox
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
+import de.koenidv.sph.objects.FileAttachment
 import de.koenidv.sph.objects.Post
-import de.koenidv.sph.objects.PostAttachment
 import de.koenidv.sph.objects.PostTask
 import me.saket.bettermovementmethod.BetterLinkMovementMethod
 import java.text.SimpleDateFormat
@@ -25,10 +25,10 @@ import java.util.*
 //  Created by koenidv on 20.12.2020.
 class PostsAdapter(private val posts: List<Post>,
                    private val tasks: List<PostTask>,
-                   private val attachments: List<PostAttachment>,
+                   private val files: List<FileAttachment>,
                    private val linkMethod: BetterLinkMovementMethod?,
-                   private val onAttachmentClick: (PostAttachment, View) -> Unit,
-                   private val onAttachmentLongClick: (PostAttachment, View) -> Unit) :
+                   private val onAttachmentClick: (FileAttachment, View) -> Unit,
+                   private val onAttachmentLongClick: (FileAttachment, View) -> Unit) :
         RecyclerView.Adapter<PostsAdapter.ViewHolder>() {
 
     val prefs: SharedPreferences = SphPlanner.applicationContext().getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
@@ -52,11 +52,11 @@ class PostsAdapter(private val posts: List<Post>,
 
         fun bind(post: Post,
                  task: PostTask?,
-                 attachments: List<PostAttachment>,
+                 files: List<FileAttachment>,
                  attachmentsViewPool: RecyclerView.RecycledViewPool,
                  movementMethod: BetterLinkMovementMethod?,
-                 onAttachmentClick: (PostAttachment, View) -> Unit,
-                 onAttachmentLongClick: (PostAttachment, View) -> Unit) {
+                 onAttachmentClick: (FileAttachment, View) -> Unit,
+                 onAttachmentLongClick: (FileAttachment, View) -> Unit) {
 
             val themeColor = SphPlanner.applicationContext()
                     .getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
@@ -89,20 +89,20 @@ class PostsAdapter(private val posts: List<Post>,
             }
 
             // Attachments
-            if (attachments.isNullOrEmpty()) {
-                // Re-set bottom margin if there are no attachments
+            if (files.isNullOrEmpty()) {
+                // Re-set bottom margin if there are no mAttachments
                 val constraintSet = ConstraintSet()
                 constraintSet.clone(layout)
                 constraintSet.setMargin(R.id.materialCardView, ConstraintSet.BOTTOM, 0)
                 constraintSet.applyTo(layout)
             } else {
-                // Set up attachments recycler
+                // Set up mAttachments recycler
                 attachmentsRecycler.setHasFixedSize(true)
                 attachmentsRecycler.setRecycledViewPool(attachmentsViewPool)
-                // Add a pagerSnapHelper for nice scrolling with many attachments
+                // Add a pagerSnapHelper for nice scrolling with many mAttachments
                 if (attachmentsRecycler.onFlingListener == null)
                     PagerSnapHelper().attachToRecyclerView(attachmentsRecycler)
-                attachmentsRecycler.adapter = AttachmentsAdapter(attachments, onAttachmentClick, onAttachmentLongClick)
+                attachmentsRecycler.adapter = FilesAdapter(files, onAttachmentClick, onAttachmentLongClick)
             }
 
             // Use better link movement to open links in-app
@@ -127,7 +127,7 @@ class PostsAdapter(private val posts: List<Post>,
         viewHolder.bind(
                 post,
                 tasks.firstOrNull { it.id_post == post.postId }, // There will always only be one task per post
-                attachments.filter { it.id_post == post.postId }, // Filter attachments for post
+                files.filter { it.id_post == post.postId }, // Filter mAttachments for post
                 attachmentsViewPool,
                 linkMethod,
                 onAttachmentClick,

@@ -13,7 +13,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import de.koenidv.sph.MainActivity
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
-import de.koenidv.sph.database.TilesDb
+import de.koenidv.sph.database.FunctionTilesDb
 import de.koenidv.sph.networking.NetworkManager
 import de.koenidv.sph.parsing.RawParser
 
@@ -153,7 +153,7 @@ class OnboardingSupportlistFragment : Fragment() {
                             // If this was the last tile
                             if (tilesResolved == featureList.size) {
                                 // Save features in case we need them later
-                                TilesDb.getInstance().save(featureList)
+                                FunctionTilesDb.getInstance().save(featureList)
 
                                 // Now index everything else
                                 NetworkManager().indexAll {

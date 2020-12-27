@@ -12,37 +12,37 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import de.koenidv.sph.R
-import de.koenidv.sph.objects.Tile
+import de.koenidv.sph.objects.FunctionTile
 
 //  Created by koenidv on 18.12.2020.
-class LinksAdapter(private val dataset: List<Tile>, private val onClick: (Tile) -> Unit) :
-        RecyclerView.Adapter<LinksAdapter.ViewHolder>() {
+class ExploreLinksAdapter(private val dataset: List<FunctionTile>, private val onClick: (FunctionTile) -> Unit) :
+        RecyclerView.Adapter<ExploreLinksAdapter.ViewHolder>() {
 
     /**
      * Provides a reference to the type of view
      * (custom ViewHolder).
      */
-    class ViewHolder(view: View, val onClick: (Tile) -> Unit) : RecyclerView.ViewHolder(view) {
+    class ViewHolder(view: View, val onClick: (FunctionTile) -> Unit) : RecyclerView.ViewHolder(view) {
         val layout: LinearLayout = view.findViewById(R.id.itemLayout)
         private val iconText: TextView = view.findViewById(R.id.iconTextView)
         private val nameText: TextView = view.findViewById(R.id.nameTextView)
-        private var currentTile: Tile? = null
+        private var currentFunctionTile: FunctionTile? = null
 
         init {
             // Set onClickListener from attribute
             layout.setOnClickListener {
-                currentTile?.let {
+                currentFunctionTile?.let {
                     onClick(it)
                 }
             }
         }
 
-        fun bind(tile: Tile) {
-            currentTile = tile
+        fun bind(functionTile: FunctionTile) {
+            currentFunctionTile = functionTile
 
             // Set data
-            nameText.text = tile.name
-            var icon = tile.icon.replace("fa-", "")
+            nameText.text = functionTile.name
+            var icon = functionTile.icon.replace("fa-", "")
             if (icon.startsWith("glyphicon-")) icon = icon.substring(icon.lastIndexOf("-") + 1)
             // replace some icons that we know don't work
             icon = icon.replace("mail-bulk", "comment-alt") // This does not even work on desktop
@@ -53,11 +53,11 @@ class LinksAdapter(private val dataset: List<Tile>, private val onClick: (Tile) 
 
             // Set icon background color
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                (iconText.background as StateListDrawable).colorFilter = BlendModeColorFilter(tile.color, BlendMode.SRC_ATOP)
+                (iconText.background as StateListDrawable).colorFilter = BlendModeColorFilter(functionTile.color, BlendMode.SRC_ATOP)
             } else {
                 @Suppress("DEPRECATION") // not in < Q
                 (iconText.background as StateListDrawable)
-                        .setColorFilter(tile.color, PorterDuff.Mode.SRC_ATOP)
+                        .setColorFilter(functionTile.color, PorterDuff.Mode.SRC_ATOP)
             }
         }
     }
@@ -77,7 +77,7 @@ class LinksAdapter(private val dataset: List<Tile>, private val onClick: (Tile) 
         viewHolder.bind(dataset[position])
     }
 
-    // Return the size of your dataset (invoked by the layout manager)
+    // Return the size of your mDataset (invoked by the layout manager)
     override fun getItemCount() = dataset.size
 
 }

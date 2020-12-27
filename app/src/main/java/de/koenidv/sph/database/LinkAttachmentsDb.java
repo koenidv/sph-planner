@@ -10,31 +10,31 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import de.koenidv.sph.objects.PostLink;
+import de.koenidv.sph.objects.LinkAttachment;
 
-public class PostLinksDb {
+public class LinkAttachmentsDb {
 
     private final DatabaseHelper dbhelper = DatabaseHelper.getInstance();
 
-    private static PostLinksDb instance;
+    private static LinkAttachmentsDb instance;
 
-    private PostLinksDb() {
+    private LinkAttachmentsDb() {
     }
 
-    public static PostLinksDb getInstance() {
-        if (PostLinksDb.instance == null) {
-            PostLinksDb.instance = new PostLinksDb();
+    public static LinkAttachmentsDb getInstance() {
+        if (LinkAttachmentsDb.instance == null) {
+            LinkAttachmentsDb.instance = new LinkAttachmentsDb();
         }
-        return PostLinksDb.instance;
+        return LinkAttachmentsDb.instance;
     }
 
-    public void save(List<PostLink> postlinks) {
-        for (PostLink postlink : postlinks) {
+    public void save(List<LinkAttachment> postlinks) {
+        for (LinkAttachment postlink : postlinks) {
             save(postlink);
         }
     }
 
-    public void save(PostLink postlink) {
+    public void save(LinkAttachment postlink) {
         final SQLiteDatabase db = dbhelper.getReadableDatabase();
         ContentValues cv = new ContentValues();
 
@@ -49,48 +49,48 @@ public class PostLinksDb {
             cv.put("lastUse", postlink.getLastUse().getTime() / 1000);
 
         // Add or update post in db
-        Cursor cursor = db.rawQuery("SELECT * FROM postLinks WHERE post_id = '" + postlink.getId_post() + "'AND url = '" + postlink.getUrl() + "'", null);
+        Cursor cursor = db.rawQuery("SELECT * FROM linkAttachments WHERE post_id = '" + postlink.getId_post() + "'AND url = '" + postlink.getUrl() + "'", null);
         if (cursor.getCount() == 0) {
-            db.insert("postLinks", null, cv);
+            db.insert("linkAttachments", null, cv);
         } else {
             // Don't update pinned attribute
             cv.remove("pinned");
-            db.update("postLinks", cv, "post_id = '" + postlink.getId_post() + "'AND url = '" + postlink.getUrl() + "'", null);
+            db.update("linkAttachments", cv, "post_id = '" + postlink.getId_post() + "'AND url = '" + postlink.getUrl() + "'", null);
         }
         cursor.close();
     }
 
 
-    public List<PostLink> getByCourseId(String course_id) throws MalformedURLException {
+    public List<LinkAttachment> getByCourseId(String course_id) throws MalformedURLException {
         final SQLiteDatabase db = dbhelper.getReadableDatabase();
         // Query posts
-        String queryString = "SELECT * FROM postLinks WHERE id_course = '" + course_id + "'";
+        String queryString = "SELECT * FROM linkAttachments WHERE id_course = '" + course_id + "'";
         Cursor cursor = db.rawQuery(queryString, null);
         // Get posts with the cursor
         return getWithCursor(cursor);
     }
 
-    public List<PostLink> getByPostId(String post_id) throws MalformedURLException {
+    public List<LinkAttachment> getByPostId(String post_id) throws MalformedURLException {
         final SQLiteDatabase db = dbhelper.getReadableDatabase();
         // Query posts
-        String queryString = "SELECT * FROM postLinks WHERE id_post = '" + post_id + "'";
+        String queryString = "SELECT * FROM linkAttachments WHERE id_post = '" + post_id + "'";
         Cursor cursor = db.rawQuery(queryString, null);
         // Get posts with the cursor
         return getWithCursor(cursor);
     }
 
-    public List<PostLink> getByDate(String date) throws MalformedURLException {
+    public List<LinkAttachment> getByDate(String date) throws MalformedURLException {
         final SQLiteDatabase db = dbhelper.getReadableDatabase();
         // Query posts
-        String queryString = "SELECT * FROM postLinks WHERE date = '" + date + "'";
+        String queryString = "SELECT * FROM linkAttachments WHERE date = '" + date + "'";
         Cursor cursor = db.rawQuery(queryString, null);
         // Get posts with the cursor
         return getWithCursor(cursor);
     }
 
 
-    private List<PostLink> getWithCursor(Cursor cursor) throws MalformedURLException {
-        List<PostLink> returnList = new ArrayList<>();
+    private List<LinkAttachment> getWithCursor(Cursor cursor) throws MalformedURLException {
+        List<LinkAttachment> returnList = new ArrayList<>();
         if (cursor.moveToFirst()) {
             do {
 
@@ -103,7 +103,7 @@ public class PostLinksDb {
                 Date lastUse = null;
                 if (!cursor.isNull(7)) lastUse = new Date(cursor.getInt(7) * 1000);
 
-                PostLink newPostLink = new PostLink(id_course, id_post, name, date, url, pinned, lastUse);
+                LinkAttachment newPostLink = new LinkAttachment(id_course, id_post, name, date, url, pinned, lastUse);
 
                 returnList.add(newPostLink);
             } while (cursor.moveToNext());

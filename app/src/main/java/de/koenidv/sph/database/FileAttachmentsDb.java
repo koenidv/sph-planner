@@ -8,33 +8,33 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import de.koenidv.sph.objects.PostAttachment;
+import de.koenidv.sph.objects.FileAttachment;
 
-public class PostAttachmentsDb {
+public class FileAttachmentsDb {
 
     private final DatabaseHelper dbhelper = DatabaseHelper.getInstance();
 
-    private static PostAttachmentsDb instance;
+    private static FileAttachmentsDb instance;
 
-    private PostAttachmentsDb() {
+    private FileAttachmentsDb() {
     }
 
-    public static PostAttachmentsDb getInstance() {
-        if (PostAttachmentsDb.instance == null) {
-            PostAttachmentsDb.instance = new PostAttachmentsDb();
+    public static FileAttachmentsDb getInstance() {
+        if (FileAttachmentsDb.instance == null) {
+            FileAttachmentsDb.instance = new FileAttachmentsDb();
         }
-        return PostAttachmentsDb.instance;
+        return FileAttachmentsDb.instance;
     }
 
     /**
      * This will save or update a list of post file attachments to the db
      * Does not update pinned attribute
      *
-     * @param postAttachments list of post file attachments to save
+     * @param fileAttachments list of post file attachments to save
      */
-    public void save(List<PostAttachment> postAttachments) {
-        for (PostAttachment postAttachment : postAttachments) {
-            save(postAttachment);
+    public void save(List<FileAttachment> fileAttachments) {
+        for (FileAttachment fileAttachment : fileAttachments) {
+            save(fileAttachment);
         }
     }
 
@@ -42,32 +42,32 @@ public class PostAttachmentsDb {
      * This will save or update a post file attachment to the db
      * Does not update pinned attribute
      *
-     * @param postAttachment post file attachment to save
+     * @param fileAttachment post file attachment to save
      */
-    public void save(PostAttachment postAttachment) {
+    public void save(FileAttachment fileAttachment) {
         final SQLiteDatabase db = dbhelper.getReadableDatabase();
         ContentValues cv = new ContentValues();
 
-        cv.put("attachment_id", postAttachment.getAttachmentId());
-        cv.put("id_course", postAttachment.getId_course());
-        cv.put("id_post", postAttachment.getId_post());
-        cv.put("name", postAttachment.getName());
-        cv.put("date", postAttachment.getDate().getTime() / 1000);
-        cv.put("url", postAttachment.getUrl());
-        cv.put("size", postAttachment.getFileSize());
-        cv.put("type", postAttachment.getFileType());
-        cv.put("pinned", postAttachment.getPinned());
-        if (postAttachment.getLastUse() != null)
-            cv.put("lastUse", postAttachment.getLastUse().getTime() / 1000);
+        cv.put("attachment_id", fileAttachment.getAttachmentId());
+        cv.put("id_course", fileAttachment.getId_course());
+        cv.put("id_post", fileAttachment.getId_post());
+        cv.put("name", fileAttachment.getName());
+        cv.put("date", fileAttachment.getDate().getTime() / 1000);
+        cv.put("url", fileAttachment.getUrl());
+        cv.put("size", fileAttachment.getFileSize());
+        cv.put("type", fileAttachment.getFileType());
+        cv.put("pinned", fileAttachment.getPinned());
+        if (fileAttachment.getLastUse() != null)
+            cv.put("lastUse", fileAttachment.getLastUse().getTime() / 1000);
 
-        Cursor cursor = db.rawQuery("SELECT * FROM postAttachments WHERE attachment_id = '" + postAttachment.getAttachmentId() + "'", null);
+        Cursor cursor = db.rawQuery("SELECT * FROM fileAttachments WHERE attachment_id = '" + fileAttachment.getAttachmentId() + "'", null);
         if (cursor.getCount() == 0) {
-            db.insert("postAttachments", null, cv);
+            db.insert("fileAttachments", null, cv);
         } else {
             // Don't overwrite pinned attribute
             // If pinned status should be changed, use #setPinned
             cv.remove("pinned");
-            db.update("postAttachments", cv, "attachment_id = '" + postAttachment.getAttachmentId() + "'", null);
+            db.update("fileAttachments", cv, "attachment_id = '" + fileAttachment.getAttachmentId() + "'", null);
         }
         cursor.close();
     }
@@ -78,7 +78,7 @@ public class PostAttachmentsDb {
      * @param attachmentId Id of the file to change
      */
     public void used(String attachmentId) {
-        dbhelper.getWritableDatabase().execSQL("UPDATE postAttachments SET lastUse="
+        dbhelper.getWritableDatabase().execSQL("UPDATE fileAttachments SET lastUse="
                 + new Date().getTime() / 1000 + " WHERE attachment_id=\"" + attachmentId + "\"");
     }
 
@@ -89,7 +89,7 @@ public class PostAttachmentsDb {
      * @param pinned       Whether the file is pinned
      */
     public void setPinned(String attachmentId, boolean pinned) {
-        dbhelper.getWritableDatabase().execSQL("UPDATE postAttachments SET pinned="
+        dbhelper.getWritableDatabase().execSQL("UPDATE fileAttachments SET pinned="
                 + (pinned ? 1 : 0) + " WHERE attachment_id=\"" + attachmentId + "\"");
     }
 
@@ -101,7 +101,7 @@ public class PostAttachmentsDb {
      */
     public boolean isPinned(String attachmentId) {
         Cursor cursor = dbhelper.getReadableDatabase().rawQuery(
-                "SELECT pinned FROM postAttachments WHERE attachment_id=\""
+                "SELECT pinned FROM fileAttachments WHERE attachment_id=\""
                         + attachmentId + "\"", null);
         cursor.moveToFirst();
         boolean isPinned = cursor.getInt(0) == 1;
@@ -109,11 +109,11 @@ public class PostAttachmentsDb {
         return isPinned;
     }
 
-    public List<PostAttachment> getPostByCourseId(String course_id) {
-        List<PostAttachment> returnList = new ArrayList<>();
+    public List<FileAttachment> getPostByCourseId(String course_id) {
+        List<FileAttachment> returnList = new ArrayList<>();
         final SQLiteDatabase db = dbhelper.getReadableDatabase();
 
-        String queryString = "SELECT * FROM postAttachments WHERE id_course = '" + course_id + "'";
+        String queryString = "SELECT * FROM fileAttachments WHERE id_course = '" + course_id + "'";
 
         Cursor cursor = db.rawQuery(queryString, null);
         if (cursor.moveToFirst()) {
@@ -130,9 +130,9 @@ public class PostAttachmentsDb {
                 Date lastUse = null;
                 if (!cursor.isNull(9)) lastUse = new Date(cursor.getInt(9) * 1000);
 
-                PostAttachment newPostAttachment = new PostAttachment(attachmentId, id_course, id_post, name, date, url, size, type, pinned, lastUse);
+                FileAttachment newFileAttachment = new FileAttachment(attachmentId, id_course, id_post, name, date, url, size, type, pinned, lastUse);
 
-                returnList.add(newPostAttachment);
+                returnList.add(newFileAttachment);
             } while (cursor.moveToNext());
         }
 
@@ -140,11 +140,11 @@ public class PostAttachmentsDb {
         return returnList;
     }
 
-    public List<PostAttachment> getPostByPostId(String postid) {
-        List<PostAttachment> returnList = new ArrayList<>();
+    public List<FileAttachment> getByPostId(String postid) {
+        List<FileAttachment> returnList = new ArrayList<>();
         final SQLiteDatabase db = dbhelper.getReadableDatabase();
 
-        String queryString = "SELECT * FROM postAttachments WHERE id_post = '" + postid + "'";
+        String queryString = "SELECT * FROM fileAttachments WHERE id_post = '" + postid + "'";
 
         Cursor cursor = db.rawQuery(queryString, null);
         if (cursor.moveToFirst()) {
@@ -161,9 +161,9 @@ public class PostAttachmentsDb {
                 Date lastUse = null;
                 if (!cursor.isNull(9)) lastUse = new Date(cursor.getInt(9) * 1000);
 
-                PostAttachment newPostAttachment = new PostAttachment(attachmentId, id_course, id_post, name, date, url, size, type, pinned, lastUse);
+                FileAttachment newFileAttachment = new FileAttachment(attachmentId, id_course, id_post, name, date, url, size, type, pinned, lastUse);
 
-                returnList.add(newPostAttachment);
+                returnList.add(newFileAttachment);
             } while (cursor.moveToNext());
         }
 

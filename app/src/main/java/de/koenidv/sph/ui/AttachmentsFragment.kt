@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
-import de.koenidv.sph.database.PostAttachmentsDb
+import de.koenidv.sph.database.FileAttachmentsDb
 import de.koenidv.sph.database.PostTasksDb
 import de.koenidv.sph.database.PostsDb
 
@@ -35,7 +35,7 @@ class AttachmentsFragment : Fragment() {
 
         val posts = PostsDb.getInstance().getByCourseId(courseId)
         val tasks = PostTasksDb.getInstance().getByCourseId(courseId)
-        val attachments = PostAttachmentsDb.getInstance().getPostByCourseId(courseId)
+        val attachments = FileAttachmentsDb.getInstance().getPostByCourseId(courseId)
 
 
 
