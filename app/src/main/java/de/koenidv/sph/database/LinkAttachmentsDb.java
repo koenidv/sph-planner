@@ -38,7 +38,7 @@ public class LinkAttachmentsDb {
         ContentValues cv = new ContentValues();
 
         // Put values into ContentValues
-        cv.put("attachment_id", postlink.getAttachment_id());
+        cv.put("attachment_id", postlink.getAttachmentId());
         cv.put("id_course", postlink.getId_course());
         cv.put("id_post", postlink.getId_post());
         cv.put("name", postlink.getName());
@@ -49,13 +49,13 @@ public class LinkAttachmentsDb {
             cv.put("lastUse", postlink.getLastUse().getTime() / 1000);
 
         // Add or update post in db
-        Cursor cursor = db.rawQuery("SELECT * FROM linkAttachments WHERE attachment_id = \"" + postlink.getAttachment_id() + "\"", null);
+        Cursor cursor = db.rawQuery("SELECT * FROM linkAttachments WHERE attachment_id = \"" + postlink.getAttachmentId() + "\"", null);
         if (cursor.getCount() == 0) {
             db.insert("linkAttachments", null, cv);
         } else {
             // Don't update pinned attribute
             cv.remove("pinned");
-            db.update("linkAttachments", cv, "attachment_id = \"" + postlink.getAttachment_id() + "\"", null);
+            db.update("linkAttachments", cv, "attachment_id = \"" + postlink.getAttachmentId() + "\"", null);
         }
         cursor.close();
     }

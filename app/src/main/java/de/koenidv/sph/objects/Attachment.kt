@@ -9,7 +9,7 @@ data class Attachment(
     constructor(link: LinkAttachment) : this(link, null, "link")
     constructor(file: FileAttachment) : this(null, file, "file")
 
-    fun attachId() = if (type == "link") "wip" else file!!.attachmentId
+    fun attachId() = if (type == "link") link!!.attachmentId else file!!.attachmentId
     fun courseId() = if (type == "link") link!!.id_course else file!!.id_course
     fun postId() = if (type == "link") link!!.id_post else file!!.id_post
     fun name() = if (type == "link") link!!.name else file!!.name

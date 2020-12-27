@@ -132,5 +132,6 @@
     <string name="attachments_options_unpin">Loslösen</string>
     <string name="attachments_options_unpin_complete">Losgelöst</string>
     <string name="attachments_options_share">Teilen</string>
+    <string name="attachments_options_open">Öffnen</string>
 
 </resources>
