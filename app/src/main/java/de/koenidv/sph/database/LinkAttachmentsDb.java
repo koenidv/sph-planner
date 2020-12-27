@@ -97,6 +97,22 @@ public class LinkAttachmentsDb {
         return isPinned;
     }
 
+
+    /**
+     * Get a list of attachments with links for a course
+     *
+     * @param course_id Course to find attached links for
+     * @return List of Attachments with LinkAttachments
+     */
+    public List<Attachment> getByCourseId(String course_id) {
+        final SQLiteDatabase db = dbhelper.getReadableDatabase();
+        // Query posts
+        String queryString = "SELECT * FROM linkAttachments WHERE id_course = '" + course_id + "'";
+        Cursor cursor = db.rawQuery(queryString, null);
+        // Get posts with the cursor
+        return getWithCursor(cursor);
+    }
+
     /**
      * Get a list of pinned attachments with links for a course
      *

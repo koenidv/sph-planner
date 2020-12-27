@@ -9,7 +9,7 @@ import com.androidnetworking.common.Priority
 import com.androidnetworking.error.ANError
 import com.androidnetworking.interfaces.StringRequestListener
 import com.facebook.stetho.okhttp3.StethoInterceptor
-import de.koenidv.sph.SphPlanner
+import de.koenidv.sph.SphPlanner.Companion.TAG
 import de.koenidv.sph.SphPlanner.Companion.applicationContext
 import okhttp3.OkHttpClient
 import java.util.*
@@ -30,7 +30,7 @@ class TokenManager {
     fun generateAccessToken(forceNewToken: Boolean = false, onComplete: (success: Int, token: String?) -> Unit) {
 
 
-        Log.d(SphPlanner.TAG, "Time since last success: " + (Date().time - prefs.getLong("token_last_success", 0)).toString())
+        Log.d(TAG, "Time since last success: " + (Date().time - prefs.getLong("token_last_success", 0)).toString())
         // todo still 15min?
 
         // Return existing, signed-in token if it was used within 15 Minutes
@@ -48,7 +48,7 @@ class TokenManager {
                         .addNetworkInterceptor(StethoInterceptor())
                         .cookieJar(CookieStore)
                         .cache(null)
-                        .connectTimeout(60, TimeUnit.SECONDS)
+                        .connectTimeout(30, TimeUnit.SECONDS)
                         .build()
                 AndroidNetworking.initialize(applicationContext(), okHttpClient)
 
@@ -66,7 +66,8 @@ class TokenManager {
                                 if (CookieStore.getCookie("schulportal.hessen.de", "sid") != null
                                         && response.contains("- Schulportal Hessen")
                                         && !response.contains("Login - Schulportal Hessen")
-                                        && !response.contains("Schulauswahl - Schulportal Hessen")) {
+                                        && !response.contains("Schulauswahl - Schulportal Hessen")
+                                        && !response.contains("Login failed!")) {
                                     // Login success todo not always
                                     onComplete(NetworkManager().SUCCESS, CookieStore.getCookie("schulportal.hessen.de", "sid")!!)
                                     prefs.edit().putString("token", CookieStore.getCookie("schulportal.hessen.de", "sid"))
@@ -80,6 +81,8 @@ class TokenManager {
                                 } else if (response.contains("Wartungsarbeiten")) {
                                     // Cannot login at the moment
                                     onComplete(NetworkManager().FAILED_MAINTENANCE, null)
+                                } else if (response.contains("Login failed!")) {
+                                    Log.d(TAG, "Login failed :/")
                                 }
                             }
 

@@ -433,6 +433,7 @@ class RawParser {
         val tasks = mutableListOf<PostTask>()
         val links = mutableListOf<LinkAttachment>()
         val attachIds = mutableListOf<String>()
+        val linkIds = mutableListOf<String>()
         // Extract table using jsoup
         val doc = Jsoup.parse(rawResponse)
         val rawPosts = doc.select("div#old tbody").select("tr")
@@ -457,6 +458,9 @@ class RawParser {
         var fileType: String
         var fileUrl: String
         var fileSize: String
+        // Link attachment-specific
+        var linkId: String
+        var linkMatches: List<String>?
         // For getting the date
         val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.GERMAN)
         val internalDateFormat = SimpleDateFormat("2020-MM-dd", Locale.ROOT)
@@ -528,7 +532,7 @@ class RawParser {
             }
 
             /*
-             * Attachments
+             * File attachments
              */
 
             // Todo dont replace old files, localpath will be lost
@@ -573,8 +577,41 @@ class RawParser {
                 }
             }
 
+            /*
+             * Links
+             * sph returns links as plain text and converts them using js,
+             * so we'll have to use some markdown
+             */
+
+            // For description and homework
+            for (content in cells[1].select("span.markup")) {
+                // Get links from content
+                linkMatches = Regex("""(http[^\s|<|"]*)""".trimMargin()).find(content.toString())?.groupValues
+                if (linkMatches != null) {
+                    // Remove doubled entries
+                    linkMatches = linkMatches.distinct()
+                    for (link in linkMatches) {
+                        // Filter out entire match and some more stuff
+                        if (link.startsWith("http")) {
+                            // Add link
+                            linkId = IdParser().getLinkAttachmentId(courseId, date, linkIds)
+                            linkIds.add(linkId)
+                            links.add(LinkAttachment(
+                                    linkId,
+                                    courseId,
+                                    postId,
+                                    link.trim(),
+                                    date,
+                                    link.trim(),
+                                    false,
+                                    null
+                            ))
+                        }
+                    }
+                }
+            }
+
             // todo Parse submissions
-            // todo Don't replace existing attachments
 
         }
 

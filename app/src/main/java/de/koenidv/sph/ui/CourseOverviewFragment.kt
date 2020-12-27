@@ -17,6 +17,7 @@ import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.adapters.PostsAdapter
 import de.koenidv.sph.database.FileAttachmentsDb
+import de.koenidv.sph.database.LinkAttachmentsDb
 import de.koenidv.sph.database.PostTasksDb
 import de.koenidv.sph.database.PostsDb
 import de.koenidv.sph.networking.AttachmentManager
@@ -42,7 +43,12 @@ class CourseOverviewFragment : Fragment() {
 
         val posts = PostsDb.getInstance().getByCourseId(courseId)
         val tasks = PostTasksDb.getInstance().getByCourseId(courseId)
-        val files = FileAttachmentsDb.getInstance().getPostByCourseId(courseId)
+        // Get file attachments..
+        val attachments = FileAttachmentsDb.getInstance().getPostByCourseId(courseId).toMutableList()
+        // ..and link attachments
+        if (prefs.getBoolean("links_in_post_attachments", true))
+            attachments.addAll(LinkAttachmentsDb.getInstance().getByCourseId(courseId))
+
 
         /*
          * Posts recycler
@@ -53,7 +59,7 @@ class CourseOverviewFragment : Fragment() {
         if (posts.isNotEmpty()) {
             val postsToShow = posts.take(2).toMutableList()
             val taskstoShow = tasks.filter { it.id_post == postsToShow[0].postId || it.id_post == postsToShow.getOrNull(1)?.postId }.toMutableList()
-            val filesToShow = files.filter { it.postId() == postsToShow[0].postId || it.postId() == postsToShow.getOrNull(1)?.postId }.toMutableList()
+            val filesToShow = attachments.filter { it.postId() == postsToShow[0].postId || it.postId() == postsToShow.getOrNull(1)?.postId }.toMutableList()
 
             // Movement method to open links in-app
             val movementMethod = BetterLinkMovementMethod.newInstance()
@@ -84,7 +90,7 @@ class CourseOverviewFragment : Fragment() {
                 taskstoShow.clear()
                 taskstoShow.addAll(tasks)
                 filesToShow.clear()
-                filesToShow.addAll(files)
+                filesToShow.addAll(attachments)
                 // Show loading symbol and hide button
                 postsLoading.visibility = View.VISIBLE
                 loadMorePostsButton.visibility = View.GONE

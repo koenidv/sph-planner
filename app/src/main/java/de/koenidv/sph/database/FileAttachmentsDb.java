@@ -65,9 +65,12 @@ public class FileAttachmentsDb {
         if (cursor.getCount() == 0) {
             db.insert("fileAttachments", null, cv);
         } else {
-            // Don't overwrite pinned attribute
+            // Don't overwrite name, pinned and lastUse attribute
             // If pinned status should be changed, use #setPinned
+            // If last use should be updated, use #used
             cv.remove("pinned");
+            cv.remove("lastUse");
+            cv.remove("name");
             db.update("fileAttachments", cv, "attachment_id = '" + fileAttachment.getAttachmentId() + "'", null);
         }
         cursor.close();

@@ -111,7 +111,7 @@ class NetworkManager {
      * Load and save Posts, PostAtachments and PostTasks for a list of courses
      * @param coursesToLoad Courses that should be loaded, all courses with NumberIds when null
      */
-    private fun loadAndSavePosts(coursesToLoad: List<Course>? = null, markAsRead: Boolean = false, onComplete: (success: Int) -> Unit) {
+    fun loadAndSavePosts(coursesToLoad: List<Course>? = null, markAsRead: Boolean = false, onComplete: (success: Int) -> Unit) {
         // Use all courses with number_id if nothing was specified
         val courses = coursesToLoad ?: CoursesDb.getInstance().withNumberId
         // Save all errors in a list, only return one later
@@ -138,9 +138,9 @@ class NetworkManager {
                                         // Write all that parsed stuff to the database
                                         // todo remove old entries for each course
                                         PostsDb.getInstance().save(posts)
-                                        FileAttachmentsDb.getInstance().save(files)
                                         PostTasksDb.getInstance().save(tasks)
-                                        // todo Save links
+                                        FileAttachmentsDb.getInstance().save(files)
+                                        LinkAttachmentsDb.getInstance().save(links)
                                     })
                         } else {
                             errors.add(success)

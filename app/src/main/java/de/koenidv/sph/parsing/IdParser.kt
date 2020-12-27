@@ -203,9 +203,9 @@ class IdParser {
     }
 
     /**
-     * Get a brand new, never before seen id for a link attachment
+     * Get a new id for a link attachment
      */
-    fun getNewLinkAttachmentId(courseId: String, date: Date, allIds: List<String>): String {
+    fun getLinkAttachmentId(courseId: String, date: Date, allIds: List<String>): String {
         val internalDateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT)
         var fileIndex = 0
         var linkId: String
