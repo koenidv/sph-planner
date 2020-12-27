@@ -1,7 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">SPHplanner</string>
     <string name="title_overview">Overview</string>
-    <string name="title_courses">My Courses</string>
+    <string name="title_courses">Your Courses</string>
     <string name="title_messages">Messages</string>
     <string name="title_explore">Explore</string>
 
@@ -59,6 +59,14 @@
     <string name="greeting_evening">Good evening, %name</string>
     <string name="greeting_night">Sleep well, %name</string>
     <string name="greeting_friday_weekend">Weekend\'s coming up!</string>
+    <string name="greeting_random_general_1">How are you doing?</string>
+    <string name="greeting_random_general_2">Good to see you again!</string>
+    <string name="greeting_random_general_3">Naa?</string>
+    <string name="greeting_random_morning_1">Have a great day!</string>
+    <string name="greeting_random_morning_2">What are your plans today?</string>
+    <string name="greeting_random_evening_1">How was day, %name?</string>
+    <string name="greeting_random_evening_2">What did you do today?</string>
+
 
     <!-- Courses -->
     <string name="course_appendix_lk">""</string>

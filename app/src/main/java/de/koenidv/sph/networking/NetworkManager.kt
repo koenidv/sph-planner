@@ -32,7 +32,8 @@ class NetworkManager {
     val FAILED_NO_NETWORK = 1
     val FAILED_INVALID_CREDENTIALS = 2
     val FAILED_MAINTENANCE = 3
-    val FAILED_CANCELLED = 4
+    val FAILED_SERVER_ERROR = 4
+    val FAILED_CANCELLED = 5
 
 
     fun indexAll(onComplete: (success: Int) -> Unit) {

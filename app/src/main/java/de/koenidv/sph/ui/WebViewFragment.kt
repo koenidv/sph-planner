@@ -7,6 +7,7 @@ import android.content.res.Configuration
 import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.webkit.CookieManager
 import android.webkit.WebSettings
@@ -47,14 +48,15 @@ class WebViewFragment : Fragment() {
                 webView.visibility = View.VISIBLE
                 view.findViewById<ProgressBar>(R.id.webviewLoading)?.visibility = View.GONE
                 // Set action bar title
-                (activity as AppCompatActivity).supportActionBar?.title = webView?.title
+                if (activity != null) (activity as AppCompatActivity).supportActionBar?.title = webView?.title
                 // Update open in browser url
                 SphPlanner.openInBrowserUrl = webView?.url
                 // Check if login was successful on page load
                 webView.evaluateJavascript(
                         "(function() { return ('<html>'+document.getElementsByTagName('html')[0].innerHTML+'</html>'); })();"
                 ) { html ->
-                    if (!html.contains("Login - Schulportal Hessen")) {
+                    if (!html.contains("Login - Schulportal Hessen")
+                            && !html.contains("Schulauswahl")) {
                         // Login was successful, save last token usage
                         prefs.edit().putLong("token_last_success", Date().time).apply()
                     }
@@ -73,10 +75,28 @@ class WebViewFragment : Fragment() {
         webView.settings.loadWithOverviewMode = true
         webView.settings.useWideViewPort = true
         webView.setInitialScale(1)
-        // todo store aes key
         // Remove previous sph cookies as they might lead to problems
-        cookieManager.setCookie(".schulportal.hessen.de", "")
+        /*listOf("https://schulportal.hessen.de",
+                "schulportal.hessen.de",
+                "https://connect.schulportal.hessen.de",
+                "connect.schulportal.hessen.de",
+                "https://www.schulportal.hessen.de",
+                "www.schulportal.hessen.de",
+                "https://sync.schulportal.hessen.de",
+                "sync.schulportal.hessen.de",
+                "https://login.schulportal.hessen.de",
+                "login.schulportal.hessen.de",
+                "https://start.schulportal.hessen.de",
+                "start.schulportal.hessen.de",
+                ".schulportal.hessen.de").forEach {
+            cookieManager.setCookie(it, "")
+        }*/
+        // Removing only sph's cookies somehow doesn't work, so we'll remove all session cookies
+        // This will also remove any login to other sites..
+        cookieManager.removeSessionCookies {}
         cookieManager.setAcceptThirdPartyCookies(webView, true)
+
+        WebView.setWebContentsDebuggingEnabled(true)
 
         // Enable force dark mode above Android 10 if dark theme is selected
         if (VERSION.SDK_INT >= VERSION_CODES.Q
@@ -103,9 +123,11 @@ class WebViewFragment : Fragment() {
         if (domain.contains("schulportal.hessen.de")) {
             TokenManager().generateAccessToken { success: Int, token: String? ->
                 if (success == NetworkManager().SUCCESS) {
+                    Log.d(SphPlanner.TAG, token!!)
                     cookieManager.setCookie(domain, "sid=$token")
                     webView.loadUrl(domain)
                 }
+                // todo handle errors
             }
         } else {
             webView.loadUrl(domain)

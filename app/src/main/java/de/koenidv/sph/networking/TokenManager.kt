@@ -82,24 +82,34 @@ class TokenManager {
                                     // Cannot login at the moment
                                     onComplete(NetworkManager().FAILED_MAINTENANCE, null)
                                 } else if (response.contains("Login failed!")) {
+                                    onComplete(NetworkManager().FAILED_SERVER_ERROR, null)
                                     Log.d(TAG, "Login failed :/")
+                                    Toast.makeText(applicationContext(), "Login failed :/", Toast.LENGTH_LONG).show()
                                     // todo Message: Retry in a few minutes
                                 }
                             }
 
                             override fun onError(error: ANError) {
                                 // todo handle 500
-                                when (error.errorDetail) {
-                                    "connectionError" -> {
-                                        // This will also be called if reqest timed out
-                                        onComplete(NetworkManager().FAILED_NO_NETWORK, null)
+                                Toast.makeText(applicationContext(), "An error occurred :/", Toast.LENGTH_LONG).show()
+                                if (error.errorCode == 0) {
+                                    when (error.errorDetail) {
+                                        "connectionError" -> {
+                                            // This will also be called if reqest timed out
+                                            onComplete(NetworkManager().FAILED_NO_NETWORK, null)
+                                        }
+                                        "requestCancelledError" -> {
+                                            onComplete(NetworkManager().FAILED_CANCELLED, null)
+                                        }
+                                        else -> {
+                                            Toast.makeText(applicationContext(), error.toString(), Toast.LENGTH_LONG).show()
+                                        }
                                     }
-                                    "requestCancelledError" -> {
-                                        onComplete(NetworkManager().FAILED_CANCELLED, null)
-                                    }
-                                    else -> {
+                                } else {
+                                    if (error.errorCode == 500)
+                                        onComplete(NetworkManager().FAILED_SERVER_ERROR, null)
+                                    else
                                         Toast.makeText(applicationContext(), error.toString(), Toast.LENGTH_LONG).show()
-                                    }
                                 }
                             }
                         })

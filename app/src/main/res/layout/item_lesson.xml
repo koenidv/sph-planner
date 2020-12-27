@@ -30,7 +30,7 @@
                 android:layout_height="match_parent"
                 android:gravity="center"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                android:textColor="@color/white"
+                android:textColor="?attr/colorOnSurface"
                 app:autoSizeMaxTextSize="14sp"
                 app:autoSizeMinTextSize="8sp"
                 app:autoSizeTextType="uniform"

@@ -27,8 +27,9 @@ class HomeFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_home, container, false)
         //val prefs = requireContext().getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
 
-        // Set action bar title
-        (activity as AppCompatActivity).supportActionBar?.title = Utility().getGreeting()
+        // Set random greeting as action bar title, once per app start
+        if (SphPlanner.randomGreeting == null) SphPlanner.randomGreeting = Utility().getGreeting()
+        (activity as AppCompatActivity).supportActionBar?.title = SphPlanner.randomGreeting
 
         // Only for demonstration
 

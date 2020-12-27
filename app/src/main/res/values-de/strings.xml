@@ -2,7 +2,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Schulportal</string>
     <string name="title_overview">Übersicht</string>
-    <string name="title_courses">Meine Kurse</string>
+    <string name="title_courses">Deine Kurse</string>
     <string name="title_messages">Nachrichten</string>
     <string name="title_explore">Erkunden</string>
     <string name="cancel">Abbrechen</string>
@@ -138,5 +138,13 @@
     <string name="greeting_evening">Guten Abend, %name</string>
     <string name="greeting_night">Schlaf gut, %name</string>
     <string name="greeting_friday_weekend">Bald ist Wochenende!</string>
+    <string name="open_in_browser">Im Browser öffnen</string>
+    <string name="greeting_random_general_1">Wie läufts, %name?</string>
+    <string name="greeting_random_general_2">Schön, dich wiederzusehen!</string>
+    <string name="greeting_random_morning_1">Hab einen schönen Tag!</string>
+    <string name="greeting_random_morning_2">Was hast du heute vor?</string>
+    <string name="greeting_random_evening_1">Wie war dein Tag, %name?</string>
+    <string name="greeting_random_evening_2">Was hast du heute gemacht?</string>
+    <string name="greeting_random_general_3">Naa du?</string>
 
 </resources>
