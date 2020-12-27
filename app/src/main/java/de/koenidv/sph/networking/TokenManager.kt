@@ -63,9 +63,10 @@ class TokenManager {
                         .getAsString(object : StringRequestListener {
                             override fun onResponse(response: String) {
                                 if (CookieStore.getCookie("schulportal.hessen.de", "sid") != null
+                                        && response.contains("- Schulportal Hessen")
                                         && !response.contains("Login - Schulportal Hessen")
                                         && !response.contains("Schulauswahl - Schulportal Hessen")) {
-                                    // Login success
+                                    // Login success todo not always
                                     onComplete(NetworkManager().SUCCESS, CookieStore.getCookie("schulportal.hessen.de", "sid")!!)
                                     prefs.edit().putString("token", CookieStore.getCookie("schulportal.hessen.de", "sid"))
                                             .putLong("token_last_success", Date().time)

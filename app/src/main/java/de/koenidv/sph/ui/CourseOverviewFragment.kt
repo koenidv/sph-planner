@@ -53,7 +53,7 @@ class CourseOverviewFragment : Fragment() {
         if (posts.isNotEmpty()) {
             val postsToShow = posts.take(2).toMutableList()
             val taskstoShow = tasks.filter { it.id_post == postsToShow[0].postId || it.id_post == postsToShow.getOrNull(1)?.postId }.toMutableList()
-            val filesToShow = files.filter { it.id_post == postsToShow[0].postId || it.id_post == postsToShow.getOrNull(1)?.postId }.toMutableList()
+            val filesToShow = files.filter { it.postId() == postsToShow[0].postId || it.postId() == postsToShow.getOrNull(1)?.postId }.toMutableList()
 
             // Movement method to open links in-app
             val movementMethod = BetterLinkMovementMethod.newInstance()

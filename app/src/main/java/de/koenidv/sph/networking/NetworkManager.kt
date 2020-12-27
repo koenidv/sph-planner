@@ -10,6 +10,7 @@ import com.androidnetworking.error.ANError
 import com.androidnetworking.interfaces.OkHttpResponseListener
 import com.androidnetworking.interfaces.StringRequestListener
 import com.facebook.stetho.okhttp3.StethoInterceptor
+import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.SphPlanner.Companion.applicationContext
 import de.koenidv.sph.database.*
@@ -218,7 +219,10 @@ class NetworkManager {
                             }
 
                         })
-            } else onComplete(success, null)
+            } else {
+                Toast.makeText(applicationContext(), R.string.error, Toast.LENGTH_SHORT).show()
+                onComplete(success, null)
+            }
         }
     }
 

@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import de.koenidv.sph.objects.Attachment;
 import de.koenidv.sph.objects.FileAttachment;
 
 public class FileAttachmentsDb {
@@ -109,8 +110,14 @@ public class FileAttachmentsDb {
         return isPinned;
     }
 
-    public List<FileAttachment> getPostByCourseId(String course_id) {
-        List<FileAttachment> returnList = new ArrayList<>();
+    /**
+     * Get a list of attachments with files for a course
+     *
+     * @param course_id Course to find attached files for
+     * @return List of Attachments with FileAttachments
+     */
+    public List<Attachment> getPostByCourseId(String course_id) {
+        List<Attachment> returnList = new ArrayList<>();
         final SQLiteDatabase db = dbhelper.getReadableDatabase();
 
         String queryString = "SELECT * FROM fileAttachments WHERE id_course = '" + course_id + "'";
@@ -130,9 +137,9 @@ public class FileAttachmentsDb {
                 Date lastUse = null;
                 if (!cursor.isNull(9)) lastUse = new Date(cursor.getInt(9) * 1000);
 
-                FileAttachment newFileAttachment = new FileAttachment(attachmentId, id_course, id_post, name, date, url, size, type, pinned, lastUse);
+                Attachment newAttachment = new Attachment(new FileAttachment(attachmentId, id_course, id_post, name, date, url, size, type, pinned, lastUse));
 
-                returnList.add(newFileAttachment);
+                returnList.add(newAttachment);
             } while (cursor.moveToNext());
         }
 

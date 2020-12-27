@@ -7,6 +7,7 @@ import android.content.Intent
 import android.os.Looper
 import android.util.Log
 import android.view.View
+import android.view.View.GONE
 import android.widget.TextView
 import androidx.core.app.ShareCompat
 import androidx.core.content.FileProvider
@@ -20,6 +21,7 @@ import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner.Companion.TAG
 import de.koenidv.sph.SphPlanner.Companion.applicationContext
 import de.koenidv.sph.database.FileAttachmentsDb
+import de.koenidv.sph.objects.Attachment
 import de.koenidv.sph.objects.FileAttachment
 import okhttp3.Cookie
 import okhttp3.HttpUrl
@@ -34,35 +36,37 @@ class AttachmentManager {
     /**
      * Returns a lambda to handle clicks on an attachment item
      */
-    fun onAttachmentClick(activity: Activity): (FileAttachment, View) -> Unit =
+    fun onAttachmentClick(activity: Activity): (Attachment, View) -> Unit =
             { attachment, view ->
-                // Prepare downloading snackbar
-                val snackbar = Snackbar.make(activity.findViewById(R.id.nav_host_fragment),
-                        activity.getString(R.string.attachments_downloading_size, attachment.fileSize),
-                        Snackbar.LENGTH_INDEFINITE)
-                // Add option to cancel the download
-                snackbar.setAction(R.string.cancel) {
-                    AndroidNetworking.cancel(attachment.attachmentId)
-                }
-                // Show the snackbar
-                snackbar.show()
-                // Let AttachmentManager handle downloading and opening the file
-                AttachmentManager().handleAttachment(attachment) { opened ->
-                    // Hide snackbar when the file has been opened
-                    if (opened == NetworkManager().SUCCESS) {
-                        val icon = view.findViewById<TextView>(R.id.iconTextView)
-                        // If downloading & opening was successful
-                        // Add check icon if there wasn't a donwloaded check before
-                        if (!icon.text.contains("check-circle"))
-                            @SuppressLint("SetTextI18n")
-                            icon.text = "check-circle ${icon.text}"
-                        // Hide snackbar
-                        snackbar.dismiss()
-                    } else {
-                        // An error occurred
-                        snackbar.dismiss()
-                        Snackbar.make(activity.findViewById(R.id.nav_host_fragment),
-                                R.string.error, Snackbar.LENGTH_SHORT).show()
+                if (attachment.type() == "file") {
+                    // Prepare downloading snackbar
+                    val snackbar = Snackbar.make(activity.findViewById(R.id.nav_host_fragment),
+                            activity.getString(R.string.attachments_downloading_size, attachment.file().fileSize),
+                            Snackbar.LENGTH_INDEFINITE)
+                    // Add option to cancel the download
+                    snackbar.setAction(R.string.cancel) {
+                        AndroidNetworking.cancel(attachment.file().attachmentId)
+                    }
+                    // Show the snackbar
+                    snackbar.show()
+                    // Let AttachmentManager handle downloading and opening the file
+                    AttachmentManager().handleFileAttachment(attachment.file()) { opened ->
+                        // Hide snackbar when the file has been opened
+                        if (opened == NetworkManager().SUCCESS) {
+                            val icon = view.findViewById<TextView>(R.id.iconTextView)
+                            // If downloading & opening was successful
+                            // Add check icon if there wasn't a donwloaded check before
+                            if (!icon.text.contains("check-circle"))
+                                @SuppressLint("SetTextI18n")
+                                icon.text = "check-circle ${icon.text}"
+                            // Hide snackbar
+                            snackbar.dismiss()
+                        } else {
+                            // An error occurred
+                            snackbar.dismiss()
+                            Snackbar.make(activity.findViewById(R.id.nav_host_fragment),
+                                    R.string.error, Snackbar.LENGTH_SHORT).show()
+                        }
                     }
                 }
             }
@@ -71,10 +75,14 @@ class AttachmentManager {
      * Returns a lambda to handle long clicks on an attachment item
      */
     @SuppressLint("SetTextI18n")
-    fun onAttachmentLongClick(activity: Activity): (FileAttachment, View) -> Unit =
+    fun onAttachmentLongClick(activity: Activity): (Attachment, View) -> Unit =
             { attachment, view ->
                 val sheet = BottomSheetDialog(activity)
                 sheet.setContentView(R.layout.sheet_manage_attachment)
+
+                val type = attachment.type()
+                @Suppress("SimplifyBooleanWithConstants") val isPinned = (type == "file" && FileAttachmentsDb.getInstance().isPinned(attachment.attachId())
+                        || type == "link" && false)
 
                 val download = sheet.findViewById<TextView>(R.id.downloadTextView)
                 val delete = sheet.findViewById<TextView>(R.id.deleteTextView)
@@ -88,16 +96,22 @@ class AttachmentManager {
 
                 // Hide unusable options
 
-                // Check if file exists
-                if (File(applicationContext().filesDir.toString() + "/" + attachment.localPath()).exists())
-                    download?.visibility = View.GONE
-                else delete?.visibility = View.GONE
+                // Hide if attachment is not a file
+                if (type != "file") {
+                    download?.visibility = GONE
+                    delete?.visibility = GONE
+                } else {
+                    // Check if file exists
+                    if (File(applicationContext().filesDir.toString() + "/" + attachment.file().localPath()).exists())
+                        download?.visibility = GONE
+                    else delete?.visibility = GONE
+                }
 
                 // Check if the attachment is pinned in the database
                 // Might have changed since it was loaded into the recyclerview
-                if (FileAttachmentsDb.getInstance().isPinned(attachment.attachmentId))
-                    pin?.visibility = View.GONE
-                else unpin?.visibility = View.GONE
+                if (isPinned)
+                    pin?.visibility = GONE
+                else unpin?.visibility = GONE
 
                 // Set option logic
 
@@ -106,16 +120,16 @@ class AttachmentManager {
                     // Prepare downloading snackbar
                     @SuppressLint("CutPasteId")
                     val snackbar = Snackbar.make(activity.findViewById(R.id.nav_host_fragment),
-                            activity.getString(R.string.attachments_downloading_size, attachment.fileSize),
+                            activity.getString(R.string.attachments_downloading_size, attachment.file().fileSize),
                             Snackbar.LENGTH_INDEFINITE)
                     // Add option to cancel the download
                     snackbar.setAction(R.string.cancel) {
-                        AndroidNetworking.cancel(attachment.attachmentId)
+                        AndroidNetworking.cancel(attachment.attachId())
                     }
                     // Show the snackbar
                     snackbar.show()
                     // Download the file
-                    downloadFile(attachment) {
+                    downloadFile(attachment.file()) {
                         if (it == NetworkManager().SUCCESS) {
                             // If downloading & opening was successful
                             // Add check icon to show file has been downloaded
@@ -136,7 +150,7 @@ class AttachmentManager {
                 // Remove from device option
                 delete?.setOnClickListener {
                     // File to remove
-                    val file = File(applicationContext().filesDir.toString() + "/" + attachment.localPath())
+                    val file = File(applicationContext().filesDir.toString() + "/" + attachment.file().localPath())
                     // Try to delete file
                     if (file.delete())
                         doneSnackbar.setText(R.string.attachments_options_delete_complete)
@@ -154,9 +168,10 @@ class AttachmentManager {
                 // Pin
                 pin?.setOnClickListener {
                     // Mark attachment as pinned
-                    FileAttachmentsDb.getInstance().setPinned(attachment.attachmentId, true)
+                    if (type == "file")
+                        FileAttachmentsDb.getInstance().setPinned(attachment.attachId(), true)
                     // Update the icon textview accordingly
-                    icon.text = "thumbtack  ${icon.text}"
+                    icon.text = "thumbtack ${icon.text}"
                     // Hide the bottom sheet dialog
                     sheet.dismiss()
                     // Show success
@@ -166,7 +181,8 @@ class AttachmentManager {
                 // Unpin
                 unpin?.setOnClickListener {
                     // Mark attachment as not pinned
-                    FileAttachmentsDb.getInstance().setPinned(attachment.attachmentId, false)
+                    if (type == "file")
+                        FileAttachmentsDb.getInstance().setPinned(attachment.attachId(), false)
                     // Update the icon textview accordingly
                     icon.text = icon.text.toString().replace("thumbtack ", "")
                     // Hide the bottom sheet dialog
@@ -177,37 +193,39 @@ class AttachmentManager {
 
                 // Share a file
                 share?.setOnClickListener {
-                    // If file exists, share, else download and share
-                    if (File(applicationContext().filesDir.toString() + "/" + attachment.localPath()).exists()) {
-                        shareAttachmentFile(attachment, activity)
-                        sheet.dismiss()
-                    } else {
-                        // First, download the file
-                        // Prepare downloading snackbar
-                        @SuppressLint("CutPasteId")
-                        val snackbar = Snackbar.make(activity.findViewById(R.id.nav_host_fragment),
-                                activity.getString(R.string.attachments_downloading_size, attachment.fileSize),
-                                Snackbar.LENGTH_INDEFINITE)
-                        // Add option to cancel the download
-                        snackbar.setAction(R.string.cancel) {
-                            AndroidNetworking.cancel(attachment.attachmentId)
-                        }
-                        // Show the snackbar
-                        snackbar.show()
-                        // Download the file
-                        downloadFile(attachment) {
-                            if (it == NetworkManager().SUCCESS) {
-                                // If downloading & opening was successful
-                                // Add check icon to show file has been downloaded
-                                icon.text = "check-circle ${icon.text}"
-                                // Dismiss snackbar
-                                snackbar.dismiss()
-                                // Now share the downloaded file
-                                shareAttachmentFile(attachment, activity)
-                            } else {
-                                // An error occurred
-                                snackbar.dismiss()
-                                doneSnackbar.setText(R.string.error).show()
+                    if (type == "file") {
+                        // If file exists, share, else download and share
+                        if (File(applicationContext().filesDir.toString() + "/" + attachment.file().localPath()).exists()) {
+                            shareAttachmentFile(attachment.file(), activity)
+                            sheet.dismiss()
+                        } else {
+                            // First, download the file
+                            // Prepare downloading snackbar
+                            @SuppressLint("CutPasteId")
+                            val snackbar = Snackbar.make(activity.findViewById(R.id.nav_host_fragment),
+                                    activity.getString(R.string.attachments_downloading_size, attachment.file().fileSize),
+                                    Snackbar.LENGTH_INDEFINITE)
+                            // Add option to cancel the download
+                            snackbar.setAction(R.string.cancel) {
+                                AndroidNetworking.cancel(attachment.attachId())
+                            }
+                            // Show the snackbar
+                            snackbar.show()
+                            // Download the file
+                            downloadFile(attachment.file()) {
+                                if (it == NetworkManager().SUCCESS) {
+                                    // If downloading & opening was successful
+                                    // Add check icon to show file has been downloaded
+                                    icon.text = "check-circle ${icon.text}"
+                                    // Dismiss snackbar
+                                    snackbar.dismiss()
+                                    // Now share the downloaded file
+                                    shareAttachmentFile(attachment.file(), activity)
+                                } else {
+                                    // An error occurred
+                                    snackbar.dismiss()
+                                    doneSnackbar.setText(R.string.error).show()
+                                }
                             }
                         }
                     }
@@ -220,7 +238,7 @@ class AttachmentManager {
     /**
      * Handles downloading and opening attachment items
      */
-    private fun handleAttachment(attachment: FileAttachment, onComplete: (success: Int) -> Unit) {
+    private fun handleFileAttachment(attachment: FileAttachment, onComplete: (success: Int) -> Unit) {
         // Check if file already exists
         val file = File(applicationContext().filesDir.toString() + "/" + attachment.localPath())
 
@@ -380,6 +398,7 @@ class AttachmentManager {
      */
     fun getIconForFiletype(filetype: String): String {
         return when (filetype) {
+            "link" -> "link"
             "pdf" -> "file-pdf"
             "doc", "docx" -> "file-word"
             "ppt", "pptx" -> "file-powerpoint"
