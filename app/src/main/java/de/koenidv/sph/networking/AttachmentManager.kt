@@ -37,25 +37,34 @@ import java.util.*
 
 //  Created by koenidv on 26.12.2020.
 class AttachmentManager {
+    companion object {
+        val ATTACHMENT_USED = 0
+        val ATTACHMENT_USED_PIN = 1
+        val ATTACHMENT_PINNED = 2
+        val ATTACHMENT_UNPINNED = 3
+    }
 
     /**
      * Returns a lambda to handle clicks on an attachment item
      */
-    fun onAttachmentClick(activity: Activity): (Attachment, View) -> Unit =
-            { attachment, view -> handleAttachment(activity, attachment, view) }
+    fun onAttachmentClick(activity: Activity, onAction: (action: Int, attachment: Attachment) -> Unit):
+            (Attachment, View) -> Unit = { attachment, view ->
+        handleAttachment(activity, attachment, view)
+        onAction(ATTACHMENT_USED, attachment)
+    }
 
     /**
      * Returns a lambda to handle long clicks on an attachment item
      */
     @SuppressLint("SetTextI18n")
-    fun onAttachmentLongClick(activity: Activity): (Attachment, View) -> Unit =
+    fun onAttachmentLongClick(activity: Activity, onAction: (action: Int, attachment: Attachment) -> Unit): (Attachment, View) -> Unit =
             { attachment, view ->
                 val sheet = BottomSheetDialog(activity)
                 sheet.setContentView(R.layout.sheet_manage_attachment)
 
                 val type = attachment.type()
                 @Suppress("SimplifyBooleanWithConstants") val isPinned = (type == "file" && FileAttachmentsDb.getInstance().isPinned(attachment.attachId())
-                        || type == "link" && false)
+                        || type == "link" && LinkAttachmentsDb.getInstance().isPinned(attachment.attachId()))
 
                 val open = sheet.findViewById<TextView>(R.id.openTextView)
                 val download = sheet.findViewById<TextView>(R.id.downloadTextView)
@@ -94,6 +103,9 @@ class AttachmentManager {
                 open?.setOnClickListener {
                     sheet.dismiss()
                     handleAttachment(activity, attachment, view)
+                    // Notify the calling activity
+                    if (isPinned) onAction(ATTACHMENT_USED_PIN, attachment)
+                    else onAction(ATTACHMENT_USED, attachment)
                 }
 
                 // Download option
@@ -119,6 +131,11 @@ class AttachmentManager {
                             // Dismiss snackbar
                             snackbar.dismiss()
                             doneSnackbar.setText(R.string.attachments_options_download_complete).show()
+                            // Update last use
+                            LinkAttachmentsDb.getInstance().used(attachment.attachId())
+                            // Notify the calling activity
+                            if (isPinned) onAction(ATTACHMENT_USED_PIN, attachment)
+                            else onAction(ATTACHMENT_USED, attachment)
                         } else {
                             // An error occurred
                             snackbar.dismiss()
@@ -157,6 +174,8 @@ class AttachmentManager {
                     sheet.dismiss()
                     // Show success
                     doneSnackbar.setText(R.string.attachments_options_pin_complete).show()
+                    // Notify the calling activity
+                    onAction(ATTACHMENT_PINNED, attachment)
                 }
 
                 // Unpin
@@ -172,6 +191,8 @@ class AttachmentManager {
                     sheet.dismiss()
                     // Show success
                     doneSnackbar.setText(R.string.attachments_options_unpin_complete).show()
+                    // Notify the calling activity
+                    onAction(ATTACHMENT_UNPINNED, attachment)
                 }
 
                 // Share attachment
@@ -207,6 +228,9 @@ class AttachmentManager {
                                     shareAttachmentFile(attachment.file(), activity)
                                     // Update file last use
                                     FileAttachmentsDb.getInstance().used(attachment.attachId())
+                                    // Notify the calling activity
+                                    if (isPinned) onAction(ATTACHMENT_USED_PIN, attachment)
+                                    else onAction(ATTACHMENT_USED, attachment)
                                 } else {
                                     // An error occurred
                                     snackbar.dismiss()
@@ -225,6 +249,10 @@ class AttachmentManager {
                         activity.startActivity(shareIntent)
                         // Update link last use
                         LinkAttachmentsDb.getInstance().used(attachment.attachId())
+                        // Notify the calling activity
+                        if (isPinned) onAction(ATTACHMENT_USED_PIN, attachment)
+                        else onAction(ATTACHMENT_USED, attachment)
+
                     }
                     sheet.dismiss()
                 }

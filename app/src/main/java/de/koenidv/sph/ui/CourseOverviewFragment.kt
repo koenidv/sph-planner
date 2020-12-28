@@ -21,6 +21,7 @@ import de.koenidv.sph.adapters.AttachmentsAdapter
 import de.koenidv.sph.adapters.PostsAdapter
 import de.koenidv.sph.database.*
 import de.koenidv.sph.networking.AttachmentManager
+import de.koenidv.sph.objects.Attachment
 import de.koenidv.sph.objects.Course
 import me.saket.bettermovementmethod.BetterLinkMovementMethod
 
@@ -64,14 +65,49 @@ class CourseOverviewFragment : Fragment() {
         // We need to reorder pins as files and links should be mixed, according to their last use
         pins.sortByDescending { it.lastuse() }
 
+        // Prepare listeners
+        val onAttachmentClick = AttachmentManager().onAttachmentClick(requireActivity()) { _: Int, _: Attachment ->
+            // Currently, it's not really worth updating the pinned list on click
+        }
+        val onAttachmentLongClick = AttachmentManager().onAttachmentLongClick(requireActivity()) { action: Int, attachment: Attachment ->
+            // Update ui (currently onyl pins recycler) according to selected action
+            when (action) {
+                AttachmentManager.ATTACHMENT_USED_PIN -> {
+                    // Attachment was used.
+                    // Move it to the front
+                    val index = pins.indexOf(attachment)
+                    pins.removeAt(index)
+                    pins.add(0, attachment)
+                    // Notify the adapter
+                    pinsRecycler.adapter?.notifyItemMoved(index, 0)
+                }
+                AttachmentManager.ATTACHMENT_PINNED -> {
+                    // New attachment pinned
+                    // Add it to the front
+                    pins.add(0, attachment)
+                    // Notify the adapter
+                    pinsRecycler.adapter?.notifyItemInserted(0)
+                }
+                AttachmentManager.ATTACHMENT_UNPINNED -> {
+                    // Attachment no longer pinned
+                    // Remove it from the list
+                    val index = pins.indexOf(attachment)
+                    pins.removeAt(index)
+                    // Notify the adapter
+                    pinsRecycler.adapter?.notifyItemRemoved(index)
+                }
+            }
+
+        }
+
         /*
          * Pinned attachments recycler
          */
 
         if (!pins.isNullOrEmpty()) {
             pinsRecycler.adapter = AttachmentsAdapter(pins,
-                    AttachmentManager().onAttachmentClick(requireActivity()),
-                    AttachmentManager().onAttachmentLongClick(requireActivity()))
+                    onAttachmentClick,
+                    onAttachmentLongClick)
             PagerSnapHelper().attachToRecyclerView(pinsRecycler)
         } else {
             // Hide recycler and title if there are no pinned attachments
@@ -108,9 +144,8 @@ class CourseOverviewFragment : Fragment() {
                     taskstoShow,
                     filesToShow,
                     movementMethod,
-                    AttachmentManager().onAttachmentClick(requireActivity()),
-                    AttachmentManager().onAttachmentLongClick(requireActivity())
-            )
+                    onAttachmentClick,
+                    onAttachmentLongClick)
             postsRecycler.adapter = postsAdapter
 
             loadMorePostsButton.setOnClickListener {
@@ -148,4 +183,5 @@ class CourseOverviewFragment : Fragment() {
 
         return view
     }
+
 }

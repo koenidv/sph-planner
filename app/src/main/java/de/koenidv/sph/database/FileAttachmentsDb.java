@@ -87,6 +87,17 @@ public class FileAttachmentsDb {
     }
 
     /**
+     * Update a file attachment's name
+     *
+     * @param attachmentId Id of the attachment to update
+     * @param newName      Name to set
+     */
+    public void rename(String attachmentId, String newName) {
+        dbhelper.getWritableDatabase().execSQL("UPDATE fileAttachments SET name=\""
+                + newName + "\" WHERE attachment_id=\"" + attachmentId + "\"");
+    }
+
+    /**
      * Mark an attached file as (not) pinned
      *
      * @param attachmentId Id of the file to change

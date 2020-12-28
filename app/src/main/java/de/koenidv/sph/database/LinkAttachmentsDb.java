@@ -72,6 +72,7 @@ public class LinkAttachmentsDb {
 
     /**
      * Mark an attached link as (not) pinned
+     * Will also update last used if pinned
      *
      * @param attachmentId Id of the attachment to change
      * @param pinned       Whether the link is pinned
@@ -79,6 +80,7 @@ public class LinkAttachmentsDb {
     public void setPinned(String attachmentId, boolean pinned) {
         dbhelper.getWritableDatabase().execSQL("UPDATE linkAttachments SET pinned="
                 + (pinned ? 1 : 0) + " WHERE attachment_id=\"" + attachmentId + "\"");
+        if (pinned) used(attachmentId);
     }
 
     /**

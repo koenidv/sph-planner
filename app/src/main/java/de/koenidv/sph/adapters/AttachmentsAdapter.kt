@@ -14,7 +14,7 @@ import de.koenidv.sph.objects.Attachment
 import java.io.File
 
 //  Created by koenidv on 20.12.2020.
-class AttachmentsAdapter(private val attachments: List<Attachment>,
+class AttachmentsAdapter(private var attachments: List<Attachment>,
                          private val onAttachmentClick: (Attachment, View) -> Unit,
                          private val onAttachmentLongClick: (Attachment, View) -> Unit) :
         RecyclerView.Adapter<AttachmentsAdapter.ViewHolder>() {
@@ -88,4 +88,9 @@ class AttachmentsAdapter(private val attachments: List<Attachment>,
 
     // Return the size of your dataset (invoked by the layout manager)
     override fun getItemCount() = attachments.size
+
+    fun updateDataset(dataset: List<Attachment>) {
+        this.attachments = dataset
+        notifyDataSetChanged()
+    }
 }
