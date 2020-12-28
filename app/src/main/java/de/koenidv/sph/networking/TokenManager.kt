@@ -38,7 +38,7 @@ class TokenManager {
         if (Date().time - prefs.getLong("token_last_success", 0) <= 15 * 60 * 1000
                 && Date().time - prefs.getLong("token_last_success", 0) > 0
                 && !forceNewToken) {
-            onComplete(NetworkManager().SUCCESS, prefs.getString("token", "")!!)
+            onComplete(NetworkManager.SUCCESS, prefs.getString("token", "")!!)
         } else {
             // Get a new token
             if (prefs.getString("user", "") != null && prefs.getString("password", "") != null) {
@@ -69,20 +69,20 @@ class TokenManager {
                                         && !response.contains("Schulauswahl - Schulportal Hessen")
                                         && !response.contains("Login failed!")) {
                                     // Login success todo not always
-                                    onComplete(NetworkManager().SUCCESS, CookieStore.getCookie("schulportal.hessen.de", "sid")!!)
+                                    onComplete(NetworkManager.SUCCESS, CookieStore.getCookie("schulportal.hessen.de", "sid")!!)
                                     prefs.edit().putString("token", CookieStore.getCookie("schulportal.hessen.de", "sid"))
                                             .putLong("token_last_success", Date().time)
                                             .apply()
                                 } else if (response.contains("Login - Schulportal Hessen")
                                         || response.contains("Schulauswahl - Schulportal Hessen")) {
                                     // Login not successful
-                                    onComplete(NetworkManager().FAILED_INVALID_CREDENTIALS, null)
+                                    onComplete(NetworkManager.FAILED_INVALID_CREDENTIALS, null)
                                     prefs.edit().putLong("token_last_success", 0).apply()
                                 } else if (response.contains("Wartungsarbeiten")) {
                                     // Cannot login at the moment
-                                    onComplete(NetworkManager().FAILED_MAINTENANCE, null)
+                                    onComplete(NetworkManager.FAILED_MAINTENANCE, null)
                                 } else if (response.contains("Login failed!")) {
-                                    onComplete(NetworkManager().FAILED_SERVER_ERROR, null)
+                                    onComplete(NetworkManager.FAILED_SERVER_ERROR, null)
                                     Log.d(TAG, "Login failed :/")
                                     Toast.makeText(applicationContext(), "Login failed :/", Toast.LENGTH_LONG).show()
                                     // todo Message: Retry in a few minutes
@@ -96,10 +96,10 @@ class TokenManager {
                                     when (error.errorDetail) {
                                         "connectionError" -> {
                                             // This will also be called if reqest timed out
-                                            onComplete(NetworkManager().FAILED_NO_NETWORK, null)
+                                            onComplete(NetworkManager.FAILED_NO_NETWORK, null)
                                         }
                                         "requestCancelledError" -> {
-                                            onComplete(NetworkManager().FAILED_CANCELLED, null)
+                                            onComplete(NetworkManager.FAILED_CANCELLED, null)
                                         }
                                         else -> {
                                             Toast.makeText(applicationContext(), error.toString(), Toast.LENGTH_LONG).show()
@@ -107,7 +107,7 @@ class TokenManager {
                                     }
                                 } else {
                                     if (error.errorCode == 500)
-                                        onComplete(NetworkManager().FAILED_SERVER_ERROR, null)
+                                        onComplete(NetworkManager.FAILED_SERVER_ERROR, null)
                                     else
                                         Toast.makeText(applicationContext(), error.toString(), Toast.LENGTH_LONG).show()
                                 }

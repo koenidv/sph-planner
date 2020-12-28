@@ -50,7 +50,7 @@ dependencies {
     implementation 'androidx.navigation:navigation-fragment-ktx:2.3.2'
     implementation 'androidx.navigation:navigation-ui-ktx:2.3.2'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'com.github.azygous13:SearchableSpinner:v1.4' // Only for login, really
+    implementation 'com.github.koenidv:SearchableSpinner:1.4.1' // Only for login, really
     implementation 'org.jsoup:jsoup:1.13.1' // Parse html
     implementation 'me.saket:better-link-movement-method:2.2.0'
     implementation 'androidx.gridlayout:gridlayout:1.0.0'// Open links in-app

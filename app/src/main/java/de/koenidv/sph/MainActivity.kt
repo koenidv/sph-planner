@@ -11,11 +11,15 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.fragment.app.FragmentContainerView
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.snackbar.Snackbar
+import de.koenidv.sph.networking.NetworkManager
 import de.koenidv.sph.ui.OnboardingActivity
 import de.koenidv.sph.ui.OptionsSheet
 
@@ -26,6 +30,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
 
         val prefs = getSharedPreferences("sharedPrefs", MODE_PRIVATE)
+        var lastNavArguments: Bundle? = null
 
         // Apply custom accent color theme
         if (prefs.contains("themeRes")) setTheme(prefs.getInt("themeRes", R.style.Theme_SPH_Electric))
@@ -57,9 +62,35 @@ class MainActivity : AppCompatActivity() {
         val navController = navHostFragment!!.navController
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration)
         NavigationUI.setupWithNavController(navView, navController)
-        navController.addOnDestinationChangedListener { _, _, _ ->
+        navController.addOnDestinationChangedListener { _, _, args ->
             // Reset browser url on destination changed
             SphPlanner.openInBrowserUrl = null
+            lastNavArguments = args
+        }
+
+        /*
+         * Pull to refresh
+         */
+        val swipeRefresh = findViewById<SwipeRefreshLayout>(R.id.swipeRefresh)
+        swipeRefresh.setOnRefreshListener {
+            navController.currentDestination?.id?.let { destination ->
+                // If destination is known, let network manager handle the refreshing
+                NetworkManager().handlePullToRefresh(destination, lastNavArguments) { success ->
+                    val errorSnackbar = Snackbar.make(findViewById<FragmentContainerView>(R.id.nav_host_fragment), "", Snackbar.LENGTH_SHORT)
+                    errorSnackbar.setAnchorView(R.id.nav_view)
+                    // Show error message if needed
+                    when (success) {
+                        NetworkManager.FAILED_NO_NETWORK -> errorSnackbar.setText(R.string.error_offline).show()
+                        NetworkManager.FAILED_MAINTENANCE -> errorSnackbar.setText(R.string.error_maintenance).show()
+                        NetworkManager.FAILED_SERVER_ERROR -> errorSnackbar.setText(R.string.error_server).show()
+                        NetworkManager.FAILED_UNKNOWN, NetworkManager.FAILED_CANCELLED ->
+                            errorSnackbar.setText(R.string.error).show()
+                        else -> if (success != NetworkManager.SUCCESS) errorSnackbar.setText(R.string.error).show()
+                    }
+                    // todo handle ERROR_WRONG_CREDENTIALS
+                    swipeRefresh.isRefreshing = false
+                }
+            }
         }
 
         // Save theme color to use somewhere without application context
@@ -79,7 +110,6 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == R.id.openInBrowserItem) {
             // Open in browser
-            val nav = findNavController(R.id.nav_host_fragment)
             if (SphPlanner.openInBrowserUrl == null) {
                 // Open SPH start page
                 openSph(this)

@@ -36,7 +36,7 @@ class OnboardingSupportlistFragment : Fragment() {
         NetworkManager().loadSiteWithToken("https://start.schulportal.hessen.de/index.php", onComplete = { success: Int, response: String? ->
 
             // todo handle success != 0
-            if (success != NetworkManager().SUCCESS) {
+            if (success != NetworkManager.SUCCESS) {
                 // Display network error
                 // Might display if sph is being maintained
                 // Credentials should be valid as we just checked them in the last onboarding step
@@ -151,8 +151,8 @@ class OnboardingSupportlistFragment : Fragment() {
                         kotlin.run {
                             // Save new url to object
                             // todo handle errors
-                            if (successUrl == NetworkManager().SUCCESS
-                                    || successUrl == NetworkManager().FAILED_UNKNOWN // If sph redirected back to home
+                            if (successUrl == NetworkManager.SUCCESS
+                                    || successUrl == NetworkManager.FAILED_UNKNOWN // If sph redirected back to home
                             )
                                 feature.location = resolvedUrl
                             // Save number of tiles resolved
@@ -164,7 +164,7 @@ class OnboardingSupportlistFragment : Fragment() {
 
                                 // Now index everything else
                                 NetworkManager().indexAll {
-                                    if (it == NetworkManager().SUCCESS) {
+                                    if (it == NetworkManager.SUCCESS) {
                                         indexLoading.visibility = View.GONE
                                         nextFab.visibility = View.VISIBLE
                                         prefs.edit().putBoolean("introComplete", true).apply()

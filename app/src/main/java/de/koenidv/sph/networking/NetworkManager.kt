@@ -1,6 +1,7 @@
 package de.koenidv.sph.networking
 
 import android.content.Context
+import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -27,13 +28,34 @@ import java.util.concurrent.TimeUnit
 @Suppress("PropertyName")
 class NetworkManager {
 
-    val FAILED_UNKNOWN = -1
-    val SUCCESS = 0
-    val FAILED_NO_NETWORK = 1
-    val FAILED_INVALID_CREDENTIALS = 2
-    val FAILED_MAINTENANCE = 3
-    val FAILED_SERVER_ERROR = 4
-    val FAILED_CANCELLED = 5
+    companion object {
+        const val FAILED_UNKNOWN = -1
+        const val SUCCESS = 0
+        const val FAILED_NO_NETWORK = 1
+        const val FAILED_INVALID_CREDENTIALS = 2
+        const val FAILED_MAINTENANCE = 3
+        const val FAILED_SERVER_ERROR = 4
+        const val FAILED_CANCELLED = 5
+    }
+
+    fun handlePullToRefresh(destinationId: Int, arguments: Bundle?, onComplete: (success: Int) -> Unit) {
+        when (destinationId) {
+            R.id.nav_home -> onComplete(FAILED_UNKNOWN)
+            R.id.nav_courses -> onComplete(FAILED_UNKNOWN)
+            R.id.frag_posts -> {
+                if (arguments?.getString("courseId") != null) {
+                    // Update posts for this course
+                    loadAndSavePosts(listOf(
+                            CoursesDb.getInstance().getByInternalId(arguments.getString("courseId")))) {
+                        // todo notify via broadcast
+                        // todo only after x time
+                        onComplete(it)
+                    }
+                }
+            }
+            else -> onComplete(FAILED_UNKNOWN)
+        }
+    }
 
 
     fun indexAll(onComplete: (success: Int) -> Unit) {
@@ -148,7 +170,9 @@ class NetworkManager {
                         counter++
                         if (counter == courses.size) {
                             // todo error handling
-                            onComplete(SUCCESS)
+                            if (errors.isEmpty())
+                                onComplete(SUCCESS)
+                            else onComplete(errors.maxOf { it })
                         }
                     })
         }
@@ -185,7 +209,8 @@ class NetworkManager {
                             override fun onResponse(response: String) {
                                 val prefs = applicationContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
                                 val responseLine = response.replace("\n", "")
-                                if (!responseLine.contains("Login - Schulportal Hessen")
+                                if (responseLine.contains("- Schulportal Hessen")
+                                        && !responseLine.contains("Login - Schulportal Hessen")
                                         && !responseLine.contains("Fehler - Schulportal Hessen")
                                         && !responseLine.contains("Schulauswahl - Schulportal Hessen")) {
                                     // Getting site was successful
@@ -207,10 +232,10 @@ class NetworkManager {
                                 when (error.errorDetail) {
                                     "connectionError" -> {
                                         // This will also be called if reqest timed out
-                                        onComplete(NetworkManager().FAILED_NO_NETWORK, null)
+                                        onComplete(FAILED_NO_NETWORK, null)
                                     }
                                     "requestCancelledError" -> {
-                                        onComplete(NetworkManager().FAILED_CANCELLED, null)
+                                        onComplete(FAILED_CANCELLED, null)
                                     }
                                     else -> {
                                         Toast.makeText(applicationContext(), error.toString(), Toast.LENGTH_LONG).show()

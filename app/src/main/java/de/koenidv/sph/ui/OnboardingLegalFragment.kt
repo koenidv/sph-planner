@@ -54,6 +54,14 @@ class OnboardingLegalFragment : Fragment() {
             }
         }
 
+        // Prefetch school picker
+        // Next stop will load faster if user stayed long enough in this fragment
+        /*AndroidNetworking.get("https://start.schulportal.hessen.de/")
+                .setPriority(Priority.LOW)
+                .build()
+                .prefetch()*/
+        // Useless, sph disallows cache, even on public pages
+
         return view
     }
 

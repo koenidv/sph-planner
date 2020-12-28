@@ -38,10 +38,10 @@ import java.util.*
 //  Created by koenidv on 26.12.2020.
 class AttachmentManager {
     companion object {
-        val ATTACHMENT_USED = 0
-        val ATTACHMENT_USED_PIN = 1
-        val ATTACHMENT_PINNED = 2
-        val ATTACHMENT_UNPINNED = 3
+        const val ATTACHMENT_USED = 0
+        const val ATTACHMENT_USED_PIN = 1
+        const val ATTACHMENT_PINNED = 2
+        const val ATTACHMENT_UNPINNED = 3
     }
 
     /**
@@ -76,6 +76,7 @@ class AttachmentManager {
 
                 val doneSnackbar = Snackbar.make(activity.findViewById(R.id.nav_host_fragment),
                         "", Snackbar.LENGTH_SHORT)
+                        .setAnchorView(R.id.nav_view)
 
                 // Hide unusable options
 
@@ -115,6 +116,7 @@ class AttachmentManager {
                     val snackbar = Snackbar.make(activity.findViewById(R.id.nav_host_fragment),
                             activity.getString(R.string.attachments_downloading_size, attachment.file().fileSize),
                             Snackbar.LENGTH_INDEFINITE)
+                            .setAnchorView(R.id.nav_view)
                     // Add option to cancel the download
                     snackbar.setAction(R.string.cancel) {
                         AndroidNetworking.cancel(attachment.attachId())
@@ -123,7 +125,7 @@ class AttachmentManager {
                     snackbar.show()
                     // Download the file
                     downloadFile(attachment.file()) {
-                        if (it == NetworkManager().SUCCESS) {
+                        if (it == NetworkManager.SUCCESS) {
                             // If downloading & opening was successful
                             // Add check icon to show file has been downloaded
                             @SuppressLint("SetTextI18n")
@@ -210,6 +212,7 @@ class AttachmentManager {
                             val snackbar = Snackbar.make(activity.findViewById(R.id.nav_host_fragment),
                                     activity.getString(R.string.attachments_downloading_size, attachment.file().fileSize),
                                     Snackbar.LENGTH_INDEFINITE)
+                                    .setAnchorView(R.id.nav_view)
                             // Add option to cancel the download
                             snackbar.setAction(R.string.cancel) {
                                 AndroidNetworking.cancel(attachment.attachId())
@@ -218,7 +221,7 @@ class AttachmentManager {
                             snackbar.show()
                             // Download the file
                             downloadFile(attachment.file()) {
-                                if (it == NetworkManager().SUCCESS) {
+                                if (it == NetworkManager.SUCCESS) {
                                     // If downloading & opening was successful
                                     // Add check icon to show file has been downloaded
                                     icon.text = "check-circle ${icon.text}"
@@ -267,6 +270,7 @@ class AttachmentManager {
             val snackbar = Snackbar.make(activity.findViewById(R.id.nav_host_fragment),
                     activity.getString(R.string.attachments_downloading_size, attachment.file().fileSize),
                     Snackbar.LENGTH_INDEFINITE)
+                    .setAnchorView(R.id.nav_view)
             // Add option to cancel the download
             snackbar.setAction(R.string.cancel) {
                 AndroidNetworking.cancel(attachment.attachId())
@@ -276,7 +280,7 @@ class AttachmentManager {
             // Let AttachmentManager handle downloading and opening the file
             AttachmentManager().handleFileAttachment(attachment.file()) { opened ->
                 // Hide snackbar when the file has been opened
-                if (opened == NetworkManager().SUCCESS) {
+                if (opened == NetworkManager.SUCCESS) {
                     val icon = view.findViewById<TextView>(R.id.iconTextView)
                     // If downloading & opening was successful
                     // Update file last use
@@ -291,7 +295,8 @@ class AttachmentManager {
                     // An error occurred
                     snackbar.dismiss()
                     Snackbar.make(activity.findViewById(R.id.nav_host_fragment),
-                            R.string.error, Snackbar.LENGTH_SHORT).show()
+                            R.string.error, Snackbar.LENGTH_SHORT).setAnchorView(R.id.nav_view)
+                            .setAnchorView(R.id.nav_view).show()
                 }
             }
         } else {
@@ -322,15 +327,15 @@ class AttachmentManager {
             // Download file, then open it
             // todo handle errors
             downloadFile(attachment) {
-                if (it == NetworkManager().SUCCESS) {
+                if (it == NetworkManager.SUCCESS) {
                     openAttachmentFile(attachment)
-                    onComplete(NetworkManager().SUCCESS)
                 }
+                onComplete(it)
             }
         } else {
             // File already exists, open it
             openAttachmentFile(attachment)
-            onComplete(NetworkManager().SUCCESS)
+            onComplete(NetworkManager.SUCCESS)
         }
     }
 
@@ -341,7 +346,7 @@ class AttachmentManager {
     private fun downloadFile(file: FileAttachment, onComplete: (success: Int) -> Unit) {
         // Get an access token
         TokenManager().generateAccessToken { success: Int, token: String? ->
-            if (success == NetworkManager().SUCCESS) {
+            if (success == NetworkManager.SUCCESS) {
                 // Set sid cookie
                 CookieStore.saveFromResponse(
                         HttpUrl.parse("https://schulportal.hessen.de")!!,
@@ -369,7 +374,7 @@ class AttachmentManager {
                                 Log.d(TAG, "File download Completed")
                                 Log.d(TAG, "onDownloadComplete isMainThread : " + (Looper.myLooper() == Looper.getMainLooper()).toString())
 
-                                onComplete(NetworkManager().SUCCESS)
+                                onComplete(NetworkManager.SUCCESS)
                             }
 
                             override fun onError(error: ANError) {

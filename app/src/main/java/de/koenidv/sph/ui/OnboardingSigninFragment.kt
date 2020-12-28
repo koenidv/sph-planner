@@ -86,6 +86,8 @@ class OnboardingSigninFragment : Fragment() {
                                 schoolid.adapter = SpinAdapter(requireContext(), schoolIds)
                                 schoolid.setPositiveButton(getString(R.string.cancel))
                                 schoolid.setTitle(getString(R.string.onboard_select_school))
+                                schoolid.setSelection(schoolIds.indexOf("Gymnasium am Mosbacher Berg, Wiesbaden" to "5146"))
+
                                 // Set component visibility
                                 loadicon.visibility = View.GONE
                                 title.visibility = View.VISIBLE
@@ -167,7 +169,7 @@ class OnboardingSigninFragment : Fragment() {
                 // We'll only get a token if login was successfull
                 TokenManager().generateAccessToken(true) { success: Int, token: String? ->
                     run {
-                        if (success == NetworkManager().SUCCESS && token != null && token != "") {
+                        if (success == NetworkManager.SUCCESS && token != null && token != "") {
                             // User signed in successfully - NOW DO SOMETHING WITH IT :)
                             prefs.edit().putBoolean("credsVerified", true).apply()
                             // Move to next onboarding fragment
@@ -186,14 +188,14 @@ class OnboardingSigninFragment : Fragment() {
                             // Show an error message
                             description.setTextColor(requireContext().getColor(R.color.colorAccent))
                             description.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f)
-                            if (success == NetworkManager().FAILED_INVALID_CREDENTIALS) {
+                            if (success == NetworkManager.FAILED_INVALID_CREDENTIALS) {
                                 // Incorrect user/password
                                 description.text = getString(R.string.onboard_signin_error_credentials)
-                            } else if (success == NetworkManager().FAILED_NO_NETWORK
-                                    || success == NetworkManager().FAILED_CANCELLED) {
+                            } else if (success == NetworkManager.FAILED_NO_NETWORK
+                                    || success == NetworkManager.FAILED_CANCELLED) {
                                 // No connectivity, request timed out or got cancelled
                                 description.text = getString(R.string.onboard_signin_error_network)
-                            } else if (success == NetworkManager().FAILED_MAINTENANCE) {
+                            } else if (success == NetworkManager.FAILED_MAINTENANCE) {
                                 // sph is under maintenance
                                 description.text = getString(R.string.onboard_signin_error_maintenance)
                             }

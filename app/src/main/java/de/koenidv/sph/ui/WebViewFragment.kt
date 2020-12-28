@@ -122,7 +122,7 @@ class WebViewFragment : Fragment() {
         // else just load the page
         if (domain.contains("schulportal.hessen.de")) {
             TokenManager().generateAccessToken { success: Int, token: String? ->
-                if (success == NetworkManager().SUCCESS) {
+                if (success == NetworkManager.SUCCESS) {
                     Log.d(SphPlanner.TAG, token!!)
                     cookieManager.setCookie(domain, "sid=$token")
                     webView.loadUrl(domain)

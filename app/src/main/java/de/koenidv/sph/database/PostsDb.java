@@ -69,7 +69,7 @@ public class PostsDb {
     public List<Post> getByCourseId(String course_id) {
         final SQLiteDatabase db = dbhelper.getReadableDatabase();
         // Query posts
-        String queryString = "SELECT * FROM posts WHERE id_course = '" + course_id + "'";
+        String queryString = "SELECT * FROM posts WHERE id_course = '" + course_id + "' ORDER BY date DESC";
         Cursor cursor = db.rawQuery(queryString, null);
         // Get posts with the cursor
         return getWithCursor(cursor, db);
@@ -95,9 +95,10 @@ public class PostsDb {
                 String description = cursor.getString(4);
                 boolean unread = cursor.getInt(5) == 1;
 
-                Post newPost = new Post(postId, id_course, date, title, description, unread);
-
-                returnList.add(newPost);
+                if (postId != null) {
+                    Post newPost = new Post(postId, id_course, date, title, description, unread);
+                    returnList.add(newPost);
+                }
             } while (cursor.moveToNext());
         }
         cursor.close();

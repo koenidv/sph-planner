@@ -24,6 +24,11 @@
     <string name="emoji_check" translatable="false">✔</string>
     <string name="emoji_cross" translatable="false">❌</string>
 
+    <!-- General purpose network stuff -->
+    <string name="error_offline">Your are offline</string>
+    <string name="error_maintenance">Maintenance, try again later</string>
+    <string name="error_server">Try again in a few minutes</string>
+
     <!-- Sign in process -->
     <string name="onboard_legal_title">Before we start</string>
     <string name="onboard_legal_description">You should know a few things so that we\'ll along well 😊</string>
