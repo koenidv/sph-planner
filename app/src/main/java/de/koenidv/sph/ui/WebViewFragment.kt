@@ -4,18 +4,17 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.res.Configuration
-import android.os.Build.VERSION
-import android.os.Build.VERSION_CODES
 import android.os.Bundle
 import android.util.Log
 import android.view.*
 import android.webkit.CookieManager
-import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.webkit.WebSettingsCompat
+import androidx.webkit.WebViewFeature
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.networking.NetworkManager
@@ -91,19 +90,20 @@ class WebViewFragment : Fragment() {
                 ".schulportal.hessen.de").forEach {
             cookieManager.setCookie(it, "")
         }*/
-        // Removing only sph's cookies somehow doesn't work, so we'll remove all session cookies
+        // todo Removing only sph's cookies somehow doesn't work, so we'll remove all session cookies
         // This will also remove any login to other sites..
         cookieManager.removeSessionCookies {}
         cookieManager.setAcceptThirdPartyCookies(webView, true)
 
-        WebView.setWebContentsDebuggingEnabled(true)
-
         // Enable force dark mode above Android 10 if dark theme is selected
-        if (VERSION.SDK_INT >= VERSION_CODES.Q
-                && webView.isForceDarkAllowed
-                && ((prefs.contains("forceDark") && prefs.getBoolean("forceDark", true))
-                        || resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES)) {
-            webView.settings.forceDark = WebSettings.FORCE_DARK_ON
+        if ((!prefs.contains("forceDark") || prefs.getBoolean("forceDark", true)
+                        && resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES)) {
+            if (WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK)) {
+                WebSettingsCompat.setForceDark(webView.settings, WebSettingsCompat.FORCE_DARK_ON)
+            }
+            if (WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK_STRATEGY)) {
+                WebSettingsCompat.setForceDarkStrategy(webView.settings, WebSettingsCompat.DARK_STRATEGY_PREFER_WEB_THEME_OVER_USER_AGENT_DARKENING)
+            }
         }
 
         // Enable using back button for webView

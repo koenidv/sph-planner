@@ -12,6 +12,17 @@
         android:orientation="vertical">
 
         <TextView
+            android:id="@+id/pinsTitleTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="32dp"
+            android:fontFamily="@font/roboto_slab"
+            android:text="@string/attachments_pins_title"
+            android:textSize="16sp" />
+
+        <TextView
             android:id="@+id/postsTitleTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -23,12 +34,25 @@
             android:textSize="16sp" />
 
         <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/pinsRecycler"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:clipToPadding="false"
+            android:orientation="horizontal"
+            android:paddingEnd="16dp"
+            android:paddingStart="16dp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:listitem="@layout/item_attachment" />
+
+        <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/postsRecycler"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:nestedScrollingEnabled="false"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:listitem="@layout/item_post" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/loadMorePostsButton"

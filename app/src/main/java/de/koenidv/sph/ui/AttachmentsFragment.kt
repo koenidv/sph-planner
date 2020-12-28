@@ -35,7 +35,7 @@ class AttachmentsFragment : Fragment() {
 
         val posts = PostsDb.getInstance().getByCourseId(courseId)
         val tasks = PostTasksDb.getInstance().getByCourseId(courseId)
-        val attachments = FileAttachmentsDb.getInstance().getPostByCourseId(courseId)
+        val attachments = FileAttachmentsDb.getInstance().getByCourseId(courseId)
 
 
 

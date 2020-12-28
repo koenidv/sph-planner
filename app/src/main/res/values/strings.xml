@@ -89,6 +89,7 @@
     <string name="timetable_title">Timetable</string>
 
     <!-- Attachments -->
+    <string name="attachments_pins_title">Pinned attachments</string>
     <string name="attachments_title">Files &amp; Links</string>
     <string name="attachments_namereplace_picture">Picture</string>
     <string name="attachments_downloading_size">Downlaoding %s</string>

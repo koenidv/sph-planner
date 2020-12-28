@@ -115,14 +115,16 @@ public class LinkAttachmentsDb {
 
     /**
      * Get a list of pinned attachments with links for a course
+     * The list will be sorted by last use
      *
      * @param course_id Course to find attached links for
-     * @return List of pinned Attachments with LinkAttachments
+     * @return List of pinned Attachments with LinkAttachments, sorted by last use
      */
-    public List<Attachment> getPinnedByCourseId(String course_id) {
+    public List<Attachment> getPinsByCourseId(String course_id) {
         final SQLiteDatabase db = dbhelper.getReadableDatabase();
         // Query posts
-        String queryString = "SELECT * FROM linkAttachments WHERE pinned=1 AND id_course = '" + course_id + "'";
+        String queryString = "SELECT * FROM linkAttachments WHERE pinned=1 " +
+                "AND id_course = '" + course_id + "' ORDER BY lastUse DESC";
         Cursor cursor = db.rawQuery(queryString, null);
         // Get posts with the cursor
         return getWithCursor(cursor);

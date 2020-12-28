@@ -54,6 +54,7 @@ dependencies {
     implementation 'org.jsoup:jsoup:1.13.1' // Parse html
     implementation 'me.saket:better-link-movement-method:2.2.0'
     implementation 'androidx.gridlayout:gridlayout:1.0.0'// Open links in-app
+    implementation 'androidx.webkit:webkit:1.4.0'
 
     testImplementation 'junit:junit:4.13.1'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'

@@ -12,10 +12,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
+import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
+import de.koenidv.sph.adapters.AttachmentsAdapter
 import de.koenidv.sph.adapters.PostsAdapter
 import de.koenidv.sph.database.*
 import de.koenidv.sph.networking.AttachmentManager
@@ -32,8 +34,10 @@ class CourseOverviewFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_course_overview, container, false)
         val prefs: SharedPreferences = SphPlanner.applicationContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
 
-        val postsRecycler = view.findViewById<RecyclerView>(R.id.postsRecycler)
+        val pinsTitleText = view.findViewById<TextView>(R.id.pinsTitleTextView)
+        val pinsRecycler = view.findViewById<RecyclerView>(R.id.pinsRecycler)
         val postsTitleText = view.findViewById<TextView>(R.id.postsTitleTextView)
+        val postsRecycler = view.findViewById<RecyclerView>(R.id.postsRecycler)
         val postsLoading = view.findViewById<ProgressBar>(R.id.postsLoading)
         val loadMorePostsButton = view.findViewById<MaterialButton>(R.id.loadMorePostsButton)
 
@@ -47,13 +51,33 @@ class CourseOverviewFragment : Fragment() {
         // Set open in browser url
         SphPlanner.openInBrowserUrl = getString(R.string.url_course_overview).replace("%numberid", course?.number_id.toString())
 
+        // Get data
         val posts = PostsDb.getInstance().getByCourseId(courseId)
         val tasks = PostTasksDb.getInstance().getByCourseId(courseId)
         // Get file attachments..
-        val attachments = FileAttachmentsDb.getInstance().getPostByCourseId(courseId).toMutableList()
+        val attachments = FileAttachmentsDb.getInstance().getByCourseId(courseId).toMutableList()
+        val pins = FileAttachmentsDb.getInstance().getPinsByCourseId(courseId).toMutableList()
         // ..and link attachments
         if (prefs.getBoolean("links_in_post_attachments", true))
             attachments.addAll(LinkAttachmentsDb.getInstance().getByCourseId(courseId))
+        pins.addAll(LinkAttachmentsDb.getInstance().getPinsByCourseId(courseId))
+        // We need to reorder pins as files and links should be mixed, according to their last use
+        pins.sortByDescending { it.lastuse() }
+
+        /*
+         * Pinned attachments recycler
+         */
+
+        if (!pins.isNullOrEmpty()) {
+            pinsRecycler.adapter = AttachmentsAdapter(pins,
+                    AttachmentManager().onAttachmentClick(requireActivity()),
+                    AttachmentManager().onAttachmentLongClick(requireActivity()))
+            PagerSnapHelper().attachToRecyclerView(pinsRecycler)
+        } else {
+            // Hide recycler and title if there are no pinned attachments
+            pinsTitleText.visibility = View.GONE
+            pinsRecycler.visibility = View.GONE
+        }
 
 
         /*
