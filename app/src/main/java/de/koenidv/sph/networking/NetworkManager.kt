@@ -1,10 +1,12 @@
 package de.koenidv.sph.networking
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.androidnetworking.AndroidNetworking
 import com.androidnetworking.common.Priority
 import com.androidnetworking.error.ANError
@@ -43,12 +45,21 @@ class NetworkManager {
             R.id.nav_home -> onComplete(FAILED_UNKNOWN)
             R.id.nav_courses -> onComplete(FAILED_UNKNOWN)
             R.id.frag_posts -> {
+                // Course Overview fragment
+                // Update posts, tasks, files, links
                 if (arguments?.getString("courseId") != null) {
                     // Update posts for this course
                     loadAndSavePosts(listOf(
                             CoursesDb.getInstance().getByInternalId(arguments.getString("courseId")))) {
-                        // todo notify via broadcast
                         // todo only after x time
+
+                        if (it == SUCCESS) {
+                            // Send broadcast to update posts, tasks and attachments in CourseOverviewFragment
+                            val uiBroadcast = Intent("uichange")
+                            uiBroadcast.putExtra("content", "posts")
+                            LocalBroadcastManager.getInstance(applicationContext()).sendBroadcast(uiBroadcast)
+                        }
+
                         onComplete(it)
                     }
                 }
@@ -62,19 +73,19 @@ class NetworkManager {
         // todo include tiles
         // Firstly, create a index of all courses
         createCourseIndex { courses ->
-            if (courses == SUCCESS) {
-                // Load and parse timetable
+            if (courses == SUCCESS)
+            // Load and parse timetable
                 loadAndSaveTimetable { lessons ->
                     if (lessons == SUCCESS)
                     // Load all posts, tasks, attachments and links from all courses
                         NetworkManager().loadAndSavePosts(markAsRead = true) { posts ->
-                            if (posts == SUCCESS) {
+                            if (posts == SUCCESS)
                                 onComplete(SUCCESS)
-                            }
-                            // todo handle errors
+                            else onComplete(posts)
                         }
+                    else onComplete(lessons)
                 }
-            }
+            else onComplete(courses)
         }
     }
 
@@ -87,7 +98,6 @@ class NetworkManager {
         coursesDb.clear()
         // Set courses last updated to 0 in case this gets cancelled
         prefs.edit().putLong("courses_last_updated", 0).apply()
-
 
         // Firstly, load courses from timetable so we have an overview
         loadSiteWithToken(applicationContext().getString(R.string.url_timetable), onComplete = { successTimetable: Int, responseTimetable: String? ->
@@ -169,7 +179,7 @@ class NetworkManager {
                         }
                         counter++
                         if (counter == courses.size) {
-                            // todo error handling
+                            // Return success or the highest error code
                             if (errors.isEmpty())
                                 onComplete(SUCCESS)
                             else onComplete(errors.maxOf { it })
@@ -231,7 +241,7 @@ class NetworkManager {
                             override fun onError(error: ANError) {
                                 when (error.errorDetail) {
                                     "connectionError" -> {
-                                        // This will also be called if reqest timed out
+                                        // This will also be called if request timed out
                                         onComplete(FAILED_NO_NETWORK, null)
                                     }
                                     "requestCancelledError" -> {
@@ -244,10 +254,7 @@ class NetworkManager {
                             }
 
                         })
-            } else {
-                Toast.makeText(applicationContext(), R.string.error, Toast.LENGTH_SHORT).show()
-                onComplete(success, null)
-            }
+            } else onComplete(success, null)
         }
     }
 

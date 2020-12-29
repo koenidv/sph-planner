@@ -150,5 +150,10 @@
     <string name="error_offline">Du bist offline</string>
     <string name="error_maintenance">Wartung, versuche es später erneut</string>
     <string name="error_server">Versuche es in einigen Minuten erneut</string>
+    <string name="onboard_signin_error_server">Ein Serverfehler ist aufgetreten.\nBitte versuche es in einigen Minuten erneut.</string>
+    <string name="onboard_supported_error_maintenance">Das Schulportal wird im Moment gewartet.\nTippe, um es erneut zu versuchen.</string>
+    <string name="onboard_supported_error_server">Ein Serverfehler ist aufgetreten.\nBitte versuche es in einigen Minuten erneut.</string>
+    <string name="onboard_supported_error_unknown">Etwas ist schiefgelaufen.\nTippe, um es erneut zu versuchen.</string>
+    <string name="onboard_signin_info_wrong_credentials">Deine Zugangsdaten scheinen nicht mehr zu stimmen.\nBitte melde dich erneut an.</string>
 
 </resources>

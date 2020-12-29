@@ -198,6 +198,9 @@ class OnboardingSigninFragment : Fragment() {
                             } else if (success == NetworkManager.FAILED_MAINTENANCE) {
                                 // sph is under maintenance
                                 description.text = getString(R.string.onboard_signin_error_maintenance)
+                            } else if (success == NetworkManager.FAILED_SERVER_ERROR) {
+                                // An server error occurred
+                                description.text = getString(R.string.onboard_signin_error_maintenance)
                             }
                         }
                     }

@@ -76,7 +76,7 @@ class MainActivity : AppCompatActivity() {
             navController.currentDestination?.id?.let { destination ->
                 // If destination is known, let network manager handle the refreshing
                 NetworkManager().handlePullToRefresh(destination, lastNavArguments) { success ->
-                    val errorSnackbar = Snackbar.make(findViewById<FragmentContainerView>(R.id.nav_host_fragment), "", Snackbar.LENGTH_SHORT)
+                    val errorSnackbar = Snackbar.make(findViewById<FragmentContainerView>(R.id.nav_host_fragment), "", Snackbar.LENGTH_LONG)
                     errorSnackbar.setAnchorView(R.id.nav_view)
                     // Show error message if needed
                     when (success) {
@@ -87,8 +87,13 @@ class MainActivity : AppCompatActivity() {
                             errorSnackbar.setText(R.string.error).show()
                         else -> if (success != NetworkManager.SUCCESS) errorSnackbar.setText(R.string.error).show()
                     }
-                    // todo handle ERROR_WRONG_CREDENTIALS
+                    // Indicate no longer refreshing
                     swipeRefresh.isRefreshing = false
+                    if (success == NetworkManager.FAILED_INVALID_CREDENTIALS) {
+                        // Credentials seem to be invalid
+                        // Show sign in screen
+                        prefs.edit().remove("credsVerified").apply()
+                    }
                 }
             }
         }

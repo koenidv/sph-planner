@@ -1,7 +1,6 @@
 package de.koenidv.sph.ui
 
-import android.content.Context
-import android.content.SharedPreferences
+import android.content.*
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,6 +10,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
@@ -23,11 +23,95 @@ import de.koenidv.sph.database.*
 import de.koenidv.sph.networking.AttachmentManager
 import de.koenidv.sph.objects.Attachment
 import de.koenidv.sph.objects.Course
+import de.koenidv.sph.objects.Post
+import de.koenidv.sph.objects.PostTask
 import me.saket.bettermovementmethod.BetterLinkMovementMethod
 
 
 // Created by koenidv on 18.12.2020.
 class CourseOverviewFragment : Fragment() {
+
+    lateinit var courseId: String
+    var isExanded = false
+    lateinit var postsRecycler: RecyclerView
+    lateinit var posts: MutableList<Post>
+    lateinit var tasks: MutableList<PostTask>
+    lateinit var attachments: MutableList<Attachment>
+    lateinit var postsToShow: MutableList<Post>
+    lateinit var taskstoShow: MutableList<PostTask>
+    lateinit var attachsToShow: MutableList<Attachment>
+
+    // Refresh whenever the broadcast "uichange" is received
+    private val uichangeReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            // Only do something posts were updated
+            // This includes attachments, tasks
+            if (intent.getStringExtra("content") == "posts") {
+                val allPosts: List<Post> = if (!isExanded) {
+                    // Not expanded, get 2 latest posts
+                    PostsDb.getInstance().getByCourseId(courseId, 2)
+                } else {
+                    // Expanded, get all posts
+                    PostsDb.getInstance().getByCourseId(courseId)
+                }
+                // Add all new posts to the posts list
+                // Removed posts will not be removed
+                // That shouldn't happen all to often and if it does,
+                // the changes will be reflected once the fragment is recreated
+                var changed = 0
+                // New posts will most probably be the latest ones
+                // Even if not, it's good to have freshly fetched posts at the top of the list
+                for (post in allPosts) {
+                    if (!posts.contains(post)) {
+                        posts.add(0, post)
+                        // Add new task for this post
+                        tasks.addAll(PostTasksDb.getInstance().getByPostId(post.postId))
+                        // Add new attachments for this post
+                        attachments.addAll(FileAttachmentsDb.getInstance().getByPostId(post.postId))
+                        attachments.addAll(LinkAttachmentsDb.getInstance().getByPostId(post.postId))
+                        // Well add tasks and attachments to display here,
+                        // so we don't have to filter again later
+                        taskstoShow.addAll(PostTasksDb.getInstance().getByPostId(post.postId))
+                        attachsToShow.addAll(FileAttachmentsDb.getInstance().getByPostId(post.postId))
+                        attachsToShow.addAll(LinkAttachmentsDb.getInstance().getByPostId(post.postId))
+                        changed++
+                    }
+                }
+                // If anything changed, update recyclerview
+                // We can assume that posts are added to the top
+                if (changed > 0) {
+                    // Add all posts that should be displayed
+                    //posts.sortByDescending { it.date }
+                    postsToShow.clear()
+                    if (!isExanded) {
+                        postsToShow.addAll(posts.take(2))
+                        // Mark displayed posts as read
+                        PostsDb.getInstance().markAsRead(postsToShow[0].postId, postsToShow.getOrNull(1)?.postId)
+                        // todo properly update recyclerview
+                        if (changed == 1) {
+                            postsRecycler.adapter?.notifyItemRangeRemoved(2 - changed, 1)
+                            postsRecycler.adapter?.notifyItemRangeInserted(0, changed)
+                        } else postsRecycler.adapter?.notifyDataSetChanged()
+                    } else {
+                        postsToShow.addAll(posts)
+                        postsRecycler.adapter?.notifyDataSetChanged()
+                        // Mark all posts as read
+                        PostsDb.getInstance().markAsRead(courseId)
+                    }
+                    // Notify about new items
+                    //postsRecycler.adapter?.notifyItemRangeChanged(0, changed - 1)
+                }
+
+            }
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        // Register to receive messages.
+        LocalBroadcastManager.getInstance(requireContext()).registerReceiver(uichangeReceiver,
+                IntentFilter("uichange"))
+    }
 
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -38,12 +122,12 @@ class CourseOverviewFragment : Fragment() {
         val pinsTitleText = view.findViewById<TextView>(R.id.pinsTitleTextView)
         val pinsRecycler = view.findViewById<RecyclerView>(R.id.pinsRecycler)
         val postsTitleText = view.findViewById<TextView>(R.id.postsTitleTextView)
-        val postsRecycler = view.findViewById<RecyclerView>(R.id.postsRecycler)
+        postsRecycler = view.findViewById(R.id.postsRecycler)
         val postsLoading = view.findViewById<ProgressBar>(R.id.postsLoading)
         val loadMorePostsButton = view.findViewById<MaterialButton>(R.id.loadMorePostsButton)
 
         // Get passed course id argument
-        val courseId = arguments?.getString("courseId") ?: ""
+        courseId = arguments?.getString("courseId") ?: ""
         val course: Course? = CoursesDb.getInstance().getByInternalId(courseId)
 
         // Set action bar title
@@ -53,10 +137,10 @@ class CourseOverviewFragment : Fragment() {
         SphPlanner.openInBrowserUrl = getString(R.string.url_course_overview).replace("%numberid", course?.number_id.toString())
 
         // Get data
-        val posts = PostsDb.getInstance().getByCourseId(courseId)
-        val tasks = PostTasksDb.getInstance().getByCourseId(courseId)
+        posts = PostsDb.getInstance().getByCourseId(courseId).toMutableList()
+        tasks = PostTasksDb.getInstance().getByCourseId(courseId).toMutableList()
         // Get file attachments..
-        val attachments = FileAttachmentsDb.getInstance().getByCourseId(courseId).toMutableList()
+        attachments = FileAttachmentsDb.getInstance().getByCourseId(courseId).toMutableList()
         val pins = FileAttachmentsDb.getInstance().getPinsByCourseId(courseId).toMutableList()
         // ..and link attachments
         if (prefs.getBoolean("links_in_post_attachments", true))
@@ -64,6 +148,10 @@ class CourseOverviewFragment : Fragment() {
         pins.addAll(LinkAttachmentsDb.getInstance().getPinsByCourseId(courseId))
         // We need to reorder pins as files and links should be mixed, according to their last use
         pins.sortByDescending { it.lastuse() }
+
+        // Initialize inline function so we can use it in onAttachmentLongClick,
+        // but also attach the adapter from there
+        var attachPinsAdapter: () -> Unit = {}
 
         // Prepare listeners
         val onAttachmentClick = AttachmentManager().onAttachmentClick(requireActivity()) { _: Int, _: Attachment ->
@@ -82,6 +170,12 @@ class CourseOverviewFragment : Fragment() {
                     pinsRecycler.adapter?.notifyItemMoved(index, 0)
                 }
                 AttachmentManager.ATTACHMENT_PINNED -> {
+                    // Make title and recycler visible if this is the first pin
+                    if (pinsTitleText.visibility == View.GONE) {
+                        pinsTitleText.visibility = View.VISIBLE
+                        pinsRecycler.visibility = View.VISIBLE
+                        attachPinsAdapter()
+                    }
                     // New attachment pinned
                     // Add it to the front
                     pins.add(0, attachment)
@@ -95,6 +189,11 @@ class CourseOverviewFragment : Fragment() {
                     pins.removeAt(index)
                     // Notify the adapter
                     pinsRecycler.adapter?.notifyItemRemoved(index)
+                    // Hide title and recycler if this was the last pin
+                    if (pins.isEmpty()) {
+                        pinsTitleText.visibility = View.GONE
+                        pinsRecycler.visibility = View.GONE
+                    }
                 }
             }
 
@@ -104,11 +203,15 @@ class CourseOverviewFragment : Fragment() {
          * Pinned attachments recycler
          */
 
-        if (!pins.isNullOrEmpty()) {
+        attachPinsAdapter = {
             pinsRecycler.adapter = AttachmentsAdapter(pins,
                     onAttachmentClick,
                     onAttachmentLongClick)
             PagerSnapHelper().attachToRecyclerView(pinsRecycler)
+        }
+
+        if (!pins.isNullOrEmpty()) {
+            attachPinsAdapter()
         } else {
             // Hide recycler and title if there are no pinned attachments
             pinsTitleText.visibility = View.GONE
@@ -123,9 +226,9 @@ class CourseOverviewFragment : Fragment() {
          */
 
         if (posts.isNotEmpty()) {
-            val postsToShow = posts.take(2).toMutableList()
-            val taskstoShow = tasks.filter { it.id_post == postsToShow[0].postId || it.id_post == postsToShow.getOrNull(1)?.postId }.toMutableList()
-            val filesToShow = attachments.filter { it.postId() == postsToShow[0].postId || it.postId() == postsToShow.getOrNull(1)?.postId }.toMutableList()
+            postsToShow = posts.take(2).toMutableList()
+            taskstoShow = tasks.filter { it.id_post == postsToShow[0].postId || it.id_post == postsToShow.getOrNull(1)?.postId }.toMutableList()
+            attachsToShow = attachments.filter { it.postId() == postsToShow[0].postId || it.postId() == postsToShow.getOrNull(1)?.postId }.toMutableList()
 
             // Movement method to open links in-app
             val movementMethod = BetterLinkMovementMethod.newInstance()
@@ -142,7 +245,7 @@ class CourseOverviewFragment : Fragment() {
             val postsAdapter = PostsAdapter(
                     postsToShow,
                     taskstoShow,
-                    filesToShow,
+                    attachsToShow,
                     movementMethod,
                     onAttachmentClick,
                     onAttachmentLongClick)
@@ -155,8 +258,8 @@ class CourseOverviewFragment : Fragment() {
                 postsToShow.addAll(posts)
                 taskstoShow.clear()
                 taskstoShow.addAll(tasks)
-                filesToShow.clear()
-                filesToShow.addAll(attachments)
+                attachsToShow.clear()
+                attachsToShow.addAll(attachments)
                 // Show loading symbol and hide button
                 postsLoading.visibility = View.VISIBLE
                 loadMorePostsButton.visibility = View.GONE
@@ -166,6 +269,8 @@ class CourseOverviewFragment : Fragment() {
                 postsLoading.visibility = View.GONE
                 // Mark all posts as read
                 PostsDb.getInstance().markAsRead(courseId)
+                // Remember we're showing all posts, using this in the update function
+                isExanded = true
             }
 
             // Mark displayed posts as read
@@ -182,6 +287,12 @@ class CourseOverviewFragment : Fragment() {
         }
 
         return view
+    }
+
+    override fun onDestroy() {
+        // Unregister broadcast receiver
+        LocalBroadcastManager.getInstance(requireActivity()).unregisterReceiver(uichangeReceiver)
+        super.onDestroy()
     }
 
 }

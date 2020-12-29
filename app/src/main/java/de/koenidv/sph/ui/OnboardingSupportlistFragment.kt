@@ -35,13 +35,17 @@ class OnboardingSupportlistFragment : Fragment() {
         // Get supported features
         NetworkManager().loadSiteWithToken("https://start.schulportal.hessen.de/index.php", onComplete = { success: Int, response: String? ->
 
-            // todo handle success != 0
             if (success != NetworkManager.SUCCESS) {
                 // Display network error
                 // Might display if sph is being maintained
                 // Credentials should be valid as we just checked them in the last onboarding step
                 featuresLoading.visibility = View.GONE
-                titleText.text = getString(R.string.onboard_supported_error_network)
+                titleText.text = when (success) {
+                    NetworkManager.FAILED_NO_NETWORK -> getString(R.string.onboard_supported_error_network)
+                    NetworkManager.FAILED_MAINTENANCE -> getString(R.string.onboard_supported_error_maintenance)
+                    NetworkManager.FAILED_SERVER_ERROR -> getString(R.string.onboard_supported_error_server)
+                    else -> getString(R.string.onboard_supported_error_unknown)
+                }
                 warningText.visibility = View.VISIBLE
                 warningText.setTextColor(requireContext().getColor(R.color.colorAccent))
                 warningText.setOnClickListener {

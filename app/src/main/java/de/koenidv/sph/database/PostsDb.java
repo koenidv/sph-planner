@@ -75,6 +75,23 @@ public class PostsDb {
         return getWithCursor(cursor, db);
     }
 
+    /**
+     * Gets the latest n entries for a specific course
+     *
+     * @param course_id Course to get posts for
+     * @param limit     Maximum amount of posts
+     * @return List of n newest posts for a course
+     */
+    public List<Post> getByCourseId(String course_id, int limit) {
+        final SQLiteDatabase db = dbhelper.getReadableDatabase();
+        // Query posts
+        String queryString = "SELECT * FROM posts WHERE id_course = '" + course_id + "' " +
+                "AND post_id NOT NULL ORDER BY date DESC LIMIT " + limit;
+        Cursor cursor = db.rawQuery(queryString, null);
+        // Get posts with the cursor
+        return getWithCursor(cursor, db);
+    }
+
     public List<Post> getUnread() {
         final SQLiteDatabase db = dbhelper.getReadableDatabase();
         // Query posts

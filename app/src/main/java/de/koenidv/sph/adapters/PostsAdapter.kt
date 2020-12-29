@@ -22,6 +22,7 @@ import me.saket.bettermovementmethod.BetterLinkMovementMethod
 import java.text.SimpleDateFormat
 import java.util.*
 
+
 //  Created by koenidv on 20.12.2020.
 class PostsAdapter(private val posts: List<Post>,
                    private val tasks: List<PostTask>,

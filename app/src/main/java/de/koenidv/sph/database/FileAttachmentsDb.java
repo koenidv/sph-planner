@@ -152,8 +152,8 @@ public class FileAttachmentsDb {
         return cursorToAttachment(cursor);
     }
 
-    public List<FileAttachment> getByPostId(String postid) {
-        List<FileAttachment> returnList = new ArrayList<>();
+    public List<Attachment> getByPostId(String postid) {
+        List<Attachment> returnList = new ArrayList<>();
         final SQLiteDatabase db = dbhelper.getReadableDatabase();
 
         String queryString = "SELECT * FROM fileAttachments WHERE id_post = '" + postid + "'";
@@ -173,9 +173,9 @@ public class FileAttachmentsDb {
                 Date lastUse = null;
                 if (!cursor.isNull(9)) lastUse = new Date(cursor.getInt(9) * 1000);
 
-                FileAttachment newFileAttachment = new FileAttachment(attachmentId, id_course, id_post, name, date, url, size, type, pinned, lastUse);
+                Attachment newAttachment = new Attachment(new FileAttachment(attachmentId, id_course, id_post, name, date, url, size, type, pinned, lastUse));
 
-                returnList.add(newFileAttachment);
+                returnList.add(newAttachment);
             } while (cursor.moveToNext());
         }
 
