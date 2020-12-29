@@ -1,7 +1,17 @@
 package de.koenidv.sph.parsing
 
+import android.content.Context
 import android.content.pm.PackageManager
+import android.content.res.Resources
+import android.graphics.BlendMode
+import android.graphics.BlendModeColorFilter
+import android.graphics.PorterDuff
+import android.graphics.drawable.StateListDrawable
+import android.os.Build
 import android.util.TypedValue
+import android.view.View
+import androidx.annotation.AttrRes
+import androidx.annotation.ColorInt
 import androidx.appcompat.app.AppCompatActivity
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
@@ -123,5 +133,44 @@ class Utility {
         }
         return greeting.replace("%name", prefs.getString("real_name", "").toString())
     }
+
+    /**
+     * Tints a view's background
+     * @param view View to tint
+     * @param color Color to use as color int
+     * @param opacity opacity as hex int, i.e. 0xb4000000 for about 70%
+     */
+    fun tintBackground(view: View, color: Int, opacity: Int) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            (view.background as StateListDrawable).colorFilter = BlendModeColorFilter(
+                    color and 0x00FFFFFF or opacity, BlendMode.SRC_ATOP)
+        } else {
+            @Suppress("DEPRECATION") // not in < Q
+            (view.background as StateListDrawable).setColorFilter(
+                    color and 0x00FFFFFF or opacity, PorterDuff.Mode.SRC_ATOP)
+        }
+    }
+
+    /**
+     * Get a color from a theme reference
+     */
+    @ColorInt
+    fun getThemedColor(@AttrRes attr: Int): Int {
+        val typedValue = TypedValue()
+        val theme: Resources.Theme = SphPlanner.applicationContext().theme
+        theme.resolveAttribute(attr, typedValue, true)
+        return typedValue.data
+    }
+
+    @ColorInt
+    fun Context.getColorFromAttr(
+            @AttrRes attrColor: Int,
+            typedValue: TypedValue = TypedValue(),
+            resolveRefs: Boolean = true
+    ): Int {
+        theme.resolveAttribute(attrColor, typedValue, resolveRefs)
+        return typedValue.data
+    }
+
 
 }

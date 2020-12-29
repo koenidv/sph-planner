@@ -107,7 +107,7 @@ class CourseOverviewFragment : Fragment() {
                         postsToShow.addAll(posts)
                         postsRecycler.adapter?.notifyDataSetChanged()
                         // Mark all posts as read
-                        PostsDb.getInstance().markAsRead(courseId)
+                        PostsDb.getInstance().markCourseAsRead(courseId)
                     }
                     // Notify about new items
                     //postsRecycler.adapter?.notifyItemRangeChanged(0, changed - 1)
@@ -279,7 +279,7 @@ class CourseOverviewFragment : Fragment() {
                 postsAdapter.notifyDataSetChanged()
                 postsLoading.visibility = View.GONE
                 // Mark all posts as read
-                PostsDb.getInstance().markAsRead(courseId)
+                PostsDb.getInstance().markCourseAsRead(courseId)
                 // Remember we're showing all posts, using this in the update function
                 isExanded = true
             }

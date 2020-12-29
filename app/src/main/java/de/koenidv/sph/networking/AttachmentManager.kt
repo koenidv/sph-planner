@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Looper
 import android.util.Log
@@ -14,6 +15,7 @@ import android.widget.TextView
 import androidx.core.app.ShareCompat
 import androidx.core.content.FileProvider
 import androidx.core.os.bundleOf
+import androidx.navigation.Navigation
 import androidx.navigation.findNavController
 import com.androidnetworking.AndroidNetworking
 import com.androidnetworking.common.Priority
@@ -28,6 +30,7 @@ import de.koenidv.sph.database.FileAttachmentsDb
 import de.koenidv.sph.database.LinkAttachmentsDb
 import de.koenidv.sph.objects.Attachment
 import de.koenidv.sph.objects.FileAttachment
+import me.saket.bettermovementmethod.BetterLinkMovementMethod
 import okhttp3.Cookie
 import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
@@ -43,6 +46,18 @@ class AttachmentManager {
         const val ATTACHMENT_PINNED = 2
         const val ATTACHMENT_UNPINNED = 3
     }
+
+    // Movement method to open links in-app
+    fun movementMethod(activity: Activity, webViewAction: Int): BetterLinkMovementMethod = BetterLinkMovementMethod.newInstance()
+            .setOnLinkClickListener { _, url ->
+                val prefs: SharedPreferences = applicationContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
+                if (prefs.getBoolean("open_links_inapp", true)) {
+                    // Open WebViewFragment with respective url on click
+                    Navigation.findNavController(activity, R.id.nav_host_fragment)
+                            .navigate(webViewAction, bundleOf("url" to url))
+                    true
+                } else false
+            }
 
     /**
      * Returns a lambda to handle clicks on an attachment item

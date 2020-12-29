@@ -12,14 +12,6 @@
         <item quantity="one">Ein Anhang</item>
         <item quantity="other">%d Anhänge</item>
     </plurals>
-    <plurals name="posts_info_attachments_and_task_done">
-        <item quantity="one">Ein Anhang und Aufgabe erledigt</item>
-        <item quantity="other">%d Anhänge und Aufgabe erledit</item>
-    </plurals>
-    <plurals name="posts_info_attachments_and_task_undone">
-        <item quantity="one">Ein Anhang und eine offene Aufgabe</item>
-        <item quantity="other">%d Anhänge und eine offene Aufgabe</item>
-    </plurals>
     <plurals name="posts_more_unread">
         <item quantity="one">Ein weiterer ungelesener Beitrag</item>
         <item quantity="other">%d weitere ungelesene Beiträge</item>
@@ -143,8 +135,8 @@
     <string name="onboard_signin_info_wrong_credentials">Deine Zugangsdaten scheinen nicht mehr zu stimmen.\nBitte melde dich erneut an.</string>
     <string name="posts_unread_title">Neue Einträge</string>
     <string name="posts_no_text">Keine Beschreibung</string>
-    <string name="posts_info_homework_done">Aufgabe erledigt</string>
-    <string name="posts_info_homework_undone">Mit einer nicht erledigten Aufgabe</string>
+    <string name="posts_info_task_done">Aufgabe erledigt</string>
+    <string name="posts_info_task_undone">Offene Aufgabe</string>
     <string name="post_unread">Ungelesen</string>
     <string-array name="courseId_fullName">
         <item>d|Deutsch</item>
@@ -176,5 +168,6 @@
         <item>rka|Reli</item>
         <item>rev|Reli</item>
     </string-array>
+    <string name="course_from">Aus</string>
 
 </resources>

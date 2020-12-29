@@ -76,7 +76,9 @@ class HomeFragment : Fragment() {
             moreUnreadText.visibility = View.VISIBLE
         }
 
-        unreadPostsRecycler.adapter = CompactPostsAdapter(posts) {}
+        unreadPostsRecycler.adapter = CompactPostsAdapter(posts) {
+            PostSheet(it).show(parentFragmentManager, "post")
+        }
 
         unreadPostsLayout.setOnClickListener {
             Toast.makeText(context, "Coming, sometime", Toast.LENGTH_SHORT).show()

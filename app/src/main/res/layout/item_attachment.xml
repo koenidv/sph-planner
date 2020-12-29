@@ -49,7 +49,7 @@
             android:fontFamily="@font/font_awesome"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            tools:text="icons" />
+            tools:text="check-circle file" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

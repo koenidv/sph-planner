@@ -104,7 +104,7 @@ public class PostsDb {
     public List<Post> getUnread() {
         final SQLiteDatabase db = dbhelper.getReadableDatabase();
         // Query posts
-        String queryString = "SELECT * FROM posts WHERE unread = 1";
+        String queryString = "SELECT * FROM posts WHERE unread = 1 ORDER BY date DESC";
         Cursor cursor = db.rawQuery(queryString, null);
         // Get post objects and return them
         return getWithCursor(cursor, db);
@@ -136,7 +136,7 @@ public class PostsDb {
      *
      * @param courseId Internal Id of the course where the posts belong
      */
-    public void markAsRead(String courseId) {
+    public void markCourseAsRead(String courseId) {
         dbhelper.getReadableDatabase().execSQL("UPDATE posts SET unread = 0 WHERE id_course IS \"" + courseId + "\"");
     }
 

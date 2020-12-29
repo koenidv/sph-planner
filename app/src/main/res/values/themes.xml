@@ -19,6 +19,8 @@
         <item name="actionBarStyle">@style/Theme.SPH.ActionBar</item>
         <item name="customStrokeColor">@color/strokeColorLight</item>
         <item name="customStrokeWidth">2dp</item>
+        <item name="tagBackground">@color/grey_800</item>
+        <item name="tagBackgroundWarning">@color/pink_a400</item>
     </style>
 
     <style name="Theme.SPH.Electric" parent="Theme.SPH">
@@ -73,6 +75,7 @@
         <item name="bottomSheetStyle">@style/Theme.SPH.ModalStyle</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="colorPrimary">@color/textColor</item>
+        <item name="colorOnPrimary">@color/white</item>
         <item name="android:windowContentTransitions">true</item>
     </style>
 

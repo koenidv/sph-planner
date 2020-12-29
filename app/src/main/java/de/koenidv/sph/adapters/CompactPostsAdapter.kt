@@ -1,10 +1,5 @@
 package de.koenidv.sph.adapters
 
-import android.graphics.BlendMode
-import android.graphics.BlendModeColorFilter
-import android.graphics.PorterDuff
-import android.graphics.drawable.StateListDrawable
-import android.os.Build
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,7 +11,9 @@ import de.koenidv.sph.SphPlanner.Companion.applicationContext
 import de.koenidv.sph.database.AttachmentsDb
 import de.koenidv.sph.database.CoursesDb
 import de.koenidv.sph.database.PostTasksDb
+import de.koenidv.sph.database.PostsDb
 import de.koenidv.sph.objects.Post
+import de.koenidv.sph.parsing.Utility
 
 
 //  Created by koenidv on 20.12.2020.
@@ -33,6 +30,8 @@ class CompactPostsAdapter(private val posts: List<Post>,
         private val title = view.findViewById<TextView>(R.id.titleTextView)
         private val unread = view.findViewById<TextView>(R.id.unreadTextView)
         private val course = view.findViewById<TextView>(R.id.courseTextView)
+        private val attachs = view.findViewById<TextView>(R.id.attachmentsTextView)
+        private val task = view.findViewById<TextView>(R.id.taskTextView)
         private val info = view.findViewById<TextView>(R.id.infoTextView)
         private var currentPost: Post? = null
 
@@ -40,11 +39,16 @@ class CompactPostsAdapter(private val posts: List<Post>,
             layout.setOnClickListener {
                 currentPost?.let {
                     onClick(it)
+                    if (it.unread) {
+                        unread.visibility = View.GONE
+                        PostsDb.getInstance().markAsRead(it.postId)
+                    }
                 }
             }
         }
 
         fun bind(post: Post) {
+            currentPost = post
 
             val taskDone: Boolean? = PostTasksDb.getInstance().taskDone(post.postId)
             val attachCount = AttachmentsDb.countForPost(post.postId)
@@ -52,34 +56,34 @@ class CompactPostsAdapter(private val posts: List<Post>,
             // Set data
             title.text = post.title ?: post.description
                     ?: applicationContext().getString(R.string.posts_no_text)
+
             course.text = CoursesDb.getInstance().getFullname(post.id_course)
+
             if (post.unread) unread.visibility = View.VISIBLE
-            info.text = when {
-                taskDone == true && attachCount > 0 ->
-                    applicationContext().resources.getQuantityString(R.plurals.posts_info_attachments_and_task_done, attachCount, attachCount)
-                taskDone == false && attachCount > 0 ->
-                    applicationContext().resources.getQuantityString(R.plurals.posts_info_attachments_and_task_undone, attachCount, attachCount)
-                attachCount > 0 ->
-                    applicationContext().resources.getQuantityString(R.plurals.posts_info_attachments, attachCount, attachCount)
-                taskDone == true ->
-                    applicationContext().getString(R.string.posts_info_homework_done)
-                taskDone == false ->
-                    applicationContext().getString(R.string.posts_info_homework_undone)
-                else -> ""
+
+            if (attachCount > 0) {
+                attachs.visibility = View.VISIBLE
+                attachs.text = applicationContext().resources.getQuantityString(R.plurals.posts_info_attachments, attachCount, attachCount)
+            }
+            if (taskDone != null) {
+                task.visibility = View.VISIBLE
+                val color: Int
+                if (taskDone) {
+                    task.text = applicationContext().getString(R.string.posts_info_task_done)
+                    // todo use theme color
+                    //color = Utility().getThemedColor(R.attr.tagBackground)
+                    color = applicationContext().getColor(R.color.grey_800)
+                } else {
+                    task.text = applicationContext().getString(R.string.posts_info_task_undone)
+                    //color = Utility().getThemedColor(R.attr.tagBackgroundWarning)
+                    color = applicationContext().getColor(R.color.pink_a700)
+                }
+                Utility().tintBackground(task, color, 0xb4000000.toInt())
             }
 
             // Adjust course background color
             // Set background color, about 70% opacity
-            val opacity: Int = 0xb4000000.toInt()
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                (course.background as StateListDrawable).colorFilter = BlendModeColorFilter(
-                        CoursesDb.getInstance().getColor(post.id_course) and 0x00FFFFFF or opacity, BlendMode.SRC_ATOP)
-            } else {
-                @Suppress("DEPRECATION") // not in < Q
-                (course.background as StateListDrawable).setColorFilter(
-                        CoursesDb.getInstance().getColor(post.id_course) and 0x00FFFFFF or opacity, PorterDuff.Mode.SRC_ATOP)
-            }
-
+            Utility().tintBackground(course, CoursesDb.getInstance().getColor(post.id_course), 0xb4000000.toInt())
 
         }
     }

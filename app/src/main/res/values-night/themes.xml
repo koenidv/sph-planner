@@ -18,6 +18,8 @@
         <item name="actionBarStyle">@style/Theme.SPH.ActionBar</item>
         <item name="customStrokeColor">@color/strokeColorDark</item>
         <item name="customStrokeWidth">2dp</item>
+        <item name="tagBackground">@color/grey_800</item>
+        <item name="tagBackgroundWarning">@color/pink_a400</item>
     </style>
 
     <!-- Override only for 30s theme-->
@@ -40,6 +42,7 @@
         <item name="bottomSheetStyle">@style/Theme.SPH.ModalStyle</item>
         <item name="colorAccent">@color/white</item>
         <item name="colorPrimary">@color/white</item>
+        <item name="colorOnPrimary">@color/white</item>
         <item name="android:windowContentTransitions">true</item>
     </style>
 

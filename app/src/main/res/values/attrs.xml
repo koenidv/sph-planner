@@ -2,4 +2,6 @@
 <resources>
     <attr name="customStrokeColor" format="color" />
     <attr name="customStrokeWidth" format="dimension" />
+    <attr name="tagBackground" format="color" />
+    <attr name="tagBackgroundWarning" format="color" />
 </resources>
