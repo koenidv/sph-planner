@@ -6,15 +6,19 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentContainerView
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.FragmentNavigatorExtras
+import androidx.recyclerview.widget.RecyclerView
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
-import de.koenidv.sph.networking.NetworkManager
+import de.koenidv.sph.adapters.CompactPostsAdapter
+import de.koenidv.sph.database.DatabaseHelper
+import de.koenidv.sph.database.PostsDb
 import de.koenidv.sph.parsing.Utility
 
 
@@ -36,15 +40,48 @@ class HomeFragment : Fragment() {
         val surpriseButton = view.findViewById<Button>(R.id.surpriseButton)
         surpriseButton.setOnClickListener {
             //NetworkManager().indexAll { Toast.makeText(SphPlanner.applicationContext(), "Heute schon, Kartoffel", Toast.LENGTH_SHORT).show() }
-            NetworkManager().loadAndSavePosts { Toast.makeText(SphPlanner.applicationContext(), "Kartoffelfeld abgeräumt", Toast.LENGTH_SHORT).show() }
+            //NetworkManager().loadAndSavePosts { Toast.makeText(SphPlanner.applicationContext(), "Kartoffelfeld abgeräumt", Toast.LENGTH_SHORT).show() }
+            DatabaseHelper.getInstance().writableDatabase.execSQL("DELETE FROM posts WHERE post_id IN (SELECT post_id FROM posts ORDER BY date DESC LIMIT 3)")
         }
+
+        /*
+         * Timetable
+         */
 
         val timetable = view.findViewById<FragmentContainerView>(R.id.timetableFragment)
-
         view.findViewById<LinearLayout>(R.id.timetableLayout).setOnClickListener {
             Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
-                    .navigate(R.id.timetableFromHomeAction, null, null, FragmentNavigatorExtras(timetable to "timetable"))
+                    .navigate(R.id.timetableFromHomeAction, null, null,
+                            FragmentNavigatorExtras(timetable to "timetable"))
         }
+
+        /*
+         * Unread posts
+         */
+
+        val unreadPostsLayout = view.findViewById<LinearLayout>(R.id.unreadPostsLayout)
+        val unreadPostsRecycler = view.findViewById<RecyclerView>(R.id.unreadPostsRecycler)
+        val moreUnreadText = view.findViewById<TextView>(R.id.moreUnreadTextView)
+
+        // Get unread posts
+        // Fill up to 4 posts with read posts
+        // Or limit to 4 and inform about more unread posts
+        var posts = PostsDb.getInstance().unread.toMutableList()
+        if (posts.size < 4) posts.addAll(PostsDb.getInstance().getAll(4 - posts.size))
+        else if (posts.size > 4) {
+            val postsOverflow = posts.size - 4
+            posts = posts.take(4).toMutableList()
+            // Display more unread posts text
+            moreUnreadText.text = resources.getQuantityString(R.plurals.posts_more_unread, postsOverflow, postsOverflow)
+            moreUnreadText.visibility = View.VISIBLE
+        }
+
+        unreadPostsRecycler.adapter = CompactPostsAdapter(posts) {}
+
+        unreadPostsLayout.setOnClickListener {
+            Toast.makeText(context, "Coming, sometime", Toast.LENGTH_SHORT).show()
+        }
+
 
         return view
 

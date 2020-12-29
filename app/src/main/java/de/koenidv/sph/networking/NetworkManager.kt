@@ -41,27 +41,34 @@ class NetworkManager {
     }
 
     fun handlePullToRefresh(destinationId: Int, arguments: Bundle?, onComplete: (success: Int) -> Unit) {
+        val prefs = applicationContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
+        val time = Date().time
+
         when (destinationId) {
             R.id.nav_home -> onComplete(FAILED_UNKNOWN)
-            R.id.nav_courses -> onComplete(FAILED_UNKNOWN)
+            R.id.nav_courses -> NetworkManager().loadAndSavePosts { Toast.makeText(applicationContext(), "Kartoffelfeld abgeräumt", Toast.LENGTH_SHORT).show();onComplete(SUCCESS) }
             R.id.frag_posts -> {
                 // Course Overview fragment
                 // Update posts, tasks, files, links
                 if (arguments?.getString("courseId") != null) {
-                    // Update posts for this course
-                    loadAndSavePosts(listOf(
-                            CoursesDb.getInstance().getByInternalId(arguments.getString("courseId")))) {
-                        // todo only after x time
+                    // Only after 2 minutes
+                    if (time - prefs.getLong("updated_posts_${arguments.getString("courseId")}", 0) > 2 * 60 * 1000) {
+                        // Update posts for this course
+                        loadAndSavePosts(listOf(
+                                CoursesDb.getInstance().getByInternalId(arguments.getString("courseId")))) {
 
-                        if (it == SUCCESS) {
-                            // Send broadcast to update posts, tasks and attachments in CourseOverviewFragment
-                            val uiBroadcast = Intent("uichange")
-                            uiBroadcast.putExtra("content", "posts")
-                            LocalBroadcastManager.getInstance(applicationContext()).sendBroadcast(uiBroadcast)
+                            if (it == SUCCESS) {
+                                // Send broadcast to update posts, tasks and attachments in CourseOverviewFragment
+                                val uiBroadcast = Intent("uichange")
+                                uiBroadcast.putExtra("content", "posts")
+                                LocalBroadcastManager.getInstance(applicationContext()).sendBroadcast(uiBroadcast)
+                            }
+
+                            onComplete(it)
                         }
-
-                        onComplete(it)
-                    }
+                    } else
+                    // Just return SUCCESS if posts for this course were updated within the last 2 minutes
+                        onComplete(SUCCESS)
                 }
             }
             else -> onComplete(FAILED_UNKNOWN)
@@ -154,6 +161,9 @@ class NetworkManager {
         // Counter for done courses
         var counter = 0
 
+        val prefs = applicationContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
+        val time = Date().time
+
         // Load every course
         for (course in courses) {
             loadSiteWithToken(applicationContext().getString(R.string.url_course_overview).replace("%numberid", course.number_id.toString()),
@@ -174,15 +184,18 @@ class NetworkManager {
                                         FileAttachmentsDb.getInstance().save(files)
                                         LinkAttachmentsDb.getInstance().save(links)
                                     })
+                            // Remember when we last refreshed this course
+                            prefs.edit().putLong("updated_posts_${course.courseId}", time).apply()
                         } else {
                             errors.add(success)
                         }
                         counter++
                         if (counter == courses.size) {
                             // Return success or the highest error code
-                            if (errors.isEmpty())
+                            if (errors.isEmpty()) {
                                 onComplete(SUCCESS)
-                            else onComplete(errors.maxOf { it })
+                                prefs.edit().putLong("updated_posts", time).apply()
+                            } else onComplete(errors.maxOf { it })
                         }
                     })
         }

@@ -128,6 +128,26 @@ public class PostTasksDb {
         return getWithCursor(cursor, db);
     }
 
+    /**
+     * Gets whether a post has a task and if it's done
+     *
+     * @param postId Post to check for
+     * @return null if the post does not have a task, true if it is done, false if not
+     */
+    public Boolean taskDone(String postId) {
+        Cursor cursor = dbhelper.getReadableDatabase().rawQuery("SELECT isdone FROM postTasks WHERE id_post=\"" + postId + "\"", null);
+        if (cursor.getCount() == 0) {
+            // No task for this post
+            cursor.close();
+            return null;
+        } else {
+            cursor.moveToFirst();
+            boolean done = cursor.getInt(0) == 1;
+            cursor.close();
+            return done;
+        }
+    }
+
 
     private List<PostTask> getWithCursor(Cursor cursor, SQLiteDatabase db) {
         List<PostTask> returnList = new ArrayList<>();

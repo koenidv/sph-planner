@@ -92,6 +92,27 @@
     <!-- Posts -->
     <string name="posts_list_title">Posts</string>
     <string name="posts_no_data">No posts yet</string>
+    <string name="posts_unread_title">New posts</string>
+    <string name="posts_no_text">No description</string>
+    <string name="posts_info_homework_done">Task done</string>
+    <string name="posts_info_homework_undone">Contains an undone task</string>
+    <plurals name="posts_info_attachments">
+        <item quantity="one">%d attachment</item>
+        <item quantity="other">%d attachments</item>
+    </plurals>
+    <plurals name="posts_info_attachments_and_task_done">
+        <item quantity="one">%d attachment and a done task</item>
+        <item quantity="other">%d attachments and a done task</item>
+    </plurals>
+    <plurals name="posts_info_attachments_and_task_undone">
+        <item quantity="one">%d attachment and an undone task</item>
+        <item quantity="other">%d attachments and an undone task</item>
+    </plurals>
+    <string name="post_unread">Unread</string>
+    <plurals name="posts_more_unread">
+        <item quantity="one">%d more unread post</item>
+        <item quantity="other">%d more unread posts</item>
+    </plurals>
 
     <!-- Timetable -->
     <string name="timetable_personal_title">Your timetable</string>

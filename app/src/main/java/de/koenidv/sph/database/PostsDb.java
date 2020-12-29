@@ -65,6 +65,15 @@ public class PostsDb {
         return getWithCursor(cursor, db);
     }
 
+    public List<Post> getAll(int limit) {
+        final SQLiteDatabase db = dbhelper.getReadableDatabase();
+        // Query posts
+        String queryString = "SELECT * FROM posts ORDER BY date DESC LIMIT " + limit;
+        Cursor cursor = db.rawQuery(queryString, null);
+        // Get posts with the cursor
+        return getWithCursor(cursor, db);
+    }
+
 
     public List<Post> getByCourseId(String course_id) {
         final SQLiteDatabase db = dbhelper.getReadableDatabase();

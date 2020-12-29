@@ -183,6 +183,14 @@ public class FileAttachmentsDb {
         return returnList;
     }
 
+    public int countForPost(String postId) {
+        Cursor cursor = dbhelper.getReadableDatabase().rawQuery("SELECT COUNT(*) FROM fileAttachments WHERE id_post=\"" + postId + "\"", null);
+        cursor.moveToFirst();
+        int count = cursor.getInt(0);
+        cursor.close();
+        return count;
+    }
+
     public List<Attachment> cursorToAttachment(Cursor cursor) {
         List<Attachment> returnList = new ArrayList<>();
         if (cursor.moveToFirst()) {

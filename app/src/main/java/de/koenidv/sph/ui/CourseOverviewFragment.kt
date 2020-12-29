@@ -54,6 +54,17 @@ class CourseOverviewFragment : Fragment() {
                     // Expanded, get all posts
                     PostsDb.getInstance().getByCourseId(courseId)
                 }
+                // If there wasn't any post before but now is,
+                // it's easier to recreate the fragment
+                if (allPosts.isNotEmpty() && postsRecycler.adapter == null) {
+                    @Suppress("DEPRECATION")
+                    parentFragmentManager.beginTransaction()
+                            .replace(R.id.nav_host_fragment,
+                                    instantiate(context, CourseOverviewFragment().javaClass.name,
+                                            bundleOf("courseId" to courseId)))
+                            .commit()
+                    return
+                }
                 // Add all new posts to the posts list
                 // Removed posts will not be removed
                 // That shouldn't happen all to often and if it does,

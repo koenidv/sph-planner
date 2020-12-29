@@ -11,13 +11,13 @@
         style="@style/Widget.MaterialComponents.Button.OutlinedButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
         android:text="Der beste Button Deutschlands"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/timetableLayout"
+        app:layout_constraintTop_toBottomOf="@+id/unreadPostsLayout"
         tools:ignore="HardcodedText" />
 
     <LinearLayout
@@ -26,11 +26,11 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:background="?attr/selectableItemBackground"
-        android:orientation="vertical"
         android:clipChildren="false"
+        android:orientation="vertical"
+        android:paddingEnd="8dp"
         android:paddingStart="8dp"
         android:paddingTop="8dp"
-        android:paddingEnd="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -40,8 +40,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="@font/roboto_slab"
-            android:paddingStart="8dp"
             android:paddingEnd="8dp"
+            android:paddingStart="8dp"
             android:text="@string/timetable_personal_title"
             android:textSize="16sp"
             app:drawableEndCompat="@drawable/ic_chevron_right"
@@ -52,13 +52,71 @@
             android:name="de.koenidv.sph.ui.TimetableViewFragment"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp"
             android:background="@drawable/card_background"
             android:transitionName="timetable"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/timetableTitleTextView" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/unreadPostsLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:background="?attr/selectableItemBackground"
+        android:clipChildren="false"
+        android:orientation="vertical"
+        android:paddingEnd="8dp"
+        android:paddingStart="8dp"
+        android:paddingTop="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/timetableLayout">
+
+        <TextView
+            android:id="@+id/unreadPostsTitleTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/roboto_slab"
+            android:paddingEnd="8dp"
+            android:paddingStart="8dp"
+            android:text="@string/posts_unread_title"
+            android:textSize="16sp"
+            app:drawableEndCompat="@drawable/ic_chevron_right"
+            app:drawableTint="@android:color/tab_indicator_text" />
+
+        <LinearLayout
+            android:id="@+id/unreadPostsRecyclerLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/card_background"
+            android:orientation="vertical"
+            android:padding="8dp">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/unreadPostsRecycler"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:itemCount="4"
+                tools:listitem="@layout/item_post_compact" />
+
+            <TextView
+                android:id="@+id/moreUnreadTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:visibility="gone"
+                tools:text="x weitere ungelesene Beiträge"
+                tools:visibility="visible" />
+
+        </LinearLayout>
 
     </LinearLayout>
 

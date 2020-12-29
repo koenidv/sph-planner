@@ -150,6 +150,13 @@ public class LinkAttachmentsDb {
         return getWithCursor(cursor);
     }
 
+    public int countForPost(String postId) {
+        Cursor cursor = dbhelper.getReadableDatabase().rawQuery("SELECT COUNT(*) FROM linkAttachments WHERE id_post=\"" + postId + "\"", null);
+        cursor.moveToFirst();
+        int count = cursor.getInt(0);
+        cursor.close();
+        return count;
+    }
 
     private List<Attachment> getWithCursor(Cursor cursor) {
         List<Attachment> returnList = new ArrayList<>();

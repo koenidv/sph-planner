@@ -292,6 +292,34 @@ public class CoursesDb {
         return returnCourse;
     }
 
+    /**
+     * Get a course's color by its internal id
+     *
+     * @param internalId Internal id of the course to look for
+     * @return Its color als color int
+     */
+    public int getColor(String internalId) {
+        Cursor cursor = dbhelper.getReadableDatabase().rawQuery("SELECT color FROM courses WHERE course_id=\"" + internalId + "\"", null);
+        cursor.moveToFirst();
+        int color = cursor.getInt(0);
+        cursor.close();
+        return color;
+    }
+
+    /**
+     * Get a course's full name by its internal id
+     *
+     * @param internalId Internal id of the course to look for
+     * @return Its full name or its internal id if none is saved
+     */
+    public String getFullname(String internalId) {
+        Cursor cursor = dbhelper.getReadableDatabase().rawQuery("SELECT fullname FROM courses WHERE course_id=\"" + internalId + "\"", null);
+        cursor.moveToFirst();
+        String name = cursor.getString(0);
+        cursor.close();
+        return name != null ? name : internalId;
+    }
+
 
     private Course cursorToCourse(Cursor cursor) {
         String CourseId = cursor.getString(0);

@@ -1,5 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
+    <plurals name="course_info_undone_tasks">
+        <item quantity="one">Eine offene Aufgabe</item>
+        <item quantity="other">%d offene Aufgaben</item>
+    </plurals>
+    <plurals name="course_info_unread_posts">
+        <item quantity="one">Ein neuer Eintrag</item>
+        <item quantity="other">%d neue Einträge</item>
+    </plurals>
+    <plurals name="posts_info_attachments">
+        <item quantity="one">Ein Anhang</item>
+        <item quantity="other">%d Anhänge</item>
+    </plurals>
+    <plurals name="posts_info_attachments_and_task_done">
+        <item quantity="one">Ein Anhang und Aufgabe erledigt</item>
+        <item quantity="other">%d Anhänge und Aufgabe erledit</item>
+    </plurals>
+    <plurals name="posts_info_attachments_and_task_undone">
+        <item quantity="one">Ein Anhang und eine offene Aufgabe</item>
+        <item quantity="other">%d Anhänge und eine offene Aufgabe</item>
+    </plurals>
+    <plurals name="posts_more_unread">
+        <item quantity="one">Ein weiterer ungelesener Beitrag</item>
+        <item quantity="other">%d weitere ungelesene Beiträge</item>
+    </plurals>
     <string name="app_name">Schulportal</string>
     <string name="title_overview">Übersicht</string>
     <string name="title_courses">Deine Kurse</string>
@@ -45,14 +69,14 @@
     <string name="onboard_signin_error_network">Bitte überprüfe deine Netzwerkverbindung und versuche es erneut.</string>
     <string name="onboard_signin_error_credentials">Bitte überprüfe deine Zugangsdaten.</string>
     <string name="onboard_signin_error_maintenance">Das Schulportal wird im Moment gewartet.\nBitte versuche es später erneut.</string>
+    <!--<string name="onboard_supported_features_partly_not">"❌ Deine Schule unterstützt nicht alle benötigten Funktionen. Bitte nimm mit uns <a href="https://instagram.com/halbunsichtbar">über Instagram</a> oder <a href="mailto:koenidv@gmail.com">E-Mail</a> Konakt auf, um herauszufinden, wie du uns dabei helfen kannst, deine Schule zu untersützen!"</string>
+    <string name="onboard_supported_features_full">"✔ Deine Schule untersützt alle benötigten Funktionen, aber wir haben sie noch nicht getestet.\nBitte kontaktiere uns über <a href="https://instagram.com/halbunsichtbar">Instagram</a>, <a href="mailto:koenidv@gmail.com">E-Mail</a> oder die Option im Menü!"</string>-->
     <string name="onboard_supported_schooltested">✔ Wir haben die App mit deiner Schule getestet und sie sollte funktionieren.</string>
     <string name="onboard_supported_warning">Bitte teile uns mögliche Fehler über die Option im Menü mit!</string>
     <string name="onboard_supported_features_none">❌ Sorry, deine Schule untersützt die benötigten Funktionen nicht.</string>
     <string name="onboard_supported_features_partly_not">"❌ Deine Schule unterstützt nicht alle benötigten Funktionen. Bitte nimm mit uns Konakt auf, um herauszufinden, wie du uns dabei helfen kannst, deine Schule zu untersützen!"</string>
     <string name="onboard_supported_features_partly_hidden">✔ Deine Schule unterstützt einige der Funktionen, die wir benötigen.</string>
     <string name="onboard_supported_features_full">"✔ Deine Schule untersützt alle benötigten Funktionen, aber wir haben sie noch nicht getestet.\nBitte kontaktiere uns über die Option im Menü!"</string>
-    <!--<string name="onboard_supported_features_partly_not">"❌ Deine Schule unterstützt nicht alle benötigten Funktionen. Bitte nimm mit uns <a href="https://instagram.com/halbunsichtbar">über Instagram</a> oder <a href="mailto:koenidv@gmail.com">E-Mail</a> Konakt auf, um herauszufinden, wie du uns dabei helfen kannst, deine Schule zu untersützen!"</string>
-    <string name="onboard_supported_features_full">"✔ Deine Schule untersützt alle benötigten Funktionen, aber wir haben sie noch nicht getestet.\nBitte kontaktiere uns über <a href="https://instagram.com/halbunsichtbar">Instagram</a>, <a href="mailto:koenidv@gmail.com">E-Mail</a> oder die Option im Menü!"</string>-->
     <string name="onboard_supported_featurelist">%mycourses Mein Unterricht\n%messages Nachrichten\n%studygroups Lerngruppen\n%timetable Stundenplan\n%changes Vertretungsplan</string>
     <string name="onboard_supported_error_network">Ein Netzwerkfehler ist aufgetreten.\nTippe, um es erneut zu versuchen.</string>
     <string name="onboard_supported_features_partly_manual">✔ Deine Schule unterstützt einige der Funktionen, die wir benötigen, du musst allerdings einige Daten manuell hinzufügen.</string>
@@ -74,51 +98,13 @@
     <string name="onboard_legal_description">Du solltest einige Dinge wissen, damit wir gut miteinander auskommen 😊</string>
     <string name="onboard_legal_liability">Ich weiß, dass die App keine Garantie für die angezeigten Daten übernehmen kann und Fehler auftreten können.</string>
     <string name="onboard_legal_sources">Ich verstehe, dass alle Daten aus dem Schulportal Hessen abgerufen werden und Eigentum der jeweiligen Autoren sind.</string>
+    <!-- Translatable Arrays -->
+    <!-- Only translate values (after "|"), not the keys! -->
+    <!-- Spanish, Russian, Korean ? -->
     <string name="onboard_legal_privacy">Ich habe die  <a href="http://koenidv.de/sph/datenschutz">Datenschutzerklärung</a> gelesen, verstanden und stimme ihr zu.</string>
     <string name="timetable_personal_title">Dein Stundenplan</string>
     <string name="timetable_personal_filter">Nur eigene Kurse zeigen</string>
     <string name="timetable_title">Stundenplan</string>
-    <plurals name="course_info_undone_tasks">
-        <item quantity="one">Eine offene Aufgabe</item>
-        <item quantity="other">%d offene Aufgaben</item>
-    </plurals>
-    <plurals name="course_info_unread_posts">
-        <item quantity="one">Ein neuer Eintrag</item>
-        <item quantity="other">%d neue Einträge</item>
-    </plurals>
-    <!-- Translatable Arrays -->
-    <!-- Only translate values (after "|"), not the keys! -->
-    <!-- Spanish, Russian, Korean ? -->
-    <string-array name="courseId_fullName">
-        <item>d|Deutsch</item>
-        <item>e|Englisch</item>
-        <item>l|Latein</item>
-        <item>f|Französisch</item>
-        <item>g|Geschichte</item>
-        <item>info|Informatik</item>
-        <item>ku|Kunst</item>
-        <item>mu|Musik</item>
-        <item>m|Mathematik</item>
-        <item>ph|Physik</item>
-        <item>bio|Biologie</item>
-        <item>ch|Chemie</item>
-        <item>ek|Erdkunde</item>
-        <item>powi|Politik</item>
-        <item>spo|Sport</item>
-        <item>rka|Religion</item>
-        <item>rev|Religion</item>
-        <item>rfrr|Religion</item>
-        <item>ethi|Ethik</item>
-    </string-array>
-    <string-array name="courseId_shortName_override" tools:ignore="InconsistentArrays">
-        <item>f|Franz</item>
-        <item>g|Geschi</item>
-        <item>info|Info</item>
-        <item>m|Mathe</item>
-        <item>bio|Bio</item>
-        <item>rka|Reli</item>
-        <item>rev|Reli</item>
-    </string-array>
     <string name="attachments_title">Dateien &amp; Links</string>
     <string name="attachments_downloading_size">%s werden heruntergeladen</string>
     <string name="attachments_namereplace_picture">Bild</string>
@@ -155,5 +141,40 @@
     <string name="onboard_supported_error_server">Ein Serverfehler ist aufgetreten.\nBitte versuche es in einigen Minuten erneut.</string>
     <string name="onboard_supported_error_unknown">Etwas ist schiefgelaufen.\nTippe, um es erneut zu versuchen.</string>
     <string name="onboard_signin_info_wrong_credentials">Deine Zugangsdaten scheinen nicht mehr zu stimmen.\nBitte melde dich erneut an.</string>
+    <string name="posts_unread_title">Neue Einträge</string>
+    <string name="posts_no_text">Keine Beschreibung</string>
+    <string name="posts_info_homework_done">Aufgabe erledigt</string>
+    <string name="posts_info_homework_undone">Mit einer nicht erledigten Aufgabe</string>
+    <string name="post_unread">Ungelesen</string>
+    <string-array name="courseId_fullName">
+        <item>d|Deutsch</item>
+        <item>e|Englisch</item>
+        <item>l|Latein</item>
+        <item>f|Französisch</item>
+        <item>g|Geschichte</item>
+        <item>info|Informatik</item>
+        <item>ku|Kunst</item>
+        <item>mu|Musik</item>
+        <item>m|Mathematik</item>
+        <item>ph|Physik</item>
+        <item>bio|Biologie</item>
+        <item>ch|Chemie</item>
+        <item>ek|Erdkunde</item>
+        <item>powi|Politik</item>
+        <item>spo|Sport</item>
+        <item>rka|Religion</item>
+        <item>rev|Religion</item>
+        <item>rfrr|Religion</item>
+        <item>ethi|Ethik</item>
+    </string-array>
+    <string-array name="courseId_shortName_override" tools:ignore="InconsistentArrays">
+        <item>f|Franz</item>
+        <item>g|Geschi</item>
+        <item>info|Info</item>
+        <item>m|Mathe</item>
+        <item>bio|Bio</item>
+        <item>rka|Reli</item>
+        <item>rev|Reli</item>
+    </string-array>
 
 </resources>
