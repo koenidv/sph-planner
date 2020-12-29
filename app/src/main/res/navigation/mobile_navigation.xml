@@ -18,8 +18,19 @@
             app:popEnterAnim="@anim/fragment_fade_enter"
             app:popExitAnim="@anim/fragment_fade_exit" />
         <action
-            android:id="@+id/postsFromHomeAction"
-            app:destination="@id/frag_posts" />
+            android:id="@+id/overviewFromHomeAction"
+            app:destination="@id/frag_course_overview"
+            app:enterAnim="@anim/fragment_fade_enter"
+            app:exitAnim="@anim/fragment_fade_exit"
+            app:popEnterAnim="@anim/fragment_fade_enter"
+            app:popExitAnim="@anim/fragment_fade_exit" />
+        <action
+            android:id="@+id/allPostsFromHomeAction"
+            app:destination="@id/allPostsFragment"
+            app:enterAnim="@anim/fragment_fade_enter"
+            app:exitAnim="@anim/fragment_fade_exit"
+            app:popEnterAnim="@anim/fragment_fade_enter"
+            app:popExitAnim="@anim/fragment_fade_exit" />
     </fragment>
 
     <fragment
@@ -28,12 +39,19 @@
         android:label="@string/title_courses"
         tools:layout="@layout/fragment_courses">
         <action
-            android:id="@+id/postsFromCoursesAction"
-            app:destination="@id/frag_posts"
+            android:id="@+id/overviewFromCoursesAction"
+            app:destination="@id/frag_course_overview"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_close_exit"
             app:popEnterAnim="@anim/fragment_open_enter"
             app:popExitAnim="@anim/fragment_close_exit" />
+        <action
+            android:id="@+id/allPostsFromCoursesAction"
+            app:destination="@id/allPostsFragment"
+            app:enterAnim="@anim/fragment_fade_enter"
+            app:exitAnim="@anim/fragment_fade_exit"
+            app:popEnterAnim="@anim/fragment_fade_enter"
+            app:popExitAnim="@anim/fragment_fade_exit" />
     </fragment>
 
     <fragment
@@ -81,7 +99,7 @@
     </fragment>
 
     <fragment
-        android:id="@+id/frag_posts"
+        android:id="@+id/frag_course_overview"
         android:name="de.koenidv.sph.ui.CourseOverviewFragment"
         android:label="@string/posts_list_title">
         <argument
@@ -105,5 +123,9 @@
         android:name="de.koenidv.sph.ui.AttachmentsFragment"
         android:label="fragment_attachments"
         tools:layout="@layout/fragment_attachments" />
+    <fragment
+        android:id="@+id/allPostsFragment"
+        android:name="de.koenidv.sph.ui.AllPostsFragment"
+        android:label="PostsFragment" />
 
 </navigation>

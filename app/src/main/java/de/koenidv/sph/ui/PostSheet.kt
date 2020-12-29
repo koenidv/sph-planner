@@ -63,7 +63,7 @@ class PostSheet internal constructor(private val post: Post) : BottomSheetDialog
         titleLayout.setOnClickListener {
             dismiss()
             Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
-                    .navigate(R.id.postsFromHomeAction, bundleOf("courseId" to post.id_course))
+                    .navigate(R.id.frag_course_overview, bundleOf("courseId" to post.id_course))
         }
 
         doneButton.setOnClickListener { dismiss() }

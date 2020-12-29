@@ -47,7 +47,7 @@ class NetworkManager {
         when (destinationId) {
             R.id.nav_home -> onComplete(FAILED_UNKNOWN)
             R.id.nav_courses -> NetworkManager().loadAndSavePosts { Toast.makeText(applicationContext(), "Kartoffelfeld abgeräumt", Toast.LENGTH_SHORT).show();onComplete(SUCCESS) }
-            R.id.frag_posts -> {
+            R.id.frag_course_overview -> {
                 // Course Overview fragment
                 // Update posts, tasks, files, links
                 if (arguments?.getString("courseId") != null) {

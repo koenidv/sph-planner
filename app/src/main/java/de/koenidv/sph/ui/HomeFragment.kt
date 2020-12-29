@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentContainerView
@@ -76,12 +75,14 @@ class HomeFragment : Fragment() {
             moreUnreadText.visibility = View.VISIBLE
         }
 
+        unreadPostsRecycler.setHasFixedSize(true)
         unreadPostsRecycler.adapter = CompactPostsAdapter(posts) {
             PostSheet(it).show(parentFragmentManager, "post")
         }
 
         unreadPostsLayout.setOnClickListener {
-            Toast.makeText(context, "Coming, sometime", Toast.LENGTH_SHORT).show()
+            Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
+                    .navigate(R.id.allPostsFromHomeAction)
         }
 
 
