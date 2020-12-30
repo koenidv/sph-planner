@@ -14,6 +14,7 @@ class SphPlanner : Application() {
     companion object {
         var openInBrowserUrl: String? = null
         var randomGreeting: String? = null
+        var randomGreetingTime: Long = 0
         private var instance: SphPlanner? = null
 
         // Returns the applications context for usage everywhere within the app

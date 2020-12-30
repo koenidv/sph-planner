@@ -180,5 +180,8 @@
     <string name="posts_filter_task_any">Jegliche</string>
     <string name="posts_filter_task_undone">Offen</string>
     <string name="posts_filter_task_done">Erledigt</string>
+    <string name="posts_title">Einträge</string>
+    <string name="tasks_title">Aufgaben</string>
+    <string name="task_not_synchronized">Aufgabe konnte nicht synchronisiert werden</string>
 
 </resources>

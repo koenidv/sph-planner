@@ -5,13 +5,13 @@ import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.card.MaterialCardView
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.adapters.ExploreLinksAdapter
@@ -30,15 +30,21 @@ class ExploreFragment : Fragment() {
          * Collections
          */
 
-        val timetableCard = view.findViewById<MaterialCardView>(R.id.timetableCardView)
-        val attachmentsCard = view.findViewById<MaterialCardView>(R.id.attachmentsCardView)
+        val timetableText = view.findViewById<TextView>(R.id.timetableTextView)
+        val postsText = view.findViewById<TextView>(R.id.postsTextView)
+        val attachmentsText = view.findViewById<TextView>(R.id.attachmentsTextView)
+        val tasksText = view.findViewById<TextView>(R.id.tasksTextView)
 
         // Set on click listeners, open respective fragment
-        timetableCard.setOnClickListener {
+        timetableText.setOnClickListener {
             // Open timetable
             nav.navigate(R.id.timetableFromExploreAction)
         }
-        attachmentsCard.setOnClickListener {
+        postsText.setOnClickListener {
+            // Open all posts
+            nav.navigate(R.id.allPostsFromExploreAction)
+        }
+        attachmentsText.setOnClickListener {
             // Open attachments
             nav.navigate(R.id.attachmentsFromExploreAction)
         }

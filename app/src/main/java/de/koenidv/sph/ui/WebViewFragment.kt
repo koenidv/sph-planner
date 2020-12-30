@@ -1,8 +1,7 @@
 package de.koenidv.sph.ui
 
 import android.annotation.SuppressLint
-import android.content.Context
-import android.content.SharedPreferences
+import android.content.*
 import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
@@ -13,6 +12,7 @@ import android.webkit.WebViewClient
 import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewFeature
 import de.koenidv.sph.R
@@ -25,6 +25,22 @@ import java.util.*
 // Created by koenidv on 18.12.2020.
 class WebViewFragment : Fragment() {
 
+    lateinit var webView: WebView
+
+    // Reload webvoew whenever the broadcast "uichange" with content=webview is received
+    private val uichangeReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            webView.reload()
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        // Register to receive messages.
+        LocalBroadcastManager.getInstance(requireContext()).registerReceiver(uichangeReceiver,
+                IntentFilter("uichange"))
+    }
+
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
@@ -32,7 +48,7 @@ class WebViewFragment : Fragment() {
         val prefs: SharedPreferences = SphPlanner.applicationContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
 
         // Set up WebView to show a page
-        val webView = view.findViewById<WebView>(R.id.webview)
+        webView = view.findViewById(R.id.webview)
         val cookieManager = CookieManager.getInstance()
         cookieManager.acceptCookie()
 
@@ -47,9 +63,9 @@ class WebViewFragment : Fragment() {
                 webView.visibility = View.VISIBLE
                 view.findViewById<ProgressBar>(R.id.webviewLoading)?.visibility = View.GONE
                 // Set action bar title
-                if (activity != null) (activity as AppCompatActivity).supportActionBar?.title = webView?.title
+                if (activity != null) (activity as AppCompatActivity).supportActionBar?.title = webView.title
                 // Update open in browser url
-                SphPlanner.openInBrowserUrl = webView?.url
+                SphPlanner.openInBrowserUrl = webView.url
                 // Check if login was successful on page load
                 webView.evaluateJavascript(
                         "(function() { return ('<html>'+document.getElementsByTagName('html')[0].innerHTML+'</html>'); })();"
@@ -134,5 +150,11 @@ class WebViewFragment : Fragment() {
         }
 
         return view
+    }
+
+    override fun onDestroy() {
+        // Unregister broadcast receiver
+        LocalBroadcastManager.getInstance(requireActivity()).unregisterReceiver(uichangeReceiver)
+        super.onDestroy()
     }
 }

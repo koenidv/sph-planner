@@ -504,7 +504,6 @@ class RawParser {
                         postDescription,
                         !markAsRead // We know it's unread because it wasn't in the current posts list
                 ))
-                // todo check if post includes link
             }
 
             /*
@@ -515,7 +514,7 @@ class RawParser {
             if (cells[1].toString().contains("<span class=\"homework\">")) {
                 // There can only be one task per post, it seems
                 taskId = courseId + "_task-" + internalDateFormat.format(date) + "_1"
-                taskDone = cells[1].toString().contains("<span class=\"done \"")
+                taskDone = !cells[1].select("span.homework span.done").hasClass("hidden")
                 taskDescription = cells[1].select("span.homework").nextAll("span.markup")[0].wholeText()
                 // Add new task to tasks list
                 tasks.add(PostTask(
@@ -526,7 +525,6 @@ class RawParser {
                         date,
                         taskDone
                 ))
-                // todo check if homework includes link
             }
 
             /*

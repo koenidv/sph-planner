@@ -56,7 +56,8 @@ class PostSheet internal constructor(private val post: Post) : BottomSheetDialog
                 AttachmentsDb.byPostId(post.postId),
                 AttachmentManager().movementMethod(requireActivity(), R.id.frag_webview),
                 AttachmentManager().onAttachmentClick(requireActivity()) { _: Int, _: Attachment -> },
-                AttachmentManager().onAttachmentLongClick(requireActivity()) { _: Int, _: Attachment -> }
+                AttachmentManager().onAttachmentLongClick(requireActivity()) { _: Int, _: Attachment -> },
+                AttachmentManager().onTaskCheckedChanged(requireActivity(), CoursesDb.getInstance().getNumberId(post.id_course))
         )
 
         titleLayout.setOnClickListener {

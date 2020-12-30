@@ -259,7 +259,8 @@ class CourseOverviewFragment : Fragment() {
                     attachsToShow,
                     movementMethod,
                     onAttachmentClick,
-                    onAttachmentLongClick)
+                    onAttachmentLongClick,
+                    AttachmentManager().onTaskCheckedChanged(requireActivity(), course?.number_id!!))
             postsRecycler.adapter = postsAdapter
 
             loadMorePostsButton.setOnClickListener {

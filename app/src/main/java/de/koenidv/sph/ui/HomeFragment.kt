@@ -21,6 +21,7 @@ import de.koenidv.sph.database.DatabaseHelper
 import de.koenidv.sph.database.PostsDb
 import de.koenidv.sph.objects.Post
 import de.koenidv.sph.parsing.Utility
+import java.util.*
 
 
 class HomeFragment : Fragment() {
@@ -32,8 +33,11 @@ class HomeFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_home, container, false)
         //val prefs = requireContext().getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
 
-        // Set random greeting as action bar title, once per app start
-        if (SphPlanner.randomGreeting == null) SphPlanner.randomGreeting = Utility().getGreeting()
+        // Set random greeting as action bar title, once per app start, or after 30 minutes
+        if (SphPlanner.randomGreeting == null || Date().time - SphPlanner.randomGreetingTime > 30 * 60 * 1000) {
+            SphPlanner.randomGreeting = Utility().getGreeting()
+            SphPlanner.randomGreetingTime = Date().time
+        }
         (activity as AppCompatActivity).supportActionBar?.title = SphPlanner.randomGreeting
 
         // Only for demonstration

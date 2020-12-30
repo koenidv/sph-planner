@@ -92,6 +92,7 @@
     </plurals>
 
     <!-- Posts -->
+    <string name="posts_title">Posts</string>
     <string name="posts_list_title">Posts</string>
     <string name="posts_all_title">All posts</string>
     <string name="posts_no_data">No posts yet</string>
@@ -123,6 +124,10 @@
     <string name="timetable_personal_title">Your timetable</string>
     <string name="timetable_personal_filter">Only show own courses</string>
     <string name="timetable_title">Timetable</string>
+
+    <!-- Tasks -->
+    <string name="tasks_title">Tasks</string>
+    <string name="task_not_synchronized">Could not synchronize task</string>
 
     <!-- Attachments -->
     <string name="attachments_pins_title">Pinned attachments</string>

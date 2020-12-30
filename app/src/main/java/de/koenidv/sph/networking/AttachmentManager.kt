@@ -11,6 +11,7 @@ import android.os.Looper
 import android.util.Log
 import android.view.View
 import android.view.View.GONE
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.core.app.ShareCompat
 import androidx.core.content.FileProvider
@@ -138,6 +139,9 @@ class AttachmentManager {
                     }
                     // Show the snackbar
                     snackbar.show()
+                    // Show a downloading progress bar
+                    val loading = view.findViewById<ProgressBar>(R.id.downloadingProgressBar)
+                    loading.visibility = View.VISIBLE
                     // Download the file
                     downloadFile(attachment.file()) {
                         if (it == NetworkManager.SUCCESS) {
@@ -145,8 +149,10 @@ class AttachmentManager {
                             // Add check icon to show file has been downloaded
                             @SuppressLint("SetTextI18n")
                             icon.text = "check-circle ${icon.text}"
-                            // Dismiss snackbar
+                            // Dismiss snackbar and progress bar
                             snackbar.dismiss()
+                            loading.visibility = GONE
+                            // Show done snackbar
                             doneSnackbar.setText(R.string.attachments_options_download_complete).show()
                             // Update last use
                             LinkAttachmentsDb.getInstance().used(attachment.attachId())
@@ -157,6 +163,7 @@ class AttachmentManager {
                             // An error occurred
                             snackbar.dismiss()
                             doneSnackbar.setText(R.string.error).show()
+                            loading.visibility = GONE
                         }
                     }
                     sheet.dismiss()
@@ -228,6 +235,9 @@ class AttachmentManager {
                                     activity.getString(R.string.attachments_downloading_size, attachment.file().fileSize),
                                     Snackbar.LENGTH_INDEFINITE)
                                     .setAnchorView(R.id.nav_view)
+                            // Show loading progress bar
+                            val loading = view.findViewById<ProgressBar>(R.id.downloadingProgressBar)
+                            loading.visibility = View.VISIBLE
                             // Add option to cancel the download
                             snackbar.setAction(R.string.cancel) {
                                 AndroidNetworking.cancel(attachment.attachId())
@@ -240,8 +250,9 @@ class AttachmentManager {
                                     // If downloading & opening was successful
                                     // Add check icon to show file has been downloaded
                                     icon.text = "check-circle ${icon.text}"
-                                    // Dismiss snackbar
+                                    // Dismiss snackbar and progress bar
                                     snackbar.dismiss()
+                                    loading.visibility = GONE
                                     // Now share the downloaded file
                                     shareAttachmentFile(attachment.file(), activity)
                                     // Update file last use
@@ -253,6 +264,7 @@ class AttachmentManager {
                                     // An error occurred
                                     snackbar.dismiss()
                                     doneSnackbar.setText(R.string.error).show()
+                                    loading.visibility = GONE
                                 }
                             }
                         }
@@ -278,6 +290,24 @@ class AttachmentManager {
                 sheet.show()
             }
 
+    /**
+     * Returns a lambda to handle task checked changes
+     */
+    fun onTaskCheckedChanged(activity: Activity, courseNumberId: String): (String, Boolean) -> Unit = { postId, isDone ->
+        NetworkManager().markTaskAsDone(courseNumberId, postId, isDone) {
+            if (it != NetworkManager.SUCCESS) {
+                // todo handle errors properly
+                Snackbar.make(activity.findViewById(R.id.nav_host_fragment),
+                        R.string.task_not_synchronized, Snackbar.LENGTH_SHORT)
+                        .setAnchorView(R.id.nav_view).show()
+            }
+        }
+
+    }
+
+    /**
+     * Download if needed and open a file or link
+     */
     private fun handleAttachment(activity: Activity, attachment: Attachment, view: View) {
         if (attachment.type() == "file") {
             // Open file if existing, otherwise download and open
@@ -292,6 +322,8 @@ class AttachmentManager {
             }
             // Show the snackbar
             snackbar.show()
+            val loading = view.findViewById<ProgressBar>(R.id.downloadingProgressBar)
+            loading.visibility = View.VISIBLE
             // Let AttachmentManager handle downloading and opening the file
             AttachmentManager().handleFileAttachment(attachment.file()) { opened ->
                 // Hide snackbar when the file has been opened
@@ -301,6 +333,7 @@ class AttachmentManager {
                     // Update file last use
                     FileAttachmentsDb.getInstance().used(attachment.attachId())
                     // Add check icon if there wasn't a donwloaded check before
+                    loading.visibility = GONE
                     if (!icon.text.contains("check-circle"))
                         @SuppressLint("SetTextI18n")
                         icon.text = "check-circle ${icon.text}"

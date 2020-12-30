@@ -62,7 +62,7 @@ public class PostsDb {
         String queryString = "SELECT * FROM posts";
         Cursor cursor = db.rawQuery(queryString, null);
         // Get posts with the cursor
-        return getWithCursor(cursor, db);
+        return getWithCursor(cursor);
     }
 
     public List<Post> getAll(int limit) {
@@ -71,7 +71,7 @@ public class PostsDb {
         String queryString = "SELECT * FROM posts ORDER BY date DESC LIMIT " + limit;
         Cursor cursor = db.rawQuery(queryString, null);
         // Get posts with the cursor
-        return getWithCursor(cursor, db);
+        return getWithCursor(cursor);
     }
 
     public List<Post> getAllOrderedByUnread() {
@@ -80,7 +80,7 @@ public class PostsDb {
         String queryString = "SELECT * FROM posts ORDER BY unread DESC, date DESC";
         Cursor cursor = db.rawQuery(queryString, null);
         // Get posts with the cursor
-        return getWithCursor(cursor, db);
+        return getWithCursor(cursor);
     }
 
 
@@ -90,7 +90,7 @@ public class PostsDb {
         String queryString = "SELECT * FROM posts WHERE id_course = '" + course_id + "' ORDER BY date DESC";
         Cursor cursor = db.rawQuery(queryString, null);
         // Get posts with the cursor
-        return getWithCursor(cursor, db);
+        return getWithCursor(cursor);
     }
 
     /**
@@ -107,7 +107,7 @@ public class PostsDb {
                 "AND post_id NOT NULL ORDER BY date DESC LIMIT " + limit;
         Cursor cursor = db.rawQuery(queryString, null);
         // Get posts with the cursor
-        return getWithCursor(cursor, db);
+        return getWithCursor(cursor);
     }
 
     public List<Post> getUnread() {
@@ -116,7 +116,7 @@ public class PostsDb {
         String queryString = "SELECT * FROM posts WHERE unread = 1 ORDER BY date DESC";
         Cursor cursor = db.rawQuery(queryString, null);
         // Get post objects and return them
-        return getWithCursor(cursor, db);
+        return getWithCursor(cursor);
     }
 
     public List<Post> getRead(int limit) {
@@ -125,10 +125,10 @@ public class PostsDb {
         String queryString = "SELECT * FROM posts WHERE unread = 0 ORDER BY date DESC LIMIT " + limit;
         Cursor cursor = db.rawQuery(queryString, null);
         // Get posts with the cursor
-        return getWithCursor(cursor, db);
+        return getWithCursor(cursor);
     }
 
-    private List<Post> getWithCursor(Cursor cursor, SQLiteDatabase db) {
+    private List<Post> getWithCursor(Cursor cursor) {
         List<Post> returnList = new ArrayList<>();
         if (cursor.moveToFirst()) {
             do {

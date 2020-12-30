@@ -19,6 +19,9 @@ import de.koenidv.sph.SphPlanner.Companion.applicationContext
 import de.koenidv.sph.database.*
 import de.koenidv.sph.objects.*
 import de.koenidv.sph.parsing.RawParser
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import okhttp3.Cookie
 import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
@@ -69,6 +72,18 @@ class NetworkManager {
                     } else
                     // Just return SUCCESS if posts for this course were updated within the last 2 minutes
                         onComplete(SUCCESS)
+                }
+            }
+            R.id.frag_webview -> {
+                // WebViewFragment, send a broadcast to reload webview
+                val uiBroadcast = Intent("uichange")
+                uiBroadcast.putExtra("content", "webview")
+                LocalBroadcastManager.getInstance(applicationContext()).sendBroadcast(uiBroadcast)
+                // Let the activity know it can hide the refreshing icon
+                // But wait a short while first so the user doesn't think nothing happened
+                GlobalScope.launch {
+                    delay(600)
+                    onComplete(SUCCESS)
                 }
             }
             else -> onComplete(FAILED_UNKNOWN)
@@ -318,6 +333,61 @@ class NetworkManager {
 
                         })
             } else onComplete(success, url)
+        }
+    }
+
+    /**
+     * Mark a task as done in the db and send a post to sph to mark it as read there, too
+     * @param numberId NumberId of the course the task belongs to
+     * @param postId Id of the post the task is attached to
+     * @param isDone Whether the task is now done or not
+     */
+    // todo retry later on error
+    fun markTaskAsDone(numberId: String, postId: String, isDone: Boolean, onComplete: (success: Int) -> Unit) {
+        // Mark as (un)done in the db
+        PostTasksDb.getInstance().setDone(postId, isDone)
+        // Mark as done on sph
+        // Cancel potential pending requests for this same task, just to be sure
+        AndroidNetworking.cancel("task-$postId")
+        // We need an access token first
+        TokenManager().generateAccessToken { success: Int, token: String? ->
+            if (success == SUCCESS) {
+                // Set sid cookie
+                CookieStore.saveFromResponse(
+                        HttpUrl.parse("https://schulportal.hessen.de")!!,
+                        listOf(Cookie.Builder().domain("schulportal.hessen.de")
+                                .name("sid").value(token!!).build()))
+
+                // todo initialize ANet only once
+                AndroidNetworking.initialize(applicationContext(),
+                        OkHttpClient.Builder().cookieJar(CookieStore).build())
+
+                // Send a post request to let sph know the task is done
+                AndroidNetworking.post("https://start.schulportal.hessen.de/meinunterricht.php")
+                        .addBodyParameter("a", "sus_homeworkDone")
+                        .addBodyParameter("id", numberId)
+                        .addBodyParameter("entry", postId.substring(postId.lastIndexOf("_") + 1))
+                        .addBodyParameter("b", if (isDone) "done" else "undone")
+                        .setTag("task-$postId")
+                        .build()
+                        .getAsString(object : StringRequestListener {
+                            override fun onResponse(response: String) {
+                                if (response == "1")
+                                    onComplete(SUCCESS)
+                                else
+                                    onComplete(FAILED_UNKNOWN)
+                            }
+
+                            override fun onError(error: ANError) {
+                                when (error.errorDetail) {
+                                    "connectionError" -> onComplete(FAILED_NO_NETWORK)
+                                    "requestCancelledError" -> onComplete(FAILED_CANCELLED)
+                                    else -> onComplete(FAILED_UNKNOWN)
+                                }
+                            }
+                        })
+
+            } else onComplete(success)
         }
     }
 }

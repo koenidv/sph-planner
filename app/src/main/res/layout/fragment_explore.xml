@@ -17,59 +17,73 @@
             android:layout_margin="8dp"
             app:columnCount="2">
 
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/timetableCardView"
+            <TextView
+                android:id="@+id/timetableTextView"
                 android:layout_width="0dp"
                 android:layout_height="48dp"
                 android:layout_margin="8dp"
-                android:background="?attr/selectableItemBackground"
-                app:cardBackgroundColor="?attr/backgroundColor"
-                app:cardCornerRadius="4dp"
-                app:cardElevation="0dp"
+                android:autoSizeMaxTextSize="16sp"
+                android:autoSizeTextType="uniform"
+                android:background="@drawable/card_background"
+                android:foreground="?selectableItemBackground"
+                android:gravity="center"
+                android:padding="8dp"
+                android:text="@string/timetable_title"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                android:textSize="16sp"
                 app:layout_columnWeight="1"
-                app:strokeColor="?attr/customStrokeColor"
-                app:strokeWidth="2dp">
+                tools:targetApi="o" />
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:autoSizeMaxTextSize="16sp"
-                    android:autoSizeTextType="uniform"
-                    android:gravity="center"
-                    android:padding="8dp"
-                    android:text="@string/timetable_title"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                    android:textSize="16sp"
-                    tools:targetApi="o" />
-
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/attachmentsCardView"
+            <TextView
+                android:id="@+id/postsTextView"
                 android:layout_width="0dp"
                 android:layout_height="48dp"
                 android:layout_margin="8dp"
-                android:background="?attr/selectableItemBackground"
-                app:cardBackgroundColor="?attr/backgroundColor"
-                app:cardCornerRadius="4dp"
-                app:cardElevation="0dp"
+                android:autoSizeMaxTextSize="16sp"
+                android:autoSizeTextType="uniform"
+                android:background="@drawable/card_background"
+                android:foreground="?selectableItemBackground"
+                android:gravity="center"
+                android:padding="8dp"
+                android:text="@string/posts_title"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                android:textSize="16sp"
                 app:layout_columnWeight="1"
-                app:strokeColor="?attr/customStrokeColor"
-                app:strokeWidth="2dp">
+                tools:targetApi="o" />
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:autoSizeMaxTextSize="16sp"
-                    android:autoSizeTextType="uniform"
-                    android:gravity="center"
-                    android:padding="8dp"
-                    android:text="@string/attachments_title"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                    android:textSize="16sp"
-                    tools:targetApi="o" />
+            <TextView
+                android:id="@+id/attachmentsTextView"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_margin="8dp"
+                android:autoSizeMaxTextSize="16sp"
+                android:autoSizeTextType="uniform"
+                android:background="@drawable/card_background"
+                android:foreground="?selectableItemBackground"
+                android:gravity="center"
+                android:padding="8dp"
+                android:text="@string/attachments_title"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                android:textSize="16sp"
+                app:layout_columnWeight="1"
+                tools:targetApi="o" />
 
-            </com.google.android.material.card.MaterialCardView>
+            <TextView
+                android:id="@+id/tasksTextView"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_margin="8dp"
+                android:autoSizeMaxTextSize="16sp"
+                android:autoSizeTextType="uniform"
+                android:background="@drawable/card_background"
+                android:foreground="?selectableItemBackground"
+                android:gravity="center"
+                android:padding="8dp"
+                android:text="@string/tasks_title"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                android:textSize="16sp"
+                app:layout_columnWeight="1"
+                tools:targetApi="o" />
 
         </androidx.gridlayout.widget.GridLayout>
 

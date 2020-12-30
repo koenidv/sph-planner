@@ -15,6 +15,7 @@ import com.google.android.material.card.MaterialCardView
 import com.google.android.material.checkbox.MaterialCheckBox
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
+import de.koenidv.sph.database.PostTasksDb
 import de.koenidv.sph.objects.Attachment
 import de.koenidv.sph.objects.Post
 import de.koenidv.sph.objects.PostTask
@@ -29,7 +30,8 @@ class PostsAdapter(private val posts: List<Post>,
                    private val attachments: List<Attachment>,
                    private val linkMethod: BetterLinkMovementMethod?,
                    private val onAttachmentClick: (Attachment, View) -> Unit,
-                   private val onAttachmentLongClick: (Attachment, View) -> Unit) :
+                   private val onAttachmentLongClick: (Attachment, View) -> Unit,
+                   private val onTaskCheckedChanged: (postId: String, isDone: Boolean) -> Unit) :
         RecyclerView.Adapter<PostsAdapter.ViewHolder>() {
 
     val prefs: SharedPreferences = SphPlanner.applicationContext().getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
@@ -39,7 +41,7 @@ class PostsAdapter(private val posts: List<Post>,
      * Provides a reference to the type of view
      * (custom ViewHolder).
      */
-    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    class ViewHolder(view: View, onTaskCheckedChanged: (postId: String, isDone: Boolean) -> Unit) : RecyclerView.ViewHolder(view) {
         private val layout: ConstraintLayout = view.findViewById(R.id.postLayout)
         private val card: MaterialCardView = view.findViewById(R.id.materialCardView)
         private val dateText: TextView = view.findViewById(R.id.dateTextView)
@@ -51,6 +53,28 @@ class PostsAdapter(private val posts: List<Post>,
         private val attachmentsRecycler: RecyclerView = view.findViewById(R.id.attachmentsRecycler)
         private val dateFormat = SimpleDateFormat("d. MMM yyyy", Locale.getDefault())
 
+        private var taskset = false
+        private var currentPost: Post? = null
+        private val themeColor = SphPlanner.applicationContext()
+                .getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
+                .getInt("themeColor", 0)
+
+        init {
+            taskCheckBox.setOnCheckedChangeListener { _, isChecked ->
+                if (taskset)
+                    currentPost?.let {
+                        onTaskCheckedChanged(it.postId, isChecked)
+                        if (isChecked) {
+                            // Remove colored background (set transparent)
+                            taskHighlight.setBackgroundColor(0x00FFFFFF)
+                        } else {
+                            // Apply theme color with 20% opacity to background
+                            taskHighlight.setBackgroundColor(themeColor and 0x00FFFFFF or 0x33000000)
+                        }
+                    }
+            }
+        }
+
         fun bind(post: Post,
                  task: PostTask?,
                  attachments: List<Attachment>,
@@ -58,10 +82,7 @@ class PostsAdapter(private val posts: List<Post>,
                  movementMethod: BetterLinkMovementMethod?,
                  onAttachmentClick: (Attachment, View) -> Unit,
                  onAttachmentLongClick: (Attachment, View) -> Unit) {
-
-            val themeColor = SphPlanner.applicationContext()
-                    .getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
-                    .getInt("themeColor", 0)
+            currentPost = post
 
             // Set data
             dateText.text = dateFormat.format(post.date)
@@ -77,10 +98,12 @@ class PostsAdapter(private val posts: List<Post>,
 
             // Task
             if (task != null) {
-                taskCheckBox.isChecked = task.isDone
+                taskset = false
+                taskCheckBox.isChecked = PostTasksDb.getInstance().taskDone(post.postId) == true
                 taskCheckBox.visibility = View.VISIBLE
                 taskText.text = task.description
                 taskText.visibility = View.VISIBLE
+                taskset = true
 
                 if (!task.isDone && !post.unread) {
                     // If task not done and post doesn't already have a colored background
@@ -118,7 +141,7 @@ class PostsAdapter(private val posts: List<Post>,
         // Create a new view, which defines the UI of the list item
         val view = LayoutInflater.from(viewGroup.context)
                 .inflate(R.layout.item_post, viewGroup, false)
-        return ViewHolder(view)
+        return ViewHolder(view, onTaskCheckedChanged)
     }
 
     // Replaces the contents of a view (invoked by the layout manager)

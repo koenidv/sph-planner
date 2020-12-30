@@ -44,12 +44,23 @@
             android:id="@+id/iconTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"
             android:fontFamily="@font/font_awesome"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             tools:text="check-circle file" />
+
+        <ProgressBar
+            android:id="@+id/downloadingProgressBar"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="16dp"
+            android:layout_height="0dp"
+            android:layout_marginEnd="4dp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@id/iconTextView"
+            app:layout_constraintEnd_toStartOf="@+id/iconTextView"
+            app:layout_constraintTop_toTopOf="@+id/iconTextView" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

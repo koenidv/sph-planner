@@ -230,6 +230,14 @@ public class CoursesDb {
         return returnList;
     }
 
+    public String getNumberId(String internalId) {
+        Cursor cursor = dbhelper.getReadableDatabase().rawQuery("SELECT number_id FROM courses WHERE course_id=\"" + internalId + "\"", null);
+        cursor.moveToFirst();
+        String numberId = cursor.getString(0);
+        cursor.close();
+        return numberId;
+    }
+
     /**
      * @param course course which should be deleted
      * @return True, if course was deleted

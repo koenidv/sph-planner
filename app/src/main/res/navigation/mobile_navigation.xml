@@ -86,6 +86,13 @@
             app:exitAnim="@anim/fragment_close_exit"
             app:popEnterAnim="@anim/fragment_open_enter"
             app:popExitAnim="@anim/fragment_close_exit" />
+        <action
+            android:id="@+id/allPostsFromExploreAction"
+            app:destination="@id/allPostsFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_close_exit"
+            app:popEnterAnim="@anim/fragment_open_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
     </fragment>
 
     <fragment

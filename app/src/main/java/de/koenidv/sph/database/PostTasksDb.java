@@ -39,15 +39,17 @@ public class PostTasksDb {
         // Put values into ContentValues
         cv.put("task_id", postTask.getTaskId());
         cv.put("id_course", postTask.getId_course());
-        cv.put("id_post",postTask.getId_post());
+        cv.put("id_post", postTask.getId_post());
         cv.put("description", postTask.getDescription());
         cv.put("date", postTask.getDate().getTime() / 1000);
-        cv.put("isDone",postTask.isDone());
+        cv.put("isdone", postTask.isDone());
         // Add or update post in db
-        Cursor cursor = db.rawQuery("SELECT * FROM postTasks WHERE id_post = '" + postTask.getTaskId() + "'", null);
+        Cursor cursor = db.rawQuery("SELECT * FROM postTasks WHERE task_id = '" + postTask.getTaskId() + "'", null);
         if (cursor.getCount() == 0) {
             db.insert("postTasks", null, cv);
         } else {
+            // Only update done status if it is true
+            if (!postTask.isDone()) cv.remove("isdone");
             db.update("postTasks", cv, "post_id = '" + postTask.getTaskId() + "'", null);
         }
         cursor.close();
@@ -148,6 +150,10 @@ public class PostTasksDb {
         }
     }
 
+    public void setDone(String postId, boolean isDone) {
+        dbhelper.getReadableDatabase()
+                .execSQL("UPDATE postTasks SET isdone = " + (isDone ? "1" : "0") + " WHERE id_post IS \"" + postId + "\"");
+    }
 
     private List<PostTask> getWithCursor(Cursor cursor, SQLiteDatabase db) {
         List<PostTask> returnList = new ArrayList<>();
