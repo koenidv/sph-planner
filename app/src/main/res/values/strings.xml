@@ -8,6 +8,7 @@
     <!-- URLs -->
     <string name="url_course_overview" translatable="false">"https://start.schulportal.hessen.de/meinunterricht.php?a=sus_view&amp;id=%numberid"</string>
     <string name="url_timetable" translatable="false">"https://start.schulportal.hessen.de/stundenplan.php"</string>
+    <string name="url_allposts" translatable="false">https://start.schulportal.hessen.de/meinunterricht.php</string>
 
     <!-- General purpose -->
     <string name="cancel">Cancel</string>
@@ -92,6 +93,7 @@
 
     <!-- Posts -->
     <string name="posts_list_title">Posts</string>
+    <string name="posts_all_title">All posts</string>
     <string name="posts_no_data">No posts yet</string>
     <string name="posts_unread_title">New posts</string>
     <string name="posts_no_text">No description</string>
@@ -106,6 +108,16 @@
         <item quantity="one">%d more unread post</item>
         <item quantity="other">%d more unread posts</item>
     </plurals>
+    <string name="posts_filter">Filter posts</string>
+    <string name="posts_filtered">Posts filtered</string>
+    <string name="posts_filter_read">Is read?</string>
+    <string name="posts_filter_read_read">Read</string>
+    <string name="posts_filter_read_unread">Unread</string>
+    <string name="posts_filter_task">Contains a task?</string>
+    <string name="posts_filter_task_none">None</string>
+    <string name="posts_filter_task_any">Any</string>
+    <string name="posts_filter_task_undone">Undone</string>
+    <string name="posts_filter_task_done">Done</string>
 
     <!-- Timetable -->
     <string name="timetable_personal_title">Your timetable</string>

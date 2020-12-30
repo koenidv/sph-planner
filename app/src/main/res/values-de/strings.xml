@@ -169,5 +169,16 @@
         <item>rev|Reli</item>
     </string-array>
     <string name="course_from">Aus</string>
+    <string name="posts_all_title">Alle Einträge</string>
+    <string name="posts_filter">Beiträge filtern</string>
+    <string name="posts_filtered">Beiträge gefiltert</string>
+    <string name="posts_filter_read">Gelesen?</string>
+    <string name="posts_filter_read_read">Gelesen</string>
+    <string name="posts_filter_read_unread">Ungelesen</string>
+    <string name="posts_filter_task">Beinhaltet eine Aufgabe?</string>
+    <string name="posts_filter_task_none">Keine</string>
+    <string name="posts_filter_task_any">Jegliche</string>
+    <string name="posts_filter_task_undone">Offen</string>
+    <string name="posts_filter_task_done">Erledigt</string>
 
 </resources>

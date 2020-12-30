@@ -8,6 +8,7 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentContainerView
 import androidx.navigation.Navigation
@@ -18,6 +19,7 @@ import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.adapters.CompactPostsAdapter
 import de.koenidv.sph.database.DatabaseHelper
 import de.koenidv.sph.database.PostsDb
+import de.koenidv.sph.objects.Post
 import de.koenidv.sph.parsing.Utility
 
 
@@ -63,26 +65,38 @@ class HomeFragment : Fragment() {
         val moreUnreadText = view.findViewById<TextView>(R.id.moreUnreadTextView)
 
         // Get unread posts
-        // Fill up to 4 posts with read posts
-        // Or limit to 4 and inform about more unread posts
-        var posts = PostsDb.getInstance().unread.toMutableList()
-        if (posts.size < 4) posts.addAll(PostsDb.getInstance().getAll(4 - posts.size))
-        else if (posts.size > 4) {
-            val postsOverflow = posts.size - 4
-            posts = posts.take(4).toMutableList()
+        // and up to 4 read posts
+        // We'll only display 4 posts,
+        // but unread posts will get removed once they are read
+        val posts = PostsDb.getInstance().unread.toMutableList()
+        var postsOverflow: Int? = null
+        if (posts.size > 4) {
+            postsOverflow = posts.size - 4
             // Display more unread posts text
             moreUnreadText.text = resources.getQuantityString(R.plurals.posts_more_unread, postsOverflow, postsOverflow)
             moreUnreadText.visibility = View.VISIBLE
         }
+        posts.addAll(PostsDb.getInstance().getRead(4))
 
         unreadPostsRecycler.setHasFixedSize(true)
-        unreadPostsRecycler.adapter = CompactPostsAdapter(posts) {
-            PostSheet(it).show(parentFragmentManager, "post")
+        unreadPostsRecycler.adapter = CompactPostsAdapter(posts, 4) { post: Post, _: View ->
+            // Show single post bottom sheet
+            PostSheet(post).show(parentFragmentManager, "post")
+            // Remove the item from the list if it is unread
+            if (post.unread) {
+                val index = posts.indexOf(post)
+                posts.removeAt(index)
+                unreadPostsRecycler.adapter?.notifyItemRemoved(index)
+                PostsDb.getInstance().markAsRead(post.postId)
+            }
         }
 
         unreadPostsLayout.setOnClickListener {
+            val bundle =
+                    if (postsOverflow != null) bundleOf("filters" to arrayOf("unread"))
+                    else bundleOf()
             Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
-                    .navigate(R.id.allPostsFromHomeAction)
+                    .navigate(R.id.allPostsFromHomeAction, bundle)
         }
 
 

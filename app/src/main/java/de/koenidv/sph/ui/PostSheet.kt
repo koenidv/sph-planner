@@ -25,8 +25,7 @@ import de.koenidv.sph.networking.AttachmentManager
 import de.koenidv.sph.objects.Attachment
 import de.koenidv.sph.objects.Post
 
-//  Created by koenidv on 16.02.2020.
-// Bottom sheet to let the user select a dark/light theme and accent color combination
+//  Created by koenidv on 29.12.2020.
 class PostSheet internal constructor(private val post: Post) : BottomSheetDialogFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {

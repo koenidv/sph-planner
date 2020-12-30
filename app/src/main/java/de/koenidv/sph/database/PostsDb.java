@@ -119,6 +119,15 @@ public class PostsDb {
         return getWithCursor(cursor, db);
     }
 
+    public List<Post> getRead(int limit) {
+        final SQLiteDatabase db = dbhelper.getReadableDatabase();
+        // Query posts
+        String queryString = "SELECT * FROM posts WHERE unread = 0 ORDER BY date DESC LIMIT " + limit;
+        Cursor cursor = db.rawQuery(queryString, null);
+        // Get posts with the cursor
+        return getWithCursor(cursor, db);
+    }
+
     private List<Post> getWithCursor(Cursor cursor, SQLiteDatabase db) {
         List<Post> returnList = new ArrayList<>();
         if (cursor.moveToFirst()) {

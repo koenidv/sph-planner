@@ -13,7 +13,7 @@ import com.google.android.material.button.MaterialButtonToggleGroup
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
 
-//  Created by koenidv on 16.02.2020.
+//  Created by koenidv on 16.12.2020.
 // Bottom sheet to let the user select a dark/light theme and accent color combination
 class ThemeSheet internal constructor() : BottomSheetDialogFragment() {
 

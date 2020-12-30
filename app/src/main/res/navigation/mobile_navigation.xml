@@ -126,6 +126,12 @@
     <fragment
         android:id="@+id/allPostsFragment"
         android:name="de.koenidv.sph.ui.AllPostsFragment"
-        android:label="PostsFragment" />
+        android:label="@string/posts_all_title">
+        <argument
+            android:name="filters"
+            android:defaultValue="@null"
+            app:argType="string[]"
+            app:nullable="true" />
+    </fragment>
 
 </navigation>
