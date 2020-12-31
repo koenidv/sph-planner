@@ -74,6 +74,21 @@ class NetworkManager {
                         onComplete(SUCCESS)
                 }
             }
+            R.id.frag_changes -> {
+                // Changes fragment
+                // Update changes after 30sec cooldown
+                if (time - prefs.getLong("updated_changes", 0) > 30 * 1000) {
+                    loadAndSaveChanges {
+                        if (it == SUCCESS) {
+                            // Send broadcast to update changes in ChangesFragment
+                            val uiBroadcast = Intent("uichange")
+                            uiBroadcast.putExtra("content", "changes")
+                            LocalBroadcastManager.getInstance(applicationContext()).sendBroadcast(uiBroadcast)
+                        }
+                        onComplete(it)
+                    }
+                }
+            }
             R.id.frag_webview -> {
                 // WebViewFragment, send a broadcast to reload webview
                 val uiBroadcast = Intent("uichange")

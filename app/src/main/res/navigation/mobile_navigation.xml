@@ -26,14 +26,14 @@
             app:popExitAnim="@anim/fragment_close_exit" />
         <action
             android:id="@+id/allPostsFromHomeAction"
-            app:destination="@id/allPostsFragment"
+            app:destination="@id/frag_allposts"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_close_exit"
             app:popEnterAnim="@anim/fragment_open_enter"
             app:popExitAnim="@anim/fragment_close_exit" />
         <action
             android:id="@+id/changesFromHomeAction"
-            app:destination="@id/changesFragment"
+            app:destination="@id/frag_changes"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_close_exit"
             app:popEnterAnim="@anim/fragment_open_enter"
@@ -54,7 +54,7 @@
             app:popExitAnim="@anim/fragment_close_exit" />
         <action
             android:id="@+id/allPostsFromCoursesAction"
-            app:destination="@id/allPostsFragment"
+            app:destination="@id/frag_allposts"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_close_exit"
             app:popEnterAnim="@anim/fragment_open_enter"
@@ -88,14 +88,14 @@
             app:popExitAnim="@anim/fragment_close_exit" />
         <action
             android:id="@+id/attachmentsFromExploreAction"
-            app:destination="@id/attachmentsFragment"
+            app:destination="@id/frag_attachments"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_close_exit"
             app:popEnterAnim="@anim/fragment_open_enter"
             app:popExitAnim="@anim/fragment_close_exit" />
         <action
             android:id="@+id/allPostsFromExploreAction"
-            app:destination="@id/allPostsFragment"
+            app:destination="@id/frag_allposts"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_close_exit"
             app:popEnterAnim="@anim/fragment_open_enter"
@@ -135,12 +135,12 @@
         android:label="@string/timetable_title"
         tools:layout="@layout/fragment_timetable" />
     <fragment
-        android:id="@+id/attachmentsFragment"
+        android:id="@+id/frag_attachments"
         android:name="de.koenidv.sph.ui.AttachmentsFragment"
         android:label="fragment_attachments"
         tools:layout="@layout/fragment_attachments" />
     <fragment
-        android:id="@+id/allPostsFragment"
+        android:id="@+id/frag_allposts"
         android:name="de.koenidv.sph.ui.AllPostsFragment"
         android:label="@string/posts_all_title"
         tools:layout="@layout/fragment_allposts">
@@ -151,12 +151,12 @@
             app:nullable="true" />
     </fragment>
     <fragment
-        android:id="@+id/placeholderFragment"
+        android:id="@+id/frag_placeholder"
         android:name="de.koenidv.sph.PlaceholderFragment"
         android:label="fragment_placeholder"
         tools:layout="@layout/fragment_placeholder" />
     <fragment
-        android:id="@+id/changesFragment"
+        android:id="@+id/frag_changes"
         android:name="de.koenidv.sph.ui.ChangesFragment"
         android:label="@string/changes_title"
         app:enterAnim="@anim/fragment_open_enter"
