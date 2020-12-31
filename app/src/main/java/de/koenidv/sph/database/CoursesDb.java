@@ -320,8 +320,8 @@ public class CoursesDb {
      * @return Its color als color int
      */
     public int getColor(String internalId) {
-        Cursor cursor = dbhelper.getReadableDatabase().rawQuery("SELECT color FROM courses WHERE course_id=\"" + internalId + "\"", null);
-        cursor.moveToFirst();
+        Cursor cursor = dbhelper.getReadableDatabase().rawQuery("SELECT color FROM courses WHERE course_id=\"" + internalId.toLowerCase() + "\"", null);
+        if (!cursor.moveToFirst()) return 0;
         int color = cursor.getInt(0);
         cursor.close();
         return color;
@@ -334,8 +334,8 @@ public class CoursesDb {
      * @return Its full name or its internal id if none is saved
      */
     public String getFullname(String internalId) {
-        Cursor cursor = dbhelper.getReadableDatabase().rawQuery("SELECT fullname FROM courses WHERE course_id=\"" + internalId + "\"", null);
-        cursor.moveToFirst();
+        Cursor cursor = dbhelper.getReadableDatabase().rawQuery("SELECT fullname FROM courses WHERE course_id=\"" + internalId.toLowerCase() + "\"", null);
+        if (!cursor.moveToFirst()) return null;
         String name = cursor.getString(0);
         cursor.close();
         return name != null ? name : internalId;

@@ -2,6 +2,7 @@ package de.koenidv.sph.ui
 
 import android.content.Context
 import android.os.Bundle
+import android.text.method.PasswordTransformationMethod
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
@@ -155,6 +156,8 @@ class OnboardingSigninFragment : Fragment() {
                 textlayout2.visibility = View.GONE
                 signinButton.visibility = View.GONE
                 (requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).hideSoftInputFromWindow(view.windowToken, 0)
+                // Hide the password
+                passText.transformationMethod = PasswordTransformationMethod()
 
 
                 prefs.edit()
@@ -200,7 +203,7 @@ class OnboardingSigninFragment : Fragment() {
                                 description.text = getString(R.string.onboard_signin_error_maintenance)
                             } else if (success == NetworkManager.FAILED_SERVER_ERROR) {
                                 // An server error occurred
-                                description.text = getString(R.string.onboard_signin_error_maintenance)
+                                description.text = getString(R.string.onboard_signin_error_server)
                             }
                         }
                     }

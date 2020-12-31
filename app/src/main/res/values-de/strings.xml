@@ -183,5 +183,20 @@
     <string name="posts_title">Einträge</string>
     <string name="tasks_title">Aufgaben</string>
     <string name="task_not_synchronized">Aufgabe konnte nicht synchronisiert werden</string>
+    <string name="changes_personalized_title">Deine Vertretungen</string>
+    <string name="changes_personalized_none">👨‍🏫 Du hast regulären Unterricht</string>
+    <string name="changes_title">Vertretungen</string>
+    <string name="changes_date_today">Today</string>
+    <string name="changes_date_tomorrow">Tomorrow</string>
+    <string name="changes_template_eva">%name-EVA</string>
+    <string name="changes_template_cancelled">%name-Entfall</string>
+    <string name="changes_template_freed">Freigestellt von %name</string>
+    <string name="changes_template_substitute">%name bei %substitute</string>
+    <string name="changes_template_care">%name: Aufsicht von %substitute</string>
+    <string name="changes_template_room">%name in %room</string>
+    <string name="changes_template_switched">%name statt %nameOld</string>
+    <string name="changes_template_exam">%name-Klausur</string>
+    <string name="changes_template_other">%name: Etwas anderes</string>
+    <string name="changes_date_past">Vergangen</string>
 
 </resources>

@@ -10,7 +10,7 @@
     <string name="url_timetable" translatable="false">"https://start.schulportal.hessen.de/stundenplan.php"</string>
     <string name="url_allposts" translatable="false">https://start.schulportal.hessen.de/meinunterricht.php</string>
     <string name="url_changes" translatable="false">https://start.schulportal.hessen.de/vertretungsplan.php</string>
-    <string name="url_changes_debug" translatable="false">https://gist.githubusercontent.com/koenidv/7c0b35895d1daf86b2b00f243d687fe2/raw/75be574b45556420eb0d9c6311795fbbe2b29424/gistfile1.txt</string>
+    <string name="url_changes_debug" translatable="false">https://gist.githubusercontent.com/koenidv/7c0b35895d1daf86b2b00f243d687fe2/raw/gistfile1.txt</string>
 
     <!-- General purpose -->
     <string name="cancel">Cancel</string>
@@ -80,7 +80,6 @@
     <string name="greeting_random_evening_1">How was day, %name?</string>
     <string name="greeting_random_evening_2">What did you do today?</string>
 
-
     <!-- Courses -->
     <string name="course_appendix_lk">""</string>
     <string name="course_from">From</string>
@@ -146,6 +145,24 @@
     <string name="attachments_options_unpin">Unpin</string>
     <string name="attachments_options_unpin_complete">No longer pinned</string>
     <string name="attachments_options_share">Share</string>
+
+    <!-- Changes -->
+    <string name="changes_personalized_title">Your changes</string>
+    <string name="changes_personalized_none">👨‍🏫 No changes found</string>
+    <string name="changes_title">Changes</string>
+    <string name="changes_date_today">Today</string>
+    <string name="changes_date_past">Past date</string>
+    <string name="changes_date_tomorrow">Tomorrow</string>
+    <string name="changes_template_eva">%name independently</string>
+    <string name="changes_template_cancelled">%name cancelled</string>
+    <string name="changes_template_freed">Freed from %name</string>
+    <string name="changes_template_substitute">%name with %substitute</string>
+    <string name="changes_template_care">%name supervides by %substitute</string>
+    <string name="changes_template_room">%name in %room</string>
+    <string name="changes_template_switched">%name instead of %nameOld</string>
+    <string name="changes_template_exam">%name exam</string>
+    <string name="changes_template_other">%name: Something else</string>
+
 
     <!-- Options sheet -->
     <string name="info_menuaction">Options</string>

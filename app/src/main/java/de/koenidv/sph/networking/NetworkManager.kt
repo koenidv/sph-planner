@@ -102,7 +102,12 @@ class NetworkManager {
                     // Load all posts, tasks, attachments and links from all courses
                         NetworkManager().loadAndSavePosts(markAsRead = true) { posts ->
                             if (posts == SUCCESS)
-                                onComplete(SUCCESS)
+                            // Load changes, if there are any
+                                NetworkManager().loadAndSaveChanges { changes ->
+                                    if (changes == SUCCESS)
+                                        onComplete(SUCCESS)
+                                    else onComplete(changes)
+                                }
                             else onComplete(posts)
                         }
                     else onComplete(lessons)
@@ -226,8 +231,7 @@ class NetworkManager {
                 onComplete = { success: Int, result: String? ->
                     if (success == SUCCESS) {
                         ChangesDb.instance!!.removeOld()
-                        val changes = RawParser().parseChanges(result!!)
-                        ChangesDb.instance!!.save(changes)
+                        ChangesDb.instance!!.save(RawParser().parseChanges(result!!))
                         applicationContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
                                 .edit().putLong("updated_changes", Date().time).apply()
                     }

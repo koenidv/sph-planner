@@ -84,7 +84,6 @@ class TokenManager {
                                 } else if (response.contains("Login failed!")) {
                                     onComplete(NetworkManager.FAILED_SERVER_ERROR, null)
                                     Log.d(TAG, "Login failed :/")
-                                    Toast.makeText(applicationContext(), "Login failed :/", Toast.LENGTH_LONG).show()
                                     // todo Message: Retry in a few minutes
                                 }
                             }

@@ -123,9 +123,9 @@ class RawParser {
                                 "Klausur" -> Change.TYPE_EXAM
                                 else -> Change.TYPE_OTHER
                             }
-                            7 -> id_course_external = if (rawCell == "") null else rawCell.toUpperCase()
-                            8 -> id_course_external_before = if (rawCell == "") null else rawCell.toUpperCase()
-                            9 -> room = if (rawCell == "") null else rawCell.toUpperCase()
+                            7 -> id_course_external = if (rawCell == "") null else rawCell.toLowerCase()
+                            8 -> id_course_external_before = if (rawCell == "") null else rawCell.toLowerCase()
+                            9 -> room = if (rawCell == "") null else rawCell
                             10 -> description = if (rawCell == "") null else rawCell
                                     .replace("\n", "")
                                     .replace("""\W+""".toRegex(), " ")

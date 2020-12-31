@@ -51,6 +51,45 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/changesLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="?attr/selectableItemBackground"
+            android:clipChildren="false"
+            android:orientation="vertical"
+            android:paddingEnd="8dp"
+            android:paddingStart="8dp"
+            android:paddingTop="8dp">
+
+            <TextView
+                android:id="@+id/changesTitleTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/roboto_slab"
+                android:paddingEnd="8dp"
+                android:paddingStart="8dp"
+                android:text="@string/changes_personalized_title"
+                android:textSize="16sp"
+                app:drawableEndCompat="@drawable/ic_chevron_right"
+                app:drawableTint="@android:color/tab_indicator_text" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/changesRecycler"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/card_background"
+                android:nestedScrollingEnabled="false"
+                android:padding="8dp"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:itemCount="4"
+                tools:listitem="@layout/item_change_compact" />
+
+        </LinearLayout>
+
+        <LinearLayout
             android:id="@+id/unreadPostsLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

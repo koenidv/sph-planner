@@ -2,6 +2,7 @@ package de.koenidv.sph.database
 
 import android.content.ContentValues
 import android.database.Cursor
+import android.util.Log
 import de.koenidv.sph.objects.Change
 import java.util.*
 
@@ -24,23 +25,30 @@ class ChangesDb private constructor() {
         val db = dbhelper.writableDatabase
         val cv = ContentValues()
 
-        // Put values into ContentValues
-        cv.put("id_course", change.id_course)
-        cv.put("id_course_external", change.id_course_external)
-        cv.put("date", change.date.time / 1000)
-        cv.put("lessons", change.lessons.joinToString(","))
-        cv.put("type", change.type)
-        cv.put("id_course_external_before", change.id_course_external_before)
-        cv.put("className", change.className)
-        cv.put("className_before", change.className_before)
-        cv.put("id_teacher", change.id_teacher)
-        cv.put("id_subsTeacher", change.id_subsTeacher)
-        cv.put("room", change.room)
-        cv.put("room_before", change.room_before)
-        cv.put("description", change.description)
+        // Check if this course already exists
+        val cursor = db.rawQuery("""SELECT * FROM changes WHERE id_course = "${change.id_course}"
+            | AND date = ${change.date.time / 1000} AND lessons = "${change.lessons.joinToString(",")}"
+            | AND type = ${change.type}""".trimMargin(), null)
+        if (cursor.count == 0) {
+            // Put values into ContentValues
+            cv.put("id_course", change.id_course)
+            cv.put("id_course_external", change.id_course_external)
+            cv.put("date", change.date.time / 1000)
+            cv.put("lessons", change.lessons.joinToString(","))
+            cv.put("type", change.type)
+            cv.put("id_course_external_before", change.id_course_external_before)
+            cv.put("className", change.className)
+            cv.put("className_before", change.className_before)
+            cv.put("id_teacher", change.id_teacher)
+            cv.put("id_subsTeacher", change.id_subsTeacher)
+            cv.put("room", change.room)
+            cv.put("room_before", change.room_before)
+            cv.put("description", change.description)
 
-        // Add change to the db if it's not already there
-        db.insert("changes", null, cv)
+            // Add change to the db if it's not already there
+            db.insert("changes", null, cv)
+        }
+        cursor.close()
     }
 
     /**
@@ -53,19 +61,20 @@ class ChangesDb private constructor() {
         if (cursor.moveToFirst()) {
             do {
                 returnList.add(Change(
-                        cursor.getString(0), // id course
-                        cursor.getString(1), // id course external
-                        Date(cursor.getInt(2) * 1000L), // date
-                        cursor.getString(3).split(",").map { it.toInt() }, // affected lessons
-                        cursor.getInt(4), // type
-                        cursor.getString(5), // id course external before
-                        cursor.getString(6), // class name
-                        cursor.getString(7), // class name before
-                        cursor.getString(8), // id teacher
-                        cursor.getString(9), // id substitute teacher
-                        cursor.getString(10), // room
-                        cursor.getString(11), // room before
-                        cursor.getString(12), // description
+                        // 0 is auto increment change id, we don't need that
+                        cursor.getString(1), // id course
+                        cursor.getString(2), // id course external
+                        Date(cursor.getInt(3) * 1000L), // date
+                        cursor.getString(4).split(",").map { it.toInt() }, // affected lessons
+                        cursor.getInt(5), // type
+                        cursor.getString(6), // id course external before
+                        cursor.getString(7), // class name
+                        cursor.getString(8), // class name before
+                        cursor.getString(9), // id teacher
+                        cursor.getString(10), // id substitute teacher
+                        cursor.getString(11), // room
+                        cursor.getString(12), // room before
+                        cursor.getString(13), // description
                 ))
             } while (cursor.moveToNext())
         }
@@ -77,12 +86,14 @@ class ChangesDb private constructor() {
      * Returns changes for favorite courses with a date of today or later
      * Ordered by date, ascending
      */
-    fun getFavorites(): List<Change> =
-            getWithCursor(dbhelper.readableDatabase.rawQuery("SELECT * from changes " +
-                    "INNER JOIN courses ON changes.id_course = courses.course_id " +
-                    "WHERE changes.date >= ${Date().time / 1000 - 24 * 60 * 60} " +
-                    "AND (courses.isFavorite = 1 OR changes.id_course IS NULL) " +
-                    "ORDER BY changes.date ASC", null))
+    fun getFavorites(): List<Change> {
+        Log.d("SPH-PLANNER", Date().time.toString())
+        return getWithCursor(dbhelper.readableDatabase.rawQuery("SELECT * from changes " +
+                "INNER JOIN courses ON changes.id_course = courses.course_id " +
+                "WHERE changes.date >= ${(Date().time / 1000) - (24 * 60 * 60)} " +
+                "AND (courses.isFavorite = 1 OR changes.id_course IS NULL) " +
+                "ORDER BY changes.date ASC", null))
+    }
 
     /**
      * Returns all changes, ordered by date

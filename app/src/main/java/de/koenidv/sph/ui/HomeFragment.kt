@@ -17,7 +17,9 @@ import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.recyclerview.widget.RecyclerView
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
+import de.koenidv.sph.adapters.CompactChangesAdapter
 import de.koenidv.sph.adapters.CompactPostsAdapter
+import de.koenidv.sph.database.ChangesDb
 import de.koenidv.sph.database.PostsDb
 import de.koenidv.sph.networking.NetworkManager
 import de.koenidv.sph.objects.Post
@@ -54,7 +56,7 @@ class HomeFragment : Fragment() {
         }
 
         /*
-         * Timetable
+         * Timetable todo check if timetable feature is supported
          */
 
         val timetable = view.findViewById<FragmentContainerView>(R.id.timetableFragment)
@@ -62,6 +64,25 @@ class HomeFragment : Fragment() {
             Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
                     .navigate(R.id.timetableFromHomeAction, null, null,
                             FragmentNavigatorExtras(timetable to "timetable"))
+        }
+
+        /*
+         * Personalized changes todo check if changes feature is supported
+         */
+
+        val changesLayout = view.findViewById<LinearLayout>(R.id.changesLayout)
+        val changesRecycler = view.findViewById<RecyclerView>(R.id.changesRecycler)
+
+        // Get changes for favorite courses and display them
+        val personalizedChanges = ChangesDb.instance!!.getFavorites()
+        if (personalizedChanges.isNotEmpty()) {
+            changesRecycler.setHasFixedSize(true)
+            changesRecycler.adapter = CompactChangesAdapter(personalizedChanges) { change, view ->
+                // todo change sheet
+            }
+        } else {
+            view.findViewById<TextView>(R.id.changesTitleTextView).text = getString(R.string.changes_personalized_none)
+            changesRecycler.visibility = View.GONE
         }
 
         /*
@@ -86,17 +107,22 @@ class HomeFragment : Fragment() {
         }
         posts.addAll(PostsDb.getInstance().getRead(4))
 
-        unreadPostsRecycler.setHasFixedSize(true)
-        unreadPostsRecycler.adapter = CompactPostsAdapter(posts, 4) { post: Post, _: View ->
-            // Show single post bottom sheet
-            PostSheet(post).show(parentFragmentManager, "post")
-            // Remove the item from the list if it is unread
-            if (post.unread) {
-                val index = posts.indexOf(post)
-                posts.removeAt(index)
-                unreadPostsRecycler.adapter?.notifyItemRemoved(index)
-                PostsDb.getInstance().markAsRead(post.postId)
+        if (posts.isNotEmpty()) {
+            // Only show posts if there are any
+            unreadPostsRecycler.setHasFixedSize(true)
+            unreadPostsRecycler.adapter = CompactPostsAdapter(posts, 4) { post: Post, _: View ->
+                // Show single post bottom sheet
+                PostSheet(post).show(parentFragmentManager, "post")
+                // Remove the item from the list if it is unread
+                if (post.unread) {
+                    val index = posts.indexOf(post)
+                    posts.removeAt(index)
+                    unreadPostsRecycler.adapter?.notifyItemRemoved(index)
+                    PostsDb.getInstance().markAsRead(post.postId)
+                }
             }
+        } else {
+            unreadPostsLayout.visibility = View.GONE
         }
 
         unreadPostsLayout.setOnClickListener {
