@@ -285,6 +285,19 @@ public class CoursesDb {
         return newCourse;
     }
 
+    public String getCourseIdByGmbId(String gmbId) {
+        Cursor cursor = dbhelper.getReadableDatabase().rawQuery("SELECT course_id FROM courses "
+                + "WHERE gmb_id = \"" + gmbId + "\"", null);
+        if (cursor.moveToFirst()) {
+            String id = cursor.getString(0);
+            cursor.close();
+            return id;
+        } else {
+            cursor.close();
+            return null;
+        }
+    }
+
     public Course getBySphId(String Sph_id) {
         String queryString = "SELECT * FROM courses WHERE sph_id = \"" + Sph_id + "\"";
         SQLiteDatabase db = dbhelper.getReadableDatabase();

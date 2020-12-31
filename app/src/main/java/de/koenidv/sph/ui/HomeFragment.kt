@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
@@ -17,8 +18,8 @@ import androidx.recyclerview.widget.RecyclerView
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.adapters.CompactPostsAdapter
-import de.koenidv.sph.database.DatabaseHelper
 import de.koenidv.sph.database.PostsDb
+import de.koenidv.sph.networking.NetworkManager
 import de.koenidv.sph.objects.Post
 import de.koenidv.sph.parsing.Utility
 import java.util.*
@@ -46,7 +47,10 @@ class HomeFragment : Fragment() {
         surpriseButton.setOnClickListener {
             //NetworkManager().indexAll { Toast.makeText(SphPlanner.applicationContext(), "Heute schon, Kartoffel", Toast.LENGTH_SHORT).show() }
             //NetworkManager().loadAndSavePosts { Toast.makeText(SphPlanner.applicationContext(), "Kartoffelfeld abgeräumt", Toast.LENGTH_SHORT).show() }
-            DatabaseHelper.getInstance().writableDatabase.execSQL("DELETE FROM posts WHERE post_id IN (SELECT post_id FROM posts ORDER BY date DESC LIMIT 3)")
+            //DatabaseHelper.getInstance().writableDatabase.execSQL("DELETE FROM posts WHERE post_id IN (SELECT post_id FROM posts ORDER BY date DESC LIMIT 3)")
+            NetworkManager().loadAndSaveChanges {
+                Toast.makeText(SphPlanner.applicationContext(), "Kartoffel, in Deckung!", Toast.LENGTH_SHORT).show()
+            }
         }
 
         /*

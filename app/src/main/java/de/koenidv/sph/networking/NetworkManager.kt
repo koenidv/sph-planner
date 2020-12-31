@@ -153,20 +153,25 @@ class NetworkManager {
      * This will replace any current lessons in the timetable
      */
     private fun loadAndSaveTimetable(onComplete: (success: Int) -> Unit) {
-        NetworkManager().loadSiteWithToken(applicationContext().getString(R.string.url_timetable), onComplete = { success: Int, result: String? ->
-            if (success == SUCCESS) {
-                TimetableDb.instance!!.clear()
-                TimetableDb.instance!!.save(RawParser().parseTimetable(result!!))
-            }
-            onComplete(success)
-        })
+        NetworkManager().loadSiteWithToken(applicationContext().getString(R.string.url_timetable),
+                onComplete = { success: Int, result: String? ->
+                    if (success == SUCCESS) {
+                        TimetableDb.instance!!.clear()
+                        TimetableDb.instance!!.save(RawParser().parseTimetable(result!!))
+                        applicationContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
+                                .edit().putLong("updated_timetable", Date().time).apply()
+                    }
+                    onComplete(success)
+                })
     }
 
     /**
      * Load and save Posts, PostAtachments and PostTasks for a list of courses
      * @param coursesToLoad Courses that should be loaded, all courses with NumberIds when null
      */
-    private fun loadAndSavePosts(coursesToLoad: List<Course>? = null, markAsRead: Boolean = false, onComplete: (success: Int) -> Unit) {
+    private fun loadAndSavePosts(coursesToLoad: List<Course>? = null,
+                                 markAsRead: Boolean = false,
+                                 onComplete: (success: Int) -> Unit) {
         // Use all courses with number_id if nothing was specified
         val courses = coursesToLoad ?: CoursesDb.getInstance().withNumberId
         // Save all errors in a list, only return one later
@@ -214,6 +219,20 @@ class NetworkManager {
                         }
                     })
         }
+    }
+
+    fun loadAndSaveChanges(onComplete: (success: Int) -> Unit) {
+        NetworkManager().loadSiteWithToken(applicationContext().getString(R.string.url_changes),
+                onComplete = { success: Int, result: String? ->
+                    if (success == SUCCESS) {
+                        ChangesDb.instance!!.removeOld()
+                        val changes = RawParser().parseChanges(result!!)
+                        ChangesDb.instance!!.save(changes)
+                        applicationContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
+                                .edit().putLong("updated_changes", Date().time).apply()
+                    }
+                    onComplete(success)
+                })
     }
 
     /**

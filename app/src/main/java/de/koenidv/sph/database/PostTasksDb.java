@@ -43,14 +43,15 @@ public class PostTasksDb {
         cv.put("description", postTask.getDescription());
         cv.put("date", postTask.getDate().getTime() / 1000);
         cv.put("isdone", postTask.isDone());
-        // Add or update post in db
+
+        // Add or update task in db
         Cursor cursor = db.rawQuery("SELECT * FROM postTasks WHERE task_id = '" + postTask.getTaskId() + "'", null);
         if (cursor.getCount() == 0) {
             db.insert("postTasks", null, cv);
         } else {
             // Only update done status if it is true
             if (!postTask.isDone()) cv.remove("isdone");
-            db.update("postTasks", cv, "post_id = '" + postTask.getTaskId() + "'", null);
+            db.update("postTasks", cv, "task_id = '" + postTask.getTaskId() + "'", null);
         }
         cursor.close();
     }

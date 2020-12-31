@@ -9,6 +9,8 @@
     <string name="url_course_overview" translatable="false">"https://start.schulportal.hessen.de/meinunterricht.php?a=sus_view&amp;id=%numberid"</string>
     <string name="url_timetable" translatable="false">"https://start.schulportal.hessen.de/stundenplan.php"</string>
     <string name="url_allposts" translatable="false">https://start.schulportal.hessen.de/meinunterricht.php</string>
+    <string name="url_changes" translatable="false">https://start.schulportal.hessen.de/vertretungsplan.php</string>
+    <string name="url_changes_debug" translatable="false">https://gist.githubusercontent.com/koenidv/7c0b35895d1daf86b2b00f243d687fe2/raw/75be574b45556420eb0d9c6311795fbbe2b29424/gistfile1.txt</string>
 
     <!-- General purpose -->
     <string name="cancel">Cancel</string>

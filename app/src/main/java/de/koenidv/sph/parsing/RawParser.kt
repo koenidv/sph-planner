@@ -2,11 +2,9 @@ package de.koenidv.sph.parsing
 
 import android.annotation.SuppressLint
 import android.graphics.Color
-import android.util.Log
 import android.widget.Toast
 import androidx.core.graphics.toColorInt
 import de.koenidv.sph.R
-import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.SphPlanner.Companion.applicationContext
 import de.koenidv.sph.database.CoursesDb
 import de.koenidv.sph.objects.*
@@ -27,10 +25,7 @@ class RawParser {
     fun parseChanges(rawResponse: String): List<Change> {
         val changes = mutableListOf<Change>()
 
-        // todo check if response is valid
         // we could check the week type (a/b) here: <span class="badge woche">
-        // todo get last refresh
-
 
         // Remove stuff that we don't need
         var rawContent = rawResponse.substring(rawResponse.indexOf("<div class=\"panel panel-primary\""))
@@ -50,32 +45,33 @@ class RawParser {
 
         // We'll need those below to construct our Change object
         var date: Date
-        var internalId: String
-        var id_course_external: String? = ""
-        var id_course_external_before: String?
-        var lessons: List<Int>
-        var type: String
-        var className: String?
-        var className_before: String?
+        var internalId: String?
+        var id_course_external: String? = null
+        var id_course_external_before: String? = null
+        var lessons: List<Int> = listOf()
+        var type: Int = Change.TYPE_OTHER
+        var className: String? = null
+        var className_before: String? = null
         var id_teacher: String? = null
-        var id_subsTeacher: String?
-        var room: String?
-        var description: String?
+        var id_subsTeacher: String? = null
+        var room: String? = null
+        var description: String? = null
 
         // Extract every changes table, i.e. every available day
         while (rawContent.contains("<table class=\"table")) {
             // Get today's table only
             rawToday = rawContent.substring(rawContent.indexOf("<table class=\"table"), rawContent.indexOf("<div class=\"fixed-table-footer"))
+
+            // Parse date
+            val dateIndex = rawContent.indexOf("Vertretungen am ") + 16
+            date = dateFormat.parse(rawContent.substring(dateIndex, dateIndex + 10))!!
+
             // Remove the extracted table from rawContent
             rawContent = rawContent.substring(rawContent.indexOf("<div class=\"fixed-table-footer") + 30)
             // Extract only the table's body
             // We don't need <thead> as long as the table order remains the same
             // This might vary for different schools
             rawToday = rawToday.substring(rawToday.indexOf("<tbody>") + 7, rawToday.indexOf("</tbody>"))
-
-            // Parse date
-            val dateIndex = Utility().ordinalIndexOf(rawContent, "Vertretungen am ", dayInContent) + 16
-            date = dateFormat.parse(rawContent.substring(dateIndex, dateIndex + 10))!!
 
             // We are left with a table, each row contains these columns:
             // title (not needed), lessons (11 11 - 12), classname (Q34), old classname (Q34, mostly empty),
@@ -94,64 +90,77 @@ class RawParser {
                     // Extract cell from table row
                     rawCell = rawChange.substring(rawChange.indexOf("<td"))
                     rawCell = rawCell.substring(rawCell.indexOf(">") + 1, rawCell.indexOf("</td>"))
+                    rawCell = rawCell.trim()
+                    rawChange = rawChange.substring(rawChange.indexOf("<td") + 3)
 
                     when (cellInRow) {
                         0 -> {
                         } // Ignore first cell
                         1 -> { // Affected lessons
-                            if (rawCell.contains(" - ")) {
+                            lessons = if (rawCell.contains(" -\n")) {
                                 // Get start and end lesson and put everything in between in a list
-                                val fromLesson = Integer.getInteger(rawCell.substring(0, rawCell.indexOf(" ")))!!
-                                val toLesson = Integer.getInteger(rawCell.substring(0, rawCell.indexOf(" ")))!!
-                                lessons = (fromLesson..toLesson).toList()
+                                val fromLesson = rawCell.substring(0, rawCell.indexOf("\n")).toInt()
+                                val toLesson = rawCell.substring(rawCell.lastIndexOf(" ") + 1).toInt()
+                                (fromLesson..toLesson).toList()
                             } else {
-                                lessons = listOf(Integer.getInteger(rawCell))
+                                listOf(rawCell.toInt())
                             }
                         }
-                        2 -> className = rawCell
-                        3 -> className_before = rawCell
-                        4 -> id_subsTeacher = rawCell.toLowerCase()
-                        5 -> id_teacher = rawCell.toLowerCase()
-                        6 -> type = rawCell.toUpperCase()
-                        7 -> id_course_external = rawCell.toUpperCase()
-                        8 -> id_course_external_before = rawCell.toUpperCase()
-                        9 -> room = rawCell.toUpperCase()
-                        10 -> description = rawCell
+                        2 -> className = if (rawCell == "") null else rawCell
+                        3 -> className_before = if (rawCell == "") null else rawCell
+                        4 -> id_subsTeacher = if (rawCell == "") null else rawCell.toLowerCase()
+                        5 -> id_teacher = if (rawCell == "") null else rawCell.toLowerCase()
+                        6 -> type = when (rawCell) {
+                            "EVA", "Eigenverantwortliches Arbeiten" -> Change.TYPE_EVA
+                            "Entfall" -> Change.TYPE_CANCELLED
+                            "Freisetzung" -> Change.TYPE_FREED
+                            "Vertretung", "Statt-Vertretung" -> Change.TYPE_SUBSTITUTE
+                            "Betreuung" -> Change.TYPE_CARE
+                            "Raum", "Raumwechsel" -> Change.TYPE_ROOM
+                            "Verlegung", "Tausch" -> Change.TYPE_SWITCHED
+                            "Klausur" -> Change.TYPE_EXAM
+                            else -> Change.TYPE_OTHER
+                        }
+                        7 -> id_course_external = if (rawCell == "") null else rawCell.toUpperCase()
+                        8 -> id_course_external_before = if (rawCell == "") null else rawCell.toUpperCase()
+                        9 -> room = if (rawCell == "") null else rawCell.toUpperCase()
+                        10 -> description = if (rawCell == "") null else rawCell
+                                .replace("\n", "")
+                                .replace("""\W+""".toRegex(), " ")
                     }
                     // Next cell
                     cellInRow++
                 }
 
+                // Try to get an internal id
+                internalId = if (id_course_external != null && id_teacher != null)
+                    IdParser().getCourseIdWithGmb(id_course_external, id_teacher)
+                else if (id_course_external_before != null && id_teacher != null)
+                    IdParser().getCourseIdWithGmb(id_course_external_before, id_teacher)
+                else if (id_course_external != null && IdParser().getCourseIdWithGmb(id_course_external) != null)
+                    IdParser().getCourseIdWithGmb(id_course_external)
+                else if (id_course_external_before != null && IdParser().getCourseIdWithGmb(id_course_external_before) != null)
+                    IdParser().getCourseIdWithGmb(id_course_external_before)
+                else null
 
-                /*
-
-                TODO Do not use change ids with course and teacher, change might not have one
-                 Use rolling change ids instead, guess course ids (from timetable) and search for favorite course
-
-                if ()
-
-                // Create Change with the extracted values and add it to the list
-                if (id_teacher != null) {
-                    internalId = IdParser().getCourseId(id_course_external, TYPE_GMB, id_teacher)
-                } else {
-                    // todo find course by external id. Must have seen it before, maybe full timetable
-                    internalId = ""
-                }
-
-                    changes.add(Change(
-                            changeId = IdParser().getChangeId(internalId, date, changes),
-
-                    ))
-
-                Log.d(SphPlanner.TAG, rawChange)*/
+                // Add parsed change to list
+                changes.add(Change(
+                        internalId,
+                        id_course_external,
+                        date,
+                        lessons,
+                        type,
+                        id_course_external_before,
+                        className,
+                        className_before,
+                        id_teacher,
+                        id_subsTeacher,
+                        room,
+                        null, // room before is not currently supported by sph
+                        description
+                ))
             }
 
-
-            // This will crash if no course is specified
-            // Might happen before holidays
-
-
-            Log.d(SphPlanner.TAG, rawToday)
             // Next day
             dayInContent++
         }

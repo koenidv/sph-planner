@@ -1,8 +1,6 @@
 package de.koenidv.sph.parsing
 
-import android.annotation.SuppressLint
 import de.koenidv.sph.database.CoursesDb
-import de.koenidv.sph.objects.Change
 import de.koenidv.sph.objects.Course
 import java.text.SimpleDateFormat
 import java.util.*
@@ -50,8 +48,8 @@ class IdParser {
         val courseDb = CoursesDb.getInstance()
 
         if (!forceNewId) {
-            val existingCourse = CoursesDb.getInstance().getByGmbId(courseGmbId.toLowerCase(Locale.ROOT))
-            if (existingCourse != null) return existingCourse.courseId
+            val existingCourseId = CoursesDb.getInstance().getCourseIdByGmbId(courseGmbId.toLowerCase(Locale.ROOT))
+            if (existingCourseId != null) return existingCourseId
         }
 
         // Warning: trying to get an existing internal id for a course which is not in the db will mostly fail
@@ -102,6 +100,11 @@ class IdParser {
         // Return id, example: m_bar_1 or ch_cas_2
         return classType + "_" + teachId + "_" + index
     }
+
+    /**
+     * Get an existing internal id for a gmb id, without a teacher
+     */
+    fun getCourseIdWithGmb(courseGmbId: String): String? = CoursesDb.getInstance().getCourseIdByGmbId(courseGmbId.toLowerCase(Locale.ROOT))
 
     /**
      * Returns an internal id for a gmb id and teacher id
@@ -173,19 +176,6 @@ class IdParser {
             patternInternal.matches(courseId) -> TYPE_INTERNAL
             else -> TYPE_UNKNOWN // Id does not match any type
         }
-    }
-
-    // todo documentation
-    @SuppressLint("SimpleDateFormat")
-    fun getChangeId(internalCourseId: String, date: Date, allChanges: List<Change>): String {
-        val formatter = SimpleDateFormat("yyyy-MM-dd")
-        var index = 1
-
-        // Up index while there's already an existing same change id
-        while (allChanges.none { it.changeId == (internalCourseId + "_change" + formatter.format(date) + "_$index") })
-            index++
-
-        return internalCourseId + "_change" + formatter.format(date) + "_$index"
     }
 
     /**
