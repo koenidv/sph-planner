@@ -226,6 +226,9 @@ class NetworkManager {
         }
     }
 
+    /**
+     * Load changes from sph and save them to changes db
+     */
     fun loadAndSaveChanges(onComplete: (success: Int) -> Unit) {
         NetworkManager().loadSiteWithToken(applicationContext().getString(R.string.url_changes),
                 onComplete = { success: Int, result: String? ->

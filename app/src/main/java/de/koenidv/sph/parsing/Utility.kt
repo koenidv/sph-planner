@@ -6,8 +6,10 @@ import android.content.res.Resources
 import android.graphics.BlendMode
 import android.graphics.BlendModeColorFilter
 import android.graphics.PorterDuff
+import android.graphics.drawable.LayerDrawable
 import android.graphics.drawable.StateListDrawable
 import android.os.Build
+import android.util.Log
 import android.util.TypedValue
 import android.view.View
 import androidx.annotation.AttrRes
@@ -141,14 +143,16 @@ class Utility {
      * @param opacity opacity as hex int, i.e. 0xb4000000 for about 70%
      */
     fun tintBackground(view: View, color: Int, opacity: Int) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            (view.background as StateListDrawable).colorFilter = BlendModeColorFilter(
-                    color and 0x00FFFFFF or opacity, BlendMode.SRC_ATOP)
-        } else {
-            @Suppress("DEPRECATION") // not in < Q
-            (view.background as StateListDrawable).setColorFilter(
-                    color and 0x00FFFFFF or opacity, PorterDuff.Mode.SRC_ATOP)
-        }
+        if (view.background is StateListDrawable || view.background is LayerDrawable)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                view.background.colorFilter = BlendModeColorFilter(
+                        color and 0x00FFFFFF or opacity, BlendMode.SRC_ATOP)
+            } else {
+                @Suppress("DEPRECATION") // not in < Q
+                (view.background as StateListDrawable).setColorFilter(
+                        color and 0x00FFFFFF or opacity, PorterDuff.Mode.SRC_ATOP)
+            }
+        else Log.e(SphPlanner.TAG, view.background.javaClass.toString() + " is marked as tintable")
     }
 
     /**

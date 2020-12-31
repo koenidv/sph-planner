@@ -47,15 +47,14 @@
     <color name="course_sports">#40000000</color>
     <color name="course_religion">#40eeeeee</color>
 
-    <color name="type_eva">#6066cc99</color>
-    <color name="type_freed">#6087d37c</color>
-    <color name="type_cancelled">#6005731d</color>
-    <color name="type_standin">#60e0544e</color>
-    <color name="type_standin_instead">#60fc6f58</color>
-    <color name="type_transfer">#60e45d65</color>
-    <color name="type_care">#60f39c12</color>
-    <color name="type_room">#60ba8ee0</color>
-    <color name="type_exam">#60f88379</color>
-    <color name="type_other">#6059abe3</color>
+    <color name="change_type_eva">#66cc99</color>
+    <color name="change_type_freed">#87d37c</color>
+    <color name="change_type_cancelled">#05731d</color>
+    <color name="change_type_substitute">#e0544e</color>
+    <color name="change_type_switched">#e45d65</color>
+    <color name="change_type_care">#f39c12</color>
+    <color name="change_type_room">#ba8ee0</color>
+    <color name="change_type_exam">#f88379</color>
+    <color name="change_type_other">#59abe3</color>
 
 </resources>

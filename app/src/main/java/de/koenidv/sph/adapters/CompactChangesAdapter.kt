@@ -18,14 +18,14 @@ import java.util.*
 
 //  Created by koenidv on 20.12.2020.
 class CompactChangesAdapter(private val changes: List<Change>,
-                            private val onClick: (Change, View) -> Unit) :
+                            private val onClick: (Change) -> Unit) :
         RecyclerView.Adapter<CompactChangesAdapter.ViewHolder>() {
 
     /**
      * Provides a reference to the type of view
      * (custom ViewHolder).
      */
-    class ViewHolder(view: View, onClick: (Change, View) -> Unit) : RecyclerView.ViewHolder(view) {
+    class ViewHolder(view: View, onClick: (Change) -> Unit) : RecyclerView.ViewHolder(view) {
         private val layout = view.findViewById<ConstraintLayout>(R.id.changeLayout)
         private val title = view.findViewById<TextView>(R.id.titleTextView)
         private val date = view.findViewById<TextView>(R.id.dateTextView)
@@ -40,7 +40,7 @@ class CompactChangesAdapter(private val changes: List<Change>,
         init {
             layout.setOnClickListener {
                 currentChange?.let {
-                    onClick(it, view)
+                    onClick(it)
                 }
             }
         }
@@ -116,14 +116,4 @@ class CompactChangesAdapter(private val changes: List<Change>,
 
     // Return the size of your dataset (invoked by the layout manager)
     override fun getItemCount() = changes.size
-
-    override fun getItemId(position: Int): Long {
-        // This will in almost all cases show distinct items,
-        // so we can use the position as id
-        return position.toLong()
-    }
-
-    override fun getItemViewType(position: Int): Int {
-        return position
-    }
 }

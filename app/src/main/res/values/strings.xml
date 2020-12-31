@@ -150,6 +150,8 @@
     <string name="changes_personalized_title">Your changes</string>
     <string name="changes_personalized_none">👨‍🏫 No changes found</string>
     <string name="changes_title">Changes</string>
+    <string name="changes_none">👨‍🏫 No changes found</string>
+    <string name="changes_filter">Only show own changes</string>
     <string name="changes_date_today">Today</string>
     <string name="changes_date_past">Past date</string>
     <string name="changes_date_tomorrow">Tomorrow</string>
@@ -162,7 +164,6 @@
     <string name="changes_template_switched">%name instead of %nameOld</string>
     <string name="changes_template_exam">%name exam</string>
     <string name="changes_template_other">%name: Something else</string>
-
 
     <!-- Options sheet -->
     <string name="info_menuaction">Options</string>

@@ -20,17 +20,24 @@
         <action
             android:id="@+id/overviewFromHomeAction"
             app:destination="@id/frag_course_overview"
-            app:enterAnim="@anim/fragment_fade_enter"
-            app:exitAnim="@anim/fragment_fade_exit"
-            app:popEnterAnim="@anim/fragment_fade_enter"
-            app:popExitAnim="@anim/fragment_fade_exit" />
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_close_exit"
+            app:popEnterAnim="@anim/fragment_open_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
         <action
             android:id="@+id/allPostsFromHomeAction"
             app:destination="@id/allPostsFragment"
-            app:enterAnim="@anim/fragment_fade_enter"
-            app:exitAnim="@anim/fragment_fade_exit"
-            app:popEnterAnim="@anim/fragment_fade_enter"
-            app:popExitAnim="@anim/fragment_fade_exit" />
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_close_exit"
+            app:popEnterAnim="@anim/fragment_open_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+        <action
+            android:id="@+id/changesFromHomeAction"
+            app:destination="@id/changesFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_close_exit"
+            app:popEnterAnim="@anim/fragment_open_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
     </fragment>
 
     <fragment
@@ -48,10 +55,10 @@
         <action
             android:id="@+id/allPostsFromCoursesAction"
             app:destination="@id/allPostsFragment"
-            app:enterAnim="@anim/fragment_fade_enter"
-            app:exitAnim="@anim/fragment_fade_exit"
-            app:popEnterAnim="@anim/fragment_fade_enter"
-            app:popExitAnim="@anim/fragment_fade_exit" />
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_close_exit"
+            app:popEnterAnim="@anim/fragment_open_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
     </fragment>
 
     <fragment
@@ -108,7 +115,8 @@
     <fragment
         android:id="@+id/frag_course_overview"
         android:name="de.koenidv.sph.ui.CourseOverviewFragment"
-        android:label="@string/posts_list_title">
+        android:label="@string/posts_list_title"
+        tools:layout="@layout/fragment_course_overview">
         <argument
             android:name="courseId"
             app:argType="string" />
@@ -124,7 +132,8 @@
     <fragment
         android:id="@+id/frag_timetable"
         android:name="de.koenidv.sph.ui.TimetableFragment"
-        android:label="@string/timetable_title" />
+        android:label="@string/timetable_title"
+        tools:layout="@layout/fragment_timetable" />
     <fragment
         android:id="@+id/attachmentsFragment"
         android:name="de.koenidv.sph.ui.AttachmentsFragment"
@@ -133,7 +142,8 @@
     <fragment
         android:id="@+id/allPostsFragment"
         android:name="de.koenidv.sph.ui.AllPostsFragment"
-        android:label="@string/posts_all_title">
+        android:label="@string/posts_all_title"
+        tools:layout="@layout/fragment_allposts">
         <argument
             android:name="filters"
             android:defaultValue="@null"
@@ -145,5 +155,25 @@
         android:name="de.koenidv.sph.PlaceholderFragment"
         android:label="fragment_placeholder"
         tools:layout="@layout/fragment_placeholder" />
+    <fragment
+        android:id="@+id/changesFragment"
+        android:name="de.koenidv.sph.ui.ChangesFragment"
+        android:label="@string/changes_title"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_close_exit"
+        app:popEnterAnim="@anim/fragment_open_enter"
+        app:popExitAnim="@anim/fragment_close_exit"
+        tools:layout="@layout/fragment_changes">
+        <action
+            android:id="@+id/overviewFromChangesAction"
+            app:destination="@id/frag_course_overview"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_close_exit"
+            app:popEnterAnim="@anim/fragment_open_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+        <argument
+            android:name="favorites"
+            app:argType="boolean" />
+    </fragment>
 
 </navigation>

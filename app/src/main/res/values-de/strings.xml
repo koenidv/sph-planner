@@ -186,8 +186,8 @@
     <string name="changes_personalized_title">Deine Vertretungen</string>
     <string name="changes_personalized_none">👨‍🏫 Du hast regulären Unterricht</string>
     <string name="changes_title">Vertretungen</string>
-    <string name="changes_date_today">Today</string>
-    <string name="changes_date_tomorrow">Tomorrow</string>
+    <string name="changes_date_today">Heute</string>
+    <string name="changes_date_tomorrow">Morgen</string>
     <string name="changes_template_eva">%name-EVA</string>
     <string name="changes_template_cancelled">%name-Entfall</string>
     <string name="changes_template_freed">Freigestellt von %name</string>
@@ -199,5 +199,7 @@
     <string name="changes_template_other">%name: Etwas anderes</string>
     <string name="changes_date_past">Vergangen</string>
     <string name="placeholder_under_construction">🏗️\nIn Entwicklung</string>
+    <string name="changes_none">👨‍🏫 Keine Vertretungen gefunden</string>
+    <string name="changes_filter">Nur eigene Vertretungen anzeigen</string>
 
 </resources>

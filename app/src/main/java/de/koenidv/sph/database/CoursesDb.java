@@ -341,6 +341,20 @@ public class CoursesDb {
         return name != null ? name : internalId;
     }
 
+    /**
+     * Check if a course is favorite
+     *
+     * @param internalId The course's internal id
+     * @return null if the course is not in the db, true/false if it's favorite or not
+     */
+    public Boolean isFavorite(String internalId) {
+        Cursor cursor = dbhelper.getReadableDatabase().rawQuery("SELECT isFavorite FROM courses WHERE course_id=\"" + internalId.toLowerCase() + "\"", null);
+        if (!cursor.moveToFirst()) return null;
+        boolean favorite = cursor.getInt(0) == 1;
+        cursor.close();
+        return favorite;
+    }
+
 
     private Course cursorToCourse(Cursor cursor) {
         String CourseId = cursor.getString(0);

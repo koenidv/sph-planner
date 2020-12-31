@@ -88,7 +88,7 @@ class HomeFragment : Fragment() {
 
         changesLayout.setOnClickListener {
             requireActivity().findNavController(R.id.nav_host_fragment)
-                    .navigate(R.id.placeholderFragment)
+                    .navigate(R.id.changesFromHomeAction, bundleOf("favorites" to personalizedChanges.isNotEmpty()))
         }
 
         /*
