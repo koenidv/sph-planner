@@ -13,6 +13,7 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentContainerView
 import androidx.navigation.Navigation
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.recyclerview.widget.RecyclerView
 import de.koenidv.sph.R
@@ -77,12 +78,17 @@ class HomeFragment : Fragment() {
         val personalizedChanges = ChangesDb.instance!!.getFavorites()
         if (personalizedChanges.isNotEmpty()) {
             changesRecycler.setHasFixedSize(true)
-            changesRecycler.adapter = CompactChangesAdapter(personalizedChanges) { change, view ->
+            changesRecycler.adapter = CompactChangesAdapter(personalizedChanges) { change ->
                 // todo change sheet
             }
         } else {
             view.findViewById<TextView>(R.id.changesTitleTextView).text = getString(R.string.changes_personalized_none)
             changesRecycler.visibility = View.GONE
+        }
+
+        changesLayout.setOnClickListener {
+            requireActivity().findNavController(R.id.nav_host_fragment)
+                    .navigate(R.id.placeholderFragment)
         }
 
         /*

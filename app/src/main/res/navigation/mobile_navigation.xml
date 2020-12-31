@@ -140,5 +140,10 @@
             app:argType="string[]"
             app:nullable="true" />
     </fragment>
+    <fragment
+        android:id="@+id/placeholderFragment"
+        android:name="de.koenidv.sph.PlaceholderFragment"
+        android:label="fragment_placeholder"
+        tools:layout="@layout/fragment_placeholder" />
 
 </navigation>

@@ -46,7 +46,11 @@ class ExploreFragment : Fragment() {
         }
         attachmentsText.setOnClickListener {
             // Open attachments
-            nav.navigate(R.id.attachmentsFromExploreAction)
+            //nav.navigate(R.id.attachmentsFromExploreAction)
+            nav.navigate(R.id.placeholderFragment)
+        }
+        tasksText.setOnClickListener {
+            nav.navigate(R.id.placeholderFragment)
         }
 
 

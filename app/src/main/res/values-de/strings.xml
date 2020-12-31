@@ -198,5 +198,6 @@
     <string name="changes_template_exam">%name-Klausur</string>
     <string name="changes_template_other">%name: Etwas anderes</string>
     <string name="changes_date_past">Vergangen</string>
+    <string name="placeholder_under_construction">🏗️\nIn Entwicklung</string>
 
 </resources>

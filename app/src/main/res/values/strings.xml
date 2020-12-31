@@ -197,6 +197,7 @@
 
     <!-- Explore tab -->
     <string name="tile_startpage">Start</string>
+    <string name="placeholder_under_construction">🏗️\nUnder construction</string>
 
     <!-- Feedback -->
     <string name="feedback_subject" translatable="false">[SPHplanner] Feedback</string>
