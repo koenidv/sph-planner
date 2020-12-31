@@ -25,6 +25,11 @@ class ChangesAdapter(private val changes: List<Change>,
 
     private var currentDate = Date()
 
+    override fun registerAdapterDataObserver(observer: RecyclerView.AdapterDataObserver) {
+        currentDate = Date()
+        super.registerAdapterDataObserver(observer)
+    }
+
     // todo date is not shown when filtering for favorites and change didn't show date before
 
     /**
@@ -91,7 +96,8 @@ class ChangesAdapter(private val changes: List<Change>,
             // Set description
             if (change.description != null) {
                 description.visibility = View.VISIBLE
-                description.text = change.description
+                description.text = if (isFavorite || change.id_course_external == null) change.description
+                else "${change.id_course_external!!.toUpperCase(Locale.getDefault())}: ${change.description}"
             } else description.visibility = View.GONE
 
             // Set date
@@ -128,6 +134,7 @@ class ChangesAdapter(private val changes: List<Change>,
             Utility().tintBackground(layout, ChangeParser().getTypeColor(change.type), 0x26000000)
 
         }
+
     }
 
     // Creates new views (invoked by the layout manager)

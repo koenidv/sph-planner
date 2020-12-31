@@ -71,6 +71,7 @@ class HomeFragment : Fragment() {
          * Personalized changes todo check if changes feature is supported
          */
 
+        val changesTitle = view.findViewById<TextView>(R.id.changesTitleTextView)
         val changesLayout = view.findViewById<LinearLayout>(R.id.changesLayout)
         val changesRecycler = view.findViewById<RecyclerView>(R.id.changesRecycler)
 
@@ -82,13 +83,19 @@ class HomeFragment : Fragment() {
                 // todo change sheet
             }
         } else {
-            view.findViewById<TextView>(R.id.changesTitleTextView).text = getString(R.string.changes_personalized_none)
+            changesTitle.text = getString(R.string.changes_personalized_none)
             changesRecycler.visibility = View.GONE
         }
 
-        changesLayout.setOnClickListener {
-            requireActivity().findNavController(R.id.nav_host_fragment)
-                    .navigate(R.id.changesFromHomeAction, bundleOf("favorites" to personalizedChanges.isNotEmpty()))
+        if (personalizedChanges.isNotEmpty() || ChangesDb.instance!!.existAny()) {
+            changesLayout.setOnClickListener {
+                requireActivity().findNavController(R.id.nav_host_fragment)
+                        .navigate(R.id.changesFromHomeAction, bundleOf("favorites" to personalizedChanges.isNotEmpty()))
+            }
+        } else {
+            // Hide next icon if there are no changes
+            changesTitle.text = getString(R.string.changes_none)
+            changesTitle.setCompoundDrawablesRelative(null, null, null, null)
         }
 
         /*

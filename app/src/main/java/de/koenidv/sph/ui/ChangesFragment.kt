@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CompoundButton
+import android.widget.TextView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
@@ -26,7 +27,9 @@ import de.koenidv.sph.objects.Change
 class ChangesFragment : Fragment() {
 
     var favorites = false
+    var displayed = true
     lateinit var changes: MutableList<Change>
+    lateinit var noDataText: TextView
     lateinit var changesRecycler: RecyclerView
 
     // Refresh whenever the broadcast "uichange" is received
@@ -34,11 +37,24 @@ class ChangesFragment : Fragment() {
         override fun onReceive(context: Context, intent: Intent) {
             // Only do something changes were updated
             if (intent.getStringExtra("content") == "changes") {
-                // Get changes
-                changes = if (favorites) ChangesDb.instance!!.getFavorites().toMutableList()
-                else ChangesDb.instance!!.getAll().toMutableList()
-                // Notify recyclerview
-                changesRecycler.adapter?.notifyDataSetChanged()
+                if (!displayed) {
+                    // Get changes
+                    changes.clear()
+                    changes.addAll(if (favorites) ChangesDb.instance!!.getFavorites().toMutableList()
+                    else ChangesDb.instance!!.getAll().toMutableList())
+                    noDataText.visibility = if (changes.isEmpty()) View.VISIBLE
+                    else View.GONE
+                    // Notify recyclerview
+                    changesRecycler.adapter?.notifyDataSetChanged()
+                } else {
+                    // If the recycler was never set up, recreate the fragment
+                    @Suppress("DEPRECATION")
+                    parentFragmentManager.beginTransaction()
+                            .replace(R.id.nav_host_fragment,
+                                    instantiate(context, ChangesFragment().javaClass.name,
+                                            bundleOf("favorites" to favorites)))
+                            .commit()
+                }
             }
         }
     }
@@ -55,11 +71,21 @@ class ChangesFragment : Fragment() {
 
         val view = inflater.inflate(R.layout.fragment_changes, container, false)
 
+        noDataText = view.findViewById<TextView>(R.id.noDataTextView)
+        changesRecycler = view.findViewById(R.id.changesRecycler)
+        val favoritesSwitch = view.findViewById<SwitchMaterial>(R.id.favoritesSwitch)
+
+        // Firstly, check if there are any changes to be displayed
+        if (!ChangesDb.instance!!.existAny()) {
+            noDataText.visibility = View.VISIBLE
+            favoritesSwitch.visibility = View.GONE
+            changesRecycler.visibility = View.GONE
+            displayed = false
+            return view
+        }
+
         // Set open in browser url
         SphPlanner.openInBrowserUrl = getString(R.string.url_changes)
-
-        val favoritesSwitch = view.findViewById<SwitchMaterial>(R.id.favoritesSwitch)
-        changesRecycler = view.findViewById<RecyclerView>(R.id.changesRecycler)
 
         // Get passed argument
         if (arguments?.getBoolean("favorites") != null) {
@@ -72,6 +98,8 @@ class ChangesFragment : Fragment() {
         // Get changes
         changes = if (favorites) ChangesDb.instance!!.getFavorites().toMutableList()
         else ChangesDb.instance!!.getAll().toMutableList()
+        noDataText.visibility = if (changes.isEmpty()) View.VISIBLE
+        else View.GONE
 
         // Set up changes recycler
         val adapter = ChangesAdapter(changes) { couseId: String ->
@@ -88,6 +116,8 @@ class ChangesFragment : Fragment() {
             changes.clear()
             changes.addAll(if (favorites) ChangesDb.instance!!.getFavorites()
             else ChangesDb.instance!!.getAll())
+            noDataText.visibility = if (changes.isEmpty()) View.VISIBLE
+            else View.GONE
             // Notify recyclerview
             // Should do this with notifyItemRemoved/Inserted..
             changesRecycler.adapter?.notifyDataSetChanged()

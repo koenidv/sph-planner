@@ -92,7 +92,6 @@ class CourseOverviewFragment : Fragment() {
                 // We can assume that posts are added to the top
                 if (changed > 0) {
                     // Add all posts that should be displayed
-                    //posts.sortByDescending { it.date }
                     postsToShow.clear()
                     if (!isExanded) {
                         postsToShow.addAll(posts.take(2))
@@ -109,8 +108,6 @@ class CourseOverviewFragment : Fragment() {
                         // Mark all posts as read
                         PostsDb.getInstance().markCourseAsRead(courseId)
                     }
-                    // Notify about new items
-                    //postsRecycler.adapter?.notifyItemRangeChanged(0, changed - 1)
                 }
 
             }

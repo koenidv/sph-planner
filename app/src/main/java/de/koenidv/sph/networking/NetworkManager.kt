@@ -87,7 +87,7 @@ class NetworkManager {
                         }
                         onComplete(it)
                     }
-                }
+                } else onComplete(SUCCESS)
             }
             R.id.frag_webview -> {
                 // WebViewFragment, send a broadcast to reload webview

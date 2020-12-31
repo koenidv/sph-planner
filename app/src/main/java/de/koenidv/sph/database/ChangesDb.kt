@@ -101,6 +101,14 @@ class ChangesDb private constructor() {
     fun getAll(): List<Change> = getWithCursor(dbhelper.readableDatabase.rawQuery(
             "SELECT * from changes ORDER BY date ASC", null))
 
+    fun existAny(): Boolean {
+        val cursor = dbhelper.readableDatabase.rawQuery("SELECT * FROM changes " +
+                "WHERE date >= ${(Date().time / 1000) - (24 * 60 * 60)} LIMIT 1", null)
+        val exists = cursor.moveToFirst()
+        cursor.close()
+        return exists
+    }
+
     /**
      * Remove changes with a date older than 24 hours ago
      */

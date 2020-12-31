@@ -18,6 +18,7 @@ class ChangeParser {
         Change.TYPE_CARE -> SphPlanner.applicationContext().getColor(R.color.change_type_care)
         Change.TYPE_ROOM -> SphPlanner.applicationContext().getColor(R.color.change_type_room)
         Change.TYPE_SWITCHED -> SphPlanner.applicationContext().getColor(R.color.change_type_switched)
+        Change.TYPE_EXAM -> SphPlanner.applicationContext().getColor(R.color.change_type_exam)
         else -> SphPlanner.applicationContext().getColor(R.color.change_type_other)
     }
 }

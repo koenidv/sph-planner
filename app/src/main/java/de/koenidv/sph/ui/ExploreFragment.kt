@@ -34,6 +34,8 @@ class ExploreFragment : Fragment() {
         val postsText = view.findViewById<TextView>(R.id.postsTextView)
         val attachmentsText = view.findViewById<TextView>(R.id.attachmentsTextView)
         val tasksText = view.findViewById<TextView>(R.id.tasksTextView)
+        val changesText = view.findViewById<TextView>(R.id.changesTextView)
+
 
         // Set on click listeners, open respective fragment
         timetableText.setOnClickListener {
@@ -51,6 +53,9 @@ class ExploreFragment : Fragment() {
         }
         tasksText.setOnClickListener {
             nav.navigate(R.id.frag_placeholder)
+        }
+        changesText.setOnClickListener {
+            nav.navigate(R.id.frag_changes)
         }
 
 

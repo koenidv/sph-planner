@@ -51,7 +51,7 @@
     <color name="change_type_freed">#87d37c</color>
     <color name="change_type_cancelled">#05731d</color>
     <color name="change_type_substitute">#e0544e</color>
-    <color name="change_type_switched">#e45d65</color>
+    <color name="change_type_switched">#e45da9</color>
     <color name="change_type_care">#f39c12</color>
     <color name="change_type_room">#ba8ee0</color>
     <color name="change_type_exam">#f88379</color>

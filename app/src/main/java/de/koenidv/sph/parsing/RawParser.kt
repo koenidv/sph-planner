@@ -128,7 +128,8 @@ class RawParser {
                             9 -> room = if (rawCell == "") null else rawCell
                             10 -> description = if (rawCell == "") null else rawCell
                                     .replace("\n", "")
-                                    .replace("""\W+""".toRegex(), " ")
+                                    .replace("""\s+""".toRegex(), " ")
+                                    .capitalize(Locale.getDefault())
                         }
                         // Next cell
                         cellInRow++

@@ -85,6 +85,23 @@
                 app:layout_columnWeight="1"
                 tools:targetApi="o" />
 
+            <TextView
+                android:id="@+id/changesTextView"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_margin="8dp"
+                android:autoSizeMaxTextSize="16sp"
+                android:autoSizeTextType="uniform"
+                android:background="@drawable/card_background"
+                android:foreground="?selectableItemBackground"
+                android:gravity="center"
+                android:padding="8dp"
+                android:text="@string/changes_title"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                android:textSize="16sp"
+                app:layout_columnWeight="1"
+                tools:targetApi="o" />
+
         </androidx.gridlayout.widget.GridLayout>
 
         <androidx.recyclerview.widget.RecyclerView
