@@ -27,142 +27,145 @@ class RawParser {
 
         // we could check the week type (a/b) here: <span class="badge woche">
 
-        // Remove stuff that we don't need
-        var rawContent = rawResponse.substring(rawResponse.indexOf("<div class=\"panel panel-primary\""))
-        rawContent = rawContent.substring(0, rawContent.indexOf("<link"))
-        // Remove newlines, we don't need them (But also isn't necessary atm and makes debugging horrible)
-        // rawContent = rawContent.replace("\n", "").replace("\t", "")
+        // If there are any entries..
+        if (rawResponse.contains("<div class=\"panel panel-primary\"")) {
+            // Remove stuff that we don't need
+            var rawContent = rawResponse.substring(rawResponse.indexOf("<div class=\"panel panel-primary\""))
+            rawContent = rawContent.substring(0, rawContent.indexOf("<link"))
+            // Remove newlines, we don't need them (But also isn't necessary atm and makes debugging horrible)
+            // rawContent = rawContent.replace("\n", "").replace("\t", "")
 
-        // For remembering where we left off :)
-        var rawToday: String
-        var rawChange: String
-        var rawCell: String
-        var dayInContent = 0
-        var cellInRow: Int
+            // For remembering where we left off :)
+            var rawToday: String
+            var rawChange: String
+            var rawCell: String
+            var dayInContent = 0
+            var cellInRow: Int
 
-        // For getting the date
-        val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.GERMAN)
+            // For getting the date
+            val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.GERMAN)
 
-        // We'll need those below to construct our Change object
-        var date: Date
-        var internalId: String?
-        var id_course_external: String? = null
-        var id_course_external_before: String? = null
-        var lessons: List<Int> = listOf()
-        var type: Int = Change.TYPE_OTHER
-        var className: String? = null
-        var className_before: String? = null
-        var id_teacher: String? = null
-        var id_subsTeacher: String? = null
-        var room: String? = null
-        var description: String? = null
+            // We'll need those below to construct our Change object
+            var date: Date
+            var internalId: String?
+            var id_course_external: String? = null
+            var id_course_external_before: String? = null
+            var lessons: List<Int> = listOf()
+            var type: Int = Change.TYPE_OTHER
+            var className: String? = null
+            var className_before: String? = null
+            var id_teacher: String? = null
+            var id_subsTeacher: String? = null
+            var room: String? = null
+            var description: String? = null
 
-        // Extract every changes table, i.e. every available day
-        while (rawContent.contains("<table class=\"table")) {
-            // Get today's table only
-            rawToday = rawContent.substring(rawContent.indexOf("<table class=\"table"), rawContent.indexOf("<div class=\"fixed-table-footer"))
+            // Extract every changes table, i.e. every available day
+            while (rawContent.contains("<table class=\"table")) {
+                // Get today's table only
+                rawToday = rawContent.substring(rawContent.indexOf("<table class=\"table"), rawContent.indexOf("<div class=\"fixed-table-footer"))
 
-            // Parse date
-            val dateIndex = rawContent.indexOf("Vertretungen am ") + 16
-            date = dateFormat.parse(rawContent.substring(dateIndex, dateIndex + 10))!!
+                // Parse date
+                val dateIndex = rawContent.indexOf("Vertretungen am ") + 16
+                date = dateFormat.parse(rawContent.substring(dateIndex, dateIndex + 10))!!
 
-            // Remove the extracted table from rawContent
-            rawContent = rawContent.substring(rawContent.indexOf("<div class=\"fixed-table-footer") + 30)
-            // Extract only the table's body
-            // We don't need <thead> as long as the table order remains the same
-            // This might vary for different schools
-            rawToday = rawToday.substring(rawToday.indexOf("<tbody>") + 7, rawToday.indexOf("</tbody>"))
+                // Remove the extracted table from rawContent
+                rawContent = rawContent.substring(rawContent.indexOf("<div class=\"fixed-table-footer") + 30)
+                // Extract only the table's body
+                // We don't need <thead> as long as the table order remains the same
+                // This might vary for different schools
+                rawToday = rawToday.substring(rawToday.indexOf("<tbody>") + 7, rawToday.indexOf("</tbody>"))
 
-            // We are left with a table, each row contains these columns:
-            // title (not needed), lessons (11 11 - 12), classname (Q34), old classname (Q34, mostly empty),
-            // substitute teacher id (Bar, mostly empty), teacher id (Bar), type (EVA), course (M-GK-3),
-            // old course (M-GK-3, mostly empty), room (M119), description
+                // We are left with a table, each row contains these columns:
+                // title (not needed), lessons (11 11 - 12), classname (Q34), old classname (Q34, mostly empty),
+                // substitute teacher id (Bar, mostly empty), teacher id (Bar), type (EVA), course (M-GK-3),
+                // old course (M-GK-3, mostly empty), room (M119), description
 
-            // Get the change's data for every table row
-            while (rawToday.contains("<tr")) {
-                // Extract change from today's changes
-                rawChange = rawToday.substring(rawToday.indexOf("<tr>") + 4, rawToday.indexOf("</tr>"))
-                rawToday = rawToday.substring(rawToday.indexOf("</tr>") + 5)
+                // Get the change's data for every table row
+                while (rawToday.contains("<tr")) {
+                    // Extract change from today's changes
+                    rawChange = rawToday.substring(rawToday.indexOf("<tr>") + 4, rawToday.indexOf("</tr>"))
+                    rawToday = rawToday.substring(rawToday.indexOf("</tr>") + 5)
 
-                // Process every cell
-                cellInRow = 0
-                while (rawChange.contains("<td")) {
-                    // Extract cell from table row
-                    rawCell = rawChange.substring(rawChange.indexOf("<td"))
-                    rawCell = rawCell.substring(rawCell.indexOf(">") + 1, rawCell.indexOf("</td>"))
-                    rawCell = rawCell.trim()
-                    rawChange = rawChange.substring(rawChange.indexOf("<td") + 3)
+                    // Process every cell
+                    cellInRow = 0
+                    while (rawChange.contains("<td")) {
+                        // Extract cell from table row
+                        rawCell = rawChange.substring(rawChange.indexOf("<td"))
+                        rawCell = rawCell.substring(rawCell.indexOf(">") + 1, rawCell.indexOf("</td>"))
+                        rawCell = rawCell.trim()
+                        rawChange = rawChange.substring(rawChange.indexOf("<td") + 3)
 
-                    when (cellInRow) {
-                        0 -> {
-                        } // Ignore first cell
-                        1 -> { // Affected lessons
-                            lessons = if (rawCell.contains(" -\n")) {
-                                // Get start and end lesson and put everything in between in a list
-                                val fromLesson = rawCell.substring(0, rawCell.indexOf("\n")).toInt()
-                                val toLesson = rawCell.substring(rawCell.lastIndexOf(" ") + 1).toInt()
-                                (fromLesson..toLesson).toList()
-                            } else {
-                                listOf(rawCell.toInt())
+                        when (cellInRow) {
+                            0 -> {
+                            } // Ignore first cell
+                            1 -> { // Affected lessons
+                                lessons = if (rawCell.contains(" -\n")) {
+                                    // Get start and end lesson and put everything in between in a list
+                                    val fromLesson = rawCell.substring(0, rawCell.indexOf("\n")).toInt()
+                                    val toLesson = rawCell.substring(rawCell.lastIndexOf(" ") + 1).toInt()
+                                    (fromLesson..toLesson).toList()
+                                } else {
+                                    listOf(rawCell.toInt())
+                                }
                             }
+                            2 -> className = if (rawCell == "") null else rawCell
+                            3 -> className_before = if (rawCell == "") null else rawCell
+                            4 -> id_subsTeacher = if (rawCell == "") null else rawCell.toLowerCase()
+                            5 -> id_teacher = if (rawCell == "") null else rawCell.toLowerCase()
+                            6 -> type = when (rawCell) {
+                                "EVA", "Eigenverantwortliches Arbeiten" -> Change.TYPE_EVA
+                                "Entfall" -> Change.TYPE_CANCELLED
+                                "Freisetzung" -> Change.TYPE_FREED
+                                "Vertretung", "Statt-Vertretung" -> Change.TYPE_SUBSTITUTE
+                                "Betreuung" -> Change.TYPE_CARE
+                                "Raum", "Raumwechsel" -> Change.TYPE_ROOM
+                                "Verlegung", "Tausch" -> Change.TYPE_SWITCHED
+                                "Klausur" -> Change.TYPE_EXAM
+                                else -> Change.TYPE_OTHER
+                            }
+                            7 -> id_course_external = if (rawCell == "") null else rawCell.toUpperCase()
+                            8 -> id_course_external_before = if (rawCell == "") null else rawCell.toUpperCase()
+                            9 -> room = if (rawCell == "") null else rawCell.toUpperCase()
+                            10 -> description = if (rawCell == "") null else rawCell
+                                    .replace("\n", "")
+                                    .replace("""\W+""".toRegex(), " ")
                         }
-                        2 -> className = if (rawCell == "") null else rawCell
-                        3 -> className_before = if (rawCell == "") null else rawCell
-                        4 -> id_subsTeacher = if (rawCell == "") null else rawCell.toLowerCase()
-                        5 -> id_teacher = if (rawCell == "") null else rawCell.toLowerCase()
-                        6 -> type = when (rawCell) {
-                            "EVA", "Eigenverantwortliches Arbeiten" -> Change.TYPE_EVA
-                            "Entfall" -> Change.TYPE_CANCELLED
-                            "Freisetzung" -> Change.TYPE_FREED
-                            "Vertretung", "Statt-Vertretung" -> Change.TYPE_SUBSTITUTE
-                            "Betreuung" -> Change.TYPE_CARE
-                            "Raum", "Raumwechsel" -> Change.TYPE_ROOM
-                            "Verlegung", "Tausch" -> Change.TYPE_SWITCHED
-                            "Klausur" -> Change.TYPE_EXAM
-                            else -> Change.TYPE_OTHER
-                        }
-                        7 -> id_course_external = if (rawCell == "") null else rawCell.toUpperCase()
-                        8 -> id_course_external_before = if (rawCell == "") null else rawCell.toUpperCase()
-                        9 -> room = if (rawCell == "") null else rawCell.toUpperCase()
-                        10 -> description = if (rawCell == "") null else rawCell
-                                .replace("\n", "")
-                                .replace("""\W+""".toRegex(), " ")
+                        // Next cell
+                        cellInRow++
                     }
-                    // Next cell
-                    cellInRow++
+
+                    // Try to get an internal id
+                    internalId = if (id_course_external != null && id_teacher != null)
+                        IdParser().getCourseIdWithGmb(id_course_external, id_teacher)
+                    else if (id_course_external_before != null && id_teacher != null)
+                        IdParser().getCourseIdWithGmb(id_course_external_before, id_teacher)
+                    else if (id_course_external != null && IdParser().getCourseIdWithGmb(id_course_external) != null)
+                        IdParser().getCourseIdWithGmb(id_course_external)
+                    else if (id_course_external_before != null && IdParser().getCourseIdWithGmb(id_course_external_before) != null)
+                        IdParser().getCourseIdWithGmb(id_course_external_before)
+                    else null
+
+                    // Add parsed change to list
+                    changes.add(Change(
+                            internalId,
+                            id_course_external,
+                            date,
+                            lessons,
+                            type,
+                            id_course_external_before,
+                            className,
+                            className_before,
+                            id_teacher,
+                            id_subsTeacher,
+                            room,
+                            null, // room before is not currently supported by sph
+                            description
+                    ))
                 }
 
-                // Try to get an internal id
-                internalId = if (id_course_external != null && id_teacher != null)
-                    IdParser().getCourseIdWithGmb(id_course_external, id_teacher)
-                else if (id_course_external_before != null && id_teacher != null)
-                    IdParser().getCourseIdWithGmb(id_course_external_before, id_teacher)
-                else if (id_course_external != null && IdParser().getCourseIdWithGmb(id_course_external) != null)
-                    IdParser().getCourseIdWithGmb(id_course_external)
-                else if (id_course_external_before != null && IdParser().getCourseIdWithGmb(id_course_external_before) != null)
-                    IdParser().getCourseIdWithGmb(id_course_external_before)
-                else null
-
-                // Add parsed change to list
-                changes.add(Change(
-                        internalId,
-                        id_course_external,
-                        date,
-                        lessons,
-                        type,
-                        id_course_external_before,
-                        className,
-                        className_before,
-                        id_teacher,
-                        id_subsTeacher,
-                        room,
-                        null, // room before is not currently supported by sph
-                        description
-                ))
+                // Next day
+                dayInContent++
             }
-
-            // Next day
-            dayInContent++
         }
 
         return changes
