@@ -149,7 +149,7 @@ class Utility {
                         color and 0x00FFFFFF or opacity, BlendMode.SRC_ATOP)
             } else {
                 @Suppress("DEPRECATION") // not in < Q
-                (view.background as StateListDrawable).setColorFilter(
+                view.background.setColorFilter(
                         color and 0x00FFFFFF or opacity, PorterDuff.Mode.SRC_ATOP)
             }
         else Log.e(SphPlanner.TAG, view.background.javaClass.toString() + " is marked as tintable")
