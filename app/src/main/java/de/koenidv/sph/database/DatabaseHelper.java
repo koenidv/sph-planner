@@ -50,7 +50,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("CREATE TABLE changes(change_id INTEGER UNIQUE PRIMARY KEY AUTOINCREMENT," +
                 " id_course TEXT, id_course_external TEXT, date TEXT, lessons TEXT," +
                 " type INTEGER, id_course_external_before TEXT, className TEXT, className_before TEXT," +
-                " id_teacher TEXT, id_subsTeacher TEXT, room TEXT, room_before TEXT, description TEXT)");
+                " id_teacher TEXT, id_subsTeacher TEXT, room TEXT, room_before TEXT, description TEXT," +
+                " sortLesson INTEGER)");
         // Create function tiles table
         db.execSQL("CREATE TABLE tiles(name TEXT PRIMARY KEY," +
                 " location TEXT, type TEXT, icon TEXT, color INTEGER)");

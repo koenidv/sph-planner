@@ -21,8 +21,16 @@ data class Change(
         var id_subsTeacher: String? = null, // Substitute teacher id, if any - Lowercase
         var room: String? = null, // New room, i.e. M115 - Uppercase
         var room_before: String? = null, // Old room. Per SPH implementation as of now, this will always be null - Uppercase
-        var description: String? = null // Description of the event
+        var description: String? = null, // Description of the event
+        var sortLesson: Float? = null // Only for sql ordering
 ) {
+
+    init {
+        sortLesson = if (lessons.size == 1) lessons[0].toFloat()
+        else (lessons[0] + 0.01 * lessons[lessons.size - 1]).toFloat()
+        if (description == "Entfällt" || description == "Entfällt; Verlegung auf Entfall für Lehrer")
+            description = null
+    }
 
     companion object {
         const val TYPE_OTHER = -1

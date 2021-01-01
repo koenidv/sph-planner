@@ -37,7 +37,7 @@ class ChangesFragment : Fragment() {
         override fun onReceive(context: Context, intent: Intent) {
             // Only do something changes were updated
             if (intent.getStringExtra("content") == "changes") {
-                if (!displayed) {
+                if (displayed && ::changes.isInitialized) {
                     // Get changes
                     changes.clear()
                     changes.addAll(if (favorites) ChangesDb.instance!!.getFavorites().toMutableList()

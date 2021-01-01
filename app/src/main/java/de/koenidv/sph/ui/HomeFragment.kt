@@ -80,7 +80,8 @@ class HomeFragment : Fragment() {
         if (personalizedChanges.isNotEmpty()) {
             changesRecycler.setHasFixedSize(true)
             changesRecycler.adapter = CompactChangesAdapter(personalizedChanges) { change ->
-                // todo change sheet
+                requireActivity().findNavController(R.id.nav_host_fragment)
+                        .navigate(R.id.changesFromHomeAction, bundleOf("favorites" to personalizedChanges.isNotEmpty()))
             }
         } else {
             changesTitle.text = getString(R.string.changes_personalized_none)

@@ -44,6 +44,7 @@ class ChangesDb private constructor() {
             cv.put("room", change.room)
             cv.put("room_before", change.room_before)
             cv.put("description", change.description)
+            cv.put("sortLesson", change.sortLesson)
 
             // Add change to the db if it's not already there
             db.insert("changes", null, cv)
@@ -74,7 +75,7 @@ class ChangesDb private constructor() {
                         cursor.getString(10), // id substitute teacher
                         cursor.getString(11), // room
                         cursor.getString(12), // room before
-                        cursor.getString(13), // description
+                        cursor.getString(13) // description
                 ))
             } while (cursor.moveToNext())
         }
@@ -92,14 +93,14 @@ class ChangesDb private constructor() {
                 "INNER JOIN courses ON changes.id_course = courses.course_id " +
                 "WHERE changes.date >= ${(Date().time / 1000) - (24 * 60 * 60)} " +
                 "AND (courses.isFavorite = 1 OR changes.id_course IS NULL) " +
-                "ORDER BY changes.date ASC", null))
+                "ORDER BY changes.date ASC, sortLesson ASC", null))
     }
 
     /**
      * Returns all changes, ordered by date
      */
     fun getAll(): List<Change> = getWithCursor(dbhelper.readableDatabase.rawQuery(
-            "SELECT * from changes ORDER BY date ASC", null))
+            "SELECT * from changes ORDER BY date ASC, sortLesson ASC", null))
 
     fun existAny(): Boolean {
         val cursor = dbhelper.readableDatabase.rawQuery("SELECT * FROM changes " +

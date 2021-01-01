@@ -245,7 +245,7 @@ class NetworkManager {
      * Load changes from sph and save them to changes db
      */
     fun loadAndSaveChanges(onComplete: (success: Int) -> Unit) {
-        NetworkManager().loadSiteWithToken(applicationContext().getString(R.string.url_changes),
+        NetworkManager().loadSiteWithToken(applicationContext().getString(R.string.url_changes_debug),
                 onComplete = { success: Int, result: String? ->
                     if (success == SUCCESS) {
                         ChangesDb.instance!!.removeOld()

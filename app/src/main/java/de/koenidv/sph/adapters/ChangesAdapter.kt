@@ -1,11 +1,12 @@
 package de.koenidv.sph.adapters
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner.Companion.applicationContext
@@ -23,31 +24,20 @@ class ChangesAdapter(private val changes: List<Change>,
                      private val onCourseClick: (courseId: String) -> Unit) :
         RecyclerView.Adapter<ChangesAdapter.ViewHolder>() {
 
-    private var currentDate = Date()
-
-    override fun registerAdapterDataObserver(observer: RecyclerView.AdapterDataObserver) {
-        currentDate = Date()
-        super.registerAdapterDataObserver(observer)
-    }
-
-    // todo date is not shown when filtering for favorites and change didn't show date before
-
     /**
      * Provides a reference to the type of view
      * (custom ViewHolder).
      */
     class ViewHolder(view: View, onCourseClick: (String) -> Unit) : RecyclerView.ViewHolder(view) {
-        private val layout = view.findViewById<LinearLayout>(R.id.changeLayout)
+        private val layout = view.findViewById<ConstraintLayout>(R.id.changeLayout)
         private val date = view.findViewById<TextView>(R.id.dateTextView)
         private val title = view.findViewById<TextView>(R.id.titleTextView)
+        private val lessons = view.findViewById<TextView>(R.id.lessonsTextView)
         private val description = view.findViewById<TextView>(R.id.descriptionTextView)
         private val course = view.findViewById<TextView>(R.id.courseTextView)
         private val courseLayout = view.findViewById<LinearLayout>(R.id.courseLayout)
 
         private var currentChange: Change? = null
-        private val themeColor = applicationContext()
-                .getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
-                .getInt("themeColor", 0)
         private val otherDateFormat = SimpleDateFormat("EEEE", Locale.getDefault())
 
         init {
@@ -58,7 +48,8 @@ class ChangesAdapter(private val changes: List<Change>,
             }
         }
 
-        fun bind(change: Change, currentDate: Date) {
+
+        fun bind(change: Change, currentDate: Long) {
             currentChange = change
 
             // Check if the attached course is favorite
@@ -93,6 +84,13 @@ class ChangesAdapter(private val changes: List<Change>,
 
             title.text = titletext
 
+            // Set lessons
+            @SuppressLint("SetTextI18n")
+            if (change.lessons.size == 1)
+                lessons.text = change.lessons[0].toString()
+            else
+                lessons.text = "${change.lessons[0]} - ${change.lessons[change.lessons.size - 1]}"
+
             // Set description
             if (change.description != null) {
                 description.visibility = View.VISIBLE
@@ -101,7 +99,7 @@ class ChangesAdapter(private val changes: List<Change>,
             } else description.visibility = View.GONE
 
             // Set date
-            if (change.date != currentDate) {
+            if (change.date.time != currentDate) {
                 date.visibility = View.VISIBLE
                 val time = Date().time
                 date.text = when {
@@ -148,8 +146,12 @@ class ChangesAdapter(private val changes: List<Change>,
     // Replaces the contents of a view (invoked by the layout manager)
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
         // Bind data to ViewHolder
-        viewHolder.bind(changes[position], currentDate)
-        currentDate = changes[position].date
+        val lastDate = try {
+            changes[position - 1].date.time
+        } catch (e: IndexOutOfBoundsException) {
+            0
+        }
+        viewHolder.bind(changes[position], lastDate)
     }
 
     // Return the size of your dataset (invoked by the layout manager)

@@ -103,6 +103,8 @@ class MainActivity : AppCompatActivity() {
         val typedValue = TypedValue()
         theme.resolveAttribute(R.attr.colorPrimary, typedValue, true)
         prefs.edit().putInt("themeColor", typedValue.data).apply()
+        theme.resolveAttribute(R.attr.backgroundColor, typedValue, true)
+        prefs.edit().putInt("backgroundColor", typedValue.data).apply()
 
     }
 
