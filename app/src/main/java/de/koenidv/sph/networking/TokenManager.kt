@@ -89,8 +89,6 @@ class TokenManager {
                             }
 
                             override fun onError(error: ANError) {
-                                // todo handle 500
-                                Toast.makeText(applicationContext(), "An error occurred :/", Toast.LENGTH_LONG).show()
                                 if (error.errorCode == 0) {
                                     when (error.errorDetail) {
                                         "connectionError" -> {

@@ -32,6 +32,7 @@ class AllPostsFragment(private var filters: MutableList<String> = mutableListOf(
 
         val filterText = view.findViewById<TextView>(R.id.filterPostsTextView)
         val postsRecycler = view.findViewById<RecyclerView>(R.id.postsRecycler)
+        val noDataText = view.findViewById<TextView>(R.id.noDataTextView)
         val postsUnfiltered = PostsDb.getInstance().allOrderedByUnread
         val posts = postsUnfiltered.toMutableList()
 
@@ -59,6 +60,8 @@ class AllPostsFragment(private var filters: MutableList<String> = mutableListOf(
             postsRecycler.adapter?.notifyDataSetChanged()
             if (filters.isEmpty()) filterText.text = getString(R.string.posts_filter)
             else filterText.text = getString(R.string.posts_filtered)
+            if (posts.isEmpty()) noDataText.visibility = View.VISIBLE
+            else noDataText.visibility = View.GONE
         }
 
         // Get passed course id argument

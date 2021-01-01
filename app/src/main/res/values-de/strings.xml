@@ -201,5 +201,11 @@
     <string name="placeholder_under_construction">🏗️\nIn Entwicklung</string>
     <string name="changes_none">👨‍🏫 Keine Vertretungen gefunden</string>
     <string name="changes_filter">Nur eigene Vertretungen anzeigen</string>
+    <string name="explore_collection_timetable">🗓️ Stundenplan</string>
+    <string name="explore_collection_posts">📑️ Einträge</string>
+    <string name="explore_collection_attachments">🖇️️ Dateien &amp; Links</string>
+    <string name="explore_collection_tasks">🖋️ Aufgaben</string>
+    <string name="explore_collection_changes">🗞️️ Vertretungen</string>
+    <string name="posts_filter_no_data">Keine Einträge gefunden 🗃</string>
 
 </resources>

@@ -1,5 +1,6 @@
 package de.koenidv.sph.adapters
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +12,7 @@ import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner.Companion.applicationContext
 import de.koenidv.sph.database.CoursesDb
 import de.koenidv.sph.objects.Change
+import de.koenidv.sph.parsing.ChangeParser
 import de.koenidv.sph.parsing.Utility
 import java.text.SimpleDateFormat
 import java.util.*
@@ -30,6 +32,7 @@ class CompactChangesAdapter(private val changes: List<Change>,
         private val title = view.findViewById<TextView>(R.id.titleTextView)
         private val date = view.findViewById<TextView>(R.id.dateTextView)
         private val course = view.findViewById<TextView>(R.id.courseTextView)
+        private val lessons = view.findViewById<TextView>(R.id.lessonsTextView)
 
         private var currentChange: Change? = null
         private val themeColor = applicationContext()
@@ -97,6 +100,14 @@ class CompactChangesAdapter(private val changes: List<Change>,
             // Set background color, about 70% opacity
             Utility().tintBackground(course, CoursesDb.getInstance().getColor(change.id_course), 0xb4000000.toInt())
 
+            // Set lessons
+            @SuppressLint("SetTextI18n")
+            if (change.lessons.size == 1)
+                lessons.text = change.lessons[0].toString()
+            else
+                lessons.text = "${change.lessons[0]} - ${change.lessons[change.lessons.size - 1]}"
+            // Set lessons background color according to change type (50% opacity)
+            Utility().tintBackground(lessons, ChangeParser().getTypeColor(change.type), 0x80000000.toInt())
         }
     }
 

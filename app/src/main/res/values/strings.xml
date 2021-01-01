@@ -96,6 +96,7 @@
     <string name="posts_title">Posts</string>
     <string name="posts_list_title">Posts</string>
     <string name="posts_all_title">All posts</string>
+    <string name="posts_filter_no_data">No posts found 🗃️</string>
     <string name="posts_no_data">No posts yet</string>
     <string name="posts_unread_title">New posts</string>
     <string name="posts_no_text">No description</string>
@@ -199,6 +200,11 @@
     <!-- Explore tab -->
     <string name="tile_startpage">Start</string>
     <string name="placeholder_under_construction">🏗️\nUnder construction</string>
+    <string name="explore_collection_timetable">🗓️ Timetable</string>
+    <string name="explore_collection_posts">📑️ Posts</string>
+    <string name="explore_collection_attachments">🖇️️ Files &amp; Links</string>
+    <string name="explore_collection_tasks">🖋️ Tasks</string>
+    <string name="explore_collection_changes">🗞️️ Changes</string>
 
     <!-- Feedback -->
     <string name="feedback_subject" translatable="false">[SPHplanner] Feedback</string>
