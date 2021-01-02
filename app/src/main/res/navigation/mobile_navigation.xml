@@ -40,7 +40,7 @@
             app:popExitAnim="@anim/fragment_close_exit" />
         <action
             android:id="@+id/tasksFromHomeAction"
-            app:destination="@id/tasksFragment"
+            app:destination="@id/frag_tasks"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_close_exit"
             app:popEnterAnim="@anim/fragment_open_enter"
@@ -109,7 +109,7 @@
             app:popExitAnim="@anim/fragment_close_exit" />
         <action
             android:id="@+id/tasksFromExploreAction"
-            app:destination="@id/tasksFragment"
+            app:destination="@id/frag_tasks"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_close_exit"
             app:popEnterAnim="@anim/fragment_open_enter"
@@ -197,7 +197,7 @@
             app:argType="boolean" />
     </fragment>
     <fragment
-        android:id="@+id/tasksFragment"
+        android:id="@+id/frag_tasks"
         android:name="de.koenidv.sph.ui.TasksFragment"
         android:label="@string/tasks_title"
         tools:layout="@layout/fragment_tasks">
@@ -208,6 +208,9 @@
             app:exitAnim="@anim/fragment_close_exit"
             app:popEnterAnim="@anim/fragment_open_enter"
             app:popExitAnim="@anim/fragment_close_exit" />
+        <argument
+            android:name="undone"
+            app:argType="boolean" />
     </fragment>
 
 </navigation>

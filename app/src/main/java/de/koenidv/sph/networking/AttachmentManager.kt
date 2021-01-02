@@ -294,10 +294,13 @@ class AttachmentManager {
     /**
      * Returns a lambda to handle task checked changes
      */
-    fun onTaskCheckedChanged(activity: Activity, courseNumberId: String? = null): (postId: String, courseId: String, Boolean) -> Unit = { postId, courseId, isDone ->
+    fun onTaskCheckedChanged(activity: Activity, courseNumberId: String? = null, onComplete: ((String, Boolean) -> Unit)? = null):
+            (postId: String, courseId: String, Boolean) -> Unit = { postId, courseId, isDone ->
         val numberId = courseNumberId ?: CoursesDb.getInstance().getNumberId(courseId)
         NetworkManager().markTaskAsDone(numberId, postId, isDone) {
-            if (it != NetworkManager.SUCCESS) {
+            if (it == NetworkManager.SUCCESS) {
+                if (onComplete != null) onComplete(postId, isDone)
+            } else {
                 // todo handle errors properly
                 Snackbar.make(activity.findViewById(R.id.nav_host_fragment),
                         R.string.task_not_synchronized, Snackbar.LENGTH_SHORT)

@@ -216,5 +216,11 @@
     <string name="tasks_filter_none_undone">Alle Aufgaben erledigt ✅</string>
     <string name="tasks_filter_none">Keine Aufgaben gefunden</string>
     <string name="tasks_filter_undone">Nur offene Aufgaben zeigen</string>
+    <string name="tasks_personalized_title">Offene Aufgaben</string>
+    <plurals name="tasks_personalized_more">
+        <item quantity="one">Eine weitere offene Aufgabe</item>
+        <item quantity="other">%d weitere offene Aufgaben</item>
+    </plurals>
+    <string name="tasks_date_info_prefix">Vom</string>
 
 </resources>

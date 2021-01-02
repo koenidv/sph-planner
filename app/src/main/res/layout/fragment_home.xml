@@ -91,6 +91,63 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/tasksLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="?attr/selectableItemBackground"
+            android:clipChildren="false"
+            android:orientation="vertical"
+            android:paddingEnd="8dp"
+            android:paddingStart="8dp"
+            android:paddingTop="8dp">
+
+            <TextView
+                android:id="@+id/tasksTitleTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:fontFamily="@font/roboto_slab"
+                android:paddingEnd="8dp"
+                android:paddingStart="8dp"
+                android:text="@string/tasks_personalized_title"
+                android:textSize="16sp"
+                app:drawableEndCompat="@drawable/ic_chevron_right"
+                app:drawableTint="@android:color/tab_indicator_text" />
+
+            <LinearLayout
+                android:id="@+id/tasksRecyclerLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/card_background"
+                android:orientation="vertical"
+                android:padding="8dp">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/tasksRecycler"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    tools:itemCount="1"
+                    tools:listitem="@layout/item_task_compact" />
+
+                <TextView
+                    android:id="@+id/moreTasksTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:visibility="gone"
+                    tools:text="x weitere ungelesene Beiträge"
+                    tools:visibility="visible" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
             android:id="@+id/unreadPostsLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

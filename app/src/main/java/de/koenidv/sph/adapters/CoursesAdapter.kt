@@ -1,10 +1,5 @@
 package de.koenidv.sph.adapters
 
-import android.graphics.BlendMode
-import android.graphics.BlendModeColorFilter
-import android.graphics.PorterDuff
-import android.graphics.drawable.StateListDrawable
-import android.os.Build
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,6 +11,7 @@ import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.objects.Course
 import de.koenidv.sph.objects.Post
 import de.koenidv.sph.objects.PostTask
+import de.koenidv.sph.parsing.Utility
 
 //  Created by koenidv on 18.12.2020.
 class CoursesAdapter(private val courses: List<Course>,
@@ -75,15 +71,7 @@ class CoursesAdapter(private val courses: List<Course>,
              */
 
             // Set background color, about 70% opacity
-            val opacity: Int = 0xb4000000.toInt()
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                (layout.background as StateListDrawable).colorFilter = BlendModeColorFilter((course.color
-                        ?: 6168631) and 0x00FFFFFF or opacity, BlendMode.SRC_ATOP)
-            } else {
-                @Suppress("DEPRECATION") // not in < Q
-                (layout.background as StateListDrawable)
-                        .setColorFilter(course.color ?: 6168631, PorterDuff.Mode.SRC_ATOP)
-            }
+            Utility().tintBackground(layout, course.color ?: 6168631, 0xb4000000.toInt())
         }
     }
 

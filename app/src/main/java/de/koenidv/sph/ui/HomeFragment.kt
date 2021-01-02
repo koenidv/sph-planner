@@ -22,8 +22,10 @@ import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.adapters.AttachmentsAdapter
 import de.koenidv.sph.adapters.CompactChangesAdapter
 import de.koenidv.sph.adapters.CompactPostsAdapter
+import de.koenidv.sph.adapters.CompactTasksAdapter
 import de.koenidv.sph.database.AttachmentsDb
 import de.koenidv.sph.database.ChangesDb
+import de.koenidv.sph.database.PostTasksDb
 import de.koenidv.sph.database.PostsDb
 import de.koenidv.sph.networking.AttachmentManager
 import de.koenidv.sph.networking.NetworkManager
@@ -61,6 +63,7 @@ class HomeFragment : Fragment() {
             }
         }
 
+
         /*
          * Timetable todo check if timetable feature is supported
          */
@@ -71,6 +74,7 @@ class HomeFragment : Fragment() {
                     .navigate(R.id.timetableFromHomeAction, null, null,
                             FragmentNavigatorExtras(timetable to "timetable"))
         }
+
 
         /*
          * Personalized changes todo check if changes feature is supported
@@ -84,7 +88,7 @@ class HomeFragment : Fragment() {
         val personalizedChanges = ChangesDb.instance!!.getFavorites()
         if (personalizedChanges.isNotEmpty()) {
             changesRecycler.setHasFixedSize(true)
-            changesRecycler.adapter = CompactChangesAdapter(personalizedChanges) { change ->
+            changesRecycler.adapter = CompactChangesAdapter(personalizedChanges) {
                 requireActivity().findNavController(R.id.nav_host_fragment)
                         .navigate(R.id.changesFromHomeAction, bundleOf("favorites" to personalizedChanges.isNotEmpty()))
             }
@@ -105,6 +109,63 @@ class HomeFragment : Fragment() {
             changesTitle.setCompoundDrawablesRelative(null, null, null, null)
         }
 
+
+        /**
+         * Undone tasks
+         */
+
+        val tasksLayout = view.findViewById<LinearLayout>(R.id.tasksLayout)
+        val tasksRecyclerLayout = view.findViewById<LinearLayout>(R.id.tasksRecyclerLayout)
+        val tasksRecycler = view.findViewById<RecyclerView>(R.id.tasksRecycler)
+        val tasksTitle = view.findViewById<TextView>(R.id.tasksTitleTextView)
+        val moreTasksText = view.findViewById<TextView>(R.id.moreTasksTextView)
+
+        val tasks = PostTasksDb.getInstance().undone
+        var tasksOverflow = 0
+        if (tasks.size > 6) {
+            tasksOverflow = tasks.size - 6
+            // Display more tasks message
+            moreTasksText.text = resources.getQuantityString(R.plurals.tasks_personalized_more, tasksOverflow, tasksOverflow)
+            moreTasksText.visibility = View.VISIBLE
+        }
+
+        if (tasks.isNotEmpty()) {
+            tasksRecycler.adapter = CompactTasksAdapter(
+                    tasks,
+                    6,
+                    onClick = {
+                        // Show single post bottom sheet
+                        PostSheet(
+                                PostsDb.getInstance().getByPostId(it)
+                        ).show(parentFragmentManager, "post")
+                    },
+                    onTaskCheckedChanged = AttachmentManager().onTaskCheckedChanged(requireActivity()) { postId, isDone ->
+                        if (isDone) {
+                            val index = tasks.indexOfFirst { it.id_post == postId }
+                            tasks.removeAt(index)
+                            tasksRecycler.adapter?.notifyItemRemoved(index)
+                            // Update overflow counter
+                            if (tasksOverflow > 0) {
+                                tasksOverflow--
+                                if (tasksOverflow > 0)
+                                    moreTasksText.text = resources.getQuantityString(R.plurals.tasks_personalized_more, tasksOverflow, tasksOverflow)
+                                else moreTasksText.visibility = View.GONE
+                            }
+                        }
+                    }
+            )
+        } else {
+            tasksTitle.setText(R.string.tasks_filter_none_undone)
+            tasksRecyclerLayout.visibility = View.GONE
+        }
+
+        // Open all undone tasks on click
+        tasksLayout.setOnClickListener {
+            Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
+                    .navigate(R.id.tasksFromHomeAction, bundleOf("undone" to true))
+        }
+
+
         /*
          * Unread posts
          */
@@ -118,7 +179,7 @@ class HomeFragment : Fragment() {
         // We'll only display 4 posts,
         // but unread posts will get removed once they are read
         val posts = PostsDb.getInstance().unread.toMutableList()
-        var postsOverflow: Int? = null
+        var postsOverflow = 0
         if (posts.size > 4) {
             postsOverflow = posts.size - 4
             // Display more unread posts text
@@ -139,6 +200,11 @@ class HomeFragment : Fragment() {
                     posts.removeAt(index)
                     unreadPostsRecycler.adapter?.notifyItemRemoved(index)
                     PostsDb.getInstance().markAsRead(post.postId)
+                    // Update overflow counter
+                    postsOverflow--
+                    if (postsOverflow != 0)
+                        moreUnreadText.text = resources.getQuantityString(R.plurals.posts_more_unread, postsOverflow, postsOverflow)
+                    else moreUnreadText.visibility = View.GONE
                 }
             }
         } else {
@@ -148,7 +214,7 @@ class HomeFragment : Fragment() {
         // Open all posts on click
         unreadPostsLayout.setOnClickListener {
             val bundle =
-                    if (postsOverflow != null) bundleOf("filters" to arrayOf("unread"))
+                    if (postsOverflow != 0) bundleOf("filters" to arrayOf("unread"))
                     else bundleOf()
             Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
                     .navigate(R.id.allPostsFromHomeAction, bundle)
