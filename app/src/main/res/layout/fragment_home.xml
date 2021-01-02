@@ -9,7 +9,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:paddingBottom="8dp">
 
         <LinearLayout
             android:id="@+id/timetableLayout"
@@ -66,6 +67,7 @@
                 android:id="@+id/changesTitleTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
                 android:fontFamily="@font/roboto_slab"
                 android:paddingEnd="8dp"
                 android:paddingStart="8dp"
@@ -79,7 +81,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
-                android:layout_marginTop="8dp"
                 android:background="@drawable/card_background"
                 android:nestedScrollingEnabled="false"
                 android:padding="8dp"
@@ -145,6 +146,48 @@
 
         </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/pinsLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="?attr/selectableItemBackground"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:orientation="vertical"
+            android:paddingEnd="8dp"
+            android:paddingStart="8dp"
+            android:paddingTop="8dp">
+
+            <TextView
+                android:id="@+id/pinsTitleTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:fontFamily="@font/roboto_slab"
+                android:paddingEnd="8dp"
+                android:paddingStart="8dp"
+                android:text="@string/attachments_pins_title"
+                android:textSize="16sp"
+                app:drawableEndCompat="@drawable/ic_chevron_right"
+                app:drawableTint="@android:color/tab_indicator_text" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/pinsRecycler"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/card_background"
+                android:clipToPadding="false"
+                android:orientation="horizontal"
+                android:paddingBottom="8dp"
+                android:paddingEnd="0dp"
+                android:paddingStart="8dp"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:listitem="@layout/item_attachment" />
+
+        </LinearLayout>
+
         <Button
             android:id="@+id/surpriseButton"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
@@ -154,6 +197,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:text="Der beste Button Deutschlands"
+            android:visibility="gone"
             tools:ignore="HardcodedText" />
 
     </LinearLayout>

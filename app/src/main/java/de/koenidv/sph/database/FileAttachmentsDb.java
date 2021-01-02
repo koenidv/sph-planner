@@ -152,6 +152,19 @@ public class FileAttachmentsDb {
         return cursorToAttachment(cursor);
     }
 
+    /**
+     * Get a list of all pinned file attachments across courses
+     * The list will be sorted by last use
+     *
+     * @return List of pinned dttachments with FileAttachments, sorted by last use
+     */
+    public List<Attachment> getPins() {
+        final SQLiteDatabase db = dbhelper.getReadableDatabase();
+        String queryString = "SELECT * FROM fileAttachments WHERE pinned=1 ORDER BY lastUse DESC";
+        Cursor cursor = db.rawQuery(queryString, null);
+        return cursorToAttachment(cursor);
+    }
+
     public List<Attachment> getByPostId(String postid) {
         List<Attachment> returnList = new ArrayList<>();
         final SQLiteDatabase db = dbhelper.getReadableDatabase();

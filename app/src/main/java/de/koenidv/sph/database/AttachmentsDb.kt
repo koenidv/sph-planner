@@ -22,4 +22,14 @@ object AttachmentsDb {
         return attachments
     }
 
+    /**
+     * Get all pinned attachments, ordered by last use
+     */
+    fun pins(): MutableList<Attachment> {
+        val pins = files.pins
+        pins.addAll(links.pins)
+        pins.sortByDescending { it.lastuse() }
+        return pins
+    }
+
 }

@@ -15,14 +15,19 @@ import androidx.fragment.app.FragmentContainerView
 import androidx.navigation.Navigation
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.FragmentNavigatorExtras
+import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
+import de.koenidv.sph.adapters.AttachmentsAdapter
 import de.koenidv.sph.adapters.CompactChangesAdapter
 import de.koenidv.sph.adapters.CompactPostsAdapter
+import de.koenidv.sph.database.AttachmentsDb
 import de.koenidv.sph.database.ChangesDb
 import de.koenidv.sph.database.PostsDb
+import de.koenidv.sph.networking.AttachmentManager
 import de.koenidv.sph.networking.NetworkManager
+import de.koenidv.sph.objects.Attachment
 import de.koenidv.sph.objects.Post
 import de.koenidv.sph.parsing.Utility
 import java.util.*
@@ -88,6 +93,7 @@ class HomeFragment : Fragment() {
             changesRecycler.visibility = View.GONE
         }
 
+        // Set onclick if there are any changes, else display message
         if (personalizedChanges.isNotEmpty() || ChangesDb.instance!!.existAny()) {
             changesLayout.setOnClickListener {
                 requireActivity().findNavController(R.id.nav_host_fragment)
@@ -139,6 +145,7 @@ class HomeFragment : Fragment() {
             unreadPostsLayout.visibility = View.GONE
         }
 
+        // Open all posts on click
         unreadPostsLayout.setOnClickListener {
             val bundle =
                     if (postsOverflow != null) bundleOf("filters" to arrayOf("unread"))
@@ -147,6 +154,49 @@ class HomeFragment : Fragment() {
                     .navigate(R.id.allPostsFromHomeAction, bundle)
         }
 
+        /**
+         * Pinned attachments
+         */
+
+        val pinsLayout = view.findViewById<LinearLayout>(R.id.pinsLayout)
+        val pinsTitle = view.findViewById<TextView>(R.id.pinsTitleTextView)
+        val pinsRecycler = view.findViewById<RecyclerView>(R.id.pinsRecycler)
+
+        val pins = AttachmentsDb.pins()
+
+        if (pins.isEmpty()) {
+            pinsTitle.text = getString(R.string.attachments_pins_none)
+            pinsRecycler.visibility = View.GONE
+        } else {
+            // Set up pins recycler
+            pinsRecycler.adapter = AttachmentsAdapter(
+                    pins,
+                    AttachmentManager().onAttachmentClick(requireActivity()) { _: Int, _: Attachment -> },
+                    AttachmentManager().onAttachmentLongClick(requireActivity()) { action: Int, attachment: Attachment ->
+                        if (action == AttachmentManager.ATTACHMENT_UNPINNED) {
+                            // Attachment no longer pinned
+                            // Remove it from the list
+                            val index = pins.indexOf(attachment)
+                            pins.removeAt(index)
+                            // Notify the adapter
+                            pinsRecycler.adapter?.notifyItemRemoved(index)
+                            // Hide title and recycler if this was the last pin
+                            if (pins.isEmpty()) {
+                                pinsTitle.text = getString(R.string.attachments_pins_none)
+                                pinsRecycler.visibility = View.GONE
+                            }
+                        }
+                    }
+            )
+            PagerSnapHelper().attachToRecyclerView(pinsRecycler)
+        }
+
+        // Open all attachments fragment on click
+        pinsLayout.setOnClickListener {
+            requireActivity().findNavController(R.id.nav_host_fragment)
+                    .navigate(R.id.frag_placeholder)
+            // todo attachments collection
+        }
 
         return view
 

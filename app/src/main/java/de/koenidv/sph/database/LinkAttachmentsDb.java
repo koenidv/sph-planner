@@ -132,6 +132,20 @@ public class LinkAttachmentsDb {
         return getWithCursor(cursor);
     }
 
+
+    /**
+     * Get a list of all pinned link attachments across courses
+     * The list will be sorted by last use
+     *
+     * @return List of pinned dttachments with LinkAttachments, sorted by last use
+     */
+    public List<Attachment> getPins() {
+        final SQLiteDatabase db = dbhelper.getReadableDatabase();
+        String queryString = "SELECT * FROM linkAttachments WHERE pinned=1 ORDER BY lastUse DESC";
+        Cursor cursor = db.rawQuery(queryString, null);
+        return getWithCursor(cursor);
+    }
+
     public List<Attachment> getByPostId(String post_id) {
         final SQLiteDatabase db = dbhelper.getReadableDatabase();
         // Query posts
