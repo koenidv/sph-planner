@@ -9,6 +9,7 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import de.koenidv.sph.MainActivity
 import de.koenidv.sph.R
@@ -29,6 +30,7 @@ class OnboardingSupportlistFragment : Fragment() {
         val titleText = view.findViewById<TextView>(R.id.headTextView)
         val featuresText = view.findViewById<TextView>(R.id.featurelistTextView)
         val warningText = view.findViewById<TextView>(R.id.warningTextView)
+        val contactButton = view.findViewById<MaterialButton>(R.id.contactButton)
         val indexLoading = view.findViewById<ProgressBar>(R.id.indexLoading)
         val nextFab = view.findViewById<FloatingActionButton>(R.id.nextFab)
 
@@ -138,6 +140,7 @@ class OnboardingSupportlistFragment : Fragment() {
             titleText.visibility = View.VISIBLE
             featuresText.text = featurelistText
             featuresText.visibility = View.VISIBLE
+            contactButton.visibility = View.VISIBLE
             if (someFeatures) { // todo show contact options othwerwise
                 warningText.visibility = View.VISIBLE
                 // todo start indexing

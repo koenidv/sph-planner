@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingTop="4dp">
+
+    <androidx.gridlayout.widget.GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        app:columnCount="2">
+
+        <LinearLayout
+            android:id="@+id/contactTelegramLayout"
+            android:layout_width="0dp"
+            android:layout_height="96dp"
+            android:layout_margin="8dp"
+            android:background="@drawable/card_background"
+            android:foreground="?attr/selectableItemBackground"
+            android:orientation="vertical"
+            android:padding="16dp"
+            app:layout_columnWeight="1">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="42dp"
+                android:fontFamily="@font/font_awesome"
+                android:gravity="center"
+                android:text="@string/contact_telegram_icon"
+                android:textSize="18sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="24dp"
+                android:gravity="center"
+                android:text="@string/contact_telegram_text" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/contactInstagramLayout"
+            android:layout_width="0dp"
+            android:layout_height="96dp"
+            android:layout_margin="8dp"
+            android:background="@drawable/card_background"
+            android:foreground="?attr/selectableItemBackground"
+            android:orientation="vertical"
+            android:padding="16dp"
+            app:layout_columnWeight="1">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="42dp"
+                android:fontFamily="@font/font_awesome"
+                android:gravity="center"
+                android:text="@string/contact_instagram_icon"
+                android:textSize="18sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="24dp"
+                android:gravity="center"
+                android:text="@string/contact_instagram_text" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/contactGithubLayout"
+            android:layout_width="0dp"
+            android:layout_height="96dp"
+            android:layout_margin="8dp"
+            android:background="@drawable/card_background"
+            android:foreground="?attr/selectableItemBackground"
+            android:orientation="vertical"
+            android:padding="16dp"
+            app:layout_columnWeight="1">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="42dp"
+                android:fontFamily="@font/font_awesome"
+                android:gravity="center"
+                android:text="@string/contact_github_icon"
+                android:textSize="18sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="24dp"
+                android:gravity="center"
+                android:text="@string/contact_github_text" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/contactMailLayout"
+            android:layout_width="0dp"
+            android:layout_height="96dp"
+            android:layout_margin="8dp"
+            android:background="@drawable/card_background"
+            android:foreground="?attr/selectableItemBackground"
+            android:orientation="vertical"
+            android:padding="16dp"
+            app:layout_columnWeight="1">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="42dp"
+                android:fontFamily="@font/font_awesome"
+                android:gravity="center"
+                android:text="@string/contact_mail_icon"
+                android:textSize="18sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="24dp"
+                android:gravity="center"
+                android:text="@string/contact_mail_text" />
+
+        </LinearLayout>
+
+    </androidx.gridlayout.widget.GridLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/doneButton"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/done" />
+
+</LinearLayout>

@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -177,36 +176,11 @@ class OptionsSheet internal constructor() : BottomSheetDialogFragment() {
         }
 
         /**
-         * Send feedback
+         * Contact
          */
-        view.findViewById<View>(R.id.feedbackButton).setOnClickListener {
-            // Get app version
-            val version: String
-            version = try {
-                val pInfo = SphPlanner.applicationContext().packageManager.getPackageInfo(SphPlanner.applicationContext().packageName, 0)
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                    pInfo.longVersionCode.toString()
-                } else {
-                    @Suppress("DEPRECATION")
-                    pInfo.versionCode.toString()
-                }
-            } catch (nme: PackageManager.NameNotFoundException) {
-                "?"
-            }
-            // Send an email
-            val emailIntent = Intent(Intent.ACTION_SENDTO)
-                    .setData(Uri.parse("mailto:"))
-                    .putExtra(Intent.EXTRA_EMAIL, arrayOf("sv@gmbwi.de"))
-                    .putExtra(Intent.EXTRA_SUBJECT, getString(R.string.feedback_subject))
-                    .putExtra(Intent.EXTRA_TEXT, getString(R.string.feedback_body).replace("%app", version).replace("%android", Build.VERSION.SDK_INT.toString()))
-            // Only open if email client is installed
-            if (emailIntent.resolveActivity(SphPlanner.applicationContext().packageManager) != null) startActivity(emailIntent)
+        view.findViewById<View>(R.id.contactButton).setOnClickListener {
             dismiss()
-        }
-        view.findViewById<View>(R.id.feedbackButton).setOnLongClickListener {
-            prefs.edit().putBoolean("testing_grades", !prefs.getBoolean("testing_grades", false)).apply()
-            dismiss()
-            true
+            ContactSheet().show(parentFragmentManager, "contact")
         }
         view.findViewById<View>(R.id.rateButton).setOnClickListener {
             // Open Play Store to let the user rate the app

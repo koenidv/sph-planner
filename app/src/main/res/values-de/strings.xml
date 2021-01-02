@@ -41,7 +41,7 @@
     <string name="menu_open_sph_warning_no">Manuell anmelden</string>
     <string name="menu_open_sph_warning_yes">Automatisch fortfahren</string>
     <string name="info_last_refresh">Meine Kurse: %courses\nVertretungen: %changes\nLetzte Änderung: %changeTimestamp\nIndiziert: %indexed</string>
-    <string name="menu_feedback">Feedback senden</string>
+    <string name="menu_contact">Kontakt</string>
     <string name="menu_rate">Bewerten</string>
     <string name="dateformat_hours">HH:mm</string>
     <string name="dateformat_coursesrefreshed">d. MMM</string>
@@ -207,5 +207,9 @@
     <string name="explore_collection_tasks">🖋️ Aufgaben</string>
     <string name="explore_collection_changes">🗞️️ Vertretungen</string>
     <string name="posts_filter_no_data">Keine Einträge gefunden 🗃</string>
+    <string name="contact_telegram_text">Telegram</string>
+    <string name="contact_instagram_text">Instagram</string>
+    <string name="contact_github_text">GitHub</string>
+    <string name="contact_mail_text">E-Mail</string>
 
 </resources>
