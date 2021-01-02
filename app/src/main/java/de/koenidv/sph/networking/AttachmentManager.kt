@@ -27,6 +27,7 @@ import com.google.android.material.snackbar.Snackbar
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner.Companion.TAG
 import de.koenidv.sph.SphPlanner.Companion.applicationContext
+import de.koenidv.sph.database.CoursesDb
 import de.koenidv.sph.database.FileAttachmentsDb
 import de.koenidv.sph.database.LinkAttachmentsDb
 import de.koenidv.sph.objects.Attachment
@@ -293,8 +294,9 @@ class AttachmentManager {
     /**
      * Returns a lambda to handle task checked changes
      */
-    fun onTaskCheckedChanged(activity: Activity, courseNumberId: String): (String, Boolean) -> Unit = { postId, isDone ->
-        NetworkManager().markTaskAsDone(courseNumberId, postId, isDone) {
+    fun onTaskCheckedChanged(activity: Activity, courseNumberId: String? = null): (postId: String, courseId: String, Boolean) -> Unit = { postId, courseId, isDone ->
+        val numberId = courseNumberId ?: CoursesDb.getInstance().getNumberId(courseId)
+        NetworkManager().markTaskAsDone(numberId, postId, isDone) {
             if (it != NetworkManager.SUCCESS) {
                 // todo handle errors properly
                 Snackbar.make(activity.findViewById(R.id.nav_host_fragment),

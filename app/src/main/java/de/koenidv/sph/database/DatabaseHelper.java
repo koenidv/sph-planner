@@ -58,14 +58,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // Create course posts table
         db.execSQL("CREATE TABLE posts(post_id TEXT PRIMARY KEY, id_course TEXT," +
                 "date INTEGER,title TEXT, description TEXT, unread INTEGER)");
-        // Create post attachments table
+        // Create file attachments table
         db.execSQL("CREATE TABLE fileAttachments(attachment_id TEXT PRIMARY KEY," +
                 "id_course TEXT, id_post TEXT, name TEXT, date INTEGER, url TEXT, size TEXT," +
                 "type TEXT, pinned INTEGER, lastUse INTEGER)");
         // Create post tasks table
         db.execSQL("CREATE TABLE postTasks(task_id TEXT PRIMARY KEY, id_course TEXT, id_post TEXT," +
-                "description TEXT, date INTEGER, isdone INTEGER)");
-        // Create post links table
+                "description TEXT, date INTEGER, isdone INTEGER, dueDate INTEGER)");
+        // Create link attachments table
         db.execSQL("CREATE TABLE linkAttachments(attachment_id TEXT PRIMARY KEY," +
                 "id_course TEXT, id_post TEXT, name TEXT," +
                 "date INTEGER, url TEXT, pinned INTEGER, lastUse INTEGER)");
@@ -75,7 +75,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     //upgrade Database
     @Override
-    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
+    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldversion, int newversion) {
 
     }
 }

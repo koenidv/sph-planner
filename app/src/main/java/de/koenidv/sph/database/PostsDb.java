@@ -110,6 +110,16 @@ public class PostsDb {
         return getWithCursor(cursor);
     }
 
+    public Post getByPostId(String post_id) {
+        final SQLiteDatabase db = dbhelper.getReadableDatabase();
+        // Query posts
+        String queryString = "SELECT * FROM posts WHERE post_id = \"" + post_id + "\"";
+        Cursor cursor = db.rawQuery(queryString, null);
+        // Get posts with the cursor
+        List<Post> list = getWithCursor(cursor);
+        return !list.isEmpty() ? list.get(0) : null;
+    }
+
     public List<Post> getUnread() {
         final SQLiteDatabase db = dbhelper.getReadableDatabase();
         // Query posts

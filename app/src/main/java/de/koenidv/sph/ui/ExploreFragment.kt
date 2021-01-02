@@ -52,10 +52,10 @@ class ExploreFragment : Fragment() {
             nav.navigate(R.id.frag_placeholder)
         }
         tasksText.setOnClickListener {
-            nav.navigate(R.id.frag_placeholder)
+            nav.navigate(R.id.tasksFromExploreAction)
         }
         changesText.setOnClickListener {
-            nav.navigate(R.id.frag_changes)
+            nav.navigate(R.id.changesFromExploreAction)
         }
 
 

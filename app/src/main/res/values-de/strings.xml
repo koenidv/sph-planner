@@ -212,5 +212,9 @@
     <string name="contact_github_text">GitHub</string>
     <string name="contact_mail_text">E-Mail</string>
     <string name="attachments_pins_none">Angepinnte Anhänge werden hier erscheinen</string>
+    <string name="tasks_date_info">Vom %s</string>
+    <string name="tasks_filter_none_undone">Alle Aufgaben erledigt ✅</string>
+    <string name="tasks_filter_none">Keine Aufgaben gefunden</string>
+    <string name="tasks_filter_undone">Nur offene Aufgaben zeigen</string>
 
 </resources>

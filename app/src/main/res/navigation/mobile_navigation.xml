@@ -38,6 +38,13 @@
             app:exitAnim="@anim/fragment_close_exit"
             app:popEnterAnim="@anim/fragment_open_enter"
             app:popExitAnim="@anim/fragment_close_exit" />
+        <action
+            android:id="@+id/tasksFromHomeAction"
+            app:destination="@id/tasksFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_close_exit"
+            app:popEnterAnim="@anim/fragment_open_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
     </fragment>
 
     <fragment
@@ -100,6 +107,20 @@
             app:exitAnim="@anim/fragment_close_exit"
             app:popEnterAnim="@anim/fragment_open_enter"
             app:popExitAnim="@anim/fragment_close_exit" />
+        <action
+            android:id="@+id/tasksFromExploreAction"
+            app:destination="@id/tasksFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_close_exit"
+            app:popEnterAnim="@anim/fragment_open_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+        <action
+            android:id="@+id/changesFromExploreAction"
+            app:destination="@id/frag_changes"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_close_exit"
+            app:popEnterAnim="@anim/fragment_open_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
     </fragment>
 
     <fragment
@@ -153,7 +174,7 @@
     <fragment
         android:id="@+id/frag_placeholder"
         android:name="de.koenidv.sph.PlaceholderFragment"
-        android:label="fragment_placeholder"
+        android:label=""
         tools:layout="@layout/fragment_placeholder" />
     <fragment
         android:id="@+id/frag_changes"
@@ -174,6 +195,19 @@
         <argument
             android:name="favorites"
             app:argType="boolean" />
+    </fragment>
+    <fragment
+        android:id="@+id/tasksFragment"
+        android:name="de.koenidv.sph.ui.TasksFragment"
+        android:label="@string/tasks_title"
+        tools:layout="@layout/fragment_tasks">
+        <action
+            android:id="@+id/overviewFromTasksAction"
+            app:destination="@id/frag_course_overview"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_close_exit"
+            app:popEnterAnim="@anim/fragment_open_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
     </fragment>
 
 </navigation>

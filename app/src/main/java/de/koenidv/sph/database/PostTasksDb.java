@@ -64,7 +64,7 @@ public class PostTasksDb {
     public List<PostTask> getAll() {
         final SQLiteDatabase db = dbhelper.getReadableDatabase();
         // Query posts
-        String queryString = "SELECT * FROM postTasks";
+        String queryString = "SELECT * FROM postTasks ORDER BY date DESC";
         Cursor cursor = db.rawQuery(queryString, null);
         // Get posts with the cursor
         return getWithCursor(cursor, db);
@@ -78,7 +78,7 @@ public class PostTasksDb {
     public List<PostTask> getUndone() {
         final SQLiteDatabase db = dbhelper.getReadableDatabase();
         // Query posts
-        String queryString = "SELECT * FROM postTasks WHERE isdone=0";
+        String queryString = "SELECT * FROM postTasks WHERE isdone=0 ORDER BY date DESC";
         Cursor cursor = db.rawQuery(queryString, null);
         // Get posts with the cursor
         return getWithCursor(cursor, db);
@@ -122,13 +122,21 @@ public class PostTasksDb {
     }
 
 
-    public List<PostTask> getByIsDone() {
+    public List<PostTask> getByIsDone(Boolean isDone) {
         final SQLiteDatabase db = dbhelper.getReadableDatabase();
         // Query posts
-        String queryString = "SELECT * FROM postTasks WHERE isDone = 1";
+        String queryString = "SELECT * FROM postTasks WHERE isDone = " + (isDone ? "1" : "0");
         Cursor cursor = db.rawQuery(queryString, null);
         // Get posts with the cursor
         return getWithCursor(cursor, db);
+    }
+
+    public boolean existAny() {
+        Cursor cursor = dbhelper.getReadableDatabase().rawQuery("SELECT * FROM changes " +
+                "WHERE date >= " + ((new Date().getTime() / 1000) - (24 * 60 * 60)) + " LIMIT 1", null);
+        boolean exists = cursor.moveToFirst();
+        cursor.close();
+        return exists;
     }
 
     /**

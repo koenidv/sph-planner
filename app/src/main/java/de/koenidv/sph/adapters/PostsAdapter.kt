@@ -31,7 +31,7 @@ class PostsAdapter(private val posts: List<Post>,
                    private val linkMethod: BetterLinkMovementMethod?,
                    private val onAttachmentClick: (Attachment, View) -> Unit,
                    private val onAttachmentLongClick: (Attachment, View) -> Unit,
-                   private val onTaskCheckedChanged: (postId: String, isDone: Boolean) -> Unit) :
+                   private val onTaskCheckedChanged: (postId: String, courseId: String, isDone: Boolean) -> Unit) :
         RecyclerView.Adapter<PostsAdapter.ViewHolder>() {
 
     val prefs: SharedPreferences = SphPlanner.applicationContext().getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
@@ -41,7 +41,7 @@ class PostsAdapter(private val posts: List<Post>,
      * Provides a reference to the type of view
      * (custom ViewHolder).
      */
-    class ViewHolder(view: View, onTaskCheckedChanged: (postId: String, isDone: Boolean) -> Unit) : RecyclerView.ViewHolder(view) {
+    class ViewHolder(view: View, onTaskCheckedChanged: (postId: String, courseId: String, isDone: Boolean) -> Unit) : RecyclerView.ViewHolder(view) {
         private val layout: ConstraintLayout = view.findViewById(R.id.postLayout)
         private val card: MaterialCardView = view.findViewById(R.id.materialCardView)
         private val dateText: TextView = view.findViewById(R.id.dateTextView)
@@ -63,7 +63,7 @@ class PostsAdapter(private val posts: List<Post>,
             taskCheckBox.setOnCheckedChangeListener { _, isChecked ->
                 if (taskset)
                     currentPost?.let {
-                        onTaskCheckedChanged(it.postId, isChecked)
+                        onTaskCheckedChanged(it.postId, it.id_course, isChecked)
                         if (isChecked) {
                             // Remove colored background (set transparent)
                             taskHighlight.setBackgroundColor(0x00FFFFFF)
