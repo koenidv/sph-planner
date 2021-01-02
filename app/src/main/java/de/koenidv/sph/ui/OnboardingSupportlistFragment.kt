@@ -189,6 +189,7 @@ class OnboardingSupportlistFragment : Fragment() {
         // Continue button
         nextFab.setOnClickListener { startActivity(Intent(context, MainActivity().javaClass)); requireActivity().finish() }
 
+        contactButton.setOnClickListener { ContactSheet().show(parentFragmentManager, "contact") }
 
         return view
     }

@@ -97,10 +97,12 @@ class ChangesDb private constructor() {
     }
 
     /**
-     * Returns all changes, ordered by date
+     * Returns all current changes, ordered by date
      */
-    fun getAll(): List<Change> = getWithCursor(dbhelper.readableDatabase.rawQuery(
-            "SELECT * from changes ORDER BY date ASC, sortLesson ASC", null))
+    fun getAllCurrent(): List<Change> = getWithCursor(dbhelper.readableDatabase.rawQuery(
+            "SELECT * from changes " +
+                    "WHERE changes.date >= ${(Date().time / 1000) - (24 * 60 * 60)} " +
+                    "ORDER BY date ASC, sortLesson ASC", null))
 
     fun existAny(): Boolean {
         val cursor = dbhelper.readableDatabase.rawQuery("SELECT * FROM changes " +

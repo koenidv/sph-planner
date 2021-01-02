@@ -41,7 +41,7 @@ class ChangesFragment : Fragment() {
                     // Get changes
                     changes.clear()
                     changes.addAll(if (favorites) ChangesDb.instance!!.getFavorites().toMutableList()
-                    else ChangesDb.instance!!.getAll().toMutableList())
+                    else ChangesDb.instance!!.getAllCurrent().toMutableList())
                     noDataText.visibility = if (changes.isEmpty()) View.VISIBLE
                     else View.GONE
                     // Notify recyclerview
@@ -97,7 +97,7 @@ class ChangesFragment : Fragment() {
 
         // Get changes
         changes = if (favorites) ChangesDb.instance!!.getFavorites().toMutableList()
-        else ChangesDb.instance!!.getAll().toMutableList()
+        else ChangesDb.instance!!.getAllCurrent().toMutableList()
         noDataText.visibility = if (changes.isEmpty()) View.VISIBLE
         else View.GONE
 
@@ -115,7 +115,7 @@ class ChangesFragment : Fragment() {
             // Update data
             changes.clear()
             changes.addAll(if (favorites) ChangesDb.instance!!.getFavorites()
-            else ChangesDb.instance!!.getAll())
+            else ChangesDb.instance!!.getAllCurrent())
             noDataText.visibility = if (changes.isEmpty()) View.VISIBLE
             else View.GONE
             // Notify recyclerview
