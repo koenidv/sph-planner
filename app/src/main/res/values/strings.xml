@@ -57,7 +57,7 @@
     <string name="onboard_supported_features_partly_hidden">✔ Your school supports some of the features we need.</string>
     <string name="onboard_supported_features_partly_not">❌ Your school does not support all the features we need. Please get in touch to see how you can help us support your school!</string><!--todo link to contact-->
     <string name="onboard_supported_features_none">❌ Sorry, your school does not support the features we need to work.</string>
-    <string name="onboard_supported_featurelist">%mycourses My Courses\n%messages Messages\n%studygroups Study Groups\n%timetable Timetable\n%changes Changes</string>
+    <string name="onboard_supported_featurelist">%mycourses My Courses\n%studygroups Study Groups\n%timetable Timetable\n%changes Changes</string>
     <string name="onboard_supported_warning">Please report any issues you might experience via the options menu!</string>
     <string name="onboard_supported_error_network">There was a network error.\nTap to retry.</string>
     <string name="onboard_supported_error_maintenance">The education portal is currently under maintenance.\nTap to retry.</string>

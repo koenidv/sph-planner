@@ -19,6 +19,7 @@ import androidx.navigation.ui.NavigationUI
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
+import de.koenidv.sph.database.ChangesDb
 import de.koenidv.sph.networking.NetworkManager
 import de.koenidv.sph.ui.OnboardingActivity
 import de.koenidv.sph.ui.OptionsSheet
@@ -26,6 +27,12 @@ import de.koenidv.sph.ui.OptionsSheet
 //  Created by koenidv on 05.12.2020.
 
 class MainActivity : AppCompatActivity() {
+
+    override fun onResume() {
+        findViewById<SwipeRefreshLayout>(R.id.swipeRefresh).isRefreshing = true
+        ChangesDb.instance!!.removeOld()
+        super.onResume()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
 

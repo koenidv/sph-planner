@@ -49,14 +49,20 @@ class NetworkManager {
         val time = Date().time
 
         when (destinationId) {
-            R.id.nav_home -> onComplete(FAILED_UNKNOWN)
+            R.id.nav_home -> {
+                // Update changes after 10min, posts after 30min
+                val updateList = mutableListOf<String>()
+                if (time - prefs.getLong("updated_changes", 0) > 10 * 60 * 1000) updateList.add("changes")
+                if (time - prefs.getLong("updated_posts", 0) > 30 * 60 * 1000) updateList.add("posts")
+                update(updateList) { onComplete(it) }
+            }
             R.id.nav_courses -> {
                 // 2 minutes cooldown, update all posts
                 if (time - prefs.getLong("updated_posts", 0) > 2 * 60 * 100)
                     updatePosts { onComplete(it) }
                 else onComplete(SUCCESS)
             }
-            R.id.frag_course_overview -> {
+            R.id.frag_course_overview, R.id.frag_tasks, R.id.frag_attachments -> {
                 // Course Overview fragment
                 // Update posts, tasks, files, links
                 if (arguments?.getString("courseId") != null) {
@@ -105,6 +111,11 @@ class NetworkManager {
                 GlobalScope.launch {
                     delay(600)
                     onComplete(SUCCESS)
+                }
+            }
+            R.id.frag_timetable -> {
+                loadAndSaveTimetable {
+                    onComplete(it)
                 }
             }
             else -> onComplete(FAILED_UNKNOWN)
@@ -438,13 +449,41 @@ class NetworkManager {
         }
     }
 
+    fun update(entries: List<String>, onComplete: (success: Int) -> Unit) {
+        if (entries.isNotEmpty()) {
+            // Prepare token
+            TokenManager().generateAccessToken { success, _ ->
+                if (success == SUCCESS) {
+                    var number = 0
+                    var lastError: Int? = null
+                    val checkDone = { thissuccess: Int ->
+                        if (thissuccess != SUCCESS)
+                            lastError = thissuccess
+                        number++
+                        if (number == entries.size) {
+                            if (lastError == null) onComplete(SUCCESS)
+                            else onComplete(lastError!!)
+                        }
+
+                    }
+                    for (entry in entries) {
+                        when (entry) {
+                            "posts" -> updatePosts(checkDone)
+                            "changes" -> loadAndSaveChanges(checkDone)
+                        }
+                    }
+                } else onComplete(success)
+            }
+        } else onComplete(SUCCESS)
+    }
+
     /**
      * Checks for new posts on the overview page
      * and only loads them for courses with a new entry
      * This will not update anything if a post was added with an older date
      * Therefore we also load courses that haven't been loaded within the last 48 hours
      */
-    fun updatePosts(onComplete: (success: Int) -> Unit) {
+    private fun updatePosts(onComplete: (success: Int) -> Unit) {
         // Get my courses page
         loadSiteWithToken(applicationContext().getString(R.string.url_allposts)) { success, response ->
             if (success == SUCCESS) {

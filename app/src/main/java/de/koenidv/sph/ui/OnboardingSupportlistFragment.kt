@@ -92,10 +92,10 @@ class OnboardingSupportlistFragment : Fragment() {
                 featurelistText = featurelistText.replace("%mycourses", checkmarkText)
             }
             if (!features.contains("Nachrichten")) {
-                allFeatures = false
+                //allFeatures = false
                 featurelistText = featurelistText.replace("%messages", crossmarkText)
             } else {
-                someFeatures = true
+                //someFeatures = true
                 featurelistText = featurelistText.replace("%messages", checkmarkText)
             }
             if (!features.contains("Lerngruppen")) {
