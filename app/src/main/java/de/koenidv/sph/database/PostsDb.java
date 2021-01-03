@@ -138,6 +138,16 @@ public class PostsDb {
         return getWithCursor(cursor);
     }
 
+    public int getUnreadByCourseIdCount(String courseId) {
+        final SQLiteDatabase db = dbhelper.getReadableDatabase();
+        // Query posts
+        String queryString = "SELECT COUNT(*) FROM posts WHERE id_course = \"" + courseId + "\" AND unread = 1 ORDER BY date DESC";
+        Cursor cursor = db.rawQuery(queryString, null);
+        int count = cursor.moveToFirst() ? cursor.getInt(0) : 0;
+        cursor.close();
+        return count;
+    }
+
     private List<Post> getWithCursor(Cursor cursor) {
         List<Post> returnList = new ArrayList<>();
         if (cursor.moveToFirst()) {

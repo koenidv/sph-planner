@@ -86,6 +86,12 @@
                 android:layout_marginBottom="12dp"
                 android:background="@color/infoText" />
 
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/autosphSwitch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/menu_option_autosph" />
+
         </LinearLayout>
 
         <TextView

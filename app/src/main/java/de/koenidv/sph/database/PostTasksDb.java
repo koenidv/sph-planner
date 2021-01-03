@@ -84,14 +84,22 @@ public class PostTasksDb {
         return getWithCursor(cursor, db);
     }
 
-
     public List<PostTask> getByCourseId(String course_id) {
         final SQLiteDatabase db = dbhelper.getReadableDatabase();
-        // Query posts
+        // Query tasks
         String queryString = "SELECT * FROM postTasks WHERE id_course = '" + course_id + "'";
         Cursor cursor = db.rawQuery(queryString, null);
         // Get posts with the cursor
         return getWithCursor(cursor, db);
+    }
+
+    public int getUndoneByCourseIdCount(String course_id) {
+        final SQLiteDatabase db = dbhelper.getReadableDatabase();
+        String queryString = "SELECT COUNT(*) FROM postTasks WHERE id_course = '" + course_id + "' AND isdone=0";
+        Cursor cursor = db.rawQuery(queryString, null);
+        int count = cursor.moveToFirst() ? cursor.getInt(0) : 0;
+        cursor.close();
+        return count;
     }
 
     public List<PostTask> getByPostId(String post_id) {
@@ -132,8 +140,7 @@ public class PostTasksDb {
     }
 
     public boolean existAny() {
-        Cursor cursor = dbhelper.getReadableDatabase().rawQuery("SELECT * FROM changes " +
-                "WHERE date >= " + ((new Date().getTime() / 1000) - (24 * 60 * 60)) + " LIMIT 1", null);
+        Cursor cursor = dbhelper.getReadableDatabase().rawQuery("SELECT * FROM postTasks LIMIT 1", null);
         boolean exists = cursor.moveToFirst();
         cursor.close();
         return exists;

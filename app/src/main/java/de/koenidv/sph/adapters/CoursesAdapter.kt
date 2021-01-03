@@ -8,15 +8,13 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
+import de.koenidv.sph.database.PostTasksDb
+import de.koenidv.sph.database.PostsDb
 import de.koenidv.sph.objects.Course
-import de.koenidv.sph.objects.Post
-import de.koenidv.sph.objects.PostTask
 import de.koenidv.sph.parsing.Utility
 
 //  Created by koenidv on 18.12.2020.
 class CoursesAdapter(private val courses: List<Course>,
-                     private val unreadPosts: List<Post>,
-                     private val tasks: List<PostTask>,
                      private val onClick: (Course) -> Unit) :
         RecyclerView.Adapter<CoursesAdapter.ViewHolder>() {
 
@@ -39,8 +37,11 @@ class CoursesAdapter(private val courses: List<Course>,
             }
         }
 
-        fun bind(course: Course, openPosts: Int, openTasks: Int) {
+        fun bind(course: Course) {
             currentCourse = course
+
+            val openPosts = PostsDb.getInstance().getUnreadByCourseIdCount(course.courseId)
+            val openTasks = PostTasksDb.getInstance().getUndoneByCourseIdCount(course.courseId)
 
             /*
              * Text
@@ -86,14 +87,8 @@ class CoursesAdapter(private val courses: List<Course>,
 
     // Replaces the contents of a view (invoked by the layout manager)
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
-        val courseId = courses[position].courseId
-        // Get the size of unread courses within this course
-        val openPosts = unreadPosts.filter { it.id_course == courseId && it.unread }.size
-        // Get the size of not yet done tasks within this course
-        val openTasks = tasks.filter { it.id_course == courseId && !it.isDone }.distinct().size
-
         // Bind data to ViewHolder
-        viewHolder.bind(courses[position], openPosts, openTasks)
+        viewHolder.bind(courses[position])
     }
 
     // Return the size of your dataset (invoked by the layout manager)

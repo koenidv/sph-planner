@@ -194,6 +194,7 @@
     <string name="menu_option_accent_summer">Summer</string>
     <string name="menu_option_accent_autumn">Autumn</string>
     <string name="menu_option_accent_monochrome">Winter</string>
+    <string name="menu_option_autosph">Auto-Login for external links</string>
     <string name="menu_open_sph">Open SPH</string>
     <string name="menu_open_sph_warning_title">Log in automatically?</string>
     <string name="menu_open_sph_warning_description">Your service provider or attackers might be able to see your credentials if you log in automatically.</string>

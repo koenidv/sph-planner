@@ -15,6 +15,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.content.res.AppCompatResources.getDrawable
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.switchmaterial.SwitchMaterial
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.database.DatabaseHelper
@@ -165,6 +166,15 @@ class OptionsSheet internal constructor() : BottomSheetDialogFragment() {
                 dismiss()
             }
         }*/
+
+        /**
+         * Enable/disable use of AutoSPH
+         */
+        view.findViewById<SwitchMaterial>(R.id.autosphSwitch).isChecked =
+                prefs.getBoolean("open_sph_accepted_auto", false)
+        view.findViewById<SwitchMaterial>(R.id.autosphSwitch).setOnCheckedChangeListener { _, isChecked ->
+            prefs.edit().putBoolean("open_sph_accepted_auto", isChecked).apply()
+        }
 
         /**
          * Choose a theme

@@ -26,6 +26,7 @@ import okhttp3.Cookie
 import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Response
+import org.jsoup.Jsoup
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -49,7 +50,12 @@ class NetworkManager {
 
         when (destinationId) {
             R.id.nav_home -> onComplete(FAILED_UNKNOWN)
-            R.id.nav_courses -> NetworkManager().loadAndSavePosts { Toast.makeText(applicationContext(), "Kartoffelfeld abgeräumt", Toast.LENGTH_SHORT).show();onComplete(SUCCESS) }
+            R.id.nav_courses -> {
+                // 2 minutes cooldown, update all posts
+                if (time - prefs.getLong("updated_posts", 0) > 2 * 60 * 100)
+                    updatePosts { onComplete(it) }
+                else onComplete(SUCCESS)
+            }
             R.id.frag_course_overview -> {
                 // Course Overview fragment
                 // Update posts, tasks, files, links
@@ -430,5 +436,63 @@ class NetworkManager {
 
             } else onComplete(success)
         }
+    }
+
+    /**
+     * Checks for new posts on the overview page
+     * and only loads them for courses with a new entry
+     * This will not update anything if a post was added with an older date
+     * Therefore we also load courses that haven't been loaded within the last 48 hours
+     */
+    fun updatePosts(onComplete: (success: Int) -> Unit) {
+        // Get my courses page
+        loadSiteWithToken(applicationContext().getString(R.string.url_allposts)) { success, response ->
+            if (success == SUCCESS) {
+                // Check which courses should be updated
+                // Any course that is not in this list does not have any posts.
+                val prefs = applicationContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
+                val courses = mutableListOf<Course>()
+                val courseids = mutableListOf<String>()
+                val rows = Jsoup.parse(response!!).select("#aktuell tbody tr")
+                val postsdb = PostsDb.getInstance()
+                val coursesdb = CoursesDb.getInstance()
+                val timenow = Date().time
+
+                var numberId: String
+                var postIndex: String
+                var courseId: String?
+                var latestPost: Post?
+
+                for (row in rows) {
+                    numberId = row.attr("data-book")
+                    postIndex = row.attr("data-entry")
+                    // Todo add number id if there isn't any yet
+                    courseId = coursesdb.getCourseIdByNumberId(numberId)
+                    latestPost = postsdb.getByCourseId(courseId, 1).getOrNull(0)
+
+                    if (latestPost?.postId?.substring(latestPost.postId.lastIndexOf("_") + 1)
+                            != postIndex
+                            || timenow - prefs.getLong("updated_posts_${courseId}", 0) > 48 * 60 * 60 * 1000
+                    ) {
+                        courses.add(coursesdb.getByInternalId(courseId))
+                        courseids.add(courseId)
+                    }
+                }
+
+                if (courses.isNotEmpty()) {
+                    // Now that we got all the courses that should be updated, update them
+                    loadAndSavePosts(courses) {
+                        prefs.edit().putLong("updated_posts", timenow).apply()
+                        // Send broadcast to update posts
+                        val uiBroadcast = Intent("uichange")
+                        uiBroadcast.putExtra("content", "posts")
+                        uiBroadcast.putExtra("courses", courseids.toTypedArray())
+                        LocalBroadcastManager.getInstance(applicationContext()).sendBroadcast(uiBroadcast)
+                        onComplete(it)
+                    }
+                } else onComplete(SUCCESS)
+            } else onComplete(success)
+        }
+
     }
 }
