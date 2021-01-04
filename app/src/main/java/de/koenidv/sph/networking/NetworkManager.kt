@@ -121,21 +121,21 @@ class NetworkManager {
         createCourseIndex { courses ->
             if (courses == SUCCESS)
             // Load and parse timetable
-                loadAndSaveTimetable { lessons ->
-                    if (lessons == SUCCESS)
-                    // Load all posts, tasks, attachments and links from all courses
-                        NetworkManager().loadAndSavePosts(markAsRead = true) { posts ->
-                            if (posts == SUCCESS)
-                            // Load changes, if there are any
-                                NetworkManager().loadAndSaveChanges { changes ->
-                                    if (changes == SUCCESS)
-                                        onComplete(SUCCESS)
-                                    else onComplete(changes)
-                                }
-                            else onComplete(posts)
+            //loadAndSaveTimetable { lessons ->
+            //if (lessons == SUCCESS)
+            // Load all posts, tasks, attachments and links from all courses
+                NetworkManager().loadAndSavePosts(markAsRead = true) { posts ->
+                    if (posts == SUCCESS)
+                    // Load changes, if there are any
+                        NetworkManager().loadAndSaveChanges { changes ->
+                            if (changes == SUCCESS)
+                                onComplete(SUCCESS)
+                            else onComplete(changes)
                         }
-                    else onComplete(lessons)
+                    else onComplete(posts)
                 }
+            //else onComplete(lessons)
+            //}
             else onComplete(courses)
         }
     }
@@ -154,7 +154,7 @@ class NetworkManager {
         loadSiteWithToken(applicationContext().getString(R.string.url_timetable), onComplete = { successTimetable: Int, responseTimetable: String? ->
             if (successTimetable == SUCCESS) {
                 // Save parsed courses from timetable
-                coursesDb.save(RawParser().parseCoursesFromTimetable(responseTimetable!!))
+                //coursesDb.save(RawParser().parseCoursesFromTimetable(responseTimetable!!))
                 // Secondly, load those courses from study groups to find out where the user belongs
                 loadSiteWithToken("https://start.schulportal.hessen.de/lerngruppen.php", onComplete = { successStudygroups: Int, responseStudygroups: String? ->
                     if (successStudygroups == SUCCESS) {

@@ -25,6 +25,7 @@ class ExploreFragment : Fragment() {
 
         val view = inflater.inflate(R.layout.fragment_explore, container, false)
         val nav = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
+        val features = FunctionTilesDb.getInstance()
 
         /*
          * Collections
@@ -38,10 +39,12 @@ class ExploreFragment : Fragment() {
 
 
         // Set on click listeners, open respective fragment
-        timetableText.setOnClickListener {
-            // Open timetable
-            nav.navigate(R.id.timetableFromExploreAction)
-        }
+        if (features.supports(FunctionTile.FEATURE_TIMETABLE)) {
+            timetableText.setOnClickListener {
+                // Open timetable
+                nav.navigate(R.id.timetableFromExploreAction)
+            }
+        } else timetableText.visibility = View.GONE
         postsText.setOnClickListener {
             // Open all posts
             nav.navigate(R.id.allPostsFromExploreAction)
@@ -54,9 +57,11 @@ class ExploreFragment : Fragment() {
         tasksText.setOnClickListener {
             nav.navigate(R.id.tasksFromExploreAction)
         }
-        changesText.setOnClickListener {
-            nav.navigate(R.id.changesFromExploreAction)
-        }
+        if (features.supports(FunctionTile.FEATURE_CHANGES)) {
+            changesText.setOnClickListener {
+                nav.navigate(R.id.changesFromExploreAction)
+            }
+        } else changesText.visibility = View.GONE
 
 
         /*

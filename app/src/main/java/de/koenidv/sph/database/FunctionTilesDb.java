@@ -82,6 +82,17 @@ public class FunctionTilesDb {
     }
 
     /**
+     * Check if a feature tile is supported
+     */
+    public boolean supports(String function) {
+        Cursor cursor = dbhelper.getReadableDatabase().rawQuery(
+                "SELECT name FROM tiles where type = \"" + function + "\"", null);
+        boolean supported = cursor.moveToFirst();
+        cursor.close();
+        return supported;
+    }
+
+    /**
      * Adds or updates feature functionTiles in the database
      * Will override everything with the same name if it's not null
      *

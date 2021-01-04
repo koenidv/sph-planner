@@ -100,14 +100,15 @@ class OnboardingSupportlistFragment : Fragment() {
             }
             if (!features.contains("Lerngruppen")) {
                 allFeatures = false
-                manualFeatures = true
+                //manualFeatures = true
+                usableFeatures = false // todo manual course adding
                 featurelistText = featurelistText.replace("%studygroups", crossmarkText)
             } else {
                 featurelistText = featurelistText.replace("%studygroups", checkmarkText)
             }
             if (!features.contains("Stundenplan")) {
                 allFeatures = false
-                usableFeatures = false
+                usableFeatures = true
                 featurelistText = featurelistText.replace("%timetable", crossmarkText)
             } else {
                 someFeatures = true
@@ -115,7 +116,6 @@ class OnboardingSupportlistFragment : Fragment() {
             }
             if (!features.contains("Vertretungsplan") && !features.contains("Testphase Vertretungsplan")) {
                 allFeatures = false
-                usableFeatures = false
                 featurelistText = featurelistText.replace("%changes", crossmarkText)
             } else {
                 someFeatures = true
