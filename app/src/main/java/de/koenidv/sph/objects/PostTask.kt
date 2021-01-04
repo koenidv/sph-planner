@@ -10,4 +10,14 @@ data class PostTask(
         var description: String, // Description of the task. There's no title.
         var date: Date, // Date of the post to be attached to. Should be day only, no time
         var isDone: Boolean // Whether the task has been completed
-)
+) {
+    override fun equals(other: Any?): Boolean {
+        if (other is PostTask)
+            return other.taskId == this.taskId
+        return super.equals(other)
+    }
+
+    override fun hashCode(): Int {
+        return taskId.hashCode()
+    }
+}

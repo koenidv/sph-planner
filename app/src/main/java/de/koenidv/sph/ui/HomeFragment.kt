@@ -1,17 +1,20 @@
 package de.koenidv.sph.ui
 
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentContainerView
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.navigation.Navigation
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.FragmentNavigatorExtras
@@ -28,14 +31,88 @@ import de.koenidv.sph.database.ChangesDb
 import de.koenidv.sph.database.PostTasksDb
 import de.koenidv.sph.database.PostsDb
 import de.koenidv.sph.networking.AttachmentManager
-import de.koenidv.sph.networking.NetworkManager
 import de.koenidv.sph.objects.Attachment
 import de.koenidv.sph.objects.Post
+import de.koenidv.sph.objects.PostTask
 import de.koenidv.sph.parsing.Utility
 import java.util.*
 
 
 class HomeFragment : Fragment() {
+
+    private lateinit var tasks: MutableList<PostTask>
+    private lateinit var tasksRecycler: RecyclerView
+    private lateinit var posts: MutableList<Post>
+    private lateinit var unreadPostsRecycler: RecyclerView
+
+    // Refresh whenever the broadcast "uichange" is received
+    private val uichangeReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+
+            // Update posts list with new unread posts
+            if (intent.getStringExtra("content") == "posts") {
+                // If there wasn't any post or any task before but now is,
+                // it's easier to recreate the fragment
+                if (unreadPostsRecycler.adapter == null
+                        || tasksRecycler.adapter == null) {
+                    @Suppress("DEPRECATION")
+                    parentFragmentManager.beginTransaction()
+                            .replace(R.id.nav_host_fragment,
+                                    instantiate(context, HomeFragment().javaClass.name))
+                            .commit()
+                    return
+                }
+
+                // Add all new posts to the top of the posts list
+                // Removed posts will not be removed
+                val unreadPosts = PostsDb.getInstance().unread
+                for (post in unreadPosts) {
+                    if (!posts.contains(post)) {
+                        posts.add(0, post)
+                        unreadPostsRecycler.adapter?.notifyItemInserted(0)
+                        unreadPostsRecycler.adapter?.notifyItemRemoved(3)
+                    }
+                }
+
+                // Add all new tasks to the top of the tasks list
+                val unreadTasks = PostTasksDb.getInstance().undone
+                for (task in unreadTasks) {
+                    if (!tasks.contains(task)) {
+                        tasks.add(0, task)
+                        tasksRecycler.adapter?.notifyItemInserted(0)
+                        tasksRecycler.adapter?.notifyItemRemoved(5)
+                    }
+                }
+            }
+
+            // Update tasks and posts list when a task is done
+            if (intent.getStringExtra("content") == "taskDone") {
+                val postId = intent.getStringExtra("postId")
+
+                // If tasks list contains this, notify tasks aapter
+                val taskIndex = tasks.indexOfFirst { it.id_post == postId }
+                if (taskIndex != -1) {
+                    tasksRecycler.adapter?.notifyItemChanged(taskIndex)
+                } else if (!intent.getBooleanExtra("isDone", true)) {
+                    // Add task to the top of the list if it is not done and wasn't there before
+                    tasks.add(0, PostTasksDb.getInstance().getByPostId(postId).first())
+                    tasksRecycler.adapter?.notifyItemInserted(0)
+                    tasksRecycler.adapter?.notifyItemRemoved(5)
+                }
+
+                // If posts list contains this, notify it
+                val postIndex = posts.indexOfFirst { it.postId == postId }
+                if (postIndex != -1) unreadPostsRecycler.adapter?.notifyItemChanged(postIndex)
+            }
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        // Register to receive messages.
+        LocalBroadcastManager.getInstance(requireContext()).registerReceiver(uichangeReceiver,
+                IntentFilter("uichange"))
+    }
 
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?,
@@ -50,18 +127,6 @@ class HomeFragment : Fragment() {
             SphPlanner.randomGreetingTime = Date().time
         }
         (activity as AppCompatActivity).supportActionBar?.title = SphPlanner.randomGreeting
-
-        // Only for demonstration
-
-        val surpriseButton = view.findViewById<Button>(R.id.surpriseButton)
-        surpriseButton.setOnClickListener {
-            //NetworkManager().indexAll { Toast.makeText(SphPlanner.applicationContext(), "Heute schon, Kartoffel", Toast.LENGTH_SHORT).show() }
-            //NetworkManager().loadAndSavePosts { Toast.makeText(SphPlanner.applicationContext(), "Kartoffelfeld abgeräumt", Toast.LENGTH_SHORT).show() }
-            //DatabaseHelper.getInstance().writableDatabase.execSQL("DELETE FROM posts WHERE post_id IN (SELECT post_id FROM posts ORDER BY date DESC LIMIT 3)")
-            NetworkManager().loadAndSaveChanges {
-                Toast.makeText(SphPlanner.applicationContext(), "Kartoffel, in Deckung!", Toast.LENGTH_SHORT).show()
-            }
-        }
 
 
         /*
@@ -116,11 +181,11 @@ class HomeFragment : Fragment() {
 
         val tasksLayout = view.findViewById<LinearLayout>(R.id.tasksLayout)
         val tasksRecyclerLayout = view.findViewById<LinearLayout>(R.id.tasksRecyclerLayout)
-        val tasksRecycler = view.findViewById<RecyclerView>(R.id.tasksRecycler)
+        tasksRecycler = view.findViewById(R.id.tasksRecycler)
         val tasksTitle = view.findViewById<TextView>(R.id.tasksTitleTextView)
         val moreTasksText = view.findViewById<TextView>(R.id.moreTasksTextView)
 
-        val tasks = PostTasksDb.getInstance().undone
+        tasks = PostTasksDb.getInstance().undone
         var tasksOverflow = 0
         if (tasks.size > 6) {
             tasksOverflow = tasks.size - 6
@@ -171,14 +236,14 @@ class HomeFragment : Fragment() {
          */
 
         val unreadPostsLayout = view.findViewById<LinearLayout>(R.id.unreadPostsLayout)
-        val unreadPostsRecycler = view.findViewById<RecyclerView>(R.id.unreadPostsRecycler)
+        unreadPostsRecycler = view.findViewById(R.id.unreadPostsRecycler)
         val moreUnreadText = view.findViewById<TextView>(R.id.moreUnreadTextView)
 
         // Get unread posts
         // and up to 4 read posts
         // We'll only display 4 posts,
         // but unread posts will get removed once they are read
-        val posts = PostsDb.getInstance().unread.toMutableList()
+        posts = PostsDb.getInstance().unread.toMutableList()
         var postsOverflow = 0
         if (posts.size > 4) {
             postsOverflow = posts.size - 4

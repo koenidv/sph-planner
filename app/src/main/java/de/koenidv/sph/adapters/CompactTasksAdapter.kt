@@ -1,5 +1,6 @@
 package de.koenidv.sph.adapters
 
+import android.content.Intent
 import android.content.res.ColorStateList
 import android.view.LayoutInflater
 import android.view.View
@@ -7,8 +8,10 @@ import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.RecyclerView
 import de.koenidv.sph.R
+import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.database.CoursesDb
 import de.koenidv.sph.database.PostTasksDb
 import de.koenidv.sph.objects.PostTask
@@ -40,6 +43,12 @@ class CompactTasksAdapter(private val tasks: List<PostTask>,
                 if (checkboxset)
                     currentTask?.let {
                         onTaskCheckedChanged(it.id_post, it.id_course, isChecked)
+                        // Send broadcast to update ui
+                        val uiBroadcast = Intent("uichange")
+                        uiBroadcast.putExtra("content", "taskDone")
+                        uiBroadcast.putExtra("postId", it.id_post)
+                        uiBroadcast.putExtra("isDone", isChecked)
+                        LocalBroadcastManager.getInstance(SphPlanner.applicationContext()).sendBroadcast(uiBroadcast)
                     }
             }
             layout.setOnClickListener {

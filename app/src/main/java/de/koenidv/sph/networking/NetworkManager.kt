@@ -47,22 +47,31 @@ class NetworkManager {
     fun handlePullToRefresh(destinationId: Int, arguments: Bundle?, onComplete: (success: Int) -> Unit) {
         val prefs = applicationContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
         val time = Date().time
+        val updateList = mutableListOf<String>()
+        var disableList = false
 
         when (destinationId) {
-            R.id.nav_home -> {
+            R.id.nav_home, R.id.nav_explore -> {
                 // Update changes after 10min, posts after 30min
-                val updateList = mutableListOf<String>()
                 if (time - prefs.getLong("updated_changes", 0) > 10 * 60 * 1000) updateList.add("changes")
                 if (time - prefs.getLong("updated_posts", 0) > 30 * 60 * 1000) updateList.add("posts")
-                update(updateList) { onComplete(it) }
             }
             R.id.nav_courses -> {
                 // 2 minutes cooldown, update all posts
                 if (time - prefs.getLong("updated_posts", 0) > 2 * 60 * 100)
-                    updatePosts { onComplete(it) }
-                else onComplete(SUCCESS)
+                    updateList.add("posts")
+            }
+            R.id.frag_timetable -> {
+                updateList.add("timetable")
+            }
+            R.id.frag_changes -> {
+                // Changes fragment
+                // Update changes after 30sec cooldown
+                if (time - prefs.getLong("updated_changes", 0) > 30 * 1000)
+                    updateList.add("changes")
             }
             R.id.frag_course_overview, R.id.frag_tasks, R.id.frag_attachments -> {
+                disableList = true
                 // Course Overview fragment
                 // Update posts, tasks, files, links
                 if (arguments?.getString("courseId") != null) {
@@ -86,22 +95,8 @@ class NetworkManager {
                         onComplete(SUCCESS)
                 }
             }
-            R.id.frag_changes -> {
-                // Changes fragment
-                // Update changes after 30sec cooldown
-                if (time - prefs.getLong("updated_changes", 0) > 30 * 1000) {
-                    loadAndSaveChanges {
-                        if (it == SUCCESS) {
-                            // Send broadcast to update changes in ChangesFragment
-                            val uiBroadcast = Intent("uichange")
-                            uiBroadcast.putExtra("content", "changes")
-                            LocalBroadcastManager.getInstance(applicationContext()).sendBroadcast(uiBroadcast)
-                        }
-                        onComplete(it)
-                    }
-                } else onComplete(SUCCESS)
-            }
             R.id.frag_webview -> {
+                disableList = true
                 // WebViewFragment, send a broadcast to reload webview
                 val uiBroadcast = Intent("uichange")
                 uiBroadcast.putExtra("content", "webview")
@@ -113,13 +108,10 @@ class NetworkManager {
                     onComplete(SUCCESS)
                 }
             }
-            R.id.frag_timetable -> {
-                loadAndSaveTimetable {
-                    onComplete(it)
-                }
-            }
-            else -> onComplete(FAILED_UNKNOWN)
         }
+        if (!disableList)
+            update(updateList) { onComplete(it) }
+
     }
 
 
@@ -269,6 +261,11 @@ class NetworkManager {
                         ChangesDb.instance!!.save(RawParser().parseChanges(result!!))
                         applicationContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
                                 .edit().putLong("updated_changes", Date().time).apply()
+
+                        // Send broadcast to update changes
+                        val uiBroadcast = Intent("uichange")
+                        uiBroadcast.putExtra("content", "changes")
+                        LocalBroadcastManager.getInstance(applicationContext()).sendBroadcast(uiBroadcast)
                     }
                     onComplete(success)
                 })
@@ -470,6 +467,7 @@ class NetworkManager {
                         when (entry) {
                             "posts" -> updatePosts(checkDone)
                             "changes" -> loadAndSaveChanges(checkDone)
+                            "timetable" -> loadAndSaveTimetable(checkDone)
                         }
                     }
                 } else onComplete(success)

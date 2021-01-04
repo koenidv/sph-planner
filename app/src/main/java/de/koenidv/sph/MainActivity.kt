@@ -29,7 +29,6 @@ import de.koenidv.sph.ui.OptionsSheet
 class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
-        findViewById<SwipeRefreshLayout>(R.id.swipeRefresh).isRefreshing = true
         ChangesDb.instance!!.removeOld()
         super.onResume()
     }
@@ -137,7 +136,7 @@ class MainActivity : AppCompatActivity() {
             optionsSheet.show(supportFragmentManager, "optionsSheet")
             // Reset token timer
             getSharedPreferences("sharedPrefs", MODE_PRIVATE).edit()
-                    .putLong("token_last_success", 0).apply()
+                    .putLong("updated_posts", 0).apply()
         }
         return super.onOptionsItemSelected(item)
     }
