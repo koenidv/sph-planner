@@ -91,6 +91,8 @@
         <item quantity="one">%d new post</item>
         <item quantity="other">%d new posts</item>
     </plurals>
+    <string name="courses_options_read">Mark all as read</string>
+    <string name="courses_options_color">Change color</string>
 
     <!-- Posts -->
     <string name="posts_title">Posts</string>

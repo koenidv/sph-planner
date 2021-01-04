@@ -347,6 +347,17 @@ public class CoursesDb {
     }
 
     /**
+     * Set a course's color
+     *
+     * @param internalId The course's internal id
+     * @param color      New color to set as color int
+     */
+    public void setColor(String internalId, int color) {
+        dbhelper.getWritableDatabase().execSQL("UPDATE courses SET color=\""
+                + color + "\" WHERE course_id = \"" + internalId + "\"");
+    }
+
+    /**
      * Get a course's full name by its internal id
      *
      * @param internalId Internal id of the course to look for

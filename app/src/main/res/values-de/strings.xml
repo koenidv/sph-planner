@@ -223,5 +223,8 @@
     </plurals>
     <string name="tasks_date_info_prefix">Vom</string>
     <string name="menu_option_autosph">Auto-Login für externe Links</string>
+    <string name="attachments_options_rename">Umbenennen</string>
+    <string name="courses_options_read">Alle als gelesen markieren</string>
+    <string name="courses_options_color">Farbe ändern</string>
 
 </resources>

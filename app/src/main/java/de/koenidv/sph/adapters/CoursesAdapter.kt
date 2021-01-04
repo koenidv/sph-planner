@@ -1,28 +1,83 @@
 package de.koenidv.sph.adapters
 
+import android.app.Activity
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.color.colorChooser
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
+import de.koenidv.sph.database.CoursesDb
 import de.koenidv.sph.database.PostTasksDb
 import de.koenidv.sph.database.PostsDb
 import de.koenidv.sph.objects.Course
 import de.koenidv.sph.parsing.Utility
 
 //  Created by koenidv on 18.12.2020.
-class CoursesAdapter(private val courses: List<Course>,
+class CoursesAdapter(private val courses: MutableList<Course>,
+                     private val activity: Activity,
                      private val onClick: (Course) -> Unit) :
         RecyclerView.Adapter<CoursesAdapter.ViewHolder>() {
+
+    // Show a bottom sheet for managing the course on long click
+    private val onLongClick = { course: Course, position: Int ->
+
+
+        val sheet = BottomSheetDialog(activity)
+        sheet.setContentView(R.layout.sheet_manage_course)
+
+        val markRead = sheet.findViewById<TextView>(R.id.readTextView)
+        val changeColor = sheet.findViewById<TextView>(R.id.colorTextView)
+
+        // Mark all posts as read
+        markRead?.setOnClickListener {
+            PostsDb.getInstance().markCourseAsRead(course.courseId)
+            notifyItemChanged(position)
+        }
+
+        // Change course color
+        changeColor?.setOnClickListener {
+            // Get all colors used by default
+            val colorPresets = Utility().parseStringArray(R.array.course_colors).map {
+                Color.parseColor(it.value)
+            }.toIntArray()
+
+            // Show a color picker dialog
+            MaterialDialog(activity).show {
+                colorChooser(
+                        colors = colorPresets,
+                        initialSelection = course.color,
+                        allowCustomArgb = true) { _: MaterialDialog, color: Int ->
+
+                    // Save color to db
+                    CoursesDb.getInstance().setColor(course.courseId, color)
+                    // Update dataset and recycler
+                    course.color = color
+                    courses[position] = course
+                    notifyItemChanged(position)
+                }
+                positiveButton(R.string.save)
+                negativeButton(R.string.cancel)
+                title(R.string.attachments_options_rename)
+            }
+        }
+
+
+        sheet.show()
+
+    }
 
     /**
      * Provides a reference to the type of view
      * (custom ViewHolder).
      */
-    class ViewHolder(view: View, val onClick: (Course) -> Unit) : RecyclerView.ViewHolder(view) {
+    class ViewHolder(view: View, val onClick: (Course) -> Unit, onLongClick: (Course, Int) -> Unit) : RecyclerView.ViewHolder(view) {
         val layout: LinearLayout = view.findViewById(R.id.itemLayout)
         private val nameText: TextView = view.findViewById(R.id.courseNameTextView)
         private val infoText: TextView = view.findViewById(R.id.courseInfoTextView)
@@ -34,6 +89,12 @@ class CoursesAdapter(private val courses: List<Course>,
                 currentCourse?.let {
                     onClick(it)
                 }
+            }
+            layout.setOnLongClickListener {
+                currentCourse?.let {
+                    onLongClick(it, adapterPosition)
+                }
+                true
             }
         }
 
@@ -82,7 +143,7 @@ class CoursesAdapter(private val courses: List<Course>,
         val view = LayoutInflater.from(viewGroup.context)
                 .inflate(R.layout.item_course, viewGroup, false)
 
-        return ViewHolder(view, onClick)
+        return ViewHolder(view, onClick, onLongClick)
     }
 
     // Replaces the contents of a view (invoked by the layout manager)

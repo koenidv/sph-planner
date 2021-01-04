@@ -12,8 +12,8 @@ android {
         applicationId "de.koenidv.sph"
         minSdkVersion 23
         targetSdkVersion 30
-        versionCode 100
-        versionName "1.0"
+        versionCode 101
+        versionName "1.1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -57,6 +57,7 @@ dependencies {
     implementation 'androidx.webkit:webkit:1.4.0'
     implementation 'com.afollestad.material-dialogs:core:3.3.0'
     implementation 'com.afollestad.material-dialogs:input:3.3.0'
+    implementation 'com.afollestad.material-dialogs:color:3.2.1'
 
     testImplementation 'junit:junit:4.13.1'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
