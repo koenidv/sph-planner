@@ -55,6 +55,8 @@ dependencies {
     implementation 'me.saket:better-link-movement-method:2.2.0'
     implementation 'androidx.gridlayout:gridlayout:1.0.0'// Open links in-app
     implementation 'androidx.webkit:webkit:1.4.0'
+    implementation 'com.afollestad.material-dialogs:core:3.3.0'
+    implementation 'com.afollestad.material-dialogs:input:3.3.0'
 
     testImplementation 'junit:junit:4.13.1'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'

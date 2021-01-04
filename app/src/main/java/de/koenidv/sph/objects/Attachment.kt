@@ -22,4 +22,8 @@ data class Attachment(
     fun file() = file!!
     fun type() = type
 
+    fun setName(name: String) {
+        if (type == "link") link!!.name = name else file!!.name = name
+    }
+
 }

@@ -19,12 +19,14 @@ import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.adapters.AttachmentsAdapter
 import de.koenidv.sph.adapters.PostsAdapter
-import de.koenidv.sph.database.*
+import de.koenidv.sph.database.CoursesDb
+import de.koenidv.sph.database.FileAttachmentsDb
+import de.koenidv.sph.database.LinkAttachmentsDb
+import de.koenidv.sph.database.PostsDb
 import de.koenidv.sph.networking.AttachmentManager
 import de.koenidv.sph.objects.Attachment
 import de.koenidv.sph.objects.Course
 import de.koenidv.sph.objects.Post
-import de.koenidv.sph.objects.PostTask
 import me.saket.bettermovementmethod.BetterLinkMovementMethod
 
 
@@ -35,11 +37,7 @@ class CourseOverviewFragment : Fragment() {
     var isExanded = false
     lateinit var postsRecycler: RecyclerView
     lateinit var posts: MutableList<Post>
-    lateinit var tasks: MutableList<PostTask>
-    lateinit var attachments: MutableList<Attachment>
     lateinit var postsToShow: MutableList<Post>
-    lateinit var taskstoShow: MutableList<PostTask>
-    lateinit var attachsToShow: MutableList<Attachment>
 
     // Refresh whenever the broadcast "uichange" is received
     private val uichangeReceiver: BroadcastReceiver = object : BroadcastReceiver() {
@@ -75,16 +73,6 @@ class CourseOverviewFragment : Fragment() {
                 for (post in allPosts) {
                     if (!posts.contains(post)) {
                         posts.add(0, post)
-                        // Add new task for this post
-                        tasks.addAll(PostTasksDb.getInstance().getByPostId(post.postId))
-                        // Add new attachments for this post
-                        attachments.addAll(FileAttachmentsDb.getInstance().getByPostId(post.postId))
-                        attachments.addAll(LinkAttachmentsDb.getInstance().getByPostId(post.postId))
-                        // Well add tasks and attachments to display here,
-                        // so we don't have to filter again later
-                        taskstoShow.addAll(PostTasksDb.getInstance().getByPostId(post.postId))
-                        attachsToShow.addAll(FileAttachmentsDb.getInstance().getByPostId(post.postId))
-                        attachsToShow.addAll(LinkAttachmentsDb.getInstance().getByPostId(post.postId))
                         changed++
                     }
                 }
@@ -146,13 +134,9 @@ class CourseOverviewFragment : Fragment() {
 
         // Get data
         posts = PostsDb.getInstance().getByCourseId(courseId).toMutableList()
-        tasks = PostTasksDb.getInstance().getByCourseId(courseId).toMutableList()
         // Get file attachments..
-        attachments = FileAttachmentsDb.getInstance().getByCourseId(courseId).toMutableList()
         val pins = FileAttachmentsDb.getInstance().getPinsByCourseId(courseId).toMutableList()
         // ..and link attachments
-        if (prefs.getBoolean("links_in_post_attachments", true))
-            attachments.addAll(LinkAttachmentsDb.getInstance().getByCourseId(courseId))
         pins.addAll(LinkAttachmentsDb.getInstance().getPinsByCourseId(courseId))
         // We need to reorder pins as files and links should be mixed, according to their last use
         pins.sortByDescending { it.lastuse() }
@@ -203,6 +187,20 @@ class CourseOverviewFragment : Fragment() {
                         pinsRecycler.visibility = View.GONE
                     }
                 }
+                AttachmentManager.ATTACHMENT_RENAMED_PIN -> {
+                    // Update item in pins recycler
+                    val pinsIndex = pins.indexOfFirst { it.attachId() == attachment.attachId() }
+                    pins[pinsIndex] = attachment
+                    pinsRecycler.adapter?.notifyItemChanged(pinsIndex)
+                    // Notify posts recycler about changed data
+                    val postsIndex = posts.indexOfFirst { it.postId == attachment.postId() }
+                    postsRecycler.adapter?.notifyItemChanged(postsIndex)
+                }
+                AttachmentManager.ATTACHMENT_RENAMED -> {
+                    // Notify posts recycler about changed data
+                    val postsIndex = posts.indexOfFirst { it.postId == attachment.postId() }
+                    postsRecycler.adapter?.notifyItemChanged(postsIndex)
+                }
             }
 
         }
@@ -235,8 +233,6 @@ class CourseOverviewFragment : Fragment() {
 
         if (posts.isNotEmpty()) {
             postsToShow = posts.take(2).toMutableList()
-            taskstoShow = tasks.filter { it.id_post == postsToShow[0].postId || it.id_post == postsToShow.getOrNull(1)?.postId }.toMutableList()
-            attachsToShow = attachments.filter { it.postId() == postsToShow[0].postId || it.postId() == postsToShow.getOrNull(1)?.postId }.toMutableList()
 
             // Movement method to open links in-app
             val movementMethod = BetterLinkMovementMethod.newInstance()
@@ -252,8 +248,6 @@ class CourseOverviewFragment : Fragment() {
 
             val postsAdapter = PostsAdapter(
                     postsToShow,
-                    taskstoShow,
-                    attachsToShow,
                     movementMethod,
                     onAttachmentClick,
                     onAttachmentLongClick,
@@ -265,10 +259,6 @@ class CourseOverviewFragment : Fragment() {
                 // Replace posts adapter data with all posts
                 postsToShow.clear()
                 postsToShow.addAll(posts)
-                taskstoShow.clear()
-                taskstoShow.addAll(tasks)
-                attachsToShow.clear()
-                attachsToShow.addAll(attachments)
                 // Show loading symbol and hide button
                 postsLoading.visibility = View.VISIBLE
                 loadMorePostsButton.visibility = View.GONE

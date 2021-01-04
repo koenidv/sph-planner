@@ -18,6 +18,8 @@ import androidx.core.content.FileProvider
 import androidx.core.os.bundleOf
 import androidx.navigation.Navigation
 import androidx.navigation.findNavController
+import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.input.input
 import com.androidnetworking.AndroidNetworking
 import com.androidnetworking.common.Priority
 import com.androidnetworking.error.ANError
@@ -47,6 +49,8 @@ class AttachmentManager {
         const val ATTACHMENT_USED_PIN = 1
         const val ATTACHMENT_PINNED = 2
         const val ATTACHMENT_UNPINNED = 3
+        const val ATTACHMENT_RENAMED = 4
+        const val ATTACHMENT_RENAMED_PIN = 5
     }
 
     // Movement method to open links in-app
@@ -88,6 +92,7 @@ class AttachmentManager {
                 val delete = sheet.findViewById<TextView>(R.id.deleteTextView)
                 val pin = sheet.findViewById<TextView>(R.id.pinTextView)
                 val unpin = sheet.findViewById<TextView>(R.id.unpinTextView)
+                val rename = sheet.findViewById<TextView>(R.id.renameTextView)
                 val share = sheet.findViewById<TextView>(R.id.shareTextView)
                 val icon = view.findViewById<TextView>(R.id.iconTextView)
 
@@ -218,6 +223,27 @@ class AttachmentManager {
                     doneSnackbar.setText(R.string.attachments_options_unpin_complete).show()
                     // Notify the calling activity
                     onAction(ATTACHMENT_UNPINNED, attachment)
+                }
+
+                // Change display name
+                rename?.setOnClickListener {
+                    // Show a dialog to rename the attachment
+                    MaterialDialog(activity).show {
+                        input(prefill = attachment.name()) { _, text ->
+                            if (type == "file")
+                                FileAttachmentsDb.getInstance().rename(attachment.attachId(), text.toString())
+                            else
+                                LinkAttachmentsDb.getInstance().rename(attachment.attachId(), text.toString())
+
+                            // Update ui
+                            attachment.setName(text.toString())
+                            if (isPinned) onAction(ATTACHMENT_RENAMED_PIN, attachment)
+                            else onAction(ATTACHMENT_RENAMED, attachment)
+                        }
+                        positiveButton(R.string.save)
+                        negativeButton(R.string.cancel)
+                        title(R.string.attachments_options_rename)
+                    }
                 }
 
                 // Share attachment

@@ -71,6 +71,17 @@ public class LinkAttachmentsDb {
     }
 
     /**
+     * Rename a link attachment
+     *
+     * @param attachmentId The attachment's id
+     * @param newName      New name. The old will be replaced
+     */
+    public void rename(String attachmentId, String newName) {
+        dbhelper.getWritableDatabase().execSQL("UPDATE linkAttachments SET name=\""
+                + newName + "\" WHERE attachment_id=\"" + attachmentId + "\"");
+    }
+
+    /**
      * Mark an attached link as (not) pinned
      * Will also update last used if pinned
      *

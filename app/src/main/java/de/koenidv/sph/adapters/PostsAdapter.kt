@@ -17,10 +17,10 @@ import com.google.android.material.card.MaterialCardView
 import com.google.android.material.checkbox.MaterialCheckBox
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
+import de.koenidv.sph.database.AttachmentsDb
 import de.koenidv.sph.database.PostTasksDb
 import de.koenidv.sph.objects.Attachment
 import de.koenidv.sph.objects.Post
-import de.koenidv.sph.objects.PostTask
 import me.saket.bettermovementmethod.BetterLinkMovementMethod
 import java.text.SimpleDateFormat
 import java.util.*
@@ -28,8 +28,6 @@ import java.util.*
 
 //  Created by koenidv on 20.12.2020.
 class PostsAdapter(private val posts: List<Post>,
-                   private val tasks: List<PostTask>,
-                   private val attachments: List<Attachment>,
                    private val linkMethod: BetterLinkMovementMethod?,
                    private val onAttachmentClick: (Attachment, View) -> Unit,
                    private val onAttachmentLongClick: (Attachment, View) -> Unit,
@@ -84,13 +82,14 @@ class PostsAdapter(private val posts: List<Post>,
         }
 
         fun bind(post: Post,
-                 task: PostTask?,
-                 attachments: List<Attachment>,
                  attachmentsViewPool: RecyclerView.RecycledViewPool,
                  movementMethod: BetterLinkMovementMethod?,
                  onAttachmentClick: (Attachment, View) -> Unit,
                  onAttachmentLongClick: (Attachment, View) -> Unit) {
             currentPost = post
+
+            val task = PostTasksDb.getInstance().getByPostId(post.postId).firstOrNull()
+            val attachments = AttachmentsDb.byPostId(post.postId)
 
             // Set data
             dateText.text = dateFormat.format(post.date)
@@ -158,8 +157,6 @@ class PostsAdapter(private val posts: List<Post>,
         // Bind data to ViewHolder
         viewHolder.bind(
                 post,
-                tasks.firstOrNull { it.id_post == post.postId }, // There will always only be one task per post
-                attachments.filter { it.postId() == post.postId }, // Filter file attachments for post
                 attachmentsViewPool,
                 linkMethod,
                 onAttachmentClick,

@@ -18,9 +18,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import de.koenidv.sph.R
 import de.koenidv.sph.adapters.PostsAdapter
-import de.koenidv.sph.database.AttachmentsDb
 import de.koenidv.sph.database.CoursesDb
-import de.koenidv.sph.database.PostTasksDb
 import de.koenidv.sph.networking.AttachmentManager
 import de.koenidv.sph.objects.Attachment
 import de.koenidv.sph.objects.Post
@@ -52,8 +50,6 @@ class PostSheet internal constructor(private val post: Post) : BottomSheetDialog
 
         postsRecycler.adapter = PostsAdapter(
                 listOf(post),
-                PostTasksDb.getInstance().getByPostId(post.postId),
-                AttachmentsDb.byPostId(post.postId),
                 AttachmentManager().movementMethod(requireActivity(), R.id.frag_webview),
                 AttachmentManager().onAttachmentClick(requireActivity()) { _: Int, _: Attachment -> },
                 AttachmentManager().onAttachmentLongClick(requireActivity()) { _: Int, _: Attachment -> },

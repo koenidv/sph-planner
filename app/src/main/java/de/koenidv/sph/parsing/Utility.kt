@@ -152,7 +152,7 @@ class Utility {
                 view.background.setColorFilter(
                         color and 0x00FFFFFF or opacity, PorterDuff.Mode.SRC_ATOP)
             }
-        else Log.e(SphPlanner.TAG, view.background.javaClass.toString() + " is marked as tintable")
+        else Log.e(SphPlanner.TAG, view.background.javaClass.toString() + " is not marked as tintable")
     }
 
     /**

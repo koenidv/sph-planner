@@ -84,7 +84,8 @@ class HomeFragment : Fragment() {
             }
 
             // Update tasks and posts list when a task is done
-            if (intent.getStringExtra("content") == "taskDone") {
+            if (intent.getStringExtra("content") == "taskDone"
+                    && ::tasks.isInitialized) {
                 val postId = intent.getStringExtra("postId")
 
                 // If tasks list contains this, notify tasks aapter
@@ -332,8 +333,14 @@ class HomeFragment : Fragment() {
                                     pinsTitle.text = getString(R.string.attachments_pins_none)
                                     pinsRecycler.visibility = View.GONE
                                 }
+                            } else if (action == AttachmentManager.ATTACHMENT_RENAMED_PIN) {
+                                // Update item in recycler
+                                val index = pins.indexOfFirst { it.attachId() == attachment.attachId() }
+                                pins[index] = attachment
+                                pinsRecycler.adapter?.notifyItemChanged(index)
                             }
-                        }
+                        },
+                        true
                 )
                 PagerSnapHelper().attachToRecyclerView(pinsRecycler)
             }
