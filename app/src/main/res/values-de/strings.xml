@@ -29,7 +29,7 @@
     <string name="info_menuaction">Optionen</string>
     <string name="info_greeting">Hey %name</string>
     <string name="info_app">SPHplanner %version</string>
-    <string name="info_author">Florian König 2020</string>
+    <string name="info_author">Florian König 2021</string>
     <string name="info_thanks">Besonderer Dank an Ryan etc</string>
     <string name="menu_option_logout">Abmelden</string>
     <string name="menu_option_courses">Gefundene Kurse</string>

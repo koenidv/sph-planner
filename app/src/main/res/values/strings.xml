@@ -181,7 +181,7 @@
     <string name="info_menuaction">Options</string>
     <string name="info_greeting">Hey %name</string>
     <string name="info_app">SPHplanner %version</string>
-    <string name="info_author">Florian König 2020</string>
+    <string name="info_author">Florian König 2021</string>
     <string name="info_thanks">Special thanks to Ryan etc</string>
     <string name="menu_option_logout">Logout</string>
     <string name="menu_option_logout_question">Are you sure you want to log out?\nAll local data will be removed.</string>
