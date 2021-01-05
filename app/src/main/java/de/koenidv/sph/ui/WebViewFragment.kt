@@ -152,9 +152,25 @@ class WebViewFragment : Fragment() {
         return view
     }
 
+    override fun onStop() {
+        // Stop loading any page
+        if (view != null) (view?.findViewById(R.id.webview) as WebView).stopLoading()
+        super.onStop()
+    }
+
     override fun onDestroy() {
         // Unregister broadcast receiver
         LocalBroadcastManager.getInstance(requireActivity()).unregisterReceiver(uichangeReceiver)
         super.onDestroy()
+        // Recreate activity if this was the first time using webview during this application lifecycle
+        // This is to work around a weird bug in WebView causing the night theme configuration to be changed
+        if (SphPlanner.applicationContext()
+                        .getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
+                        .getBoolean("force_webview_theme_fix", true)
+                && !SphPlanner.webViewFixed) {
+            SphPlanner.webViewFixed = true
+            Log.d(SphPlanner.TAG, "Activity recreated to force fix webview theme bug")
+            requireActivity().recreate()
+        }
     }
 }
