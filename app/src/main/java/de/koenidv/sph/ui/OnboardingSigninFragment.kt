@@ -204,6 +204,9 @@ class OnboardingSigninFragment : Fragment() {
                             } else if (success == NetworkManager.FAILED_SERVER_ERROR) {
                                 // An server error occurred
                                 description.text = getString(R.string.onboard_signin_error_server)
+                            } else {
+                                // Some other error occurred
+                                description.text = getString(R.string.onboard_signin_error_unknown)
                             }
                         }
                     }

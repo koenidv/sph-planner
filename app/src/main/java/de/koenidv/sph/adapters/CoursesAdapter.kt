@@ -28,7 +28,6 @@ class CoursesAdapter(private val courses: MutableList<Course>,
     // Show a bottom sheet for managing the course on long click
     private val onLongClick = { course: Course, position: Int ->
 
-
         val sheet = BottomSheetDialog(activity)
         sheet.setContentView(R.layout.sheet_manage_course)
 
@@ -64,7 +63,7 @@ class CoursesAdapter(private val courses: MutableList<Course>,
                 }
                 positiveButton(R.string.save)
                 negativeButton(R.string.cancel)
-                title(R.string.attachments_options_rename)
+                title(text = course.fullname)
             }
         }
 
@@ -126,6 +125,8 @@ class CoursesAdapter(private val courses: MutableList<Course>,
             if (infotext != "") {
                 infoText.text = infotext
                 infoText.visibility = View.VISIBLE
+            } else {
+                infoText.visibility = View.GONE
             }
 
             /*

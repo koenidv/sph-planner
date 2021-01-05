@@ -81,10 +81,13 @@ class TokenManager {
                                 } else if (response.contains("Wartungsarbeiten")) {
                                     // Cannot login at the moment
                                     onComplete(NetworkManager.FAILED_MAINTENANCE, null)
-                                } else if (response.contains("Login failed!")) {
+                                } else if (response.contains("Login failed!")
+                                        || response.contains("nonce is empty")) {
                                     onComplete(NetworkManager.FAILED_SERVER_ERROR, null)
                                     Log.d(TAG, "Login failed :/")
-                                    // todo Message: Retry in a few minutes
+                                } else {
+                                    onComplete(NetworkManager.FAILED_UNKNOWN, null)
+                                    Log.d(TAG, "Login failed; Reason unknown!")
                                 }
                             }
 

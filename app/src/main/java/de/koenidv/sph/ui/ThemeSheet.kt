@@ -30,17 +30,20 @@ class ThemeSheet internal constructor() : BottomSheetDialogFragment() {
         // Dark mode toggle group
         val darkToggleGroup: MaterialButtonToggleGroup = view.findViewById(R.id.darkmodeToggleGroup)
         // Check currently active dark theme selection
-        if (prefs.contains("forceDark"))
-            if (prefs.getBoolean("forceDark", true)) darkToggleGroup.check(R.id.themeDarkButton)
-            else darkToggleGroup.check(R.id.themeLightButton)
-        else darkToggleGroup.check(R.id.themeSystemButton)
+        darkToggleGroup.check(when (prefs.getInt("forceDarkType", 1)) {
+            -1 -> R.id.themeSystemButton
+            0 -> R.id.themeLightButton
+            else -> R.id.themeDarkButton
+        })
         // Put in editor on click
         darkToggleGroup.addOnButtonCheckedListener { _: MaterialButtonToggleGroup?, checkedId: Int, isChecked: Boolean ->
             if (isChecked) {
-                if (checkedId == R.id.themeSystemButton)
-                    editor.remove("forceDark").apply()
-                else
-                    editor.putBoolean("forceDark", checkedId == R.id.themeDarkButton).apply()
+                editor.putInt("forceDarkType", when (checkedId) {
+                    // -1 Follow system, 0 Light, 1 Dark
+                    R.id.themeSystemButton -> -1
+                    R.id.themeLightButton -> 0
+                    else -> 1
+                }).apply()
             }
         }
 

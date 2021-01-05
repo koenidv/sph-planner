@@ -51,6 +51,7 @@
     <string name="onboard_signin_error_credentials">Please check your credentials.</string>
     <string name="onboard_signin_error_maintenance">The education portal is currently under maintenance.\nPlease try again later.</string>
     <string name="onboard_signin_error_server">A server error occurred.\nPlease try again in a few minutes.</string>
+    <string name="onboard_signin_error_unknown">Something went wrong.\nPlease try again.</string>
     <string name="onboard_supported_schooltested">✔ We tested the app with your school and it should work.</string>
     <string name="onboard_supported_features_full">"✔ Your school supports all the features we need, but we didn't test it yet.\nPlease contact us via the options menu!"</string>
     <string name="onboard_supported_features_partly_manual">✔ Your school supports some of the features we need, but you will need to enter some data manually.</string>
