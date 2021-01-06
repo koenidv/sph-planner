@@ -11,8 +11,8 @@ import androidx.recyclerview.widget.RecyclerView
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.adapters.CompactPostsAdapter
-import de.koenidv.sph.database.PostTasksDb
 import de.koenidv.sph.database.PostsDb
+import de.koenidv.sph.database.TasksDb
 import de.koenidv.sph.objects.Post
 
 
@@ -47,7 +47,7 @@ class AllPostsFragment(private var filters: MutableList<String> = mutableListOf(
                 else if (filters.contains("read") && it.unread) remove = true
                 if (filterTask) {
                     // Filter for tasks
-                    val taskDone: Boolean? = PostTasksDb.getInstance().taskDone(it.postId)
+                    val taskDone: Boolean? = TasksDb.getInstance().taskDone(it.postId)
                     when {
                         filters.contains("task_none") && taskDone != null -> remove = true
                         filters.contains("task_any") && taskDone == null -> remove = true

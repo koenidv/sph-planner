@@ -154,7 +154,7 @@ class WebViewFragment : Fragment() {
 
     override fun onStop() {
         // Stop loading any page
-        if (view != null) (view?.findViewById(R.id.webview) as WebView).stopLoading()
+        webView.stopLoading()
         super.onStop()
     }
 

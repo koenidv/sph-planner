@@ -14,8 +14,8 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.database.CoursesDb
-import de.koenidv.sph.database.PostTasksDb
 import de.koenidv.sph.database.PostsDb
+import de.koenidv.sph.database.TasksDb
 import de.koenidv.sph.objects.Course
 import de.koenidv.sph.parsing.Utility
 
@@ -101,7 +101,7 @@ class CoursesAdapter(private val courses: MutableList<Course>,
             currentCourse = course
 
             val openPosts = PostsDb.getInstance().getUnreadByCourseIdCount(course.courseId)
-            val openTasks = PostTasksDb.getInstance().getUndoneByCourseIdCount(course.courseId)
+            val openTasks = TasksDb.getInstance().getUndoneByCourseIdCount(course.courseId)
 
             /*
              * Text

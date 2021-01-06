@@ -225,11 +225,11 @@ class NetworkManager {
                                     markAsRead,
                                     onParsed = { posts: List<Post>,
                                                  files: List<FileAttachment>,
-                                                 tasks: List<PostTask>,
+                                                 tasks: List<Task>,
                                                  links: List<LinkAttachment> ->
                                         // Write all that parsed stuff to the database
                                         PostsDb.getInstance().save(posts)
-                                        PostTasksDb.getInstance().save(tasks)
+                                        TasksDb.getInstance().save(tasks)
                                         FileAttachmentsDb.getInstance().save(files)
                                         LinkAttachmentsDb.getInstance().save(links)
                                     })
@@ -400,7 +400,7 @@ class NetworkManager {
     // todo retry later on error
     fun markTaskAsDone(numberId: String, postId: String, isDone: Boolean, onComplete: (success: Int) -> Unit) {
         // Mark as (un)done in the db
-        PostTasksDb.getInstance().setDone(postId, isDone)
+        TasksDb.getInstance().setDone(postId, isDone)
         // Mark as done on sph
         // Cancel potential pending requests for this same task, just to be sure
         AndroidNetworking.cancel("task-$postId")

@@ -31,14 +31,14 @@ import de.koenidv.sph.networking.AttachmentManager
 import de.koenidv.sph.objects.Attachment
 import de.koenidv.sph.objects.FunctionTile
 import de.koenidv.sph.objects.Post
-import de.koenidv.sph.objects.PostTask
+import de.koenidv.sph.objects.Task
 import de.koenidv.sph.parsing.Utility
 import java.util.*
 
 
 class HomeFragment : Fragment() {
 
-    private lateinit var tasks: MutableList<PostTask>
+    private lateinit var tasks: MutableList<Task>
     private lateinit var tasksRecycler: RecyclerView
     private lateinit var posts: MutableList<Post>
     private lateinit var unreadPostsRecycler: RecyclerView
@@ -73,7 +73,7 @@ class HomeFragment : Fragment() {
                 }
 
                 // Add all new tasks to the top of the tasks list
-                val unreadTasks = PostTasksDb.getInstance().undone
+                val unreadTasks = TasksDb.getInstance().undone
                 for (task in unreadTasks) {
                     if (!tasks.contains(task)) {
                         tasks.add(0, task)
@@ -94,7 +94,7 @@ class HomeFragment : Fragment() {
                     tasksRecycler.adapter?.notifyItemChanged(taskIndex)
                 } else if (!intent.getBooleanExtra("isDone", true)) {
                     // Add task to the top of the list if it is not done and wasn't there before
-                    tasks.add(0, PostTasksDb.getInstance().getByPostId(postId).first())
+                    tasks.add(0, TasksDb.getInstance().getByPostId(postId).first())
                     tasksRecycler.adapter?.notifyItemInserted(0)
                     tasksRecycler.adapter?.notifyItemRemoved(5)
                 }
@@ -193,7 +193,7 @@ class HomeFragment : Fragment() {
 
         if (FunctionTilesDb.getInstance().supports(FunctionTile.FEATURE_COURSES)) {
 
-            tasks = PostTasksDb.getInstance().undone
+            tasks = TasksDb.getInstance().undone
             var tasksOverflow = 0
             if (tasks.size > 6) {
                 tasksOverflow = tasks.size - 6

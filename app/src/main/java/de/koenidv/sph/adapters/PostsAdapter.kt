@@ -18,7 +18,7 @@ import com.google.android.material.checkbox.MaterialCheckBox
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.database.AttachmentsDb
-import de.koenidv.sph.database.PostTasksDb
+import de.koenidv.sph.database.TasksDb
 import de.koenidv.sph.objects.Attachment
 import de.koenidv.sph.objects.Post
 import me.saket.bettermovementmethod.BetterLinkMovementMethod
@@ -88,7 +88,7 @@ class PostsAdapter(private val posts: List<Post>,
                  onAttachmentLongClick: (Attachment, View) -> Unit) {
             currentPost = post
 
-            val task = PostTasksDb.getInstance().getByPostId(post.postId).firstOrNull()
+            val task = TasksDb.getInstance().getByPostId(post.postId).firstOrNull()
             val attachments = AttachmentsDb.byPostId(post.postId)
 
             // Set data
@@ -106,7 +106,7 @@ class PostsAdapter(private val posts: List<Post>,
             // Task
             if (task != null) {
                 taskset = false
-                taskCheckBox.isChecked = PostTasksDb.getInstance().taskDone(post.postId) == true
+                taskCheckBox.isChecked = TasksDb.getInstance().taskDone(post.postId) == true
                 taskCheckBox.visibility = View.VISIBLE
                 taskText.text = task.description
                 taskText.visibility = View.VISIBLE

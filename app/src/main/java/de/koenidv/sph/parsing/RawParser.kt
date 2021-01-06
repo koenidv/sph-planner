@@ -438,11 +438,11 @@ class RawParser {
                    markAsRead: Boolean = false,
                    onParsed: (posts: List<Post>,
                               attachments: List<FileAttachment>,
-                              tasks: List<PostTask>,
+                              tasks: List<Task>,
                               linkAttachments: List<LinkAttachment>) -> Unit) {
         val posts = mutableListOf<Post>()
         val files = mutableListOf<FileAttachment>()
-        val tasks = mutableListOf<PostTask>()
+        val tasks = mutableListOf<Task>()
         val links = mutableListOf<LinkAttachment>()
         val attachIds = mutableListOf<String>()
         val linkIds = mutableListOf<String>()
@@ -530,7 +530,7 @@ class RawParser {
                 taskDone = !cells[1].select("span.homework span.done").hasClass("hidden")
                 taskDescription = cells[1].select("span.homework").nextAll("span.markup")[0].wholeText()
                 // Add new task to tasks list
-                tasks.add(PostTask(
+                tasks.add(Task(
                         taskId,
                         courseId,
                         postId,

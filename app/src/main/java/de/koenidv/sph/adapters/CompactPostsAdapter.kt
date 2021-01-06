@@ -10,7 +10,7 @@ import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner.Companion.applicationContext
 import de.koenidv.sph.database.AttachmentsDb
 import de.koenidv.sph.database.CoursesDb
-import de.koenidv.sph.database.PostTasksDb
+import de.koenidv.sph.database.TasksDb
 import de.koenidv.sph.objects.Post
 import de.koenidv.sph.parsing.Utility
 
@@ -45,7 +45,7 @@ class CompactPostsAdapter(private val posts: List<Post>,
         fun bind(post: Post) {
             currentPost = post
 
-            val taskDone: Boolean? = PostTasksDb.getInstance().taskDone(post.postId)
+            val taskDone: Boolean? = TasksDb.getInstance().taskDone(post.postId)
             val attachCount = AttachmentsDb.countForPost(post.postId)
 
             // Set data

@@ -14,15 +14,15 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.database.CoursesDb
-import de.koenidv.sph.database.PostTasksDb
-import de.koenidv.sph.objects.PostTask
+import de.koenidv.sph.database.TasksDb
+import de.koenidv.sph.objects.Task
 import de.koenidv.sph.parsing.Utility
 import java.text.SimpleDateFormat
 import java.util.*
 
 
 //  Created by koenidv on 20.12.2020.
-class TasksAdapter(private val tasks: MutableList<PostTask>,
+class TasksAdapter(private val tasks: MutableList<Task>,
                    private val activity: Activity,
                    private val onDateClick: (postId: String) -> Unit,
                    private val onCourseClick: (courseId: String) -> Unit,
@@ -30,7 +30,7 @@ class TasksAdapter(private val tasks: MutableList<PostTask>,
         RecyclerView.Adapter<TasksAdapter.ViewHolder>() {
 
     // Show a bottom sheet with options when long clicking a task
-    val onLongClick = { task: PostTask, position: Int ->
+    val onLongClick = { task: Task, position: Int ->
         val sheet = BottomSheetDialog(activity)
         sheet.setContentView(R.layout.sheet_manage_task)
 
@@ -44,7 +44,7 @@ class TasksAdapter(private val tasks: MutableList<PostTask>,
         // Function for pinning / unpinning a task
         val setPinned = { pinned: Boolean ->
             // Pin/Unpin the task in the db
-            PostTasksDb.getInstance().setPinned(task.taskId, pinned)
+            TasksDb.getInstance().setPinned(task.taskId, pinned)
             // Update adapter dataset
             task.isPinned = pinned
             tasks[position] = task
@@ -77,7 +77,7 @@ class TasksAdapter(private val tasks: MutableList<PostTask>,
                      onDateClick: (postId: String) -> Unit,
                      onCourseClick: (String) -> Unit,
                      onTaskCheckedChanged: (postId: String, courseId: String, isDone: Boolean) -> Unit,
-                     onTaskLongClick: (PostTask, Int) -> Unit) : RecyclerView.ViewHolder(view) {
+                     onTaskLongClick: (Task, Int) -> Unit) : RecyclerView.ViewHolder(view) {
         private val layout = view.findViewById<ConstraintLayout>(R.id.taskLayout)
         private val checkbox = view.findViewById<CheckBox>(R.id.taskCheckBox)
         private val description = view.findViewById<TextView>(R.id.taskTextView)
@@ -87,7 +87,7 @@ class TasksAdapter(private val tasks: MutableList<PostTask>,
         private val courseLayout = view.findViewById<LinearLayout>(R.id.courseLayout)
 
         private val dateFormat = SimpleDateFormat("d. MMM yyyy", Locale.getDefault())
-        private var currentTask: PostTask? = null
+        private var currentTask: Task? = null
         private var checkboxset = false
 
         init {
@@ -115,12 +115,12 @@ class TasksAdapter(private val tasks: MutableList<PostTask>,
             }
         }
 
-        fun bind(task: PostTask) {
+        fun bind(task: Task) {
             currentTask = task
 
             // Set checkbox checked
             checkboxset = false
-            checkbox.isChecked = PostTasksDb.getInstance().taskDone(task.id_post)
+            checkbox.isChecked = TasksDb.getInstance().taskDone(task.id_post)
             checkboxset = true
 
             // Set data

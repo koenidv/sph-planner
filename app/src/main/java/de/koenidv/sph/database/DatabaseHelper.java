@@ -16,7 +16,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static DatabaseHelper instance;
 
     private DatabaseHelper(@Nullable Context context) {
-        super(context, "database", null, 1);
+        super(context, "database", null, 2);
     }
 
     public static DatabaseHelper getInstance() {
@@ -75,7 +75,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     //upgrade Database
     @Override
-    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldversion, int newversion) {
-
+    public void onUpgrade(SQLiteDatabase db, int oldversion, int newversion) {
+        if (oldversion < 2) {
+            db.execSQL("ALTER TABLE postTasks RENAME TO tasks");
+        }
     }
 }

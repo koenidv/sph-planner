@@ -13,12 +13,12 @@ import androidx.recyclerview.widget.RecyclerView
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.database.CoursesDb
-import de.koenidv.sph.database.PostTasksDb
-import de.koenidv.sph.objects.PostTask
+import de.koenidv.sph.database.TasksDb
+import de.koenidv.sph.objects.Task
 
 
 //  Created by koenidv on 20.12.2020.
-class CompactTasksAdapter(private val tasks: List<PostTask>,
+class CompactTasksAdapter(private val tasks: List<Task>,
                           private var maxSize: Int? = null,
                           private val onClick: (postId: String) -> Unit,
                           private val onTaskCheckedChanged: (postId: String, courseId: String, isDone: Boolean) -> Unit) :
@@ -35,7 +35,7 @@ class CompactTasksAdapter(private val tasks: List<PostTask>,
         private val checkbox = view.findViewById<CheckBox>(R.id.taskCheckBox)
         private val description = view.findViewById<TextView>(R.id.taskTextView)
 
-        private var currentTask: PostTask? = null
+        private var currentTask: Task? = null
         private var checkboxset = false
 
         init {
@@ -59,12 +59,12 @@ class CompactTasksAdapter(private val tasks: List<PostTask>,
         }
 
 
-        fun bind(task: PostTask) {
+        fun bind(task: Task) {
             currentTask = task
 
             // Set checkbox checked
             checkboxset = false
-            checkbox.isChecked = PostTasksDb.getInstance().taskDone(task.id_post)
+            checkbox.isChecked = TasksDb.getInstance().taskDone(task.id_post)
             checkboxset = true
 
             // Set data

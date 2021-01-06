@@ -19,17 +19,17 @@ import com.google.android.material.switchmaterial.SwitchMaterial
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.adapters.TasksAdapter
-import de.koenidv.sph.database.PostTasksDb
 import de.koenidv.sph.database.PostsDb
+import de.koenidv.sph.database.TasksDb
 import de.koenidv.sph.networking.AttachmentManager
-import de.koenidv.sph.objects.PostTask
+import de.koenidv.sph.objects.Task
 
 
 // Created by koenidv on 18.12.2020.
 class TasksFragment : Fragment() {
 
     var undone = false
-    lateinit var tasks: MutableList<PostTask>
+    lateinit var tasks: MutableList<Task>
     lateinit var noDataText: TextView
     lateinit var tasksRecycler: RecyclerView
 
@@ -41,8 +41,8 @@ class TasksFragment : Fragment() {
                 if (::tasks.isInitialized) {
                     // Get tasks
                     tasks.clear()
-                    tasks.addAll(if (undone) PostTasksDb.getInstance().undone.toMutableList()
-                    else PostTasksDb.getInstance().all.toMutableList())
+                    tasks.addAll(if (undone) TasksDb.getInstance().undone.toMutableList()
+                    else TasksDb.getInstance().all.toMutableList())
                     // Show message if there are no tasks
                     if (tasks.isEmpty()) {
                         if (undone) {
@@ -84,7 +84,7 @@ class TasksFragment : Fragment() {
         val undoneSwitch = view.findViewById<SwitchMaterial>(R.id.undoneSwitch)
 
         // Firstly, check if there are any tasks to be displayed
-        if (!PostTasksDb.getInstance().existAny()) {
+        if (!TasksDb.getInstance().existAny()) {
             noDataText.visibility = View.VISIBLE
             undoneSwitch.visibility = View.GONE
             tasksRecycler.visibility = View.GONE
@@ -103,8 +103,8 @@ class TasksFragment : Fragment() {
         undoneSwitch.isChecked = undone
 
         // Get tasks
-        tasks = if (undone) PostTasksDb.getInstance().undone.toMutableList()
-        else PostTasksDb.getInstance().all.toMutableList()
+        tasks = if (undone) TasksDb.getInstance().undone.toMutableList()
+        else TasksDb.getInstance().all.toMutableList()
         // Show message if there are no tasks
         if (tasks.isEmpty()) {
             if (undone) {
@@ -138,8 +138,8 @@ class TasksFragment : Fragment() {
             undone = checked
             // Update data
             tasks.clear()
-            tasks.addAll(if (undone) PostTasksDb.getInstance().undone.toMutableList()
-            else PostTasksDb.getInstance().all.toMutableList())
+            tasks.addAll(if (undone) TasksDb.getInstance().undone.toMutableList()
+            else TasksDb.getInstance().all.toMutableList())
             if (tasks.isEmpty()) {
                 if (undone) {
                     noDataText.setText(R.string.tasks_filter_none_undone)
