@@ -96,6 +96,8 @@ class AttachmentManager {
                 val share = sheet.findViewById<TextView>(R.id.shareTextView)
                 val icon = view.findViewById<TextView>(R.id.iconTextView)
 
+                val loading = view.findViewById<ProgressBar>(R.id.downloadingProgressBar)
+
                 val doneSnackbar = Snackbar.make(activity.findViewById(R.id.nav_host_fragment),
                         "", Snackbar.LENGTH_SHORT)
                         .setAnchorView(R.id.nav_view)
@@ -142,11 +144,11 @@ class AttachmentManager {
                     // Add option to cancel the download
                     snackbar.setAction(R.string.cancel) {
                         AndroidNetworking.cancel(attachment.attachId())
+                        loading.visibility = GONE
                     }
                     // Show the snackbar
                     snackbar.show()
                     // Show a downloading progress bar
-                    val loading = view.findViewById<ProgressBar>(R.id.downloadingProgressBar)
                     loading.visibility = View.VISIBLE
                     // Download the file
                     downloadFile(attachment.file()) {
@@ -263,11 +265,11 @@ class AttachmentManager {
                                     Snackbar.LENGTH_INDEFINITE)
                                     .setAnchorView(R.id.nav_view)
                             // Show loading progress bar
-                            val loading = view.findViewById<ProgressBar>(R.id.downloadingProgressBar)
                             loading.visibility = View.VISIBLE
                             // Add option to cancel the download
                             snackbar.setAction(R.string.cancel) {
                                 AndroidNetworking.cancel(attachment.attachId())
+                                loading.visibility = GONE
                             }
                             // Show the snackbar
                             snackbar.show()
@@ -341,6 +343,8 @@ class AttachmentManager {
      */
     private fun handleAttachment(activity: Activity, attachment: Attachment, view: View) {
         if (attachment.type() == "file") {
+            val loading = view.findViewById<ProgressBar>(R.id.downloadingProgressBar)
+
             // Open file if existing, otherwise download and open
             // Prepare downloading snackbar
             val snackbar = Snackbar.make(activity.findViewById(R.id.nav_host_fragment),
@@ -350,10 +354,10 @@ class AttachmentManager {
             // Add option to cancel the download
             snackbar.setAction(R.string.cancel) {
                 AndroidNetworking.cancel(attachment.attachId())
+                loading.visibility = GONE
             }
             // Show the snackbar
             snackbar.show()
-            val loading = view.findViewById<ProgressBar>(R.id.downloadingProgressBar)
             loading.visibility = View.VISIBLE
             // Let AttachmentManager handle downloading and opening the file
             AttachmentManager().handleFileAttachment(attachment.file()) { opened ->
@@ -373,6 +377,7 @@ class AttachmentManager {
                 } else {
                     // An error occurred
                     snackbar.dismiss()
+                    loading.visibility = GONE
                     Snackbar.make(activity.findViewById(R.id.nav_host_fragment),
                             R.string.error, Snackbar.LENGTH_SHORT).setAnchorView(R.id.nav_view)
                             .setAnchorView(R.id.nav_view).show()

@@ -64,10 +64,10 @@ public class PostTasksDb {
     public List<PostTask> getAll() {
         final SQLiteDatabase db = dbhelper.getReadableDatabase();
         // Query posts
-        String queryString = "SELECT * FROM postTasks ORDER BY date DESC";
+        String queryString = "SELECT * FROM postTasks ORDER BY pinned DESC, date DESC";
         Cursor cursor = db.rawQuery(queryString, null);
         // Get posts with the cursor
-        return getWithCursor(cursor, db);
+        return getWithCursor(cursor);
     }
 
     /**
@@ -78,10 +78,10 @@ public class PostTasksDb {
     public List<PostTask> getUndone() {
         final SQLiteDatabase db = dbhelper.getReadableDatabase();
         // Query posts
-        String queryString = "SELECT * FROM postTasks WHERE isdone=0 ORDER BY date DESC";
+        String queryString = "SELECT * FROM postTasks WHERE isdone=0 ORDER BY pinned DESC, date DESC";
         Cursor cursor = db.rawQuery(queryString, null);
         // Get posts with the cursor
-        return getWithCursor(cursor, db);
+        return getWithCursor(cursor);
     }
 
     public List<PostTask> getByCourseId(String course_id) {
@@ -90,7 +90,7 @@ public class PostTasksDb {
         String queryString = "SELECT * FROM postTasks WHERE id_course = '" + course_id + "'";
         Cursor cursor = db.rawQuery(queryString, null);
         // Get posts with the cursor
-        return getWithCursor(cursor, db);
+        return getWithCursor(cursor);
     }
 
     public int getUndoneByCourseIdCount(String course_id) {
@@ -108,7 +108,7 @@ public class PostTasksDb {
         String queryString = "SELECT * FROM postTasks WHERE id_post = '" + post_id + "'";
         Cursor cursor = db.rawQuery(queryString, null);
         // Get posts with the cursor
-        return getWithCursor(cursor, db);
+        return getWithCursor(cursor);
     }
 
     public List<PostTask> getByDate(String date) {
@@ -117,7 +117,7 @@ public class PostTasksDb {
         String queryString = "SELECT * FROM postTasks WHERE date = '" + date + "'";
         Cursor cursor = db.rawQuery(queryString, null);
         // Get posts with the cursor
-        return getWithCursor(cursor, db);
+        return getWithCursor(cursor);
     }
 
     public List<PostTask> getByTask(String Task) {
@@ -126,7 +126,7 @@ public class PostTasksDb {
         String queryString = "SELECT * FROM postTasks WHERE task_id = '" + Task + "'";
         Cursor cursor = db.rawQuery(queryString, null);
         // Get posts with the cursor
-        return getWithCursor(cursor, db);
+        return getWithCursor(cursor);
     }
 
 
@@ -136,7 +136,7 @@ public class PostTasksDb {
         String queryString = "SELECT * FROM postTasks WHERE isDone = " + (isDone ? "1" : "0");
         Cursor cursor = db.rawQuery(queryString, null);
         // Get posts with the cursor
-        return getWithCursor(cursor, db);
+        return getWithCursor(cursor);
     }
 
     public boolean existAny() {
@@ -171,7 +171,18 @@ public class PostTasksDb {
                 .execSQL("UPDATE postTasks SET isdone = " + (isDone ? "1" : "0") + " WHERE id_post IS \"" + postId + "\"");
     }
 
-    private List<PostTask> getWithCursor(Cursor cursor, SQLiteDatabase db) {
+    /**
+     * Specify if a task is pinned or not
+     *
+     * @param taskId   The task's task id (not post id)
+     * @param isPinned Whether or not the task should be pinned
+     */
+    public void setPinned(String taskId, boolean isPinned) {
+        dbhelper.getWritableDatabase().execSQL("UPDATE postTasks SET pinned="
+                + (isPinned ? 1 : 0) + " WHERE task_id=\"" + taskId + "\"");
+    }
+
+    private List<PostTask> getWithCursor(Cursor cursor) {
         List<PostTask> returnList = new ArrayList<>();
         if (cursor.moveToFirst()) {
             do {
@@ -180,9 +191,10 @@ public class PostTasksDb {
                 String id_post = cursor.getString(2);
                 String description = cursor.getString(3);
                 Date date = new Date(cursor.getInt(4) * 1000L);
-                boolean isdone = cursor.getInt(5) == 1;
+                boolean isDone = cursor.getInt(5) == 1;
+                boolean isPinned = cursor.getInt(6) == 1;
 
-                PostTask newPostTask = new PostTask(taskid, id_course, id_post, description, date, isdone);
+                PostTask newPostTask = new PostTask(taskid, id_course, id_post, description, date, isDone, isPinned);
 
                 returnList.add(newPostTask);
             } while (cursor.moveToNext());

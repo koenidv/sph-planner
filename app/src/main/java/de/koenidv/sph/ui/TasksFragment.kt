@@ -118,6 +118,7 @@ class TasksFragment : Fragment() {
         // Set up tasks recycler
         val adapter = TasksAdapter(
                 tasks,
+                requireActivity(),
                 onDateClick = {
                     // Show single post bottom sheet
                     PostSheet(

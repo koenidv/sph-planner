@@ -9,7 +9,8 @@ data class PostTask(
         var id_post: String,// Post to be attached to, i.e. Post id, i.e. m_bar_1_post-2020-12-07_48
         var description: String, // Description of the task. There's no title.
         var date: Date, // Date of the post to be attached to. Should be day only, no time
-        var isDone: Boolean // Whether the task has been completed
+        var isDone: Boolean, // Whether the task has been completed
+        var isPinned: Boolean = false // If the task is pinned
 ) {
     override fun equals(other: Any?): Boolean {
         if (other is PostTask)

@@ -1,14 +1,18 @@
 package de.koenidv.sph.adapters
 
+import android.app.Activity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import de.koenidv.sph.R
+import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.database.CoursesDb
 import de.koenidv.sph.database.PostTasksDb
 import de.koenidv.sph.objects.PostTask
@@ -18,11 +22,52 @@ import java.util.*
 
 
 //  Created by koenidv on 20.12.2020.
-class TasksAdapter(private val tasks: List<PostTask>,
+class TasksAdapter(private val tasks: MutableList<PostTask>,
+                   private val activity: Activity,
                    private val onDateClick: (postId: String) -> Unit,
                    private val onCourseClick: (courseId: String) -> Unit,
                    private val onTaskCheckedChanged: (postId: String, courseId: String, isDone: Boolean) -> Unit) :
         RecyclerView.Adapter<TasksAdapter.ViewHolder>() {
+
+    // Show a bottom sheet with options when long clicking a task
+    val onLongClick = { task: PostTask, position: Int ->
+        val sheet = BottomSheetDialog(activity)
+        sheet.setContentView(R.layout.sheet_manage_task)
+
+        val pin = sheet.findViewById<TextView>(R.id.pinTextView)
+        val unpin = sheet.findViewById<TextView>(R.id.unpinTextView)
+
+        // Only show applicable options
+        if (task.isPinned) pin?.visibility = View.GONE
+        else unpin?.visibility = View.GONE
+
+        // Function for pinning / unpinning a task
+        val setPinned = { pinned: Boolean ->
+            // Pin/Unpin the task in the db
+            PostTasksDb.getInstance().setPinned(task.taskId, pinned)
+            // Update adapter dataset
+            task.isPinned = pinned
+            tasks[position] = task
+            // Notify the adapter about the changed item
+            notifyItemChanged(position)
+        }
+
+        // Pin a task
+        // This will put it on the top the next time tasks are shown
+        // And highlight it with some color now
+        pin?.setOnClickListener {
+            setPinned(true)
+            sheet.dismiss()
+        }
+
+        // Unpin a task
+        unpin?.setOnClickListener {
+            setPinned(false)
+            sheet.dismiss()
+        }
+
+        sheet.show()
+    }
 
     /**
      * Provides a reference to the type of view
@@ -31,7 +76,8 @@ class TasksAdapter(private val tasks: List<PostTask>,
     class ViewHolder(view: View,
                      onDateClick: (postId: String) -> Unit,
                      onCourseClick: (String) -> Unit,
-                     onTaskCheckedChanged: (postId: String, courseId: String, isDone: Boolean) -> Unit) : RecyclerView.ViewHolder(view) {
+                     onTaskCheckedChanged: (postId: String, courseId: String, isDone: Boolean) -> Unit,
+                     onTaskLongClick: (PostTask, Int) -> Unit) : RecyclerView.ViewHolder(view) {
         private val layout = view.findViewById<ConstraintLayout>(R.id.taskLayout)
         private val checkbox = view.findViewById<CheckBox>(R.id.taskCheckBox)
         private val description = view.findViewById<TextView>(R.id.taskTextView)
@@ -61,8 +107,13 @@ class TasksAdapter(private val tasks: List<PostTask>,
                     onCourseClick(it)
                 }
             }
+            layout.setOnLongClickListener {
+                currentTask?.let {
+                    onTaskLongClick(it, adapterPosition)
+                }
+                true
+            }
         }
-
 
         fun bind(task: PostTask) {
             currentTask = task
@@ -82,6 +133,14 @@ class TasksAdapter(private val tasks: List<PostTask>,
             // Set background color, about 70% opacity
             Utility().tintBackground(course, CoursesDb.getInstance().getColor(task.id_course), 0xb4000000.toInt())
 
+            // Tint background with theme color at 15% if task is pinned
+            if (task.isPinned)
+                Utility().tintBackground(layout, SphPlanner.applicationContext()
+                        .getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
+                        .getInt("themeColor", 0), 0x26000000)
+            else
+                layout.background.clearColorFilter()
+
         }
 
     }
@@ -91,7 +150,7 @@ class TasksAdapter(private val tasks: List<PostTask>,
         // Create a new view, which defines the UI of the list item
         val view = LayoutInflater.from(viewGroup.context)
                 .inflate(R.layout.item_task, viewGroup, false)
-        return ViewHolder(view, onDateClick, onCourseClick, onTaskCheckedChanged)
+        return ViewHolder(view, onDateClick, onCourseClick, onTaskCheckedChanged, onLongClick)
     }
 
     // Replaces the contents of a view (invoked by the layout manager)
