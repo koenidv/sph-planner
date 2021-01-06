@@ -45,7 +45,7 @@ class CompactPostsAdapter(private val posts: List<Post>,
         fun bind(post: Post) {
             currentPost = post
 
-            val taskDone: Boolean? = TasksDb.getInstance().taskDone(post.postId)
+            val taskDone: Boolean? = TasksDb.getInstance().taskDoneByPost(post.postId)
             val attachCount = AttachmentsDb.countForPost(post.postId)
 
             // Set data

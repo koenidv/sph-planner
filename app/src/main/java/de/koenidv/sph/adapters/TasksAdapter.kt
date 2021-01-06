@@ -10,6 +10,9 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
+import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.bottomsheets.BottomSheet
+import com.afollestad.materialdialogs.datetime.datePicker
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
@@ -26,11 +29,11 @@ class TasksAdapter(private val tasks: MutableList<Task>,
                    private val activity: Activity,
                    private val onDateClick: (postId: String) -> Unit,
                    private val onCourseClick: (courseId: String) -> Unit,
-                   private val onTaskCheckedChanged: (postId: String, courseId: String, isDone: Boolean) -> Unit) :
+                   private val onTaskCheckedChanged: (task: Task, isDone: Boolean) -> Unit) :
         RecyclerView.Adapter<TasksAdapter.ViewHolder>() {
 
     // Show a bottom sheet with options when long clicking a task
-    val onLongClick = { task: Task, position: Int ->
+    private val onLongClick = { task: Task, position: Int ->
         val sheet = BottomSheetDialog(activity)
         sheet.setContentView(R.layout.sheet_manage_task)
 
@@ -69,6 +72,28 @@ class TasksAdapter(private val tasks: MutableList<Task>,
         sheet.show()
     }
 
+    // Let the user add or edit a task's due date
+    private val onDueClick: (Task, Int) -> Unit = { task: Task, position: Int ->
+        var currentCalendar: Calendar? = null
+        if (task.dueDate != null) {
+            currentCalendar = Calendar.getInstance()
+            currentCalendar.time = task.dueDate!!
+        }
+
+        MaterialDialog(activity, BottomSheet()).show {
+            datePicker(currentDate = currentCalendar) { dialog, calendar ->
+                val newDate = Date(calendar.timeInMillis)
+                // Update db and dataset
+                TasksDb.getInstance().setDueDate(task.taskId, newDate)
+                task.dueDate = newDate
+                tasks[position] = task
+                // Notify about changed item
+                notifyItemChanged(position)
+            }
+        }
+
+    }
+
     /**
      * Provides a reference to the type of view
      * (custom ViewHolder).
@@ -76,11 +101,15 @@ class TasksAdapter(private val tasks: MutableList<Task>,
     class ViewHolder(view: View,
                      onDateClick: (postId: String) -> Unit,
                      onCourseClick: (String) -> Unit,
-                     onTaskCheckedChanged: (postId: String, courseId: String, isDone: Boolean) -> Unit,
-                     onTaskLongClick: (Task, Int) -> Unit) : RecyclerView.ViewHolder(view) {
+                     onTaskCheckedChanged: (task: Task, isDone: Boolean) -> Unit,
+                     onTaskLongClick: (Task, Int) -> Unit,
+                     onDueClick: (Task, Int) -> Unit) : RecyclerView.ViewHolder(view) {
         private val layout = view.findViewById<ConstraintLayout>(R.id.taskLayout)
         private val checkbox = view.findViewById<CheckBox>(R.id.taskCheckBox)
         private val description = view.findViewById<TextView>(R.id.taskTextView)
+        private val dueInfo = view.findViewById<TextView>(R.id.dueInfoTextView)
+        private val due = view.findViewById<TextView>(R.id.dueTextView)
+        private val dueLayout = view.findViewById<LinearLayout>(R.id.dueLayout)
         private val date = view.findViewById<TextView>(R.id.dateTextView)
         private val dateLayout = view.findViewById<LinearLayout>(R.id.dateLayout)
         private val course = view.findViewById<TextView>(R.id.courseTextView)
@@ -94,8 +123,14 @@ class TasksAdapter(private val tasks: MutableList<Task>,
             checkbox.setOnCheckedChangeListener { _, isChecked ->
                 if (checkboxset)
                     currentTask?.let {
-                        onTaskCheckedChanged(it.id_post, it.id_course, isChecked)
+                        onTaskCheckedChanged(it, isChecked)
                     }
+            }
+            layout.setOnLongClickListener {
+                currentTask?.let {
+                    onTaskLongClick(it, adapterPosition)
+                }
+                true
             }
             dateLayout.setOnClickListener {
                 currentTask?.id_post?.let {
@@ -107,25 +142,75 @@ class TasksAdapter(private val tasks: MutableList<Task>,
                     onCourseClick(it)
                 }
             }
-            layout.setOnLongClickListener {
+            dueLayout.setOnClickListener {
                 currentTask?.let {
-                    onTaskLongClick(it, adapterPosition)
+                    onDueClick(it, adapterPosition)
                 }
-                true
             }
         }
+
+        private val themeColor = SphPlanner.applicationContext()
+                .getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
+                .getInt("themeColor", 0)
 
         fun bind(task: Task) {
             currentTask = task
 
             // Set checkbox checked
             checkboxset = false
-            checkbox.isChecked = TasksDb.getInstance().taskDone(task.id_post)
+            checkbox.isChecked = TasksDb.getInstance().taskDoneByPost(task.id_post)
             checkboxset = true
 
             // Set data
             description.text = task.description
             date.text = dateFormat.format(task.date)
+
+            // Set due date or show option to set one
+            val timenow = Date().time
+            when {
+                task.dueDate == null -> {
+                    due.visibility = View.GONE
+                    dueInfo.setText(R.string.tasks_due_setdate)
+                }
+                task.dueDate!!.time - timenow <= -24 * 60 * 60 * 1000 -> {
+                    // Due date not within the last 24 hours, overdue
+                    due.visibility = View.VISIBLE
+                    dueInfo.visibility = View.GONE
+                    due.setText(R.string.tasks_due_overdue)
+                    Utility().tintBackground(
+                            due,
+                            SphPlanner.applicationContext().getColor(R.color.design_default_color_error),
+                            0xb4000000.toInt())
+                }
+                task.dueDate!!.time - timenow <= 0 -> {
+                    // Date is within the last 24 hours, which means its today (only day, no time)
+                    due.visibility = View.VISIBLE
+                    dueInfo.visibility = View.VISIBLE
+                    dueInfo.setText(R.string.tasks_due_info_relative)
+                    due.setText(R.string.tasks_due_today)
+                    Utility().tintBackground(due, themeColor, 0xb4000000.toInt())
+                }
+                task.dueDate!!.time - timenow <= 24 * 60 * 60 * 1000 -> {
+                    // Tomorrow
+                    due.visibility = View.VISIBLE
+                    dueInfo.visibility = View.VISIBLE
+                    dueInfo.setText(R.string.tasks_due_info_relative)
+                    due.setText(R.string.tasks_due_tomorrow)
+                    Utility().tintBackground(due, themeColor, 0x60000000)
+                }
+                else -> {
+                    // Other day
+                    due.visibility = View.VISIBLE
+                    dueInfo.visibility = View.VISIBLE
+                    dueInfo.setText(R.string.tasks_due_info_absolute)
+
+                    due.text = SimpleDateFormat("d. MMM", Locale.getDefault())
+                            .format(task.dueDate!!)
+                    Utility().tintBackground(due,
+                            SphPlanner.applicationContext().getColor(R.color.grey_800),
+                            0xb4000000.toInt())
+                }
+            }
 
             // Set course
             course.text = CoursesDb.getInstance().getFullname(task.id_course)
@@ -135,9 +220,7 @@ class TasksAdapter(private val tasks: MutableList<Task>,
 
             // Tint background with theme color at 15% if task is pinned
             if (task.isPinned)
-                Utility().tintBackground(layout, SphPlanner.applicationContext()
-                        .getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
-                        .getInt("themeColor", 0), 0x26000000)
+                Utility().tintBackground(layout, themeColor, 0x26000000)
             else
                 layout.background.clearColorFilter()
 
@@ -150,7 +233,7 @@ class TasksAdapter(private val tasks: MutableList<Task>,
         // Create a new view, which defines the UI of the list item
         val view = LayoutInflater.from(viewGroup.context)
                 .inflate(R.layout.item_task, viewGroup, false)
-        return ViewHolder(view, onDateClick, onCourseClick, onTaskCheckedChanged, onLongClick)
+        return ViewHolder(view, onDateClick, onCourseClick, onTaskCheckedChanged, onLongClick, onDueClick)
     }
 
     // Replaces the contents of a view (invoked by the layout manager)

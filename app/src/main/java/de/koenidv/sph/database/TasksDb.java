@@ -32,6 +32,13 @@ public class TasksDb {
         }
     }
 
+    /**
+     * Save a task to the db
+     * Will save, but not update pinned and dueDate
+     * Will only update isdone if it is done
+     *
+     * @param task Task to save
+     */
     public void save(Task task) {
         final SQLiteDatabase db = dbhelper.getReadableDatabase();
         ContentValues cv = new ContentValues();
@@ -43,6 +50,8 @@ public class TasksDb {
         cv.put("description", task.getDescription());
         cv.put("date", task.getDate().getTime() / 1000);
         cv.put("isdone", task.isDone());
+        cv.put("pinned", task.isPinned() ? 1 : 0);
+        if (task.getDueDate() != null) cv.put("dueDate", task.getDueDate().getTime() / 1000);
 
         // Add or update task in db
         Cursor cursor = db.rawQuery("SELECT * FROM tasks WHERE task_id = '" + task.getTaskId() + "'", null);
@@ -51,6 +60,8 @@ public class TasksDb {
         } else {
             // Only update done status if it is true
             if (!task.isDone()) cv.remove("isdone");
+            cv.remove("pinned");
+            cv.remove("dueDate");
             db.update("tasks", cv, "task_id = '" + task.getTaskId() + "'", null);
         }
         cursor.close();
@@ -64,7 +75,7 @@ public class TasksDb {
     public List<Task> getAll() {
         final SQLiteDatabase db = dbhelper.getReadableDatabase();
         // Query posts
-        String queryString = "SELECT * FROM tasks ORDER BY pinned DESC, date DESC";
+        String queryString = "SELECT * FROM tasks ORDER BY date DESC";
         Cursor cursor = db.rawQuery(queryString, null);
         // Get posts with the cursor
         return getWithCursor(cursor);
@@ -73,12 +84,13 @@ public class TasksDb {
     /**
      * Gets all undone tasks
      *
-     * @return List of all undone tasks
+     * @return List of all undone tasks, ordered by dueDate, isPinned, date
      */
     public List<Task> getUndone() {
         final SQLiteDatabase db = dbhelper.getReadableDatabase();
         // Query posts
-        String queryString = "SELECT * FROM tasks WHERE isdone=0 ORDER BY pinned DESC, date DESC";
+        String queryString = "SELECT * FROM tasks WHERE isdone=0 " +
+                "ORDER BY pinned DESC, dueDate IS NULL, dueDate ASC, date DESC";
         Cursor cursor = db.rawQuery(queryString, null);
         // Get posts with the cursor
         return getWithCursor(cursor);
@@ -120,10 +132,10 @@ public class TasksDb {
         return getWithCursor(cursor);
     }
 
-    public List<Task> getByTask(String Task) {
+    public List<Task> getByTaskId(String taskId) {
         final SQLiteDatabase db = dbhelper.getReadableDatabase();
         // Query posts
-        String queryString = "SELECT * FROM tasks WHERE task_id = '" + Task + "'";
+        String queryString = "SELECT * FROM tasks WHERE task_id = '" + taskId + "'";
         Cursor cursor = db.rawQuery(queryString, null);
         // Get posts with the cursor
         return getWithCursor(cursor);
@@ -152,7 +164,7 @@ public class TasksDb {
      * @param postId Post to check for
      * @return null if the post does not have a task, true if it is done, false if not
      */
-    public Boolean taskDone(String postId) {
+    public Boolean taskDoneByPost(String postId) {
         Cursor cursor = dbhelper.getReadableDatabase().rawQuery("SELECT isdone FROM tasks WHERE id_post=\"" + postId + "\"", null);
         if (cursor.getCount() == 0) {
             // No task for this post
@@ -166,9 +178,9 @@ public class TasksDb {
         }
     }
 
-    public void setDone(String postId, boolean isDone) {
+    public void setDone(String taskId, boolean isDone) {
         dbhelper.getReadableDatabase()
-                .execSQL("UPDATE tasks SET isdone = " + (isDone ? "1" : "0") + " WHERE id_post IS \"" + postId + "\"");
+                .execSQL("UPDATE tasks SET isdone = " + (isDone ? "1" : "0") + " WHERE task_id IS \"" + taskId + "\"");
     }
 
     /**
@@ -182,6 +194,11 @@ public class TasksDb {
                 + (isPinned ? 1 : 0) + " WHERE task_id=\"" + taskId + "\"");
     }
 
+    public void setDueDate(String taskId, Date dueDate) {
+        dbhelper.getWritableDatabase().execSQL("UPDATE tasks SET dueDate="
+                + dueDate.getTime() / 1000 + " WHERE task_id=\"" + taskId + "\"");
+    }
+
     private List<Task> getWithCursor(Cursor cursor) {
         List<Task> returnList = new ArrayList<>();
         if (cursor.moveToFirst()) {
@@ -193,8 +210,11 @@ public class TasksDb {
                 Date date = new Date(cursor.getInt(4) * 1000L);
                 boolean isDone = cursor.getInt(5) == 1;
                 boolean isPinned = cursor.getInt(6) == 1;
+                Date dueDate = cursor.isNull(7) ?
+                        null : new Date(cursor.getInt(7) * 1000L);
 
-                Task newTask = new Task(taskid, id_course, id_post, description, date, isDone, isPinned);
+                Task newTask = new Task(
+                        taskid, id_course, id_post, description, date, isDone, isPinned, dueDate);
 
                 returnList.add(newTask);
             } while (cursor.moveToNext());

@@ -47,7 +47,7 @@ class AllPostsFragment(private var filters: MutableList<String> = mutableListOf(
                 else if (filters.contains("read") && it.unread) remove = true
                 if (filterTask) {
                     // Filter for tasks
-                    val taskDone: Boolean? = TasksDb.getInstance().taskDone(it.postId)
+                    val taskDone: Boolean? = TasksDb.getInstance().taskDoneByPost(it.postId)
                     when {
                         filters.contains("task_none") && taskDone != null -> remove = true
                         filters.contains("task_any") && taskDone == null -> remove = true

@@ -21,7 +21,7 @@ import de.koenidv.sph.objects.Task
 class CompactTasksAdapter(private val tasks: List<Task>,
                           private var maxSize: Int? = null,
                           private val onClick: (postId: String) -> Unit,
-                          private val onTaskCheckedChanged: (postId: String, courseId: String, isDone: Boolean) -> Unit) :
+                          private val onTaskCheckedChanged: (task: Task, isDone: Boolean) -> Unit) :
         RecyclerView.Adapter<CompactTasksAdapter.ViewHolder>() {
 
     /**
@@ -30,7 +30,7 @@ class CompactTasksAdapter(private val tasks: List<Task>,
      */
     class ViewHolder(view: View,
                      onClick: (postId: String) -> Unit,
-                     onTaskCheckedChanged: (postId: String, courseId: String, isDone: Boolean) -> Unit) : RecyclerView.ViewHolder(view) {
+                     onTaskCheckedChanged: (task: Task, isDone: Boolean) -> Unit) : RecyclerView.ViewHolder(view) {
         private val layout = view.findViewById<ConstraintLayout>(R.id.taskLayout)
         private val checkbox = view.findViewById<CheckBox>(R.id.taskCheckBox)
         private val description = view.findViewById<TextView>(R.id.taskTextView)
@@ -42,7 +42,7 @@ class CompactTasksAdapter(private val tasks: List<Task>,
             checkbox.setOnCheckedChangeListener { _, isChecked ->
                 if (checkboxset)
                     currentTask?.let {
-                        onTaskCheckedChanged(it.id_post, it.id_course, isChecked)
+                        onTaskCheckedChanged(it, isChecked)
                         // Send broadcast to update ui
                         val uiBroadcast = Intent("uichange")
                         uiBroadcast.putExtra("content", "taskDone")
@@ -64,7 +64,7 @@ class CompactTasksAdapter(private val tasks: List<Task>,
 
             // Set checkbox checked
             checkboxset = false
-            checkbox.isChecked = TasksDb.getInstance().taskDone(task.id_post)
+            checkbox.isChecked = TasksDb.getInstance().taskDoneByPost(task.id_post)
             checkboxset = true
 
             // Set data

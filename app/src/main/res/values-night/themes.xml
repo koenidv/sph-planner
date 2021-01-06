@@ -15,6 +15,7 @@
         <item name="android:statusBarColor" tools:targetApi="l">@color/black</item>
         <!-- Customize your theme here. -->
         <item name="bottomSheetDialogTheme">@style/Theme.SPH.Sheet</item>
+        <item name="dialogTheme">@style/Theme.SPH.Sheet</item>
         <item name="actionBarStyle">@style/Theme.SPH.ActionBar</item>
         <item name="customStrokeColor">@color/strokeColorDark</item>
         <item name="customStrokeWidth">2dp</item>
@@ -33,7 +34,6 @@
         <item name="colorSecondaryVariant">@color/grey_100</item>
         <item name="colorOnSecondary">@color/black</item>
     </style>
-
 
     <style name="Theme.SPH.Sheet" parent="Theme.MaterialComponents.DayNight.BottomSheetDialog">
         <item name="android:windowIsFloating">false</item>

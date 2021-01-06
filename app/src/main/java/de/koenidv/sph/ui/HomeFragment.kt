@@ -212,9 +212,10 @@ class HomeFragment : Fragment() {
                                     PostsDb.getInstance().getByPostId(it)
                             ).show(parentFragmentManager, "post")
                         },
-                        onTaskCheckedChanged = AttachmentManager().onTaskCheckedChanged(requireActivity()) { postId, isDone ->
+                        onTaskCheckedChanged = AttachmentManager().onTaskCheckedChanged(requireActivity()) { task, isDone ->
                             if (isDone) {
-                                val index = tasks.indexOfFirst { it.id_post == postId }
+                                // Update tasks dataset
+                                val index = tasks.indexOfFirst { it.taskId == task.taskId }
                                 tasks.removeAt(index)
                                 tasksRecycler.adapter?.notifyItemRemoved(index)
                                 // Update overflow counter

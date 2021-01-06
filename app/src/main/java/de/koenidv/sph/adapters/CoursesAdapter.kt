@@ -9,6 +9,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.bottomsheets.BottomSheet
 import com.afollestad.materialdialogs.color.colorChooser
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import de.koenidv.sph.R
@@ -38,6 +39,7 @@ class CoursesAdapter(private val courses: MutableList<Course>,
         markRead?.setOnClickListener {
             PostsDb.getInstance().markCourseAsRead(course.courseId)
             notifyItemChanged(position)
+            sheet.dismiss()
         }
 
         // Change course color
@@ -48,7 +50,7 @@ class CoursesAdapter(private val courses: MutableList<Course>,
             }.toIntArray()
 
             // Show a color picker dialog
-            MaterialDialog(activity).show {
+            MaterialDialog(activity, BottomSheet()).show {
                 colorChooser(
                         colors = colorPresets,
                         initialSelection = course.color,
@@ -65,6 +67,8 @@ class CoursesAdapter(private val courses: MutableList<Course>,
                 negativeButton(R.string.cancel)
                 title(text = course.fullname)
             }
+
+            sheet.dismiss()
         }
 
 

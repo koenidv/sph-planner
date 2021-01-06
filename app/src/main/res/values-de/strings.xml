@@ -227,5 +227,11 @@
     <string name="courses_options_read">Alle als gelesen markieren</string>
     <string name="courses_options_color">Farbe ändern</string>
     <string name="onboard_signin_error_unknown">Etwas ist schiefgelaufen.\nBitte versuche es erneut.</string>
+    <string name="tasks_due_info_relative">Fällig</string>
+    <string name="tasks_due_info_absolute">Fällig am</string>
+    <string name="tasks_due_today">Heute</string>
+    <string name="tasks_due_tomorrow">Morgen</string>
+    <string name="tasks_due_overdue">Überfällig</string>
+    <string name="tasks_due_setdate">Fälligkeitsdatum hinzufügen</string>
 
 </resources>

@@ -394,16 +394,16 @@ class NetworkManager {
     /**
      * Mark a task as done in the db and send a post to sph to mark it as read there, too
      * @param numberId NumberId of the course the task belongs to
-     * @param postId Id of the post the task is attached to
+     * @param task Task that should be marked as done
      * @param isDone Whether the task is now done or not
      */
     // todo retry later on error
-    fun markTaskAsDone(numberId: String, postId: String, isDone: Boolean, onComplete: (success: Int) -> Unit) {
+    fun markTaskAsDone(numberId: String, task: Task, isDone: Boolean, onComplete: (success: Int) -> Unit) {
         // Mark as (un)done in the db
-        TasksDb.getInstance().setDone(postId, isDone)
+        TasksDb.getInstance().setDone(task.taskId, isDone)
         // Mark as done on sph
         // Cancel potential pending requests for this same task, just to be sure
-        AndroidNetworking.cancel("task-$postId")
+        AndroidNetworking.cancel(task.taskId)
         // We need an access token first
         TokenManager().generateAccessToken { success: Int, token: String? ->
             if (success == SUCCESS) {
@@ -421,9 +421,9 @@ class NetworkManager {
                 AndroidNetworking.post("https://start.schulportal.hessen.de/meinunterricht.php")
                         .addBodyParameter("a", "sus_homeworkDone")
                         .addBodyParameter("id", numberId)
-                        .addBodyParameter("entry", postId.substring(postId.lastIndexOf("_") + 1))
+                        .addBodyParameter("entry", task.id_post.substring(task.id_post.lastIndexOf("_") + 1))
                         .addBodyParameter("b", if (isDone) "done" else "undone")
-                        .setTag("task-$postId")
+                        .setTag(task.taskId)
                         .build()
                         .getAsString(object : StringRequestListener {
                             override fun onResponse(response: String) {

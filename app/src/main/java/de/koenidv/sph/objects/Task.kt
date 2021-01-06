@@ -10,7 +10,8 @@ data class Task(
         var description: String, // Description of the task. There's no title.
         var date: Date, // Date of the post to be attached to. Should be day only, no time
         var isDone: Boolean, // Whether the task has been completed
-        var isPinned: Boolean = false // If the task is pinned
+        var isPinned: Boolean = false, // If the task is pinned
+        var dueDate: Date? = null // Due date, null if none is set
 ) {
     override fun equals(other: Any?): Boolean {
         if (other is Task)

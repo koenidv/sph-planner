@@ -34,6 +34,7 @@ import de.koenidv.sph.database.FileAttachmentsDb
 import de.koenidv.sph.database.LinkAttachmentsDb
 import de.koenidv.sph.objects.Attachment
 import de.koenidv.sph.objects.FileAttachment
+import de.koenidv.sph.objects.Task
 import me.saket.bettermovementmethod.BetterLinkMovementMethod
 import okhttp3.Cookie
 import okhttp3.HttpUrl
@@ -322,12 +323,12 @@ class AttachmentManager {
     /**
      * Returns a lambda to handle task checked changes
      */
-    fun onTaskCheckedChanged(activity: Activity, courseNumberId: String? = null, onComplete: ((String, Boolean) -> Unit)? = null):
-            (postId: String, courseId: String, Boolean) -> Unit = { postId, courseId, isDone ->
-        val numberId = courseNumberId ?: CoursesDb.getInstance().getNumberId(courseId)
-        NetworkManager().markTaskAsDone(numberId, postId, isDone) {
+    fun onTaskCheckedChanged(activity: Activity, courseNumberId: String? = null, onComplete: ((Task, Boolean) -> Unit)? = null):
+            (task: Task, isDone: Boolean) -> Unit = { task, isDone ->
+        val numberId = courseNumberId ?: CoursesDb.getInstance().getNumberId(task.id_course)
+        NetworkManager().markTaskAsDone(numberId, task, isDone) {
             if (it == NetworkManager.SUCCESS) {
-                if (onComplete != null) onComplete(postId, isDone)
+                if (onComplete != null) onComplete(task, isDone)
             } else {
                 // todo handle errors properly
                 Snackbar.make(activity.findViewById(R.id.nav_host_fragment),

@@ -135,6 +135,12 @@
     <string name="task_not_synchronized">Could not synchronize task</string>
     <string name="tasks_date_info">From %s</string>
     <string name="tasks_date_info_prefix">From</string>
+    <string name="tasks_due_info_relative">Due</string>
+    <string name="tasks_due_info_absolute">Due on</string>
+    <string name="tasks_due_today">Today</string>
+    <string name="tasks_due_tomorrow">Tomorrow</string>
+    <string name="tasks_due_overdue">Overdue</string>
+    <string name="tasks_due_setdate">Add a due date</string>
     <string name="tasks_filter_undone">Only show undone tasks</string>
     <string name="tasks_filter_none">No tasks found</string>
     <string name="tasks_filter_none_undone">All tasks completed ✅</string>

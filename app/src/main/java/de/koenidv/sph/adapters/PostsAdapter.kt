@@ -21,6 +21,7 @@ import de.koenidv.sph.database.AttachmentsDb
 import de.koenidv.sph.database.TasksDb
 import de.koenidv.sph.objects.Attachment
 import de.koenidv.sph.objects.Post
+import de.koenidv.sph.objects.Task
 import me.saket.bettermovementmethod.BetterLinkMovementMethod
 import java.text.SimpleDateFormat
 import java.util.*
@@ -31,7 +32,7 @@ class PostsAdapter(private val posts: List<Post>,
                    private val linkMethod: BetterLinkMovementMethod?,
                    private val onAttachmentClick: (Attachment, View) -> Unit,
                    private val onAttachmentLongClick: (Attachment, View) -> Unit,
-                   private val onTaskCheckedChanged: (postId: String, courseId: String, isDone: Boolean) -> Unit) :
+                   private val onTaskCheckedChanged: (task: Task, isDone: Boolean) -> Unit) :
         RecyclerView.Adapter<PostsAdapter.ViewHolder>() {
 
     val prefs: SharedPreferences = SphPlanner.applicationContext().getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
@@ -41,7 +42,7 @@ class PostsAdapter(private val posts: List<Post>,
      * Provides a reference to the type of view
      * (custom ViewHolder).
      */
-    class ViewHolder(view: View, onTaskCheckedChanged: (postId: String, courseId: String, isDone: Boolean) -> Unit) : RecyclerView.ViewHolder(view) {
+    class ViewHolder(view: View, onTaskCheckedChanged: (task: Task, isDone: Boolean) -> Unit) : RecyclerView.ViewHolder(view) {
         private val layout: ConstraintLayout = view.findViewById(R.id.postLayout)
         private val card: MaterialCardView = view.findViewById(R.id.materialCardView)
         private val dateText: TextView = view.findViewById(R.id.dateTextView)
@@ -55,6 +56,7 @@ class PostsAdapter(private val posts: List<Post>,
 
         private var taskset = false
         private var currentPost: Post? = null
+        private var currentTask: Task? = null
         private val themeColor = SphPlanner.applicationContext()
                 .getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
                 .getInt("themeColor", 0)
@@ -62,8 +64,8 @@ class PostsAdapter(private val posts: List<Post>,
         init {
             taskCheckBox.setOnCheckedChangeListener { _, isChecked ->
                 if (taskset)
-                    currentPost?.let {
-                        onTaskCheckedChanged(it.postId, it.id_course, isChecked)
+                    currentTask?.let {
+                        onTaskCheckedChanged(it, isChecked)
                         if (isChecked) {
                             // Remove colored background (set transparent)
                             taskHighlight.setBackgroundColor(0x00FFFFFF)
@@ -74,7 +76,7 @@ class PostsAdapter(private val posts: List<Post>,
                         // Send broadcast to update ui
                         val uiBroadcast = Intent("uichange")
                         uiBroadcast.putExtra("content", "taskDone")
-                        uiBroadcast.putExtra("postId", it.postId)
+                        uiBroadcast.putExtra("taskId", it.taskId)
                         uiBroadcast.putExtra("isDone", isChecked)
                         LocalBroadcastManager.getInstance(SphPlanner.applicationContext()).sendBroadcast(uiBroadcast)
                     }
@@ -90,6 +92,7 @@ class PostsAdapter(private val posts: List<Post>,
 
             val task = TasksDb.getInstance().getByPostId(post.postId).firstOrNull()
             val attachments = AttachmentsDb.byPostId(post.postId)
+            currentTask = task
 
             // Set data
             dateText.text = dateFormat.format(post.date)
@@ -106,7 +109,7 @@ class PostsAdapter(private val posts: List<Post>,
             // Task
             if (task != null) {
                 taskset = false
-                taskCheckBox.isChecked = TasksDb.getInstance().taskDone(post.postId) == true
+                taskCheckBox.isChecked = TasksDb.getInstance().taskDoneByPost(post.postId) == true
                 taskCheckBox.visibility = View.VISIBLE
                 taskText.text = task.description
                 taskText.visibility = View.VISIBLE
