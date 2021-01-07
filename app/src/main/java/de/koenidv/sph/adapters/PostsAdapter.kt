@@ -77,6 +77,7 @@ class PostsAdapter(private val posts: List<Post>,
                         val uiBroadcast = Intent("uichange")
                         uiBroadcast.putExtra("content", "taskDone")
                         uiBroadcast.putExtra("taskId", it.taskId)
+                        uiBroadcast.putExtra("postId", it.id_post)
                         uiBroadcast.putExtra("isDone", isChecked)
                         LocalBroadcastManager.getInstance(SphPlanner.applicationContext()).sendBroadcast(uiBroadcast)
                     }

@@ -59,7 +59,7 @@ class TimetableViewFragment : Fragment() {
         val onClick: (List<TimetableEntry>) -> Unit = {
             if (openOnClick) {
                 Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
-                        .navigate(R.id.frag_course_overview, bundleOf("courseId" to it[0].lesson.idCourse))
+                        .navigate(R.id.overviewAction, bundleOf("courseId" to it[0].lesson.idCourse))
             }
         }
 

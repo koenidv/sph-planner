@@ -20,7 +20,7 @@ import de.koenidv.sph.objects.Task
 //  Created by koenidv on 20.12.2020.
 class CompactTasksAdapter(private val tasks: List<Task>,
                           private var maxSize: Int? = null,
-                          private val onClick: (postId: String) -> Unit,
+                          private val onClick: (task: Task) -> Unit,
                           private val onTaskCheckedChanged: (task: Task, isDone: Boolean) -> Unit) :
         RecyclerView.Adapter<CompactTasksAdapter.ViewHolder>() {
 
@@ -29,7 +29,7 @@ class CompactTasksAdapter(private val tasks: List<Task>,
      * (custom ViewHolder).
      */
     class ViewHolder(view: View,
-                     onClick: (postId: String) -> Unit,
+                     onClick: (task: Task) -> Unit,
                      onTaskCheckedChanged: (task: Task, isDone: Boolean) -> Unit) : RecyclerView.ViewHolder(view) {
         private val layout = view.findViewById<ConstraintLayout>(R.id.taskLayout)
         private val checkbox = view.findViewById<CheckBox>(R.id.taskCheckBox)
@@ -52,7 +52,7 @@ class CompactTasksAdapter(private val tasks: List<Task>,
                     }
             }
             layout.setOnClickListener {
-                currentTask?.id_post?.let {
+                currentTask?.let {
                     onClick(it)
                 }
             }
@@ -94,6 +94,6 @@ class CompactTasksAdapter(private val tasks: List<Task>,
 
     // Return the size of your dataset (invoked by the layout manager)
     override fun getItemCount() =
-            if (maxSize != null && maxSize!! <= tasks.size)
+            if (maxSize != null && maxSize!! < tasks.size)
                 maxSize!! else tasks.size
 }

@@ -212,5 +212,10 @@
             android:name="undone"
             app:argType="boolean" />
     </fragment>
+    <action
+        android:id="@+id/overviewAction"
+        app:destination="@id/frag_course_overview"
+        app:enterAnim="@anim/popup_enter"
+        app:exitAnim="@anim/popup_exit" />
 
 </navigation>

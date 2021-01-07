@@ -86,22 +86,28 @@ class HomeFragment : Fragment() {
             // Update tasks and posts list when a task is done
             if (intent.getStringExtra("content") == "taskDone"
                     && ::tasks.isInitialized) {
+                val taskId = intent.getStringExtra("taskId")
                 val postId = intent.getStringExtra("postId")
 
                 // If tasks list contains this, notify tasks aapter
-                val taskIndex = tasks.indexOfFirst { it.id_post == postId }
+                val taskIndex = tasks.indexOfFirst { it.taskId == taskId }
                 if (taskIndex != -1) {
                     tasksRecycler.adapter?.notifyItemChanged(taskIndex)
                 } else if (!intent.getBooleanExtra("isDone", true)) {
-                    // Add task to the top of the list if it is not done and wasn't there before
-                    tasks.add(0, TasksDb.getInstance().getByPostId(postId).first())
-                    tasksRecycler.adapter?.notifyItemInserted(0)
-                    tasksRecycler.adapter?.notifyItemRemoved(5)
+                    val taskToAdd = TasksDb.getInstance().getByTaskId(taskId).firstOrNull()
+                    if (taskToAdd != null) {
+                        // Add task to the top of the list if it is not done and wasn't there before
+                        tasks.add(0, taskToAdd)
+                        tasksRecycler.adapter?.notifyItemInserted(0)
+                        tasksRecycler.adapter?.notifyItemRemoved(5)
+                    }
                 }
 
-                // If posts list contains this, notify it
-                val postIndex = posts.indexOfFirst { it.postId == postId }
-                if (postIndex != -1) unreadPostsRecycler.adapter?.notifyItemChanged(postIndex)
+                if (postId != null) {
+                    // If posts list contains this, notify it
+                    val postIndex = posts.indexOfFirst { it.postId == postId }
+                    if (postIndex != -1) unreadPostsRecycler.adapter?.notifyItemChanged(postIndex)
+                }
             }
         }
     }
@@ -207,10 +213,8 @@ class HomeFragment : Fragment() {
                         tasks,
                         6,
                         onClick = {
-                            // Show single post bottom sheet
-                            PostSheet(
-                                    PostsDb.getInstance().getByPostId(it)
-                            ).show(parentFragmentManager, "post")
+                            // Show single task bottom sheet
+                            TaskSheet(it).show(parentFragmentManager, "task")
                         },
                         onTaskCheckedChanged = AttachmentManager().onTaskCheckedChanged(requireActivity()) { task, isDone ->
                             if (isDone) {
@@ -218,6 +222,7 @@ class HomeFragment : Fragment() {
                                 val index = tasks.indexOfFirst { it.taskId == task.taskId }
                                 tasks.removeAt(index)
                                 tasksRecycler.adapter?.notifyItemRemoved(index)
+                                if (tasks.size < 6) (tasksRecycler.adapter as CompactTasksAdapter)
                                 // Update overflow counter
                                 if (tasksOverflow > 0) {
                                     tasksOverflow--

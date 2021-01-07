@@ -10,6 +10,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.bottomsheets.BottomSheet
@@ -140,6 +141,14 @@ class TasksAdapter(private val tasks: MutableList<Task>,
                 if (checkboxset)
                     currentTask?.let {
                         onTaskCheckedChanged(it, isChecked)
+
+                        // Send broadcast to update ui
+                        val uiBroadcast = Intent("uichange")
+                        uiBroadcast.putExtra("content", "taskDone")
+                        uiBroadcast.putExtra("taskId", it.taskId)
+                        uiBroadcast.putExtra("postId", it.id_post)
+                        uiBroadcast.putExtra("isDone", isChecked)
+                        LocalBroadcastManager.getInstance(SphPlanner.applicationContext()).sendBroadcast(uiBroadcast)
                     }
             }
             layout.setOnLongClickListener {
