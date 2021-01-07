@@ -2,9 +2,11 @@ package de.koenidv.sph.parsing
 
 import android.annotation.SuppressLint
 import android.graphics.Color
+import android.util.Log
 import android.widget.Toast
 import androidx.core.graphics.toColorInt
 import de.koenidv.sph.R
+import de.koenidv.sph.SphPlanner.Companion.TAG
 import de.koenidv.sph.SphPlanner.Companion.applicationContext
 import de.koenidv.sph.database.CoursesDb
 import de.koenidv.sph.objects.*
@@ -230,47 +232,56 @@ class RawParser {
      */
     fun parseCoursesFromStudygroups(rawResponse: String): List<Course> {
         val courses = mutableListOf<Course>()
-        // Remove stuff we don't need
-        // There are multiple tables in this page, we'll just take the first one
-        val rawContent = rawResponse.substring(rawResponse.indexOf("<tbody>") + 7, rawResponse.indexOf("</tbody>"))
 
-        /*
+        // Return empty list if content is invalid
+        try {
+
+            // Remove stuff we don't need
+            // There are multiple tables in this page, we'll just take the first one
+            val rawContent = rawResponse.substring(rawResponse.indexOf("<tbody>") + 7, rawResponse.indexOf("</tbody>"))
+
+            /*
          * It seems as if the sph id index is in the same order as the timetable
          * i.e. Q3Gvac03 - GYM is the 3rd History GK in the timetable
          * This means that the internal id's should be in the same order as they're taken from it
          * Let's just hope the best
          */
 
-        val rawContents = rawContent.split("<tr").toMutableList()
-        rawContents.removeFirst()
+            val rawContents = rawContent.split("<tr").toMutableList()
+            rawContents.removeFirst()
 
-        var namedId: String
-        var uniformNamedId: String
-        var sphId: String
-        var teacherId: String
-        var internalId: String
-        val nameColorMap = Utility().parseStringArray(R.array.course_colors)
+            var namedId: String
+            var uniformNamedId: String
+            var sphId: String
+            var teacherId: String
+            var internalId: String
+            val nameColorMap = Utility().parseStringArray(R.array.course_colors)
 
-        // Get data from each table row and save the courses
-        for (entry in rawContents) {
-            namedId = entry.substring(Utility().ordinalIndexOf(entry, "<td>", 1) + 4, entry.indexOf("<small>") - 1).trim()
-            uniformNamedId = CourseParser().parseNamedId(namedId)
-            sphId = entry.substring(entry.indexOf("<small>") + 8, entry.indexOf("</small>") - 1)
-            teacherId = entry.substring(Utility().ordinalIndexOf(entry, "<td>", 2))
-            teacherId = teacherId.substring(teacherId.indexOf("(") + 1, teacherId.indexOf(")")).toLowerCase(Locale.ROOT)
-            internalId = IdParser().getCourseIdWithSph(sphId, teacherId, entry.contains("LK"))
+            // Get data from each table row and save the courses
+            for (entry in rawContents) {
+                namedId = entry.substring(Utility().ordinalIndexOf(entry, "<td>", 1) + 4, entry.indexOf("<small>") - 1).trim()
+                uniformNamedId = CourseParser().parseNamedId(namedId)
+                sphId = entry.substring(entry.indexOf("<small>") + 8, entry.indexOf("</small>") - 1)
+                teacherId = entry.substring(Utility().ordinalIndexOf(entry, "<td>", 2))
+                teacherId = teacherId.substring(teacherId.indexOf("(") + 1, teacherId.indexOf(")")).toLowerCase(Locale.ROOT)
+                internalId = IdParser().getCourseIdWithSph(sphId, teacherId, entry.contains("LK"))
 
-            courses.add(Course(
-                    courseId = internalId,
-                    sph_id = sphId,
-                    named_id = uniformNamedId,
-                    id_teacher = teacherId,
-                    fullname = CourseParser().getFullnameFromInternald(internalId),
-                    isFavorite = true,
-                    isLK = entry.contains("LK"),
-                    color = (nameColorMap[namedId.substring(0, namedId.indexOf(" "))]
-                            ?: nameColorMap["default"])!!.toColorInt()
-            ))
+                courses.add(Course(
+                        courseId = internalId,
+                        sph_id = sphId,
+                        named_id = uniformNamedId,
+                        id_teacher = teacherId,
+                        fullname = CourseParser().getFullnameFromInternald(internalId),
+                        isFavorite = true,
+                        isLK = entry.contains("LK"),
+                        color = (nameColorMap[uniformNamedId.substring(0, uniformNamedId.indexOf(" "))]
+                                ?: nameColorMap["default"])!!.toColorInt()
+                ))
+            }
+
+        } catch (e: StringIndexOutOfBoundsException) {
+            Log.d(TAG, "Studygroups parsing failed!")
+            Log.d(TAG, e.stackTraceToString())
         }
 
         return courses
@@ -283,56 +294,93 @@ class RawParser {
      */
     fun parseCoursesFromPostsoverview(rawResponse: String): List<Course> {
         val courses = mutableListOf<Course>()
-        // Remove stuff we don't need, get second menu <ul>
-        @Suppress("VARIABLE_WITH_REDUNDANT_INITIALIZER") var rawContent = rawResponse.substring(rawResponse.indexOf("<ul role=\"menu\"") + 15)
-        rawContent = rawContent.substring(rawContent.indexOf("<ul role=\"menu\""))
-        rawContent = rawContent.substring(0, rawContent.indexOf("</ul>"))
-
-        val rawContents = rawContent.split("<li >").toMutableList()
-        rawContents.removeFirst() // Trash
-        rawContents.removeFirst() // Overview link
+        // Get the courses table
+        val table = Jsoup.parse(rawResponse).select("#aktuell tbody")
 
         var courseName: String
-        var uniformCourseName: String
+        var uniformNamedId: String
         var numberId: String
+        var teacherId: String
+        var isLK: Boolean
         var similiarCourses: List<Course>
-        // Get values from list
-        for (entry in rawContents) {
-            if (entry.contains("a=sus_view&id=")) {
-                numberId = entry.substring(entry.indexOf("a=sus_view&id=") + 14)
-                numberId = numberId.substring(0, numberId.indexOf("\""))
-                courseName = entry.substring(entry.indexOf("</span>") + 7, entry.indexOf("</a>")).trim()
+        val nameColorMap = Utility().parseStringArray(R.array.course_colors)
+        // Get values from table
+        for (row in table.select("tr")) {
+            numberId = row.attr("data-book")
+            courseName = row.select("span.name").text()
+            teacherId = row.select("span.teacher button")
+                    .first().ownText().toLowerCase(Locale.ROOT)
+            isLK = courseName.contains("LK")
 
-                // todo create new courses with teacher_id instead of using old ones: might not be available
+            // Make named id from post overview uniform
+            uniformNamedId = CourseParser().parseNamedId(courseName)
 
-                // Make named id from post overview uniform
-                uniformCourseName = CourseParser().parseNamedId(courseName)
+            // Get courses that might be the same as this one
+            similiarCourses = CoursesDb.getInstance().getByNamedId(uniformNamedId).toMutableList()
 
-                // Get courses that might be the same as this one
-                similiarCourses = CoursesDb.getInstance().getByNamedId(uniformCourseName).toMutableList()
-                if (courseName.contains("""\(.*\)""".toRegex())) { // if contains text in brackets
-                    val courseToAdd = CoursesDb.getInstance().getBySphId(courseName.substring(courseName.indexOf("(") + 1, courseName.lastIndexOf(")")).replace("-GYM", " - GYM"))
-                    if (courseToAdd != null) similiarCourses.add(courseToAdd)
+            // If no similiar course was found, try getting all courses with the same subject and teacher
+            var courseIdPrefix: String? = null
+            if (similiarCourses.isEmpty()) {
+                courseIdPrefix = IdParser().getCourseIdPrefixWithNamedId(uniformNamedId, teacherId)
+                if (courseIdPrefix != null)
+                    similiarCourses.addAll(CoursesDb.getInstance().getByInternalPrefix(courseIdPrefix)
+                            .filter { it.isLK == null || it.isLK == isLK })
+            }
+
+
+            if (courseName.contains("""\(.*\)""".toRegex())) { // if contains text in brackets
+                val courseToAdd = CoursesDb.getInstance().getBySphId(courseName.substring(courseName.indexOf("(") + 1, courseName.lastIndexOf(")")).replace("-GYM", " - GYM"))
+                if (courseToAdd != null) similiarCourses.add(courseToAdd)
+            }
+
+            // Make sure no course is in the list twice
+            // This might happen because we add both by NamedId and SphId
+            similiarCourses = similiarCourses.distinct()
+
+            when {
+                similiarCourses.size == 1 -> {
+                    // Only one similiar course, this should be it.
+                    similiarCourses[0].apply {
+                        number_id = numberId
+                        named_id = uniformNamedId
+                        isFavorite = true
+                        fullname = CourseParser().getFullnameFromInternald(similiarCourses[0].courseId)
+                        color = (nameColorMap[
+                                uniformNamedId
+                                        .substring(0, uniformNamedId.indexOf(" "))]
+                                ?: nameColorMap["default"])!!.toColorInt()
+                    }
+                    courses.add(similiarCourses[0])
                 }
-
-                // Make sure no course is in the list twice
-                // This might happen because we add both by NamedId and SphId
-                similiarCourses = similiarCourses.distinct()
-
-                when {
-                    similiarCourses.size == 1 -> {
-                        // Only one similiar course, this should be it.
-                        similiarCourses[0].number_id = numberId
-                        courses.add(similiarCourses[0])
+                similiarCourses.isEmpty() -> {
+                    // Create new course with this namedid & numberid
+                    // If no course could be found, there is no other course with the same internal prefix
+                    // (We tried getting every course by that)
+                    // This means we can just use the prefix - if available with an index 1
+                    if (courseIdPrefix != null) {
+                        courses.add(Course(
+                                courseId = courseIdPrefix + "_1",
+                                named_id = uniformNamedId,
+                                fullname = CourseParser().getFullnameFromInternald(courseIdPrefix + "_1"),
+                                number_id = numberId,
+                                id_teacher = teacherId,
+                                isFavorite = true,
+                                isLK = isLK,
+                                color = (nameColorMap[
+                                        uniformNamedId
+                                                .substring(0, uniformNamedId.indexOf(" "))]
+                                        ?: nameColorMap["default"])!!.toColorInt()
+                        ))
                     }
-                    similiarCourses.isEmpty() -> {
-                        // todo create new course with this namedid & numberid
-                        Toast.makeText(applicationContext(), "No valid course", Toast.LENGTH_SHORT).show()
-                    }
-                    similiarCourses.size > 1 -> {
-                        // todo handle multiple similiar courses
-                        Toast.makeText(applicationContext(), "Too many courses", Toast.LENGTH_SHORT).show()
-                    }
+                    Log.d(TAG, "No valid course for $uniformNamedId")
+                }
+                similiarCourses.size > 1 -> {
+                    // todo handle multiple similiar courses
+                    Toast.makeText(applicationContext(), "Too many courses", Toast.LENGTH_LONG).show()
+                    Log.d(TAG, "Too many courses for $uniformNamedId")
+                    // currently adds first course
+                    similiarCourses[0].number_id = numberId
+                    courses.add(similiarCourses[0])
                 }
             }
         }

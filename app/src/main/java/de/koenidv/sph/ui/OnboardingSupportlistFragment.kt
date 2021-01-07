@@ -42,7 +42,7 @@ class OnboardingSupportlistFragment : Fragment() {
                 // Might display if sph is being maintained
                 // Credentials should be valid as we just checked them in the last onboarding step
                 featuresLoading.visibility = View.GONE
-                titleText.text = when (success) {
+                warningText.text = when (success) {
                     NetworkManager.FAILED_NO_NETWORK -> getString(R.string.onboard_supported_error_network)
                     NetworkManager.FAILED_MAINTENANCE -> getString(R.string.onboard_supported_error_maintenance)
                     NetworkManager.FAILED_SERVER_ERROR -> getString(R.string.onboard_supported_error_server)
@@ -51,8 +51,8 @@ class OnboardingSupportlistFragment : Fragment() {
                 warningText.visibility = View.VISIBLE
                 warningText.setTextColor(requireContext().getColor(R.color.colorAccent))
                 warningText.setOnClickListener {
-                    val ft = parentFragmentManager.beginTransaction()
-                    ft.detach(this@OnboardingSupportlistFragment).attach(this@OnboardingSupportlistFragment).commit()
+                    // Recreate to try again
+                    requireActivity().recreate()
                 }
                 return@loadSiteWithToken
             }
@@ -100,8 +100,7 @@ class OnboardingSupportlistFragment : Fragment() {
             }
             if (!features.contains("Lerngruppen")) {
                 allFeatures = false
-                //manualFeatures = true
-                usableFeatures = false // todo manual course adding
+                manualFeatures = true // todo manual course adding
                 featurelistText = featurelistText.replace("%studygroups", crossmarkText)
             } else {
                 featurelistText = featurelistText.replace("%studygroups", checkmarkText)
@@ -125,7 +124,7 @@ class OnboardingSupportlistFragment : Fragment() {
             // Get title text from supported tags
             val featureTitleText: String
             featureTitleText = when {
-                schoolTested -> getString(R.string.onboard_supported_schooltested)
+                usableFeatures && schoolTested -> getString(R.string.onboard_supported_schooltested)
                 allFeatures -> getString(R.string.onboard_supported_features_full)
                 usableFeatures && manualFeatures -> getString(R.string.onboard_supported_features_partly_manual)
                 usableFeatures && !manualFeatures -> getString(R.string.onboard_supported_features_partly_hidden)
@@ -141,7 +140,7 @@ class OnboardingSupportlistFragment : Fragment() {
             featuresText.text = featurelistText
             featuresText.visibility = View.VISIBLE
             contactButton.visibility = View.VISIBLE
-            if (someFeatures) { // todo show contact options othwerwise
+            if (usableFeatures) {
                 warningText.visibility = View.VISIBLE
                 // todo start indexing
                 indexLoading.visibility = View.VISIBLE
@@ -175,6 +174,21 @@ class OnboardingSupportlistFragment : Fragment() {
                                         indexLoading.visibility = View.GONE
                                         nextFab.visibility = View.VISIBLE
                                         prefs.edit().putBoolean("introComplete", true).apply()
+                                    } else {
+                                        // Display error message
+                                        indexLoading.visibility = View.GONE
+                                        warningText.text = when (success) {
+                                            NetworkManager.FAILED_NO_NETWORK -> getString(R.string.onboard_supported_error_network)
+                                            NetworkManager.FAILED_MAINTENANCE -> getString(R.string.onboard_supported_error_maintenance)
+                                            NetworkManager.FAILED_SERVER_ERROR -> getString(R.string.onboard_supported_error_server)
+                                            else -> getString(R.string.onboard_supported_error_unknown)
+                                        }
+                                        warningText.visibility = View.VISIBLE
+                                        warningText.setTextColor(requireContext().getColor(R.color.colorAccent))
+                                        warningText.setOnClickListener {
+                                            // Recreate to try again
+                                            requireActivity().recreate()
+                                        }
                                     }
                                 }
 

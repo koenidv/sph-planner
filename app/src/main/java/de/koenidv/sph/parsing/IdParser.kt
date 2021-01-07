@@ -1,5 +1,6 @@
 package de.koenidv.sph.parsing
 
+import de.koenidv.sph.R
 import de.koenidv.sph.database.CoursesDb
 import de.koenidv.sph.objects.Course
 import java.text.SimpleDateFormat
@@ -154,6 +155,14 @@ class IdParser {
         filteredCourses = allCourses?.filter { it.courseId == classType + "_" + teacherId.toLowerCase(Locale.ROOT) + "_" }
                 ?: courseDb.getByInternalPrefix(classType + "_" + teacherId.toLowerCase(Locale.ROOT) + "_")
         return classType + "_" + teacherId.toLowerCase(Locale.ROOT) + "_" + filteredCourses.size + 1
+    }
+
+    fun getCourseIdPrefixWithNamedId(namedId: String, teacherId: String): String? {
+        val prefixMap = Utility().parseStringArray(R.array.namedid_course_prefixes)
+        return if (prefixMap.containsKey(namedId.substring(0, namedId.indexOf(" "))))
+            (prefixMap[namedId.substring(0, namedId.indexOf(" "))] +
+                    "_" + teacherId).toLowerCase(Locale.ROOT)
+        else null
     }
 
     /**

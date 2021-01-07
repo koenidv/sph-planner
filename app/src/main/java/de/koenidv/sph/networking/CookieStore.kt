@@ -35,10 +35,10 @@ object CookieStore : CookieJar {
      * @return List of cookies for the specified domain
      */
     override fun loadForRequest(url: HttpUrl): List<Cookie> {
-        if (url.host().contains("schulportal.hessen.de"))
-            return cookies["schulportal.hessen.de"] ?: ArrayList()
+        return if (url.host().contains("schulportal.hessen.de"))
+            cookies["schulportal.hessen.de"] ?: ArrayList()
         else
-            return cookies[url.host()] ?: ArrayList()
+            cookies[url.host()] ?: ArrayList()
 
     }
 

@@ -63,7 +63,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "id_course TEXT, id_post TEXT, name TEXT, date INTEGER, url TEXT, size TEXT," +
                 "type TEXT, pinned INTEGER, lastUse INTEGER)");
         // Create tasks table
-        db.execSQL("CREATE TABLE postTasks(task_id TEXT PRIMARY KEY, id_course TEXT, id_post TEXT," +
+        db.execSQL("CREATE TABLE tasks(task_id TEXT PRIMARY KEY, id_course TEXT, id_post TEXT," +
                 "description TEXT, date INTEGER, isdone INTEGER, pinned INTEGER, dueDate INTEGER)");
         // Create link attachments table
         db.execSQL("CREATE TABLE linkAttachments(attachment_id TEXT PRIMARY KEY," +
@@ -76,7 +76,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     //upgrade Database
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldversion, int newversion) {
-        if (oldversion < 2) {
+        if (oldversion == 1 && newversion == 2) {
             db.execSQL("ALTER TABLE postTasks RENAME TO tasks");
         }
     }

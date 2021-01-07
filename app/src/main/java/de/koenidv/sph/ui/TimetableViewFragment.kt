@@ -19,7 +19,6 @@ import de.koenidv.sph.parsing.Utility
 
 // Created on 24.12.2020 by koenidv.
 class TimetableViewFragment : Fragment() {
-    // TODO: Rename and change types of parameters
     private var expanded: Boolean = false
     private var viewAll: Boolean = false
     private var openOnClick: Boolean = true
@@ -103,16 +102,27 @@ class TimetableViewFragment : Fragment() {
     fun setViewAll(viewAll: Boolean) {
         if (this.viewAll != viewAll) {
             this.viewAll = viewAll
-            // Update timetable
-            timetable = TimetableDb.instance!!.get(!viewAll)
-            // Get maximum amount of concurrent lessons if they are shown
-            val maxConcurrent = if (viewAll) timetable.maxOf { days -> days.maxOf { it.size } } else 1
-            // Notify recyclerviews
-            (requireView().findViewById<RecyclerView>(R.id.mondayRecycler).adapter as LessonsAdapter).setDataAndMultiple(timetable[0], viewAll, maxConcurrent)
-            (requireView().findViewById<RecyclerView>(R.id.tuesdayRecycler).adapter as LessonsAdapter).setDataAndMultiple(timetable[1], viewAll, maxConcurrent)
-            (requireView().findViewById<RecyclerView>(R.id.wednesdayRecycler).adapter as LessonsAdapter).setDataAndMultiple(timetable[2], viewAll, maxConcurrent)
-            (requireView().findViewById<RecyclerView>(R.id.thursdayRecycler).adapter as LessonsAdapter).setDataAndMultiple(timetable[3], viewAll, maxConcurrent)
-            (requireView().findViewById<RecyclerView>(R.id.fridayRecycler).adapter as LessonsAdapter).setDataAndMultiple(timetable[4], viewAll, maxConcurrent)
+            // Recreate if pesonal timetable was for some reason not shown
+            if (requireView().findViewById<RecyclerView>(R.id.mondayRecycler).adapter == null) {
+                parentFragmentManager.beginTransaction()
+                        .replace(R.id.nav_host_fragment,
+                                instantiate(requireContext(), TimetableFragment().javaClass.name,
+                                        bundleOf("expanded" to this.expanded,
+                                                "viewAll" to this.viewAll,
+                                                "openOnClick" to this.openOnClick)))
+                        .commit()
+            } else {
+                // Update timetable
+                timetable = TimetableDb.instance!!.get(!viewAll)
+                // Get maximum amount of concurrent lessons if they are shown
+                val maxConcurrent = if (viewAll) timetable.maxOf { days -> days.maxOf { it.size } } else 1
+                // Notify recyclerviews
+                (requireView().findViewById<RecyclerView>(R.id.mondayRecycler).adapter as LessonsAdapter).setDataAndMultiple(timetable[0], viewAll, maxConcurrent)
+                (requireView().findViewById<RecyclerView>(R.id.tuesdayRecycler).adapter as LessonsAdapter).setDataAndMultiple(timetable[1], viewAll, maxConcurrent)
+                (requireView().findViewById<RecyclerView>(R.id.wednesdayRecycler).adapter as LessonsAdapter).setDataAndMultiple(timetable[2], viewAll, maxConcurrent)
+                (requireView().findViewById<RecyclerView>(R.id.thursdayRecycler).adapter as LessonsAdapter).setDataAndMultiple(timetable[3], viewAll, maxConcurrent)
+                (requireView().findViewById<RecyclerView>(R.id.fridayRecycler).adapter as LessonsAdapter).setDataAndMultiple(timetable[4], viewAll, maxConcurrent)
+            }
         }
     }
 

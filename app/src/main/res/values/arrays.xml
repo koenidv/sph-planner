@@ -19,10 +19,10 @@
         <item>Latein|#3d3d3d</item>
         <item>Französisch|#b70ad1</item>
         <item>Geschichte|#734b00</item>
-        <item>Informatik|#2bb5ae</item>
+        <item>Info|#2bb5ae</item>
         <item>Kunst|#ffd008</item>
         <item>Musik|#b08a00</item>
-        <item>Mathematik|#0050c0</item>
+        <item>Mathe|#0050c0</item>
         <item>Physik|#e60e7a</item>
         <item>Biologie|#1aab26</item>
         <item>Chemie|#7600ba</item>
@@ -43,5 +43,23 @@
         <item>Biologie|Bio</item>
         <item>Geographie|Erdkunde</item>
         <item>Geografie|Erdkunde</item>
+    </string-array>
+    <string-array name="namedid_course_prefixes">
+        <item>Deutsch|d</item>
+        <item>Englisch|e</item>
+        <item>Latein|l</item>
+        <item>Französisch|f</item>
+        <item>Geschichte|g</item>
+        <item>Info|info</item>
+        <item>Kunst|ku</item>
+        <item>Musik|mu</item>
+        <item>Mathe|m</item>
+        <item>Physik|ph</item>
+        <item>Bio|bio</item>
+        <item>Chemie|ch</item>
+        <item>Erdkunde|ek</item>
+        <item>Politik|powi</item>
+        <item>Sport|spo</item>
+        <item>Religion|reli</item>
     </string-array>
 </resources>

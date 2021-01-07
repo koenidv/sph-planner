@@ -27,6 +27,7 @@ import de.koenidv.sph.networking.NetworkManager
 import de.koenidv.sph.networking.TokenManager
 import de.koenidv.sph.parsing.RawParser
 import okhttp3.OkHttpClient
+import java.util.*
 
 
 class OnboardingSigninFragment : Fragment() {
@@ -57,7 +58,6 @@ class OnboardingSigninFragment : Fragment() {
             val signinButton = view.findViewById<ExtendedFloatingActionButton>(R.id.signinButton)
 
             signinButton.shrink()
-            // todo default selection for GMB
 
             // Load school names and ids to display them in a spinner
             // Hide loading icon and show contents once done
@@ -155,13 +155,17 @@ class OnboardingSigninFragment : Fragment() {
                 textlayout1.visibility = View.GONE
                 textlayout2.visibility = View.GONE
                 signinButton.visibility = View.GONE
-                (requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).hideSoftInputFromWindow(view.windowToken, 0)
+                // Hide keyboard
+                (requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager)
+                        .hideSoftInputFromWindow(view.windowToken, 0)
                 // Hide the password
                 passText.transformationMethod = PasswordTransformationMethod()
 
 
                 prefs.edit()
-                        .putString("user", userText.text.toString().replace(" ", "."))
+                        .putString("user", userText.text.toString()
+                                .replace(" ", ".")
+                                .toLowerCase(Locale.ROOT))
                         .putString("password", passText.text.toString())
                         // We'll assume schools have been loaded, as ui won't let the user get here otherwise
                         // We could mitigate this by checking for schoolIds.isNotEmpty()..
@@ -212,6 +216,11 @@ class OnboardingSigninFragment : Fragment() {
                     }
                 }
             }
+
+            // Restore credentials if sign in failed before
+            userText.setText(prefs.getString("user", ""))
+            passText.setText(prefs.getString("password", ""))
+
             return view
         }
     }

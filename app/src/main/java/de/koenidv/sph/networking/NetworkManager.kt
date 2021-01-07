@@ -156,13 +156,13 @@ class NetworkManager {
                 // Save parsed courses from timetable
                 coursesDb.save(RawParser().parseCoursesFromTimetable(responseTimetable!!))
                 // Secondly, load those courses from study groups to find out where the user belongs
-                loadSiteWithToken("https://start.schulportal.hessen.de/lerngruppen.php", onComplete = { successStudygroups: Int, responseStudygroups: String? ->
+                loadSiteWithToken(applicationContext().getString(R.string.url_studygroups), onComplete = { successStudygroups: Int, responseStudygroups: String? ->
                     if (successStudygroups == SUCCESS) {
                         // Save parsed courses from study groups
                         coursesDb.setNulledNotFavorite()
                         coursesDb.save(RawParser().parseCoursesFromStudygroups(responseStudygroups!!))
                         // Lastly, load courses again from posts overview to get number ids
-                        loadSiteWithToken("https://start.schulportal.hessen.de/meinunterricht.php", onComplete = { successOverview: Int, responseOverview: String? ->
+                        loadSiteWithToken(applicationContext().getString(R.string.url_allposts), onComplete = { successOverview: Int, responseOverview: String? ->
                             if (successOverview == SUCCESS) {
                                 // Save parsed courses from posts overview
                                 coursesDb.save(RawParser().parseCoursesFromPostsoverview(responseOverview!!))

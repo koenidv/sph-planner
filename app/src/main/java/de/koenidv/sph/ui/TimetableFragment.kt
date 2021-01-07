@@ -13,10 +13,18 @@ import de.koenidv.sph.SphPlanner
 
 class TimetableFragment : Fragment() {
 
+    private var expanded: Boolean = true
+    private var viewAll: Boolean = false
+    private var openOnClick: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         sharedElementEnterTransition = TransitionInflater.from(context).inflateTransition(android.R.transition.move)
+        arguments?.let {
+            expanded = it.getBoolean("expanded")
+            viewAll = it.getBoolean("viewAll")
+            openOnClick = it.getBoolean("openOnClick")
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -30,10 +38,13 @@ class TimetableFragment : Fragment() {
         // Show timetable
         val ft = parentFragmentManager.beginTransaction()
         val timetableFragment = TimetableViewFragment()
-        timetableFragment.arguments = bundleOf("expanded" to true, "viewAll" to false, "openOnClick" to false)
+        timetableFragment.arguments = bundleOf("expanded" to expanded,
+                "viewAll" to viewAll,
+                "openOnClick" to openOnClick)
         ft.replace(R.id.timetableFragment, timetableFragment).commit()
 
         val filterSwitch = view.findViewById<SwitchMaterial>(R.id.timetableFilterSwitch)
+        filterSwitch.isChecked = !viewAll
         filterSwitch.setOnCheckedChangeListener { _, isChecked -> timetableFragment.setViewAll(!isChecked) }
 
         return view

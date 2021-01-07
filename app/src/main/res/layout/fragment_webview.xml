@@ -7,15 +7,21 @@
     android:background="?attr/backgroundColor"
     tools:context=".ui.MessagesFragment">
 
-    <WebView
-        android:id="@+id/webview"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:visibility="gone"
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <WebView
+            android:id="@+id/webview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
+
+    </androidx.core.widget.NestedScrollView>
 
     <ProgressBar
         android:id="@+id/webviewLoading"
