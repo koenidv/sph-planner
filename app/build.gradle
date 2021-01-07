@@ -1,8 +1,7 @@
 apply plugin: 'com.android.application'
-
 apply plugin: 'kotlin-android'
-
 apply plugin: 'kotlin-kapt'
+apply plugin: 'com.google.gms.google-services'
 
 android {
     compileSdkVersion 30
@@ -55,6 +54,8 @@ dependencies {
     implementation 'me.saket:better-link-movement-method:2.2.0'
     implementation 'androidx.gridlayout:gridlayout:1.0.0'// Open links in-app
     implementation 'androidx.webkit:webkit:1.4.0'
+    implementation platform('com.google.firebase:firebase-bom:26.2.0')
+    implementation 'com.google.firebase:firebase-config-ktx'
     implementation 'com.afollestad.material-dialogs:core:3.3.0'
     implementation 'com.afollestad.material-dialogs:bottomsheets:3.2.1'
     implementation 'com.afollestad.material-dialogs:input:3.3.0'

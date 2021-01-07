@@ -13,13 +13,18 @@ object CookieStore : CookieJar {
 
     /**
      * Save cookies for a domain and account for sph's weird cookie behavior
+     * For .schulportal.hessen.de old cookies won't be deleted!
      * @param url HttpUrl to save cookies for
      * @param cookies List of cookies to save
      */
     override fun saveFromResponse(url: HttpUrl, cookies: List<Cookie>) {
-        if (url.host().contains("schulportal.hessen.de"))
-            this.cookies["schulportal.hessen.de"] = cookies
-        else
+        if (url.host().contains("schulportal.hessen.de")) {
+            if (this.cookies["schulportal.hessen.de"] != null) {
+                val oldAndNew = this.cookies["schulportal.hessen.de"]!!.toMutableList()
+                oldAndNew.addAll(cookies)
+                this.cookies["schulportal.hessen.de"] = oldAndNew
+            } else this.cookies["schulportal.hessen.de"] = cookies
+        } else
             this.cookies[url.host()] = cookies
 
     }

@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "228919064879",
+    "project_id": "schulportal-app",
+    "storage_bucket": "schulportal-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:228919064879:android:8a0588256113a31e1989da",
+        "android_client_info": {
+          "package_name": "de.koenidv.sph"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "228919064879-6tblbhn4kh5712sme23r7jerkgngs5q2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB5VZBmovN1eSV5mtcH3DPoq7DJ1IIygAs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "228919064879-6tblbhn4kh5712sme23r7jerkgngs5q2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

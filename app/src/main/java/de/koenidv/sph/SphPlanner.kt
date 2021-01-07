@@ -3,6 +3,8 @@ package de.koenidv.sph
 import android.app.Application
 import android.content.Context
 import com.facebook.stetho.Stetho
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.remoteconfig.ktx.remoteConfig
 
 //  Created by koenidv on 05.12.2020.
 class SphPlanner : Application() {
@@ -30,6 +32,9 @@ class SphPlanner : Application() {
         super.onCreate()
         // Initialize stetho for network debugging
         Stetho.initializeWithDefaults(this)
+
+        // Apply default remote configs
+        Firebase.remoteConfig.setDefaultsAsync(R.xml.remote_config_defaults)
     }
 
 
