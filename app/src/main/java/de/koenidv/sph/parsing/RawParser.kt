@@ -279,9 +279,10 @@ class RawParser {
                 ))
             }
 
-        } catch (e: StringIndexOutOfBoundsException) {
-            Log.d(TAG, "Studygroups parsing failed!")
-            Log.d(TAG, e.stackTraceToString())
+        } catch (e: Exception) {
+            Log.w(TAG, "Studygroups parsing failed!")
+            Log.w(TAG, e.stackTraceToString())
+            Toast.makeText(applicationContext(), e.stackTraceToString(), Toast.LENGTH_LONG).show()
         }
 
         return courses
@@ -779,9 +780,9 @@ class RawParser {
                 }
                 currentHour++
             }
-        } catch (e: java.lang.IndexOutOfBoundsException) {
-            Log.d(TAG, "Timetable parsing failed!")
-            Log.d(TAG, e.stackTraceToString())
+        } catch (e: Exception) {
+            Log.w(TAG, "Timetable parsing failed!")
+            Log.w(TAG, e.stackTraceToString())
         }
 
         return returnList

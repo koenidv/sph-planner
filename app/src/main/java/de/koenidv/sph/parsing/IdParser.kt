@@ -17,27 +17,6 @@ const val TYPE_NUMBER = 4 // Example: 760
 class IdParser {
 
     /**
-     * Parse a given external course id string to an internal course id
-     * If there are two courses with the same subject and teacher, the internal id will be identical
-     * todo: Different ids for courses with same subject and teacher
-     * @param courseId External id string to parse to an internal id
-     * @param courseIdType The id's type (must be one of TYPE_INTERNAL, TYPE_GMB, TYPE_SPH, TYPE_NAMED, TYPE_NUMBER): Nullable
-     * @param teacherId The course teacher's id
-     * @return Parsed internal id
-     */
-    fun getCourseId(courseId: String, courseIdType: Int?, teacherId: String): String {
-        // Get id type estimate if no type is passed
-
-        return when (courseIdType ?: getCourseIdType(courseId)) {
-            TYPE_INTERNAL -> courseId
-            TYPE_GMB -> getCourseIdWithGmb(courseId, teacherId)
-            TYPE_SPH -> getCourseIdWithSph(courseId, teacherId, null)
-            else -> TODO("Parse IDs")
-        }
-
-    }
-
-    /**
      * Returns an internal id for a gmb id and teacher id
      * Trying to get an existing internal id for a course which is not in the db or list will mostly fail
      * @param courseGmbId External course id from gmb
@@ -126,7 +105,7 @@ class IdParser {
         // Check if there's already a matching course using sph's index
         // ! This is still very vague
         var filteredCourses = allCourses?.filter { it.courseId == classType + "_" + teacherId.toLowerCase(Locale.ROOT) + "_" + sphIndex }
-                ?: courseDb.getByInternalPrefix(classType + "_" + teacherId.toLowerCase(Locale.ROOT) + "_" + sphIndex)
+                ?: listOf(courseDb.getByInternalId(classType + "_" + teacherId.toLowerCase(Locale.ROOT) + "_" + sphIndex))
         // The list should only contain 0 or 1 elements (unique id)
         // Apart from classType and teacherId, isLK is the only property we can trust
         if (filteredCourses.isNotEmpty()) {

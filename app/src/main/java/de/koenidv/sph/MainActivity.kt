@@ -73,7 +73,7 @@ class MainActivity : AppCompatActivity() {
             SphPlanner.openInBrowserUrl = null
             lastNavArguments = args
         }
-
+        
         /*
          * Pull to refresh
          */
