@@ -151,6 +151,7 @@
         <item quantity="one">%d more undone task</item>
         <item quantity="other">%d more undone tasks</item>
     </plurals>
+    <string name="tasks_share_template">Task for %course: %description</string>
 
     <!-- Attachments -->
     <string name="attachments_pins_title">Pinned attachments</string>

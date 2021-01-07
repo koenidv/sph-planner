@@ -1,6 +1,7 @@
 package de.koenidv.sph.adapters
 
 import android.app.Activity
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -39,6 +40,7 @@ class TasksAdapter(private val tasks: MutableList<Task>,
 
         val pin = sheet.findViewById<TextView>(R.id.pinTextView)
         val unpin = sheet.findViewById<TextView>(R.id.unpinTextView)
+        val share = sheet.findViewById<TextView>(R.id.shareTextView)
 
         // Only show applicable options
         if (task.isPinned) pin?.visibility = View.GONE
@@ -69,6 +71,20 @@ class TasksAdapter(private val tasks: MutableList<Task>,
             sheet.dismiss()
         }
 
+        share?.setOnClickListener {
+            sheet.dismiss()
+            // Share task description as plaintext
+            val text = SphPlanner.applicationContext().getString(R.string.tasks_share_template)
+                    .replace("%course", CoursesDb.getInstance().getFullname(task.id_course))
+                    .replace("%description", task.description)
+            val sendIntent: Intent = Intent().apply {
+                action = Intent.ACTION_SEND
+                putExtra(Intent.EXTRA_TEXT, text)
+                this.type = "text/plain"
+            }
+            activity.startActivity(Intent.createChooser(sendIntent, null))
+        }
+
         sheet.show()
     }
 
@@ -81,7 +97,7 @@ class TasksAdapter(private val tasks: MutableList<Task>,
         }
 
         MaterialDialog(activity, BottomSheet()).show {
-            datePicker(currentDate = currentCalendar) { dialog, calendar ->
+            datePicker(currentDate = currentCalendar) { _, calendar ->
                 val newDate = Date(calendar.timeInMillis)
                 // Update db and dataset
                 TasksDb.getInstance().setDueDate(task.taskId, newDate)

@@ -107,7 +107,6 @@ class OnboardingSupportlistFragment : Fragment() {
             }
             if (!features.contains("Stundenplan")) {
                 allFeatures = false
-                usableFeatures = true
                 featurelistText = featurelistText.replace("%timetable", crossmarkText)
             } else {
                 someFeatures = true

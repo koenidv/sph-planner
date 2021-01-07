@@ -233,5 +233,6 @@
     <string name="tasks_due_tomorrow">Morgen</string>
     <string name="tasks_due_overdue">Überfällig</string>
     <string name="tasks_due_setdate">Fälligkeitsdatum hinzufügen</string>
+    <string name="tasks_share_template">Aufgabe für %course: %description</string>
 
 </resources>

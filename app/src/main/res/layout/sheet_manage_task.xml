@@ -33,4 +33,18 @@
         app:drawableStartCompat="@drawable/ic_unpin"
         app:drawableTint="?attr/colorOnSurface" />
 
+    <TextView
+        android:id="@+id/shareTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
+        android:drawablePadding="16dp"
+        android:gravity="center_vertical"
+        android:padding="16dp"
+        android:text="@string/attachments_options_share"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textSize="16sp"
+        app:drawableStartCompat="@drawable/ic_send"
+        app:drawableTint="?attr/colorOnSurface" />
+
 </LinearLayout>
