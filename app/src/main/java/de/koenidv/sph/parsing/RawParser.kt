@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.graphics.Color
 import android.util.Log
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.toColorInt
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner.Companion.TAG
@@ -483,7 +484,14 @@ class RawParser {
                 colorSplits = colorTemp.substring(0, colorTemp.indexOf(")")).split(", ")
                 color = Color.rgb(colorSplits[0].toInt(), colorSplits[1].toInt(), colorSplits[2].toInt())
                 */
-                color = Color.parseColor(content.substring(content.indexOf("background-color: #") + 18, content.indexOf("background-color: #") + 25))
+                color = try {
+                    Color.parseColor(content.substring(content.indexOf("background-color: #") + 18, content.indexOf("background-color: #") + 25))
+                } catch (nfe: NumberFormatException) {
+                    // If parsing the color failed for some reason, use the current theme color
+                    applicationContext()
+                            .getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
+                            .getInt("themeColor", 0)
+                }
 
                 type = nametypeMap[name] ?: "other"
 

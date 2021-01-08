@@ -217,5 +217,10 @@
         app:destination="@id/frag_course_overview"
         app:enterAnim="@anim/popup_enter"
         app:exitAnim="@anim/popup_exit" />
+    <action
+        android:id="@+id/webviewAction"
+        app:destination="@id/frag_webview"
+        app:enterAnim="@anim/popup_enter"
+        app:exitAnim="@anim/popup_exit" />
 
 </navigation>

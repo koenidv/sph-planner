@@ -504,7 +504,7 @@ class NetworkManager {
 
                 var numberId: String
                 var postIndex: String
-                var courseId: String
+                var courseId: String?
                 var latestPost: Post?
 
                 for (row in rows) {
@@ -542,7 +542,7 @@ class NetworkManager {
                         val courseToAdd = coursesdb.getByInternalId(courseId)
                         if (courseToAdd != null) {
                             courses.add(courseToAdd)
-                            courseids.add(courseId)
+                            courseids.add(courseId!!)
                         }
                     }
                 }

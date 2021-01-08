@@ -388,11 +388,10 @@ class AttachmentManager {
             // Update link last use
             LinkAttachmentsDb.getInstance().used(attachment.attachId())
             // Open url
-            // todo action if not from posts
             if (activity.getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE).getBoolean("open_links_inapp", true)) {
                 // Open in in-app
                 activity.findNavController(R.id.nav_host_fragment)
-                        .navigate(R.id.webviewFromPostsAction, bundleOf("url" to attachment.url()))
+                        .navigate(R.id.webviewAction, bundleOf("url" to attachment.url()))
             } else {
                 // Open in browser
                 val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(attachment.url()))
