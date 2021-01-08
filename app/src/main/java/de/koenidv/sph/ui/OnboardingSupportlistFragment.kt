@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.google.android.material.button.MaterialButton
@@ -38,8 +39,7 @@ class OnboardingSupportlistFragment : Fragment() {
         NetworkManager().loadSiteWithToken("https://start.schulportal.hessen.de/index.php", onComplete = { success: Int, response: String? ->
 
             if (success != NetworkManager.SUCCESS) {
-                // Display network error
-                // Might display if sph is being maintained
+                // Display error
                 // Credentials should be valid as we just checked them in the last onboarding step
                 featuresLoading.visibility = View.GONE
                 warningText.text = when (success) {
@@ -54,6 +54,23 @@ class OnboardingSupportlistFragment : Fragment() {
                     // Recreate to try again
                     requireActivity().recreate()
                 }
+
+                // Debug option to share response on unknown error
+                // Usign text comparison because o fthe else statement
+                //if (warningText.text == getString(R.string.onboard_supported_error_unknown)) {
+                warningText.setOnLongClickListener {
+                    val sendIntent: Intent = Intent().apply {
+                        action = Intent.ACTION_SEND
+                        putExtra(Intent.EXTRA_TEXT, success.toString() + "\n" + response)
+                        this.type = "text/plain"
+                    }
+                    requireActivity().startActivity(Intent.createChooser(sendIntent, null))
+                    true
+                }
+                //}
+                // Debug show toast if credential are somehow wrong
+                if (success == NetworkManager.FAILED_INVALID_CREDENTIALS)
+                    Toast.makeText(requireContext(), "Invalid credentials", Toast.LENGTH_LONG).show()
                 return@loadSiteWithToken
             }
 

@@ -234,5 +234,6 @@
     <string name="tasks_due_overdue">Überfällig</string>
     <string name="tasks_due_setdate">Fälligkeitsdatum hinzufügen</string>
     <string name="tasks_share_template">Aufgabe für %course: %description</string>
+    <string name="messages_unread_possible">✉️ Du könntest ungelesene Nachrichten haben</string>
 
 </resources>

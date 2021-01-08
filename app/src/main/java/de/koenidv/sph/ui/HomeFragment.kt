@@ -20,6 +20,9 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.remoteconfig.ktx.remoteConfig
+import de.koenidv.sph.MainActivity
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.adapters.AttachmentsAdapter
@@ -42,6 +45,7 @@ class HomeFragment : Fragment() {
     private lateinit var tasksRecycler: RecyclerView
     private lateinit var posts: MutableList<Post>
     private lateinit var unreadPostsRecycler: RecyclerView
+    private lateinit var messagesLayout: LinearLayout
 
     // Refresh whenever the broadcast "uichange" is received
     private val uichangeReceiver: BroadcastReceiver = object : BroadcastReceiver() {
@@ -84,7 +88,7 @@ class HomeFragment : Fragment() {
             }
 
             // Update tasks and posts list when a task is done
-            if (intent.getStringExtra("content") == "taskDone"
+            else if (intent.getStringExtra("content") == "taskDone"
                     && ::tasks.isInitialized) {
                 val taskId = intent.getStringExtra("taskId")
                 val postId = intent.getStringExtra("postId")
@@ -108,6 +112,13 @@ class HomeFragment : Fragment() {
                     val postIndex = posts.indexOfFirst { it.postId == postId }
                     if (postIndex != -1) unreadPostsRecycler.adapter?.notifyItemChanged(postIndex)
                 }
+            } else if (intent.getStringExtra("content") == "messages_maybe") {
+                // If there might be unread messages and remote config enables that,
+                // show a text redirecting the user to sph's messages page
+                if (Firebase.remoteConfig.getBoolean("messages_display_possible")) {
+                    // Gone by default
+                    messagesLayout.visibility = View.VISIBLE
+                }
             }
         }
     }
@@ -124,7 +135,7 @@ class HomeFragment : Fragment() {
                               savedInstanceState: Bundle?): View? {
 
         val view = inflater.inflate(R.layout.fragment_home, container, false)
-        //val prefs = requireContext().getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
+        val prefs = requireContext().getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
 
         // Set random greeting as action bar title, once per app start, or after 30 minutes
         if (SphPlanner.randomGreeting == null || Date().time - SphPlanner.randomGreetingTime > 30 * 60 * 1000) {
@@ -147,6 +158,28 @@ class HomeFragment : Fragment() {
                                 FragmentNavigatorExtras(timetable to "timetable"))
             }
         } else timetable.visibility = View.GONE
+
+        /*
+         * Possibly new messages
+         */
+
+        messagesLayout = view.findViewById(R.id.messagesLayout)
+
+        // If there might be unread messages and remote config enables that,
+        // show a text redirecting the user to sph's messages page
+        if (prefs.getBoolean("messages_unread", false)
+                && Firebase.remoteConfig.getBoolean("messages_display_possible")) {
+            // Gone by default
+            messagesLayout.visibility = View.VISIBLE
+        }
+
+        // Open sph with a prompt to use AutoSPH,
+        // reset unread preference and hide this text
+        messagesLayout.setOnClickListener {
+            MainActivity.openSph(requireContext())
+            prefs.edit().putBoolean("messages_unread", false).apply()
+            messagesLayout.visibility = View.GONE
+        }
 
 
         /*

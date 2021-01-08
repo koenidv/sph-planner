@@ -13,8 +13,9 @@ import com.androidnetworking.error.ANError
 import com.androidnetworking.interfaces.OkHttpResponseListener
 import com.androidnetworking.interfaces.StringRequestListener
 import com.facebook.stetho.okhttp3.StethoInterceptor
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import de.koenidv.sph.R
-import de.koenidv.sph.SphPlanner
+import de.koenidv.sph.SphPlanner.Companion.TAG
 import de.koenidv.sph.SphPlanner.Companion.applicationContext
 import de.koenidv.sph.database.*
 import de.koenidv.sph.objects.*
@@ -32,7 +33,6 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 
 //  Created by koenidv on 11.12.2020.
-@Suppress("PropertyName")
 class NetworkManager {
 
     companion object {
@@ -53,9 +53,10 @@ class NetworkManager {
 
         when (destinationId) {
             R.id.nav_home, R.id.nav_explore -> {
-                // Update changes after 10min, posts after 30min
+                // Update changes after 10min, posts after 30min, messages after 20min
                 if (time - prefs.getLong("updated_changes", 0) > 10 * 60 * 1000) updateList.add("changes")
                 if (time - prefs.getLong("updated_posts", 0) > 30 * 60 * 1000) updateList.add("posts")
+                if (time - prefs.getLong("updated_messages", 0) > 20 * 60 * 1000) updateList.add("messages")
             }
             R.id.nav_courses -> {
                 // 2 minutes cooldown, update all posts
@@ -125,12 +126,15 @@ class NetworkManager {
                 loadAndSaveTimetable { lessons ->
                     if (lessons == SUCCESS)
                     // Load all posts, tasks, attachments and links from all courses
-                        NetworkManager().loadAndSavePosts(markAsRead = true) { posts ->
+                        loadAndSavePosts(markAsRead = true) { posts ->
                             if (posts == SUCCESS)
                             // Load changes, if there are any
-                                NetworkManager().loadAndSaveChanges { changes ->
+                                loadAndSaveChanges { changes ->
                                     if (changes == SUCCESS)
-                                        onComplete(SUCCESS)
+                                    // Fetch the number of messages to know they are not new
+                                        checkForNewMessages(markAsRead = true) { messages ->
+                                            onComplete(messages)
+                                        }
                                     else onComplete(changes)
                                 }
                             else onComplete(posts)
@@ -314,11 +318,11 @@ class NetworkManager {
                                         || responseLine.contains("Fehler - Schulportal Hessen")
                                         || responseLine.contains("Schulauswahl - Schulportal Hessen")) {
                                     // Signin was not successful
-                                    onComplete(FAILED_INVALID_CREDENTIALS, null)
+                                    onComplete(FAILED_INVALID_CREDENTIALS, "Invalid credentials")
                                     prefs.edit().putLong("token_last_success", 0).apply()
                                 } else if (response.contains("Wartungsarbeiten")) {
                                     // Maintenance work
-                                    onComplete(FAILED_MAINTENANCE, null)
+                                    onComplete(FAILED_MAINTENANCE, "Maintenance")
                                 }
                             }
 
@@ -326,10 +330,10 @@ class NetworkManager {
                                 when (error.errorDetail) {
                                     "connectionError" -> {
                                         // This will also be called if request timed out
-                                        onComplete(FAILED_NO_NETWORK, null)
+                                        onComplete(FAILED_NO_NETWORK, "No network available at this time")
                                     }
                                     "requestCancelledError" -> {
-                                        onComplete(FAILED_CANCELLED, null)
+                                        onComplete(FAILED_CANCELLED, "Network request was cancelled")
                                     }
                                     else -> {
                                         Toast.makeText(applicationContext(), "Error for $url",
@@ -338,7 +342,14 @@ class NetworkManager {
                                                 error.errorCode.toString()
                                                         + ": " + error.errorDetail,
                                                 Toast.LENGTH_LONG).show()
-                                        onComplete(FAILED_UNKNOWN, null)
+                                        // Provide some details for user debugging
+                                        onComplete(FAILED_UNKNOWN,
+                                                "--- Network error code: ${error.errorCode}\n"
+                                                        + "--- Error description: ${error.errorDetail}\n"
+                                                        + "--- Error body: ${error.errorCode}\n"
+                                                        + "--- No server response available ---")
+                                        // Log the error in Crashlytics
+                                        FirebaseCrashlytics.getInstance().recordException(error)
                                     }
                                 }
                             }
@@ -386,10 +397,10 @@ class NetworkManager {
                             }
 
                             override fun onError(anError: ANError?) {
-                                // Running in emulator will cause an ssl errora
+                                // Running in emulator will cause an ssl error
                                 // Network error will also happen if there is a timeout or no connection
                                 // Not a huge deal though, the unresolved url will work as well. For now.
-                                Log.e(SphPlanner.TAG, anError!!.errorDetail + ": " + url)
+                                Log.e(TAG, anError!!.errorDetail + ": " + url)
                                 onComplete(FAILED_UNKNOWN, url)
                             }
 
@@ -453,16 +464,28 @@ class NetworkManager {
         }
     }
 
+    /**
+     * Update multiple scopes
+     * @param entries List of strings with scopes to update
+     * (See in when below for what's supported)
+     */
     fun update(entries: List<String>, onComplete: (success: Int) -> Unit) {
         if (entries.isNotEmpty()) {
             // Prepare token
             TokenManager().generateAccessToken { success, _ ->
                 if (success == SUCCESS) {
-                    var number = 0
-                    var lastError: Int? = null
+                    var number = 0 // Completed calls
+                    var lastError: Int? = null // Last error occurred
+
+                    // Callback for each function
                     val checkDone = { thissuccess: Int ->
+                        // If the function did not call back successfully,
+                        // save the last error to return later
                         if (thissuccess != SUCCESS)
                             lastError = thissuccess
+                        // If this was the last function executed,
+                        // call back with a success if all went good
+                        // or the last error occurred
                         number++
                         if (number == entries.size) {
                             if (lastError == null) onComplete(SUCCESS)
@@ -470,11 +493,14 @@ class NetworkManager {
                         }
 
                     }
+
+                    // Run the respective funtion for each update order
                     for (entry in entries) {
                         when (entry) {
                             "posts" -> updatePosts(checkDone)
                             "changes" -> loadAndSaveChanges(checkDone)
                             "timetable" -> loadAndSaveTimetable(checkDone)
+                            "messages" -> checkForNewMessages(onComplete = checkDone)
                         }
                     }
                 } else onComplete(success)
@@ -563,4 +589,128 @@ class NetworkManager {
         }
 
     }
+
+    /**
+     * Check if the number of visible messages has increased
+     */
+    private fun checkForNewMessages(markAsRead: Boolean = false, onComplete: (success: Int) -> Unit) {
+
+        /*
+         * We currently cannot get messages, decryption isn't implemented yet.
+         * What we can do is get the number of visible messages and check
+         * if it is larger than last time we checked.
+         * The user will then be directed to sph in their browser,
+         * where decryption works.
+         * This will require them to sign in again, should they opt
+         * not to use the AutoSPH signin service.
+         */
+
+        // Firstly, get an access token
+        TokenManager().generateAccessToken { success, token ->
+            // If getting a token failed, call onComplete
+            // with the error and return
+            if (success != SUCCESS) {
+                onComplete(success)
+                return@generateAccessToken
+            }
+
+            // Make sure session id cookie is set
+            CookieStore.clearCookies()
+            CookieStore.saveFromResponse(
+                    HttpUrl.parse("https://schulportal.hessen.de")!!,
+                    listOf(Cookie.Builder()
+                            .domain("schulportal.hessen.de")
+                            .name("sid")
+                            .value(token!!).build()))
+
+            // Adding an Network Interceptor for Debugging purpose :
+            val okHttpClient = OkHttpClient.Builder()
+                    .addNetworkInterceptor(StethoInterceptor())
+                    .cookieJar(CookieStore)
+                    .connectTimeout(60, TimeUnit.SECONDS)
+                    .build()
+            AndroidNetworking.initialize(applicationContext(), okHttpClient)
+
+            // Now post messages.php with a few parameters
+            // a=headers - Titles only (read for entire message)
+            // getType=visibleOnly - Only get visible messages (could also be unvisibleOnly)
+            // last=0 - Not yet sure what that does, but it is needed to not get an error
+            AndroidNetworking.post(applicationContext().getString(R.string.url_messages))
+                    .addBodyParameter("a", "headers")
+                    .addBodyParameter("getType", "visibleOnly")
+                    .addBodyParameter("last", "0")
+                    .build()
+                    .getAsString(object : StringRequestListener {
+                        override fun onResponse(response: String) {
+                            // The response should be a json object with two values:
+                            // total - The number of messages matching our request
+                            // rows - The encrypted headers for each message
+                            // We only need total's value and therefore don't have
+                            // to parse the object
+                            val messagesCount: Int
+                            try {
+                                messagesCount = response.substring(
+                                        response.indexOf("\"total\":") + 8,
+                                        response.indexOf(",")
+                                ).toInt()
+                            } catch (e: Exception) {
+                                // If getting the message count failed,
+                                // log and return
+                                Log.e(TAG, "Getting messages count failed")
+                                Log.e(TAG, e.stackTraceToString())
+                                FirebaseCrashlytics.getInstance().recordException(e)
+                                onComplete(FAILED_UNKNOWN)
+                                return
+                            }
+
+                            // Get SharedPreferences to load and save messages count
+                            val prefs = applicationContext().getSharedPreferences(
+                                    "sharedPrefs", AppCompatActivity.MODE_PRIVATE)
+
+                            // Compare current messages count with the old one
+                            // If current is higher and messages should not be marked as read,
+                            // notify ui to update
+                            if (prefs.getInt("messages_count", 0) < messagesCount
+                                    && !markAsRead) {
+                                // Update preferences to reflect that new messages might be available
+                                prefs.edit().putBoolean("messages_unread", true).apply()
+
+                                // Send a local broadcast to let the current fragment know
+                                // it might want to show that new messages may be available
+                                val uiBroadcast = Intent("uichange")
+                                uiBroadcast.putExtra("content", "messages_maybe")
+                                LocalBroadcastManager.getInstance(applicationContext()).sendBroadcast(uiBroadcast)
+                            }
+
+                            // Update prefs even if current count is lower for use next time
+                            prefs.edit()
+                                    .putInt("messages_count", messagesCount)
+                                    .putLong("updated_messages", Date().time)
+                                    .apply()
+
+                            // Finally, call back with a success
+                            onComplete(SUCCESS)
+                        }
+
+                        override fun onError(error: ANError) {
+                            // Basic error handling should be enough,
+                            // as this method failing will not cause
+                            // any big issues
+                            when (error.errorDetail) {
+                                "connectionError" -> {
+                                    onComplete(FAILED_NO_NETWORK)
+                                }
+                                "requestCancelledError" -> {
+                                    onComplete(FAILED_CANCELLED)
+                                }
+                                else -> {
+                                    onComplete(FAILED_UNKNOWN)
+                                }
+                            }
+                        }
+
+                    })
+        }
+    }
+
 }

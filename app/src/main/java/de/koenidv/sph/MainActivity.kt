@@ -73,7 +73,7 @@ class MainActivity : AppCompatActivity() {
             SphPlanner.openInBrowserUrl = null
             lastNavArguments = args
         }
-        
+
         /*
          * Pull to refresh
          */
@@ -146,29 +146,35 @@ class MainActivity : AppCompatActivity() {
         return navController.navigateUp() || super.onSupportNavigateUp()
     }
 
-    private fun openSph(context: Context) {
-        val prefs = getSharedPreferences("sharedPrefs", MODE_PRIVATE)
-        // Open koenidv's autosph to log browser in to sph
-        // This will transfer user data to an external server
-        // Ask user if wants this or log in manually
-        val uri = Uri.parse("https://koenidv.de/autosph?direct="
-                + prefs.getString("schoolid", "") + "."
-                + prefs.getString("user", "")
-                + "&" + prefs.getString("password", ""))
-        val autoLoginIntent = Intent(Intent.ACTION_VIEW, uri)
-        val manualIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://start.schulportal.hessen.de/"))
+    companion object {
+        /**
+         * Prompt user to use AutoSPH if he hasn't accepted this before
+         * Otherwise just open SPH in browser for manual login
+         */
+        fun openSph(context: Context) {
+            val prefs = context.getSharedPreferences("sharedPrefs", MODE_PRIVATE)
+            // Open koenidv's autosph to log browser in to sph
+            // This will transfer user data to an external server
+            // Ask user if wants this or log in manually
+            val uri = Uri.parse("https://koenidv.de/autosph?direct="
+                    + prefs.getString("schoolid", "") + "."
+                    + prefs.getString("user", "")
+                    + "&" + prefs.getString("password", ""))
+            val autoLoginIntent = Intent(Intent.ACTION_VIEW, uri)
+            val manualIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://start.schulportal.hessen.de/"))
 
-        // Auto log in if user has accepted before and network is trusted
-        if (prefs.getBoolean("open_sph_accepted_auto", false)
-                && NetworkCapabilities().hasCapability(NetworkCapabilities.NET_CAPABILITY_TRUSTED)) {
-            startActivity(autoLoginIntent)
-        } else {
-            AlertDialog.Builder(context)
-                    .setTitle(R.string.menu_open_sph_warning_title)
-                    .setMessage(R.string.menu_open_sph_warning_description)
-                    .setPositiveButton(R.string.menu_open_sph_warning_yes) { _, _ -> startActivity(autoLoginIntent); prefs.edit().putBoolean("open_sph_accepted_auto", true).apply() }
-                    .setNegativeButton(R.string.menu_open_sph_warning_no) { _, _ -> startActivity(manualIntent) }
-                    .show()
+            // Auto log in if user has accepted before and network is trusted
+            if (prefs.getBoolean("open_sph_accepted_auto", false)
+                    && NetworkCapabilities().hasCapability(NetworkCapabilities.NET_CAPABILITY_TRUSTED)) {
+                context.startActivity(autoLoginIntent)
+            } else {
+                AlertDialog.Builder(context)
+                        .setTitle(R.string.menu_open_sph_warning_title)
+                        .setMessage(R.string.menu_open_sph_warning_description)
+                        .setPositiveButton(R.string.menu_open_sph_warning_yes) { _, _ -> context.startActivity(autoLoginIntent); prefs.edit().putBoolean("open_sph_accepted_auto", true).apply() }
+                        .setNegativeButton(R.string.menu_open_sph_warning_no) { _, _ -> context.startActivity(manualIntent) }
+                        .show()
+            }
         }
     }
 }

@@ -9,6 +9,7 @@ import com.androidnetworking.common.Priority
 import com.androidnetworking.error.ANError
 import com.androidnetworking.interfaces.StringRequestListener
 import com.facebook.stetho.okhttp3.StethoInterceptor
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.remoteconfig.ktx.remoteConfig
 import de.koenidv.sph.R
@@ -138,6 +139,7 @@ class TokenManager {
                 }
                 else -> {
                     Toast.makeText(applicationContext(), error.toString(), Toast.LENGTH_LONG).show()
+                    onComplete(NetworkManager.FAILED_UNKNOWN, null)
                 }
             }
         } else {
@@ -145,6 +147,7 @@ class TokenManager {
                 onComplete(NetworkManager.FAILED_SERVER_ERROR, null)
             else {
                 Toast.makeText(applicationContext(), error.toString(), Toast.LENGTH_LONG).show()
+                FirebaseCrashlytics.getInstance().recordException(error)
                 onComplete(NetworkManager.FAILED_UNKNOWN, null)
             }
         }

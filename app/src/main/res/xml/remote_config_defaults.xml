@@ -4,4 +4,8 @@
         <key>token_fix_0106</key>
         <value>true</value>
     </entry>
+    <entry>
+        <key>messages_display_possible</key>
+        <value>true</value>
+    </entry>
 </defaultsMap>
