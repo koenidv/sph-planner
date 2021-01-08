@@ -19,6 +19,7 @@ import de.koenidv.sph.SphPlanner.Companion.applicationContext
 import de.koenidv.sph.database.*
 import de.koenidv.sph.objects.*
 import de.koenidv.sph.parsing.RawParser
+import de.koenidv.sph.parsing.Utility
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -331,7 +332,13 @@ class NetworkManager {
                                         onComplete(FAILED_CANCELLED, null)
                                     }
                                     else -> {
-                                        Toast.makeText(applicationContext(), error.toString(), Toast.LENGTH_LONG).show()
+                                        Toast.makeText(applicationContext(), "Error for $url",
+                                                Toast.LENGTH_LONG).show()
+                                        Toast.makeText(applicationContext(),
+                                                error.errorCode.toString()
+                                                        + ": " + error.errorDetail,
+                                                Toast.LENGTH_LONG).show()
+                                        onComplete(FAILED_UNKNOWN, null)
                                     }
                                 }
                             }
@@ -497,22 +504,46 @@ class NetworkManager {
 
                 var numberId: String
                 var postIndex: String
-                var courseId: String?
+                var courseId: String
                 var latestPost: Post?
 
                 for (row in rows) {
                     numberId = row.attr("data-book")
                     postIndex = row.attr("data-entry")
-                    // Todo add number id if there isn't any yet
                     courseId = coursesdb.getCourseIdByNumberId(numberId)
+
+                    if (courseId == null) {
+                        // Course has not already been added, at least not with a number id
+                        // Try to find a matching course or create one and save it to the db
+                        val courseName = row.select("span.name").text()
+                        val teacherId = row.select("span.teacher button")
+                                .first().ownText().toLowerCase(Locale.ROOT)
+                        val isLK = courseName.contains("LK")
+
+                        val courseToAdd = RawParser().getCourseFromPostsoverviewData(
+                                courseName, teacherId, isLK, numberId,
+                                Utility().parseStringArray(R.array.course_colors))
+                        // If the found course is null, this will not crash
+                        // (won't try adding null to courses list)
+                        // But it also won't update the course
+                        if (courseToAdd != null) {
+                            coursesdb.save(courseToAdd)
+                            courseId = courseToAdd.courseId
+                        }
+                    }
+
                     latestPost = postsdb.getByCourseId(courseId, 1).getOrNull(0)
 
+                    // Check if the index of the last post in this course matches the newest index on sph
                     if (latestPost?.postId?.substring(latestPost.postId.lastIndexOf("_") + 1)
                             != postIndex
                             || timenow - prefs.getLong("updated_posts_${courseId}", 0) > 48 * 60 * 60 * 1000
                     ) {
-                        courses.add(coursesdb.getByInternalId(courseId))
-                        courseids.add(courseId)
+                        val courseToAdd = coursesdb.getByInternalId(courseId)
+                        if (courseToAdd != null) {
+                            courses.add(courseToAdd)
+                            courseids.add(courseId)
+                        }
                     }
                 }
 

@@ -108,12 +108,12 @@ class IdParser {
                 ?: listOf(courseDb.getByInternalId(classType + "_" + teacherId.toLowerCase(Locale.ROOT) + "_" + sphIndex))
         // The list should only contain 0 or 1 elements (unique id)
         // Apart from classType and teacherId, isLK is the only property we can trust
-        if (filteredCourses.isNotEmpty()) {
-            return if (isLK != null && filteredCourses[0].isLK == isLK) {
-                classType + "_" + teacherId.toLowerCase(Locale.ROOT) + "_" + sphIndex
-            } else {
+        if (filteredCourses.firstOrNull() != null) {
+            if (isLK != null && filteredCourses[0].isLK == isLK) {
+                return classType + "_" + teacherId.toLowerCase(Locale.ROOT) + "_" + sphIndex
+            } else if (isLK == null || filteredCourses[0].isLK == null) {
                 // Just assume it's correct if nothing is specified for isLK
-                classType + "_" + teacherId.toLowerCase(Locale.ROOT) + "_" + sphIndex
+                return classType + "_" + teacherId.toLowerCase(Locale.ROOT) + "_" + sphIndex
             }
         }
 
@@ -138,9 +138,16 @@ class IdParser {
 
     fun getCourseIdPrefixWithNamedId(namedId: String, teacherId: String): String? {
         val prefixMap = Utility().parseStringArray(R.array.namedid_course_prefixes)
-        return if (prefixMap.containsKey(namedId.substring(0, namedId.indexOf(" "))))
-            (prefixMap[namedId.substring(0, namedId.indexOf(" "))] +
-                    "_" + teacherId).toLowerCase(Locale.ROOT)
+        // If the named id is for some reason empty, return null
+        if (namedId.isEmpty()) return null
+
+        // Try to get the first word, it's probably the subject name
+        val name = if (namedId.contains(" ")) namedId.substring(0, namedId.indexOf(" "))
+        else namedId
+
+        // Try to get a course id from the prefix map
+        return if (prefixMap.containsKey(name))
+            (prefixMap[name] + "_" + teacherId).toLowerCase(Locale.ROOT)
         else null
     }
 

@@ -241,11 +241,11 @@ class RawParser {
             val rawContent = rawResponse.substring(rawResponse.indexOf("<tbody>") + 7, rawResponse.indexOf("</tbody>"))
 
             /*
-         * It seems as if the sph id index is in the same order as the timetable
-         * i.e. Q3Gvac03 - GYM is the 3rd History GK in the timetable
-         * This means that the internal id's should be in the same order as they're taken from it
-         * Let's just hope the best
-         */
+             * It seems as if the sph id index is in the same order as the timetable
+             * i.e. Q3Gvac03 - GYM is the 3rd History GK in the timetable
+             * This means that the internal id's should be in the same order as they're taken from it
+             * Let's just hope the best
+             */
 
             val rawContents = rawContent.split("<tr").toMutableList()
             rawContents.removeFirst()
@@ -282,7 +282,6 @@ class RawParser {
         } catch (e: Exception) {
             Log.w(TAG, "Studygroups parsing failed!")
             Log.w(TAG, e.stackTraceToString())
-            Toast.makeText(applicationContext(), e.stackTraceToString(), Toast.LENGTH_LONG).show()
         }
 
         return courses
@@ -299,11 +298,10 @@ class RawParser {
         val table = Jsoup.parse(rawResponse).select("#aktuell tbody")
 
         var courseName: String
-        var uniformNamedId: String
         var numberId: String
         var teacherId: String
         var isLK: Boolean
-        var similiarCourses: List<Course>
+        var courseToAdd: Course?
         val nameColorMap = Utility().parseStringArray(R.array.course_colors)
         // Get values from table
         for (row in table.select("tr")) {
@@ -313,81 +311,106 @@ class RawParser {
                     .first().ownText().toLowerCase(Locale.ROOT)
             isLK = courseName.contains("LK")
 
-            // Make named id from post overview uniform
-            uniformNamedId = CourseParser().parseNamedId(courseName)
-
-            // Get courses that might be the same as this one
-            similiarCourses = CoursesDb.getInstance().getByNamedId(uniformNamedId).toMutableList()
-
-            // If no similiar course was found, try getting all courses with the same subject and teacher
-            var courseIdPrefix: String? = null
-            if (similiarCourses.isEmpty()) {
-                courseIdPrefix = IdParser().getCourseIdPrefixWithNamedId(uniformNamedId, teacherId)
-                if (courseIdPrefix != null)
-                    similiarCourses.addAll(CoursesDb.getInstance().getByInternalPrefix(courseIdPrefix)
-                            .filter { it.isLK == null || it.isLK == isLK })
-            }
-
-
-            if (courseName.contains("""\(.*\)""".toRegex())) { // if contains text in brackets
-                val courseToAdd = CoursesDb.getInstance().getBySphId(courseName.substring(courseName.indexOf("(") + 1, courseName.lastIndexOf(")")).replace("-GYM", " - GYM"))
-                if (courseToAdd != null) similiarCourses.add(courseToAdd)
-            }
-
-            // Make sure no course is in the list twice
-            // This might happen because we add both by NamedId and SphId
-            similiarCourses = similiarCourses.distinct()
-
-            when {
-                similiarCourses.size == 1 -> {
-                    // Only one similiar course, this should be it.
-                    similiarCourses[0].apply {
-                        number_id = numberId
-                        named_id = uniformNamedId
-                        isFavorite = true
-                        fullname = CourseParser().getFullnameFromInternald(similiarCourses[0].courseId)
-                        color = (nameColorMap[
-                                uniformNamedId
-                                        .substring(0, uniformNamedId.indexOf(" "))]
-                                ?: nameColorMap["default"])!!.toColorInt()
-                    }
-                    courses.add(similiarCourses[0])
-                }
-                similiarCourses.isEmpty() -> {
-                    // Create new course with this namedid & numberid
-                    // If no course could be found, there is no other course with the same internal prefix
-                    // (We tried getting every course by that)
-                    // This means we can just use the prefix - if available with an index 1
-                    if (courseIdPrefix != null) {
-                        courses.add(Course(
-                                courseId = courseIdPrefix + "_1",
-                                named_id = uniformNamedId,
-                                fullname = CourseParser().getFullnameFromInternald(courseIdPrefix + "_1"),
-                                number_id = numberId,
-                                id_teacher = teacherId,
-                                isFavorite = true,
-                                isLK = isLK,
-                                color = (nameColorMap[
-                                        uniformNamedId
-                                                .substring(0, uniformNamedId.indexOf(" "))]
-                                        ?: nameColorMap["default"])!!.toColorInt()
-                        ))
-                    }
-                    Log.d(TAG, "No valid course for $uniformNamedId")
-                }
-                similiarCourses.size > 1 -> {
-                    // todo handle multiple similiar courses
-                    Toast.makeText(applicationContext(), "Too many courses", Toast.LENGTH_LONG).show()
-                    Log.d(TAG, "Too many courses for $uniformNamedId")
-                    // currently adds first course
-                    similiarCourses[0].number_id = numberId
-                    courses.add(similiarCourses[0])
-                }
-            }
+            // Add the course to the list
+            courseToAdd = getCourseFromPostsoverviewData(courseName, teacherId, isLK, numberId, nameColorMap)
+            if (courseToAdd != null)
+                courses.add(courseToAdd)
         }
 
         return courses
     }
+
+    /**
+     * Get or create course from the data provided by sph's post overview page
+     */
+    fun getCourseFromPostsoverviewData(courseName: String,
+                                       teacherId: String,
+                                       isLK: Boolean,
+                                       numberId: String,
+                                       nameColorMap: Map<String, String>): Course? {
+        // Make named id from post overview uniform
+        val uniformNamedId = CourseParser().parseNamedId(courseName)
+
+        // Get courses that might be the same as this one
+        var similiarCourses = CoursesDb.getInstance().getByNamedId(uniformNamedId).toMutableList()
+
+        // If no similiar course was found, try getting all courses with the same subject and teacher
+        var courseIdPrefix: String? = null
+        if (similiarCourses.isEmpty()) {
+            courseIdPrefix = IdParser().getCourseIdPrefixWithNamedId(uniformNamedId, teacherId)
+            if (courseIdPrefix != null)
+                similiarCourses.addAll(CoursesDb.getInstance().getByInternalPrefix(courseIdPrefix)
+                        .filter { it.isLK == null || it.isLK == isLK })
+        }
+
+
+        // If contains text in brackets and no colon in between,
+        // we'll assume that's a sph id and try to find a matching course
+        if (courseName.contains("""\([^,]+\)""".toRegex())) {
+            val courseToAdd = CoursesDb.getInstance().getBySphId(
+                    courseName.substring(
+                            courseName.indexOf("(") + 1,
+                            courseName.lastIndexOf(")"))
+                            .replace("-GYM", " - GYM"))
+            if (courseToAdd != null) similiarCourses.add(courseToAdd)
+        }
+
+        // Make sure no course is in the list twice
+        // This might happen because we add both by NamedId and SphId
+        similiarCourses = similiarCourses.distinct().toMutableList()
+
+        when {
+            similiarCourses.size == 1 -> {
+                // Only one similiar course, this should be it.
+                similiarCourses[0].apply {
+                    number_id = numberId
+                    named_id = uniformNamedId
+                    isFavorite = true
+                    fullname = CourseParser().getFullnameFromInternald(similiarCourses[0].courseId)
+                    color = (nameColorMap[
+                            uniformNamedId
+                                    .substring(0, uniformNamedId.indexOf(" "))]
+                            ?: nameColorMap["default"])!!.toColorInt()
+                }
+                return similiarCourses[0]
+            }
+            similiarCourses.isEmpty() -> {
+                // todo handle null courseIdPrefix
+                // Create new course with this namedid & numberid
+                // If no course could be found, there is no other course with the same internal prefix
+                // (We tried getting every course by that)
+                // This means we can just use the prefix - if available with an index 1
+                if (courseIdPrefix != null) {
+                    return Course(
+                            courseId = courseIdPrefix + "_1",
+                            named_id = uniformNamedId,
+                            fullname = CourseParser().getFullnameFromInternald(courseIdPrefix + "_1"),
+                            number_id = numberId,
+                            id_teacher = teacherId,
+                            isFavorite = true,
+                            isLK = isLK,
+                            color = (nameColorMap[
+                                    uniformNamedId
+                                            .substring(0, uniformNamedId.indexOf(" "))]
+                                    ?: nameColorMap["default"])!!.toColorInt()
+                    )
+                }
+                Log.d(TAG, "No valid course for $uniformNamedId")
+            }
+            else /*similiarCourses.size > 1*/ -> {
+                // todo handle multiple similiar courses
+                Toast.makeText(applicationContext(), "Too many courses", Toast.LENGTH_LONG).show()
+                Log.d(TAG, "Too many courses for $uniformNamedId")
+                // currently adds first course
+                similiarCourses[0].number_id = numberId
+                return similiarCourses[0]
+            }
+        }
+        // This should never be called
+        Log.e(TAG, "Couldn't get course from post overview data")
+        return null
+    }
+
 
     /**
      * Parse a list of school ids from raw select school webpage

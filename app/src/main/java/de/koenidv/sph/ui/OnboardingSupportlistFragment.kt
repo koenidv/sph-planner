@@ -155,7 +155,6 @@ class OnboardingSupportlistFragment : Fragment() {
                     NetworkManager().resolveUrl(feature.location, onComplete = { successUrl: Int, resolvedUrl: String ->
                         kotlin.run {
                             // Save new url to object
-                            // todo handle errors
                             if (successUrl == NetworkManager.SUCCESS
                                     || successUrl == NetworkManager.FAILED_UNKNOWN // If sph redirected back to home
                             )

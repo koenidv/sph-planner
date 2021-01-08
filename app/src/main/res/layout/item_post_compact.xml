@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/postLayout"
     android:layout_width="match_parent"
-    android:layout_height="58dp"
+    android:layout_height="wrap_content"
     android:background="?attr/selectableItemBackground"
     android:orientation="vertical"
     android:paddingBottom="8dp"

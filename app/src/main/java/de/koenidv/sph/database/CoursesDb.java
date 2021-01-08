@@ -133,6 +133,7 @@ public class CoursesDb {
      * @return Course with internal id or null
      */
     public Course getByInternalId(String courseId) {
+        if (courseId == null) return null;
         List<Course> returnList = new ArrayList<>();
         // Query course from Database
         SQLiteDatabase db = dbhelper.getReadableDatabase();
