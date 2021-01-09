@@ -121,6 +121,11 @@
             app:exitAnim="@anim/fragment_close_exit"
             app:popEnterAnim="@anim/fragment_open_enter"
             app:popExitAnim="@anim/fragment_close_exit" />
+        <action
+            android:id="@+id/usersFromExploreAction"
+            app:destination="@id/frag_users"
+            app:enterAnim="@anim/popup_enter"
+            app:exitAnim="@anim/popup_exit" />
     </fragment>
 
     <fragment
@@ -222,5 +227,10 @@
         app:destination="@id/frag_webview"
         app:enterAnim="@anim/popup_enter"
         app:exitAnim="@anim/popup_exit" />
+    <fragment
+        android:id="@+id/frag_users"
+        android:name="de.koenidv.sph.ui.UsersFragment"
+        android:label="@string/users_title"
+        tools:layout="@layout/fragment_users" />
 
 </navigation>

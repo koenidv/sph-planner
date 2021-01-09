@@ -204,6 +204,17 @@ class OnboardingSupportlistFragment : Fragment() {
                                             // Recreate to try again
                                             requireActivity().recreate()
                                         }
+                                        // Debug option to share response on unknown error
+                                        // Usign text comparison because o fthe else statement
+                                        warningText.setOnLongClickListener {
+                                            val sendIntent: Intent = Intent().apply {
+                                                action = Intent.ACTION_SEND
+                                                putExtra(Intent.EXTRA_TEXT, success.toString() + "\n" + response)
+                                                this.type = "text/plain"
+                                            }
+                                            requireActivity().startActivity(Intent.createChooser(sendIntent, null))
+                                            true
+                                        }
                                     }
                                 }
 

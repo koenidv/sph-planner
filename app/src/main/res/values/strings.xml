@@ -191,8 +191,10 @@
     <string name="changes_template_exam">%name exam</string>
     <string name="changes_template_other">%name: Something else</string>
 
-    <!-- Messages -->
+    <!-- Messages and Users-->
     <string name="messages_unread_possible">✉️ You might have unread messages</string>
+    <string name="users_title">Teachers</string>
+    <string name="users_name_template" translatable="false">%lastname, %firstname</string>
 
     <!-- Options sheet -->
     <string name="info_menuaction">Options</string>
@@ -234,6 +236,7 @@
     <string name="explore_collection_attachments">🖇️️ Files &amp; Links</string>
     <string name="explore_collection_tasks">🖋️ Tasks</string>
     <string name="explore_collection_changes">🗞️️ Changes</string>
+    <string name="explore_collection_users">👥 Teachers</string>
 
     <!-- Contact -->
     <string name="contact_telegram_icon" translatable="false">paper-plane</string>

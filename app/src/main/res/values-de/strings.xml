@@ -235,5 +235,7 @@
     <string name="tasks_due_setdate">Fälligkeitsdatum hinzufügen</string>
     <string name="tasks_share_template">Aufgabe für %course: %description</string>
     <string name="messages_unread_possible">✉️ Du könntest ungelesene Nachrichten haben</string>
+    <string name="users_title">Lehrer</string>
+    <string name="explore_collection_users">👥 Lehrer</string>
 
 </resources>

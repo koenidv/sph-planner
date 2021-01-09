@@ -348,7 +348,7 @@ class NetworkManager {
                                             teacherId = text.substring(
                                                     text.indexOf(" (") + 2,
                                                     text.indexOf(")")
-                                            )
+                                            ).toLowerCase(Locale.ROOT)
 
                                             // Add it to the list
                                             users.add(User(

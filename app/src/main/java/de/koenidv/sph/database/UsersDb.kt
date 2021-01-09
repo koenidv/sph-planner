@@ -11,6 +11,15 @@ class UsersDb {
     var writable: SQLiteDatabase = DatabaseHelper.getInstance().writableDatabase
 
     /**
+     * Get all users from the db,
+     * ordered by pinned, then lastname
+     */
+    fun all(): List<User> = getWithCursor(
+            writable.rawQuery(
+                    "SELECT * FROM users ORDER BY pinned DESC, lastname", null
+            ))
+
+    /**
      * Save a list of users to the db
      */
     fun save(users: List<User>) {
@@ -45,15 +54,6 @@ class UsersDb {
         }
         cursor.close()
     }
-
-    /**
-     * Get all users from the db,
-     * ordered by pinned, then lastname
-     */
-    private fun all(): List<User> = getWithCursor(
-            writable.rawQuery(
-                    "SELECT * FROM users ORDER BY pinned, lastname", null
-            ))
 
     private fun getWithCursor(cursor: Cursor): List<User> {
         val returnList = mutableListOf<User>()

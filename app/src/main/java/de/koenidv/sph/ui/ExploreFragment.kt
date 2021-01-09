@@ -36,6 +36,7 @@ class ExploreFragment : Fragment() {
         val attachmentsText = view.findViewById<TextView>(R.id.attachmentsTextView)
         val tasksText = view.findViewById<TextView>(R.id.tasksTextView)
         val changesText = view.findViewById<TextView>(R.id.changesTextView)
+        val usersText = view.findViewById<TextView>(R.id.usersTextView)
 
 
         // Set on click listeners, open respective fragment
@@ -62,6 +63,11 @@ class ExploreFragment : Fragment() {
                 nav.navigate(R.id.changesFromExploreAction)
             }
         } else changesText.visibility = View.GONE
+        if (features.supports(FunctionTile.FEATURE_MESSAGES)) {
+            usersText.setOnClickListener {
+                nav.navigate(R.id.usersFromExploreAction)
+            }
+        } else usersText.visibility = View.GONE
 
 
         /*
