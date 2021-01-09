@@ -16,7 +16,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static DatabaseHelper instance;
 
     private DatabaseHelper(@Nullable Context context) {
-        super(context, "database", null, 2);
+        super(context, "database", null, 3);
     }
 
     public static DatabaseHelper getInstance() {
@@ -53,24 +53,27 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 " id_teacher TEXT, id_subsTeacher TEXT, room TEXT, room_before TEXT, description TEXT," +
                 " sortLesson INTEGER)");
         // Create function tiles table
-        db.execSQL("CREATE TABLE tiles(name TEXT PRIMARY KEY," +
+        db.execSQL("CREATE TABLE tiles(name TEXT PRIMARY KEY, " +
                 " location TEXT, type TEXT, icon TEXT, color INTEGER)");
         // Create course posts table
-        db.execSQL("CREATE TABLE posts(post_id TEXT PRIMARY KEY, id_course TEXT," +
+        db.execSQL("CREATE TABLE posts(post_id TEXT PRIMARY KEY, id_course TEXT, " +
                 "date INTEGER,title TEXT, description TEXT, unread INTEGER)");
         // Create file attachments table
-        db.execSQL("CREATE TABLE fileAttachments(attachment_id TEXT PRIMARY KEY," +
-                "id_course TEXT, id_post TEXT, name TEXT, date INTEGER, url TEXT, size TEXT," +
+        db.execSQL("CREATE TABLE fileAttachments(attachment_id TEXT PRIMARY KEY, " +
+                "id_course TEXT, id_post TEXT, name TEXT, date INTEGER, url TEXT, size TEXT, " +
                 "type TEXT, pinned INTEGER, lastUse INTEGER)");
         // Create tasks table
         db.execSQL("CREATE TABLE tasks(task_id TEXT PRIMARY KEY, id_course TEXT, id_post TEXT," +
                 "description TEXT, date INTEGER, isdone INTEGER, pinned INTEGER, dueDate INTEGER)");
         // Create link attachments table
-        db.execSQL("CREATE TABLE linkAttachments(attachment_id TEXT PRIMARY KEY," +
-                "id_course TEXT, id_post TEXT, name TEXT," +
+        db.execSQL("CREATE TABLE linkAttachments(attachment_id TEXT PRIMARY KEY, " +
+                "id_course TEXT, id_post TEXT, name TEXT, " +
                 "date INTEGER, url TEXT, pinned INTEGER, lastUse INTEGER)");
         // Create timetable table
         db.execSQL("CREATE TABLE timetable(id_course TEXT, day INTEGER, hour INTEGER, room TEXT)");
+        // Create users (teachers) table
+        db.execSQL("CREATE TABLE users(user_id TEXT, teacher_id TEXT, firstname TEXT, " +
+                "lastname TEXT, type TEXT, pinned INTEGER)");
     }
 
     //upgrade Database
@@ -78,6 +81,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldversion, int newversion) {
         if (oldversion == 1 && newversion == 2) {
             db.execSQL("ALTER TABLE postTasks RENAME TO tasks");
+        }
+        if (oldversion < 3) {
+            // Create users (teachers) table
+            db.execSQL("CREATE TABLE users(user_id TEXT, teacher_id TEXT, firstname TEXT, " +
+                    "lastname TEXT, type TEXT, pinned INTEGER)");
         }
     }
 }

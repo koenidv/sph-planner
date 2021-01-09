@@ -240,6 +240,24 @@ public class CoursesDb {
     }
 
     /**
+     * Get a list of teacher ids from all favorite courses
+     */
+    public List<String> getFavoriteTeacherIds() {
+        Cursor cursor = dbhelper.getReadableDatabase().rawQuery("SELECT id_teacher FROM courses WHERE isFavorite=1", null);
+        ArrayList<String> teacherIds = new ArrayList<>();
+
+        // Add each row to teacherIds
+        if (cursor.moveToFirst()) {
+            do {
+                teacherIds.add(cursor.getString(0));
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+
+        return teacherIds;
+    }
+
+    /**
      * @param course course which should be deleted
      * @return True, if course was deleted
      */

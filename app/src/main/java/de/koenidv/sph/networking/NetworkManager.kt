@@ -10,6 +10,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.androidnetworking.AndroidNetworking
 import com.androidnetworking.common.Priority
 import com.androidnetworking.error.ANError
+import com.androidnetworking.interfaces.JSONObjectRequestListener
 import com.androidnetworking.interfaces.OkHttpResponseListener
 import com.androidnetworking.interfaces.StringRequestListener
 import com.facebook.stetho.okhttp3.StethoInterceptor
@@ -24,10 +25,9 @@ import de.koenidv.sph.parsing.Utility
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import okhttp3.Cookie
-import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Response
+import org.json.JSONObject
 import org.jsoup.Jsoup
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -119,6 +119,7 @@ class NetworkManager {
 
     fun indexAll(onComplete: (success: Int) -> Unit) {
         // todo include tiles
+        // todo list with items, then iterate one after the other
         // Firstly, create a index of all courses
         createCourseIndex { courses ->
             if (courses == SUCCESS)
@@ -133,7 +134,12 @@ class NetworkManager {
                                     if (changes == SUCCESS)
                                     // Fetch the number of messages to know they are not new
                                         checkForNewMessages(markAsRead = true) { messages ->
-                                            onComplete(messages)
+                                            if (messages == SUCCESS)
+                                            // Get all teachers
+                                                loadAndSaveTeachers { teachers ->
+                                                    onComplete(teachers)
+                                                }
+                                            else onComplete(messages)
                                         }
                                     else onComplete(changes)
                                 }
@@ -259,7 +265,7 @@ class NetworkManager {
      * Load changes from sph and save them to changes db
      */
     private fun loadAndSaveChanges(onComplete: (success: Int) -> Unit) {
-        NetworkManager().loadSiteWithToken(applicationContext().getString(R.string.url_changes),
+        loadSiteWithToken(applicationContext().getString(R.string.url_changes),
                 onComplete = { success: Int, result: String? ->
                     if (success == SUCCESS) {
                         ChangesDb.instance!!.removeOld()
@@ -277,6 +283,127 @@ class NetworkManager {
     }
 
     /**
+     * This will use sph's message recipient search function
+     * to get every recipient for each character.
+     * This might include other students, but fortunately we should
+     * be able to just filter for type=lul
+     */
+    private fun loadAndSaveTeachers(onComplete: (success: Int) -> Unit) {
+        // We need to make sure that we have an access token
+        TokenManager().generateAccessToken { success, token ->
+            // If getting a token failed, call onComplete
+            // with the error and return
+            if (success != SUCCESS) {
+                onComplete(success)
+                return@generateAccessToken
+            }
+
+            // Make sure session id cookie is set
+            CookieStore.setToken(token!!)
+
+            val users = mutableListOf<User>()
+            val userIds = mutableListOf<String>()
+            val favoriteTeachers = CoursesDb.getInstance().favoriteTeacherIds
+
+            // Iterate through every single char
+            var char = 'a'
+            var completed = 0
+            while (char <= 'z') {
+                // Not get the all recipients for the current character
+                AndroidNetworking.get(applicationContext().getString(R.string.url_messages))
+                        .addQueryParameter("a", "searchRecipt")
+                        .addQueryParameter("q", char.toString())
+                        .build()
+                        .getAsJSONObject(object : JSONObjectRequestListener {
+                            override fun onResponse(response: JSONObject) {
+                                var index = 0
+                                val items = response.getJSONArray("items")
+                                var currentItem: JSONObject
+                                var text: String
+                                var firstname: String?
+                                var lastname: String?
+                                var teacherId: String?
+
+                                // Get every item from the array
+                                while (index < response.getInt("total_count")) {
+                                    currentItem = items.getJSONObject(index)
+
+                                    // If list doesn't contain this user yet
+                                    if (!userIds.contains(currentItem.getString("id"))) {
+                                        // We'll only use names with "," and "(..)"
+                                        // This way we'll ignore admin entries
+                                        // However, this will not add anything if a school does not
+                                        // show a teacher's first name or shorthand
+                                        text = currentItem.getString("text")
+
+                                        if (text.contains(",") &&
+                                                text.contains("""\(.*\)""".toRegex())) {
+
+                                            // Get the name and shorthand
+                                            lastname = text.substring(0, text.indexOf(","))
+                                            firstname = text.substring(
+                                                    text.indexOf(", ") + 2,
+                                                    text.indexOf(" (")
+                                            )
+                                            teacherId = text.substring(
+                                                    text.indexOf(" (") + 2,
+                                                    text.indexOf(")")
+                                            )
+
+                                            // Add it to the list
+                                            users.add(User(
+                                                    userId = currentItem.getString("id"),
+                                                    teacherId = teacherId,
+                                                    firstname = firstname,
+                                                    lastname = lastname,
+                                                    type = currentItem.getString("type"),
+                                                    favoriteTeachers.contains(teacherId)
+                                            ))
+                                            // Add id to the list for faster checks of existing users
+                                            userIds.add(currentItem.getString("id"))
+                                        }
+                                    }
+
+                                    index++ // Next user for this result
+                                }
+
+                                // We could check for char = z here, but that'd break if one
+                                // request takes longer than the previous
+                                completed++
+                                if (completed == 26) {
+                                    // If this was the last request, save the user list
+                                    // and call back success
+                                    UsersDb().save(users)
+                                    onComplete(SUCCESS)
+                                }
+
+                            }
+
+                            override fun onError(error: ANError) {
+                                // Handle request errors
+                                Log.d(TAG, error.errorDetail)
+                                when (error.errorDetail) {
+                                    "connectionError" -> {
+                                        onComplete(FAILED_NO_NETWORK)
+                                    }
+                                    "requestCancelledError" -> {
+                                        onComplete(FAILED_CANCELLED)
+                                    }
+                                    else -> {
+                                        onComplete(FAILED_UNKNOWN)
+                                    }
+                                }
+                            }
+
+                        })
+                // Use the next char
+                char++
+            }
+
+        }
+    }
+
+    /**
      * Loads a url within the sph and handles authentication
      * @param url URL to load
      */
@@ -286,9 +413,7 @@ class NetworkManager {
         TokenManager().generateAccessToken(forceNewToken) { success: Int, token: String? ->
             if (success == SUCCESS) {
                 // Setting sid cookie
-                CookieStore.saveFromResponse(
-                        HttpUrl.parse("https://schulportal.hessen.de")!!,
-                        listOf(Cookie.Builder().domain("schulportal.hessen.de").name("sid").value(token!!).build()))
+                CookieStore.setToken(token!!)
 
                 // Adding an Network Interceptor for Debugging purpose :
                 val okHttpClient = OkHttpClient.Builder()
@@ -368,9 +493,7 @@ class NetworkManager {
         TokenManager().generateAccessToken { success: Int, token: String? ->
             if (success == SUCCESS) {
                 // Setting sid cookie
-                CookieStore.saveFromResponse(
-                        HttpUrl.parse("https://schulportal.hessen.de")!!,
-                        listOf(Cookie.Builder().domain("schulportal.hessen.de").name("sid").value(token!!).build()))
+                CookieStore.setToken(token!!)
 
                 // Adding an Network Interceptor for Debugging purpose :
                 val okHttpClient = OkHttpClient.Builder()
@@ -426,10 +549,7 @@ class NetworkManager {
         TokenManager().generateAccessToken { success: Int, token: String? ->
             if (success == SUCCESS) {
                 // Set sid cookie
-                CookieStore.saveFromResponse(
-                        HttpUrl.parse("https://schulportal.hessen.de")!!,
-                        listOf(Cookie.Builder().domain("schulportal.hessen.de")
-                                .name("sid").value(token!!).build()))
+                CookieStore.setToken(token!!)
 
                 // todo initialize ANet only once
                 AndroidNetworking.initialize(applicationContext(),
@@ -615,21 +735,7 @@ class NetworkManager {
             }
 
             // Make sure session id cookie is set
-            CookieStore.clearCookies()
-            CookieStore.saveFromResponse(
-                    HttpUrl.parse("https://schulportal.hessen.de")!!,
-                    listOf(Cookie.Builder()
-                            .domain("schulportal.hessen.de")
-                            .name("sid")
-                            .value(token!!).build()))
-
-            // Adding an Network Interceptor for Debugging purpose :
-            val okHttpClient = OkHttpClient.Builder()
-                    .addNetworkInterceptor(StethoInterceptor())
-                    .cookieJar(CookieStore)
-                    .connectTimeout(60, TimeUnit.SECONDS)
-                    .build()
-            AndroidNetworking.initialize(applicationContext(), okHttpClient)
+            CookieStore.setToken(token!!)
 
             // Now post messages.php with a few parameters
             // a=headers - Titles only (read for entire message)

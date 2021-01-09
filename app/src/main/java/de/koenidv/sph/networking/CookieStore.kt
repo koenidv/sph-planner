@@ -43,6 +43,19 @@ object CookieStore : CookieJar {
     }
 
     /**
+     * Clears all previous cookies and sets the provided token as sph session id
+     */
+    fun setToken(token: String) {
+        clearCookies()
+        saveFromResponse(
+                HttpUrl.parse("https://schulportal.hessen.de")!!,
+                listOf(Cookie.Builder()
+                        .domain("schulportal.hessen.de")
+                        .name("sid")
+                        .value(token).build()))
+    }
+
+    /**
      * Deletes all cookies for all domains
      */
     fun clearCookies() {
