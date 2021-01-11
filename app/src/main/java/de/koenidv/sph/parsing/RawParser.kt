@@ -1,6 +1,5 @@
 package de.koenidv.sph.parsing
 
-import android.annotation.SuppressLint
 import android.graphics.Color
 import android.util.Log
 import android.widget.Toast
@@ -24,7 +23,6 @@ class RawParser {
      * Parse changes from raw changes sph site
      */
     @Suppress("LocalVariableName")
-    @SuppressLint("DefaultLocale")
     fun parseChanges(rawResponse: String): List<Change> {
         val changes = mutableListOf<Change>()
 
@@ -32,18 +30,8 @@ class RawParser {
 
         // If there are any entries..
         if (rawResponse.contains("<div class=\"panel panel-primary\"")) {
-            // Remove stuff that we don't need
-            var rawContent = rawResponse.substring(rawResponse.indexOf("<div class=\"panel panel-primary\""))
-            rawContent = rawContent.substring(0, rawContent.indexOf("<link"))
-            // Remove newlines, we don't need them (But also isn't necessary atm and makes debugging horrible)
-            // rawContent = rawContent.replace("\n", "").replace("\t", "")
-
-            // For remembering where we left off :)
-            var rawToday: String
-            var rawChange: String
-            var rawCell: String
-            var dayInContent = 0
-            var cellInRow: Int
+            // Get the document
+            val doc = Jsoup.parse(rawResponse)
 
             // For getting the date
             val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.GERMAN)
@@ -63,20 +51,12 @@ class RawParser {
             var description: String? = null
 
             // Extract every changes table, i.e. every available day
-            while (rawContent.contains("<table class=\"table")) {
-                // Get today's table only
-                rawToday = rawContent.substring(rawContent.indexOf("<table class=\"table"), rawContent.indexOf("<div class=\"fixed-table-footer"))
-
+            for (panel in doc.select("div.panel:not(#menue_tag) div.panel-body")) {
                 // Parse date
-                val dateIndex = rawContent.indexOf("Vertretungen am ") + 16
-                date = dateFormat.parse(rawContent.substring(dateIndex, dateIndex + 10))!!
-
-                // Remove the extracted table from rawContent
-                rawContent = rawContent.substring(rawContent.indexOf("<div class=\"fixed-table-footer") + 30)
-                // Extract only the table's body
-                // We don't need <thead> as long as the table order remains the same
-                // This might vary for different schools
-                rawToday = rawToday.substring(rawToday.indexOf("<tbody>") + 7, rawToday.indexOf("</tbody>"))
+                // Substring: Only get "11.01.2021" from "Vertretungen am 11.01.2021" -> Chars 16-26
+                date = dateFormat.parse(
+                        panel.select("h3").first().text()
+                                .substring(16, 26))!!
 
                 // We are left with a table, each row contains these columns:
                 // title (not needed), lessons (11 11 - 12), classname (Q34), old classname (Q34, mostly empty),
@@ -84,38 +64,31 @@ class RawParser {
                 // old course (M-GK-3, mostly empty), room (M119), description
 
                 // Get the change's data for every table row
-                while (rawToday.contains("<tr")) {
-                    // Extract change from today's changes
-                    rawChange = rawToday.substring(rawToday.indexOf("<tr>") + 4, rawToday.indexOf("</tr>"))
-                    rawToday = rawToday.substring(rawToday.indexOf("</tr>") + 5)
-
+                for (row in panel.select("tbody tr")) {
                     // Process every cell
-                    cellInRow = 0
-                    while (rawChange.contains("<td")) {
-                        // Extract cell from table row
-                        rawCell = rawChange.substring(rawChange.indexOf("<td"))
-                        rawCell = rawCell.substring(rawCell.indexOf(">") + 1, rawCell.indexOf("</td>"))
-                        rawCell = rawCell.trim()
-                        rawChange = rawChange.substring(rawChange.indexOf("<td") + 3)
-
-                        when (cellInRow) {
+                    for ((dayIndex, cell) in row.select("td").withIndex()) {
+                        when (dayIndex) {
                             0 -> {
                             } // Ignore first cell
                             1 -> { // Affected lessons
-                                lessons = if (rawCell.contains(" -\n")) {
+                                lessons = if (cell.text().contains(" - ")) {
                                     // Get start and end lesson and put everything in between in a list
-                                    val fromLesson = rawCell.substring(0, rawCell.indexOf("\n")).toInt()
-                                    val toLesson = rawCell.substring(rawCell.lastIndexOf(" ") + 1).toInt()
+                                    val fromLesson = cell.text().substring(0, cell.text().indexOf(" ")).toInt()
+                                    val toLesson = cell.text().substring(cell.text().lastIndexOf(" ") + 1).toInt()
                                     (fromLesson..toLesson).toList()
                                 } else {
-                                    listOf(rawCell.toInt())
+                                    listOf(cell.text().toInt())
                                 }
                             }
-                            2 -> className = if (rawCell == "") null else rawCell
-                            3 -> className_before = if (rawCell == "") null else rawCell
-                            4 -> id_subsTeacher = if (rawCell == "") null else rawCell.toLowerCase()
-                            5 -> id_teacher = if (rawCell == "") null else rawCell.toLowerCase()
-                            6 -> type = when (rawCell) {
+                            2 -> className = if (cell.text() == "") null else cell.text()
+                            3 -> className_before = if (cell.text() == "") null else cell.text()
+                            4 -> id_subsTeacher =
+                                    if (cell.text() == "") null
+                                    else cell.text().toLowerCase(Locale.ROOT)
+                            5 -> id_teacher =
+                                    if (cell.text() == "") null
+                                    else cell.text().toLowerCase(Locale.ROOT)
+                            6 -> type = when (cell.text()) {
                                 "EVA", "Eigenverantwortliches Arbeiten" -> Change.TYPE_EVA
                                 "Entfall" -> Change.TYPE_CANCELLED
                                 "Freisetzung" -> Change.TYPE_FREED
@@ -126,16 +99,23 @@ class RawParser {
                                 "Klausur" -> Change.TYPE_EXAM
                                 else -> Change.TYPE_OTHER
                             }
-                            7 -> id_course_external = if (rawCell == "") null else rawCell.toLowerCase()
-                            8 -> id_course_external_before = if (rawCell == "") null else rawCell.toLowerCase()
-                            9 -> room = if (rawCell == "") null else rawCell
-                            10 -> description = if (rawCell == "") null else rawCell
-                                    .replace("\n", "")
-                                    .replace("""\s+""".toRegex(), " ")
-                                    .capitalize(Locale.getDefault())
+                            7 -> id_course_external =
+                                    if (cell.text() == "") null
+                                    else cell.text().toLowerCase(Locale.ROOT)
+                            8 -> id_course_external_before =
+                                    if (cell.text() == "") null
+                                    else cell.text().toLowerCase(Locale.ROOT)
+                            9 -> room =
+                                    if (cell.text() == "") null
+                                    else cell.text().toLowerCase(Locale.ROOT)
+                            10 -> description =
+                                    if (cell.text() == "") null
+                                    else cell.text().toLowerCase(Locale.ROOT)
+                                            // Remove duplicate whitespaces
+                                            .replace("""\s+""".toRegex(), " ")
+                                            .capitalize(Locale.getDefault())
                         }
                         // Next cell
-                        cellInRow++
                     }
 
                     // Try to get an internal id
@@ -168,7 +148,7 @@ class RawParser {
                 }
 
                 // Next day
-                dayInContent++
+
             }
         }
 
