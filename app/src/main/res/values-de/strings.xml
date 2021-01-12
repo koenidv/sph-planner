@@ -237,5 +237,6 @@
     <string name="messages_unread_possible">✉️ Du könntest ungelesene Nachrichten haben</string>
     <string name="users_title">Lehrer</string>
     <string name="explore_collection_users">👥 Lehrer</string>
+    <string name="tasks_due_change">Fälligkeit ändern</string>
 
 </resources>

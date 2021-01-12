@@ -39,6 +39,7 @@ class TasksAdapter(private val tasks: MutableList<Task>,
         val sheet = BottomSheetDialog(activity)
         sheet.setContentView(R.layout.sheet_manage_task)
 
+        val dueChange = sheet.findViewById<TextView>(R.id.changeDueTextView)
         val pin = sheet.findViewById<TextView>(R.id.pinTextView)
         val unpin = sheet.findViewById<TextView>(R.id.unpinTextView)
         val share = sheet.findViewById<TextView>(R.id.shareTextView)
@@ -56,6 +57,13 @@ class TasksAdapter(private val tasks: MutableList<Task>,
             tasks[position] = task
             // Notify the adapter about the changed item
             notifyItemChanged(position)
+        }
+
+        // Change due date, same as dueLayout click
+        // Needed when due date is over and layout isn't shown anymore
+        dueChange?.setOnClickListener {
+            sheet.dismiss()
+            onDueClick(task, position)
         }
 
         // Pin a task
@@ -192,6 +200,7 @@ class TasksAdapter(private val tasks: MutableList<Task>,
 
             // Set due date or show option to set one
             val timenow = Date().time
+            dueLayout.visibility = View.VISIBLE
             when {
                 task.dueDate == null -> {
                     due.visibility = View.GONE
@@ -199,13 +208,17 @@ class TasksAdapter(private val tasks: MutableList<Task>,
                 }
                 task.dueDate!!.time - timenow <= -24 * 60 * 60 * 1000 -> {
                     // Due date not within the last 24 hours, overdue
-                    due.visibility = View.VISIBLE
-                    dueInfo.visibility = View.GONE
-                    due.setText(R.string.tasks_due_overdue)
-                    Utility.tintBackground(
-                            due,
-                            SphPlanner.applicationContext().getColor(R.color.design_default_color_error),
-                            0xb4000000.toInt())
+                    if (!task.isDone) {
+                        due.visibility = View.VISIBLE
+                        dueInfo.visibility = View.GONE
+                        due.setText(R.string.tasks_due_overdue)
+                        Utility.tintBackground(
+                                due,
+                                SphPlanner.applicationContext().getColor(R.color.design_default_color_error),
+                                0xb4000000.toInt())
+                    } else {
+                        dueLayout.visibility = View.GONE
+                    }
                 }
                 task.dueDate!!.time - timenow <= 0 -> {
                     // Date is within the last 24 hours, which means its today (only day, no time)
