@@ -69,7 +69,7 @@ class NetworkManager {
             R.id.frag_changes -> {
                 // Changes fragment
                 // Update changes after 30sec cooldown
-                if (time - prefs.getLong("updated_changes", 0) > 30 * 1000)
+                if (time - prefs.getLong("updated_changes", 0) > 30 * 1000 || true)
                     updateList.add("changes")
             }
             R.id.frag_course_overview, R.id.frag_tasks, R.id.frag_attachments -> {

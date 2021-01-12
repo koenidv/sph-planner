@@ -65,86 +65,90 @@ class RawParser {
 
                 // Get the change's data for every table row
                 for (row in panel.select("tbody tr")) {
-                    // Process every cell
-                    for ((dayIndex, cell) in row.select("td").withIndex()) {
-                        when (dayIndex) {
-                            0 -> {
-                            } // Ignore first cell
-                            1 -> { // Affected lessons
-                                lessons = if (cell.text().contains(" - ")) {
-                                    // Get start and end lesson and put everything in between in a list
-                                    val fromLesson = cell.text().substring(0, cell.text().indexOf(" ")).toInt()
-                                    val toLesson = cell.text().substring(cell.text().lastIndexOf(" ") + 1).toInt()
-                                    (fromLesson..toLesson).toList()
-                                } else {
-                                    listOf(cell.text().toInt())
+
+                    // Skip this day if text contains "Keine Einträge" (no entries)
+                    if (!row.text().contains("Keine Einträge!")) {
+                        // Process every cell
+                        for ((dayIndex, cell) in row.select("td").withIndex()) {
+                            when (dayIndex) {
+                                0 -> {
+                                } // Ignore first cell
+                                1 -> { // Affected lessons
+                                    lessons = if (cell.text().contains(" - ")) {
+                                        // Get start and end lesson and put everything in between in a list
+                                        val fromLesson = cell.text().substring(0, cell.text().indexOf(" ")).toInt()
+                                        val toLesson = cell.text().substring(cell.text().lastIndexOf(" ") + 1).toInt()
+                                        (fromLesson..toLesson).toList()
+                                    } else {
+                                        listOf(cell.text().toInt())
+                                    }
                                 }
+                                2 -> className = if (cell.text() == "") null else cell.text()
+                                3 -> className_before = if (cell.text() == "") null else cell.text()
+                                4 -> id_subsTeacher =
+                                        if (cell.text() == "") null
+                                        else cell.text().toLowerCase(Locale.ROOT)
+                                5 -> id_teacher =
+                                        if (cell.text() == "") null
+                                        else cell.text().toLowerCase(Locale.ROOT)
+                                6 -> type = when (cell.text()) {
+                                    "EVA", "Eigenverantwortliches Arbeiten" -> Change.TYPE_EVA
+                                    "Entfall" -> Change.TYPE_CANCELLED
+                                    "Freisetzung" -> Change.TYPE_FREED
+                                    "Vertretung", "Statt-Vertretung" -> Change.TYPE_SUBSTITUTE
+                                    "Betreuung" -> Change.TYPE_CARE
+                                    "Raum", "Raumwechsel" -> Change.TYPE_ROOM
+                                    "Verlegung", "Tausch" -> Change.TYPE_SWITCHED
+                                    "Klausur" -> Change.TYPE_EXAM
+                                    else -> Change.TYPE_OTHER
+                                }
+                                7 -> id_course_external =
+                                        if (cell.text() == "") null
+                                        else cell.text().toLowerCase(Locale.ROOT)
+                                8 -> id_course_external_before =
+                                        if (cell.text() == "") null
+                                        else cell.text().toLowerCase(Locale.ROOT)
+                                9 -> room =
+                                        if (cell.text() == "") null
+                                        else cell.text().toLowerCase(Locale.ROOT)
+                                10 -> description =
+                                        if (cell.text() == "") null
+                                        else cell.text().toLowerCase(Locale.ROOT)
+                                                // Remove duplicate whitespaces
+                                                .replace("""\s+""".toRegex(), " ")
+                                                .capitalize(Locale.getDefault())
                             }
-                            2 -> className = if (cell.text() == "") null else cell.text()
-                            3 -> className_before = if (cell.text() == "") null else cell.text()
-                            4 -> id_subsTeacher =
-                                    if (cell.text() == "") null
-                                    else cell.text().toLowerCase(Locale.ROOT)
-                            5 -> id_teacher =
-                                    if (cell.text() == "") null
-                                    else cell.text().toLowerCase(Locale.ROOT)
-                            6 -> type = when (cell.text()) {
-                                "EVA", "Eigenverantwortliches Arbeiten" -> Change.TYPE_EVA
-                                "Entfall" -> Change.TYPE_CANCELLED
-                                "Freisetzung" -> Change.TYPE_FREED
-                                "Vertretung", "Statt-Vertretung" -> Change.TYPE_SUBSTITUTE
-                                "Betreuung" -> Change.TYPE_CARE
-                                "Raum", "Raumwechsel" -> Change.TYPE_ROOM
-                                "Verlegung", "Tausch" -> Change.TYPE_SWITCHED
-                                "Klausur" -> Change.TYPE_EXAM
-                                else -> Change.TYPE_OTHER
-                            }
-                            7 -> id_course_external =
-                                    if (cell.text() == "") null
-                                    else cell.text().toLowerCase(Locale.ROOT)
-                            8 -> id_course_external_before =
-                                    if (cell.text() == "") null
-                                    else cell.text().toLowerCase(Locale.ROOT)
-                            9 -> room =
-                                    if (cell.text() == "") null
-                                    else cell.text().toLowerCase(Locale.ROOT)
-                            10 -> description =
-                                    if (cell.text() == "") null
-                                    else cell.text().toLowerCase(Locale.ROOT)
-                                            // Remove duplicate whitespaces
-                                            .replace("""\s+""".toRegex(), " ")
-                                            .capitalize(Locale.getDefault())
+                            // Next cell
                         }
-                        // Next cell
+
+                        // Try to get an internal id
+                        internalId = if (id_course_external != null && id_teacher != null)
+                            IdParser().getCourseIdWithGmb(id_course_external, id_teacher)
+                        else if (id_course_external_before != null && id_teacher != null)
+                            IdParser().getCourseIdWithGmb(id_course_external_before, id_teacher)
+                        else if (id_course_external != null && IdParser().getCourseIdWithGmb(id_course_external) != null)
+                            IdParser().getCourseIdWithGmb(id_course_external)
+                        else if (id_course_external_before != null && IdParser().getCourseIdWithGmb(id_course_external_before) != null)
+                            IdParser().getCourseIdWithGmb(id_course_external_before)
+                        else null
+
+                        // Add parsed change to list
+                        changes.add(Change(
+                                internalId,
+                                id_course_external,
+                                date,
+                                lessons,
+                                type,
+                                id_course_external_before,
+                                className,
+                                className_before,
+                                id_teacher,
+                                id_subsTeacher,
+                                room,
+                                null, // room before is not currently supported by sph
+                                description
+                        ))
                     }
-
-                    // Try to get an internal id
-                    internalId = if (id_course_external != null && id_teacher != null)
-                        IdParser().getCourseIdWithGmb(id_course_external, id_teacher)
-                    else if (id_course_external_before != null && id_teacher != null)
-                        IdParser().getCourseIdWithGmb(id_course_external_before, id_teacher)
-                    else if (id_course_external != null && IdParser().getCourseIdWithGmb(id_course_external) != null)
-                        IdParser().getCourseIdWithGmb(id_course_external)
-                    else if (id_course_external_before != null && IdParser().getCourseIdWithGmb(id_course_external_before) != null)
-                        IdParser().getCourseIdWithGmb(id_course_external_before)
-                    else null
-
-                    // Add parsed change to list
-                    changes.add(Change(
-                            internalId,
-                            id_course_external,
-                            date,
-                            lessons,
-                            type,
-                            id_course_external_before,
-                            className,
-                            className_before,
-                            id_teacher,
-                            id_subsTeacher,
-                            room,
-                            null, // room before is not currently supported by sph
-                            description
-                    ))
                 }
 
                 // Next day
