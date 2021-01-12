@@ -202,7 +202,7 @@ class TasksAdapter(private val tasks: MutableList<Task>,
                     due.visibility = View.VISIBLE
                     dueInfo.visibility = View.GONE
                     due.setText(R.string.tasks_due_overdue)
-                    Utility().tintBackground(
+                    Utility.tintBackground(
                             due,
                             SphPlanner.applicationContext().getColor(R.color.design_default_color_error),
                             0xb4000000.toInt())
@@ -213,7 +213,7 @@ class TasksAdapter(private val tasks: MutableList<Task>,
                     dueInfo.visibility = View.VISIBLE
                     dueInfo.setText(R.string.tasks_due_info_relative)
                     due.setText(R.string.tasks_due_today)
-                    Utility().tintBackground(due, themeColor, 0xb4000000.toInt())
+                    Utility.tintBackground(due, themeColor, 0xb4000000.toInt())
                 }
                 task.dueDate!!.time - timenow <= 24 * 60 * 60 * 1000 -> {
                     // Tomorrow
@@ -221,7 +221,7 @@ class TasksAdapter(private val tasks: MutableList<Task>,
                     dueInfo.visibility = View.VISIBLE
                     dueInfo.setText(R.string.tasks_due_info_relative)
                     due.setText(R.string.tasks_due_tomorrow)
-                    Utility().tintBackground(due, themeColor, 0x60000000)
+                    Utility.tintBackground(due, themeColor, 0x60000000)
                 }
                 else -> {
                     // Other day
@@ -231,7 +231,7 @@ class TasksAdapter(private val tasks: MutableList<Task>,
 
                     due.text = SimpleDateFormat("d. MMM", Locale.getDefault())
                             .format(task.dueDate!!)
-                    Utility().tintBackground(due,
+                    Utility.tintBackground(due,
                             SphPlanner.applicationContext().getColor(R.color.grey_800),
                             0xb4000000.toInt())
                 }
@@ -241,11 +241,11 @@ class TasksAdapter(private val tasks: MutableList<Task>,
             course.text = CoursesDb.getInstance().getFullname(task.id_course)
             // Adjust course background color
             // Set background color, about 70% opacity
-            Utility().tintBackground(course, CoursesDb.getInstance().getColor(task.id_course), 0xb4000000.toInt())
+            Utility.tintBackground(course, CoursesDb.getInstance().getColor(task.id_course), 0xb4000000.toInt())
 
             // Tint background with theme color at 15% if task is pinned
             if (task.isPinned)
-                Utility().tintBackground(layout, themeColor, 0x26000000)
+                Utility.tintBackground(layout, themeColor, 0x26000000)
             else
                 layout.background.clearColorFilter()
 

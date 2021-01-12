@@ -139,7 +139,7 @@ class HomeFragment : Fragment() {
 
         // Set random greeting as action bar title, once per app start, or after 30 minutes
         if (SphPlanner.randomGreeting == null || Date().time - SphPlanner.randomGreetingTime > 30 * 60 * 1000) {
-            SphPlanner.randomGreeting = Utility().getGreeting()
+            SphPlanner.randomGreeting = Utility.getGreeting()
             SphPlanner.randomGreetingTime = Date().time
         }
         (activity as AppCompatActivity).supportActionBar?.title = SphPlanner.randomGreeting

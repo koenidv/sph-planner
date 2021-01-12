@@ -12,8 +12,8 @@ import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner.Companion.applicationContext
 import de.koenidv.sph.database.CoursesDb
 import de.koenidv.sph.objects.Change
-import de.koenidv.sph.parsing.ChangeParser
-import de.koenidv.sph.parsing.CourseParser
+import de.koenidv.sph.parsing.ChangeInfo
+import de.koenidv.sph.parsing.CourseInfo
 import de.koenidv.sph.parsing.Utility
 import java.text.SimpleDateFormat
 import java.util.*
@@ -78,7 +78,7 @@ class ChangesAdapter(private val changes: List<Change>,
                         CoursesDb.getInstance().getFullname(change.id_course) ?: "?")
             } else {
                 titletext.replace("%name",
-                        CourseParser().getFullnameFromInternald(change.id_course ?: "?")
+                        CourseInfo.getFullnameFromInternald(change.id_course ?: "?")
                                 + if (change.id_teacher != null) " (${change.id_teacher!!.capitalize(Locale.getDefault())})" else "")
             }
 
@@ -125,11 +125,11 @@ class ChangesAdapter(private val changes: List<Change>,
                 course.text = CoursesDb.getInstance().getFullname(change.id_course)
                 // Adjust course background color
                 // Set background color, about 70% opacity
-                Utility().tintBackground(course, CoursesDb.getInstance().getColor(change.id_course), 0xb4000000.toInt())
+                Utility.tintBackground(course, CoursesDb.getInstance().getColor(change.id_course), 0xb4000000.toInt())
             }
 
             // Set background color according to change type (15% opacity)
-            Utility().tintBackground(layout, ChangeParser().getTypeColor(change.type), 0x26000000)
+            Utility.tintBackground(layout, ChangeInfo.getTypeColor(change.type), 0x26000000)
 
         }
 

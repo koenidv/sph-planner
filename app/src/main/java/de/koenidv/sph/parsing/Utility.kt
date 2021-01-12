@@ -1,8 +1,5 @@
 package de.koenidv.sph.parsing
 
-import android.content.Context
-import android.content.pm.PackageManager
-import android.content.res.Resources
 import android.graphics.BlendMode
 import android.graphics.BlendModeColorFilter
 import android.graphics.PorterDuff
@@ -12,8 +9,6 @@ import android.os.Build
 import android.util.Log
 import android.util.TypedValue
 import android.view.View
-import androidx.annotation.AttrRes
-import androidx.annotation.ColorInt
 import androidx.appcompat.app.AppCompatActivity
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
@@ -21,7 +16,7 @@ import java.util.*
 
 
 //  Created by koenidv on 11.12.2020.
-class Utility {
+object Utility {
     /**
      * Helper to get the nth index of a String in a String
      * @param str String to check
@@ -64,21 +59,6 @@ class Utility {
             outputMap[splitResult[0]] = splitResult[1]
         }
         return outputMap.toMap()
-    }
-
-    /**
-     * Check if an app is installed on device
-     * @param packageName Package Id of the app
-     * @return true, if app is installed, false, if not
-     * Might always return false on Api 30+
-     */
-    fun isPackageInstalled(packageName: String, packageManager: PackageManager): Boolean {
-        return try {
-            packageManager.getPackageInfo(packageName, 0)
-            true
-        } catch (e: PackageManager.NameNotFoundException) {
-            false
-        }
     }
 
     /**
@@ -154,27 +134,5 @@ class Utility {
             }
         else Log.e(SphPlanner.TAG, view.background.javaClass.toString() + " is not marked as tintable")
     }
-
-    /**
-     * Get a color from a theme reference
-     */
-    @ColorInt
-    fun getThemedColor(@AttrRes attr: Int): Int {
-        val typedValue = TypedValue()
-        val theme: Resources.Theme = SphPlanner.applicationContext().theme
-        theme.resolveAttribute(attr, typedValue, true)
-        return typedValue.data
-    }
-
-    @ColorInt
-    fun Context.getColorFromAttr(
-            @AttrRes attrColor: Int,
-            typedValue: TypedValue = TypedValue(),
-            resolveRefs: Boolean = true
-    ): Int {
-        theme.resolveAttribute(attrColor, typedValue, resolveRefs)
-        return typedValue.data
-    }
-
 
 }

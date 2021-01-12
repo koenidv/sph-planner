@@ -4,7 +4,7 @@ import androidx.annotation.Nullable
 import androidx.recyclerview.widget.DiffUtil
 
 //  Created by koenidv on 29.12.2020.
-class PostDiffCallback(private val newPosts: List<Post>, private val oldPosts: List<Post>) : DiffUtil.Callback() {
+class ostDiffCallback(private val newPosts: List<Post>, private val oldPosts: List<Post>) : DiffUtil.Callback() {
 
     override fun getOldListSize(): Int {
         return oldPosts.size

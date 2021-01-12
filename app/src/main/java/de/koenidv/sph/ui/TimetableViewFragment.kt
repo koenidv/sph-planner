@@ -22,6 +22,8 @@ class TimetableViewFragment : Fragment() {
     private var expanded: Boolean = false
     private var viewAll: Boolean = false
     private var openOnClick: Boolean = true
+
+    // List of days of hours of concurrent lessons
     private lateinit var timetable: List<List<List<TimetableEntry>>>
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,6 +45,7 @@ class TimetableViewFragment : Fragment() {
         timetable = TimetableDb.instance!!.get(!viewAll)
         val recyclerViewPool = RecyclerView.RecycledViewPool()
 
+        // Get the 5 recyclerviews
         val monday = view.findViewById<RecyclerView>(R.id.mondayRecycler)
         val tuesday = view.findViewById<RecyclerView>(R.id.tuesdayRecycler)
         val wednesday = view.findViewById<RecyclerView>(R.id.wednesdayRecycler)
@@ -56,6 +59,7 @@ class TimetableViewFragment : Fragment() {
         thursday.setRecycledViewPool(recyclerViewPool)
         friday.setRecycledViewPool(recyclerViewPool)
 
+        // OnClick function for all timetable entries
         val onClick: (List<TimetableEntry>) -> Unit = {
             if (openOnClick) {
                 Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
@@ -77,7 +81,7 @@ class TimetableViewFragment : Fragment() {
         // Sometimes uses a different color if quickly fragments are quickly switched
         background?.setTint(prefs.getInt("themeColor", 0))
         background?.alpha = 40
-        when (Utility().getCurrentDayAdjusted()) {
+        when (Utility.getCurrentDayAdjusted()) {
             0 -> monday.background = background
             1 -> tuesday.background = background
             2 -> wednesday.background = background
@@ -99,6 +103,9 @@ class TimetableViewFragment : Fragment() {
         }
     }
 
+    /**
+     * Show all lessons or only favorite courses
+     */
     fun setViewAll(viewAll: Boolean) {
         if (this.viewAll != viewAll) {
             this.viewAll = viewAll

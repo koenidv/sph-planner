@@ -74,12 +74,12 @@ class CompactPostsAdapter(private val posts: List<Post>,
                     //color = Utility().getThemedColor(R.attr.tagBackgroundWarning)
                     color = applicationContext().getColor(R.color.pink_a700)
                 }
-                Utility().tintBackground(task, color, 0xb4000000.toInt())
+                Utility.tintBackground(task, color, 0xb4000000.toInt())
             } else task.visibility = View.GONE
 
             // Adjust course background color
             // Set background color, about 70% opacity
-            Utility().tintBackground(course, CoursesDb.getInstance().getColor(post.id_course), 0xb4000000.toInt())
+            Utility.tintBackground(course, CoursesDb.getInstance().getColor(post.id_course), 0xb4000000.toInt())
 
         }
     }

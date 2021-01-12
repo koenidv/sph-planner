@@ -56,8 +56,8 @@ data class Course(
     constructor(internalCourseId : String) : this(
             internalCourseId,
             null, null, null, null,
-            CourseParser().getCourseFullnameFromInternald(internalCourseId),
-            TeacherParser().teacherIdFromInternalCourseId(internalCourseId),
+            CourseInfo().getCourseFullnameFromInternald(internalCourseId),
+            TeacherInfo().teacherIdFromInternalCourseId(internalCourseId),
             null, null)
 
      */

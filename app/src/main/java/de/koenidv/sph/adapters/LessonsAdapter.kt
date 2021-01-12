@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.RecyclerView
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.objects.TimetableEntry
-import de.koenidv.sph.parsing.CourseParser
+import de.koenidv.sph.parsing.CourseInfo
 import de.koenidv.sph.parsing.Utility
 
 //  Created by koenidv on 18.12.2020.
@@ -54,11 +54,11 @@ class LessonsAdapter(private var dataset: List<List<TimetableEntry>>,
             // Set data
             var title = ""
             if (!multiple) {
-                title = CourseParser().getShortnameFromInternald(entries[0].lesson.idCourse)
+                title = CourseInfo.getShortnameFromInternald(entries[0].lesson.idCourse)
                 if (expanded) title += "<br><small>${entries[0].lesson.room}</small>"
             } else {
                 entries.forEach {
-                    title += "${CourseParser().getShortnameFromInternald(it.lesson.idCourse)} (${it.course?.id_teacher})"
+                    title += "${CourseInfo.getShortnameFromInternald(it.lesson.idCourse)} (${it.course?.id_teacher})"
                     if (expanded) title += "<br><small>${it.lesson.room}<br></small>"
                     title += "<br>"
                 }
@@ -80,7 +80,7 @@ class LessonsAdapter(private var dataset: List<List<TimetableEntry>>,
             // Or span multiple hours if consecutive lessons are the same
             val height = if (expanded && !multiple) 64f else if (multiple) maxConcurrent * 32f else 32f
             val extrapadding = (hourcount - 1) * 4f
-            layout.layoutParams.height = Utility().dpToPx(hourcount * height + extrapadding).toInt()
+            layout.layoutParams.height = Utility.dpToPx(hourcount * height + extrapadding).toInt()
 
             /*
              * Changes
@@ -155,7 +155,7 @@ class LessonsAdapter(private var dataset: List<List<TimetableEntry>>,
                 viewHolder.outerlayout.setPadding(0, 0, 0, 0)
             // Make sure a recycled item does have padding
             else if (viewHolder.outerlayout.paddingBottom == 0)
-                viewHolder.outerlayout.setPadding(0, 0, 0, Utility().dpToPx(4f).toInt())
+                viewHolder.outerlayout.setPadding(0, 0, 0, Utility.dpToPx(4f).toInt())
 
             // Bind lesson to view
             viewHolder.bind(dataset[position], hourcount, expanded, multiple, maxConcurrent)
@@ -169,7 +169,7 @@ class LessonsAdapter(private var dataset: List<List<TimetableEntry>>,
             viewHolder.outerlayout.visibility = View.INVISIBLE
             // We still need to apply the correct size
             val height = if (expanded) 64f else 32f
-            viewHolder.layout.layoutParams.height = Utility().dpToPx(height).toInt()
+            viewHolder.layout.layoutParams.height = Utility.dpToPx(height).toInt()
         }
     }
 

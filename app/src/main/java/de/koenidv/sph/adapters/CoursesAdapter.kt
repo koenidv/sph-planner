@@ -45,7 +45,7 @@ class CoursesAdapter(private val courses: MutableList<Course>,
         // Change course color
         changeColor?.setOnClickListener {
             // Get all colors used by default
-            val colorPresets = Utility().parseStringArray(R.array.course_colors).map {
+            val colorPresets = Utility.parseStringArray(R.array.course_colors).map {
                 Color.parseColor(it.value)
             }.toIntArray()
 
@@ -138,7 +138,7 @@ class CoursesAdapter(private val courses: MutableList<Course>,
              */
 
             // Set background color, about 70% opacity
-            Utility().tintBackground(layout, course.color ?: 6168631, 0xb4000000.toInt())
+            Utility.tintBackground(layout, course.color ?: 6168631, 0xb4000000.toInt())
         }
     }
 

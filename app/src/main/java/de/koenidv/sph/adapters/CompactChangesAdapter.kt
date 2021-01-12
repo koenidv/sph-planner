@@ -12,7 +12,7 @@ import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner.Companion.applicationContext
 import de.koenidv.sph.database.CoursesDb
 import de.koenidv.sph.objects.Change
-import de.koenidv.sph.parsing.ChangeParser
+import de.koenidv.sph.parsing.ChangeInfo
 import de.koenidv.sph.parsing.Utility
 import java.text.SimpleDateFormat
 import java.util.*
@@ -76,21 +76,21 @@ class CompactChangesAdapter(private val changes: List<Change>,
                 change.date.time - time <= -24 * 60 * 60 * 1000 -> {
                     // Past date
                     date.text = applicationContext().getString(R.string.changes_date_past)
-                    Utility().tintBackground(date, applicationContext().getColor(R.color.black), 0xb4000000.toInt())
+                    Utility.tintBackground(date, applicationContext().getColor(R.color.black), 0xb4000000.toInt())
                 }
                 change.date.time - time <= 0 -> {
                     // Date is within the last 24 hours, which means its today
                     date.text = applicationContext().getString(R.string.changes_date_today)
-                    Utility().tintBackground(date, themeColor, 0xb4000000.toInt())
+                    Utility.tintBackground(date, themeColor, 0xb4000000.toInt())
                 }
                 change.date.time - time <= 24 * 60 * 60 * 1000 -> {
                     // Tomorrow
                     date.text = applicationContext().getString(R.string.changes_date_tomorrow)
-                    Utility().tintBackground(date, applicationContext().getColor(R.color.grey_800), 0xb4000000.toInt())
+                    Utility.tintBackground(date, applicationContext().getColor(R.color.grey_800), 0xb4000000.toInt())
                 }
                 else -> {
                     date.text = otherDateFormat.format(change.date)
-                    Utility().tintBackground(date, applicationContext().getColor(R.color.black), 0xb4000000.toInt())
+                    Utility.tintBackground(date, applicationContext().getColor(R.color.black), 0xb4000000.toInt())
                 }
             }
 
@@ -98,7 +98,7 @@ class CompactChangesAdapter(private val changes: List<Change>,
             course.text = CoursesDb.getInstance().getFullname(change.id_course)
             // Adjust course background color
             // Set background color, about 70% opacity
-            Utility().tintBackground(course, CoursesDb.getInstance().getColor(change.id_course), 0xb4000000.toInt())
+            Utility.tintBackground(course, CoursesDb.getInstance().getColor(change.id_course), 0xb4000000.toInt())
 
             // Set lessons
             @SuppressLint("SetTextI18n")
@@ -107,7 +107,7 @@ class CompactChangesAdapter(private val changes: List<Change>,
             else
                 lessons.text = "${change.lessons[0]} - ${change.lessons[change.lessons.size - 1]}"
             // Set lessons background color according to change type (50% opacity)
-            Utility().tintBackground(lessons, ChangeParser().getTypeColor(change.type), 0x80000000.toInt())
+            Utility.tintBackground(lessons, ChangeInfo.getTypeColor(change.type), 0x80000000.toInt())
         }
     }
 

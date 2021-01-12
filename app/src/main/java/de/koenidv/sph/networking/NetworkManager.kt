@@ -668,7 +668,7 @@ class NetworkManager {
 
                         val courseToAdd = RawParser().getCourseFromPostsoverviewData(
                                 courseName, teacherId, isLK, numberId,
-                                Utility().parseStringArray(R.array.course_colors))
+                                Utility.parseStringArray(R.array.course_colors))
                         // If the found course is null, this will not crash
                         // (won't try adding null to courses list)
                         // But it also won't update the course

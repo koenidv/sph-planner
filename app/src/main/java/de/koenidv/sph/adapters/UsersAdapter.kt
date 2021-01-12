@@ -39,7 +39,7 @@ class UsersAdapter(private val users: List<User>,
 
             // Tint background with theme color at 15% if task is pinned
             if (user.isPinned)
-                Utility().tintBackground(layout, themeColor, 0x26000000)
+                Utility.tintBackground(layout, themeColor, 0x26000000)
             else
                 layout.background.clearColorFilter()
 

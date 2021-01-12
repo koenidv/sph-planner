@@ -183,7 +183,6 @@ class RawParser {
                     .replace("\n", "")
                     .replace(" ", "")
                     .toLowerCase(Locale.ROOT)
-                    .take(14)
 
             // Check if the course list already contains this id
             if (courses.none { course -> course.gmb_id == courseGmbId }) {
@@ -240,14 +239,14 @@ class RawParser {
             var sphId: String
             var teacherId: String
             var internalId: String
-            val nameColorMap = Utility().parseStringArray(R.array.course_colors)
+            val nameColorMap = Utility.parseStringArray(R.array.course_colors)
 
             // Get data from each table row and save the courses
             for (entry in rawContents) {
-                namedId = entry.substring(Utility().ordinalIndexOf(entry, "<td>", 1) + 4, entry.indexOf("<small>") - 1).trim()
-                uniformNamedId = CourseParser().parseNamedId(namedId)
+                namedId = entry.substring(Utility.ordinalIndexOf(entry, "<td>", 1) + 4, entry.indexOf("<small>") - 1).trim()
+                uniformNamedId = CourseInfo.parseNamedId(namedId)
                 sphId = entry.substring(entry.indexOf("<small>") + 8, entry.indexOf("</small>") - 1)
-                teacherId = entry.substring(Utility().ordinalIndexOf(entry, "<td>", 2))
+                teacherId = entry.substring(Utility.ordinalIndexOf(entry, "<td>", 2))
                 teacherId = teacherId.substring(teacherId.indexOf("(") + 1, teacherId.indexOf(")")).toLowerCase(Locale.ROOT)
                 internalId = IdParser().getCourseIdWithSph(sphId, teacherId, entry.contains("LK"))
 
@@ -256,7 +255,7 @@ class RawParser {
                         sph_id = sphId,
                         named_id = uniformNamedId,
                         id_teacher = teacherId,
-                        fullname = CourseParser().getFullnameFromInternald(internalId),
+                        fullname = CourseInfo.getFullnameFromInternald(internalId),
                         isFavorite = true,
                         isLK = entry.contains("LK"),
                         color = (nameColorMap[uniformNamedId.substring(0, uniformNamedId.indexOf(" "))]
@@ -287,7 +286,7 @@ class RawParser {
         var teacherId: String
         var isLK: Boolean
         var courseToAdd: Course?
-        val nameColorMap = Utility().parseStringArray(R.array.course_colors)
+        val nameColorMap = Utility.parseStringArray(R.array.course_colors)
         // Get values from table
         for (row in table.select("tr")) {
             numberId = row.attr("data-book")
@@ -314,7 +313,7 @@ class RawParser {
                                        numberId: String,
                                        nameColorMap: Map<String, String>): Course? {
         // Make named id from post overview uniform
-        val uniformNamedId = CourseParser().parseNamedId(courseName)
+        val uniformNamedId = CourseInfo.parseNamedId(courseName)
 
         // Get courses that might be the same as this one
         var similiarCourses = CoursesDb.getInstance().getByNamedId(uniformNamedId).toMutableList()
@@ -351,7 +350,7 @@ class RawParser {
                     number_id = numberId
                     named_id = uniformNamedId
                     isFavorite = true
-                    fullname = CourseParser().getFullnameFromInternald(similiarCourses[0].courseId)
+                    fullname = CourseInfo.getFullnameFromInternald(similiarCourses[0].courseId)
                     color = (nameColorMap[
                             uniformNamedId
                                     .substring(0, uniformNamedId.indexOf(" "))]
@@ -369,7 +368,7 @@ class RawParser {
                     return Course(
                             courseId = courseIdPrefix + "_1",
                             named_id = uniformNamedId,
-                            fullname = CourseParser().getFullnameFromInternald(courseIdPrefix + "_1"),
+                            fullname = CourseInfo.getFullnameFromInternald(courseIdPrefix + "_1"),
                             number_id = numberId,
                             id_teacher = teacherId,
                             isFavorite = true,
@@ -442,7 +441,7 @@ class RawParser {
         rawContents.removeFirst()
 
         // Name-type map
-        val nametypeMap = Utility().parseStringArray(R.array.tiles_name_type)
+        val nametypeMap = Utility.parseStringArray(R.array.tiles_name_type)
 
         var id: String
         var name: String
@@ -753,7 +752,7 @@ class RawParser {
                                 rowspanInner = 0
 
                                 // Extract data
-                                gmbId = lesson.select("b").text().trim()
+                                gmbId = lesson.select("b").text().trim().toLowerCase(Locale.ROOT)
                                 teacherId = lesson.select("small").text().trim()
                                 room = lesson.toString().substring(
                                         lesson.toString().indexOf("</b>") + 4,

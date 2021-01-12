@@ -28,17 +28,20 @@ class IdParser {
         val courseDb = CoursesDb.getInstance()
 
         if (!forceNewId) {
-            val existingCourseId = CoursesDb.getInstance().getCourseIdByGmbId(courseGmbId.toLowerCase(Locale.ROOT))
+            // We need to use courseGmbId here as gmb ids are stored unmodified (except for case)
+            val existingCourseId = CoursesDb.getInstance().getCourseIdByGmbId(
+                    courseGmbId.toLowerCase(Locale.ROOT))
             if (existingCourseId != null) return existingCourseId
         }
 
-        // Warning: trying to get an existing internal id for a course which is not in the db will mostly fail
+        // Apply some modifications to make gmb ids match up with sph & internal ids
+        val gmbId = CourseInfo.gmbid(courseGmbId)
 
         // GMB id might in some cases not include a dash
-        val classType: String = if (courseGmbId.contains("-"))
-            courseGmbId.substring(0, courseGmbId.indexOf("-")).take(8).toLowerCase(Locale.ROOT)
+        val classType: String = if (gmbId.contains("-"))
+            gmbId.substring(0, gmbId.indexOf("-")).take(8)
         else
-            courseGmbId.take(8).toLowerCase(Locale.ROOT)
+            gmbId.take(8)
 
         // Make everything lowercase
         val teachId = teacherId.toLowerCase(Locale.ROOT)
@@ -49,7 +52,7 @@ class IdParser {
         // Get courses with same subject from dataset or database
         coursesWithSameId = allCourses?.filter { it.courseId.startsWith(classType + "_") }
                 ?: CoursesDb.getInstance().getByInternalPrefix(classType + "_")
-        coursesWithSameId = coursesWithSameId.filter { it.isLK == courseGmbId.toLowerCase(Locale.ROOT).contains("lk") }
+        coursesWithSameId = coursesWithSameId.filter { it.isLK == gmbId.contains("lk") }
         var checkForNewIndex = coursesWithSameId.isNotEmpty()
         var courseToCheck: Course
         while (checkForNewIndex) {
@@ -59,9 +62,9 @@ class IdParser {
             } else {
                 // Use current index if there's already an interal id for this specific course
                 courseToCheck = coursesWithSameId[index - 1]
-                if (Utility().nullOrEquals(courseToCheck.gmb_id, courseGmbId.toLowerCase(Locale.ROOT))
+                if (Utility.nullOrEquals(courseToCheck.gmb_id, gmbId)
                         // No real need to check this as check for gmb_id already includes it, we'll keep it here anyways
-                        && Utility().nullOrEquals(courseToCheck.isLK, courseGmbId.toLowerCase(Locale.ROOT).contains("lk")))
+                        && Utility.nullOrEquals(courseToCheck.isLK, gmbId.contains("lk")))
                     checkForNewIndex = false
                 else
                 // If internal id belongs to another course, try the next one
@@ -84,7 +87,10 @@ class IdParser {
     /**
      * Get an existing internal id for a gmb id, without a teacher
      */
-    fun getCourseIdWithGmb(courseGmbId: String): String? = CoursesDb.getInstance().getCourseIdByGmbId(courseGmbId.toLowerCase(Locale.ROOT))
+    fun getCourseIdWithGmb(courseGmbId: String): String? =
+            CoursesDb.getInstance().getCourseIdByGmbId(
+                    courseGmbId.toLowerCase(Locale.ROOT)
+            )
 
     /**
      * Returns an internal id for a gmb id and teacher id
@@ -137,7 +143,7 @@ class IdParser {
     }
 
     fun getCourseIdPrefixWithNamedId(namedId: String, teacherId: String): String? {
-        val prefixMap = Utility().parseStringArray(R.array.namedid_course_prefixes)
+        val prefixMap = Utility.parseStringArray(R.array.namedid_course_prefixes)
         // If the named id is for some reason empty, return null
         if (namedId.isEmpty()) return null
 

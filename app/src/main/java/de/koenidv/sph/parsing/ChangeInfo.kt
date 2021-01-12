@@ -5,7 +5,7 @@ import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.objects.Change
 
 //  Created by koenidv on 31.12.2020.
-class ChangeParser {
+object ChangeInfo {
 
     /**
      * Get a color associated to the provided change type
