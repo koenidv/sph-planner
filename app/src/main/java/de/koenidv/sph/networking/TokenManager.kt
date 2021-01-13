@@ -32,10 +32,6 @@ class TokenManager {
      */
     fun generateAccessToken(forceNewToken: Boolean = false, onComplete: (success: Int, token: String?) -> Unit) {
 
-
-        Log.d(TAG, "Time since last success: " + (Date().time - prefs.getLong("token_last_success", 0)).toString())
-        // todo still 15min?
-
         // Return existing, signed-in token if it was used within 15 Minutes
         // Else get a new token
         if (Date().time - prefs.getLong("token_last_success", 0) <= 15 * 60 * 1000

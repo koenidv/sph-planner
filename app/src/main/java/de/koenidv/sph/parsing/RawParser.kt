@@ -76,11 +76,16 @@ class RawParser {
                                 1 -> { // Affected lessons
                                     lessons = if (cell.text().contains(" - ")) {
                                         // Get start and end lesson and put everything in between in a list
-                                        val fromLesson = cell.text().substring(0, cell.text().indexOf(" ")).toInt()
-                                        val toLesson = cell.text().substring(cell.text().lastIndexOf(" ") + 1).toInt()
+                                        // Also, make sure a lesson is never null but 0
+                                        val fromLesson = cell.text().substring(
+                                                0, cell.text().indexOf(" "))
+                                                .trim().toIntOrNull() ?: 0
+                                        val toLesson = cell.text().substring(
+                                                cell.text().lastIndexOf(" ") + 1)
+                                                .trim().toIntOrNull() ?: 0
                                         (fromLesson..toLesson).toList()
                                     } else {
-                                        listOf(cell.text().toInt())
+                                        listOf(cell.text().toIntOrNull() ?: 0)
                                     }
                                 }
                                 2 -> className = if (cell.text() == "") null else cell.text()

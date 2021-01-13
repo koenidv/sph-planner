@@ -11,7 +11,7 @@ data class Change(
         var id_course: String? = null, // i.e. m_bar_1 - Lowercase
         var id_course_external: String? = null, // i.e. M-GK-3 - Uppercase
         var date: Date = Date(0), // Date of the change, day only, no time
-        var lessons: List<Int> = listOf(), // Affected lessons, i.e [1,2]
+        var lessons: List<Int>, // Affected lessons, i.e [1,2]
         var type: Int = TYPE_OTHER, // Type of change (a TYPE_... constant)
         // Not so important stuff
         var id_course_external_before: String? = null, // If the schedule was changed
@@ -26,8 +26,9 @@ data class Change(
 ) {
 
     init {
-        sortLesson = if (lessons.size == 1) lessons[0].toDouble()
-        else (lessons[0] + 0.01 * lessons[lessons.size - 1])
+        sortLesson =
+                if (lessons.size == 1) lessons[0].toDouble()
+                else (lessons[0] + 0.01 * lessons[lessons.size - 1])
         if (description == "Entfällt" || description == "Entfällt; Verlegung auf Entfall für Lehrer")
             description = null
     }

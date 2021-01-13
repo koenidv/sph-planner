@@ -265,7 +265,7 @@ class NetworkManager {
      * Load changes from sph and save them to changes db
      */
     private fun loadAndSaveChanges(onComplete: (success: Int) -> Unit) {
-        loadSiteWithToken(applicationContext().getString(R.string.url_changes),
+        loadSiteWithToken(applicationContext().getString(R.string.url_changes_debug), //todo
                 onComplete = { success: Int, result: String? ->
                     if (success == SUCCESS) {
                         ChangesDb.instance!!.removeOld()
@@ -443,11 +443,11 @@ class NetworkManager {
                                         || responseLine.contains("Fehler - Schulportal Hessen")
                                         || responseLine.contains("Schulauswahl - Schulportal Hessen")) {
                                     // Signin was not successful
-                                    onComplete(FAILED_INVALID_CREDENTIALS, "Invalid credentials")
+                                    onComplete(FAILED_INVALID_CREDENTIALS, response)
                                     prefs.edit().putLong("token_last_success", 0).apply()
                                 } else if (response.contains("Wartungsarbeiten")) {
                                     // Maintenance work
-                                    onComplete(FAILED_MAINTENANCE, "Maintenance")
+                                    onComplete(FAILED_MAINTENANCE, response)
                                 }
                             }
 

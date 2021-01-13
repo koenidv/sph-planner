@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import de.koenidv.sph.MainActivity
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
@@ -35,8 +36,11 @@ class OnboardingSupportlistFragment : Fragment() {
         val indexLoading = view.findViewById<ProgressBar>(R.id.indexLoading)
         val nextFab = view.findViewById<FloatingActionButton>(R.id.nextFab)
 
+        // Mark signing in for Crashlytics
+        FirebaseCrashlytics.getInstance().setCustomKey("onboarding_indexing", true)
+
         // Get supported features
-        NetworkManager().loadSiteWithToken("https://start.schulportal.hessen.de/index.php", onComplete = { success: Int, response: String? ->
+        NetworkManager().loadSiteWithToken("https://start.schulportal.hessen.de/index.php") { success: Int, response: String? ->
 
             if (success != NetworkManager.SUCCESS) {
                 // Display error
@@ -184,15 +188,15 @@ class OnboardingSupportlistFragment : Fragment() {
                                 FunctionTilesDb.getInstance().save(featureList)
 
                                 // Now index everything else
-                                NetworkManager().indexAll {
-                                    if (it == NetworkManager.SUCCESS) {
+                                NetworkManager().indexAll { indexsuccess ->
+                                    if (indexsuccess == NetworkManager.SUCCESS) {
                                         indexLoading.visibility = View.GONE
                                         nextFab.visibility = View.VISIBLE
                                         prefs.edit().putBoolean("introComplete", true).apply()
                                     } else {
                                         // Display error message
                                         indexLoading.visibility = View.GONE
-                                        warningText.text = when (success) {
+                                        warningText.text = when (indexsuccess) {
                                             NetworkManager.FAILED_NO_NETWORK -> getString(R.string.onboard_supported_error_network)
                                             NetworkManager.FAILED_MAINTENANCE -> getString(R.string.onboard_supported_error_maintenance)
                                             NetworkManager.FAILED_SERVER_ERROR -> getString(R.string.onboard_supported_error_server)
@@ -209,7 +213,10 @@ class OnboardingSupportlistFragment : Fragment() {
                                         warningText.setOnLongClickListener {
                                             val sendIntent: Intent = Intent().apply {
                                                 action = Intent.ACTION_SEND
-                                                putExtra(Intent.EXTRA_TEXT, success.toString() + "\n" + response)
+                                                putExtra(Intent.EXTRA_TEXT,
+                                                        indexsuccess.toString()
+                                                                + "\n--- Server Response ---"
+                                                                + response)
                                                 this.type = "text/plain"
                                             }
                                             requireActivity().startActivity(Intent.createChooser(sendIntent, null))
@@ -224,10 +231,14 @@ class OnboardingSupportlistFragment : Fragment() {
                     })
                 }
             }
-        })
+        }
 
         // Continue button
-        nextFab.setOnClickListener { startActivity(Intent(context, MainActivity().javaClass)); requireActivity().finish() }
+        nextFab.setOnClickListener {
+            // Reset indexing value for Crashlytics and start MainActivity
+            FirebaseCrashlytics.getInstance().setCustomKey("onboarding_indexing", false)
+            startActivity(Intent(context, MainActivity().javaClass)); requireActivity().finish()
+        }
 
         contactButton.setOnClickListener { ContactSheet().show(parentFragmentManager, "contact") }
 
