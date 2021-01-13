@@ -247,6 +247,10 @@ class NetworkManager {
                             // Remember when we last refreshed this course
                             prefs.edit().putLong("updated_posts_${course.courseId}", time).apply()
                         } else {
+                            Log.d(TAG, "Couldn't load " +
+                                    applicationContext().getString(R.string.url_course_overview)
+                                            .replace("%numberid", course.number_id
+                                                    .toString()))
                             errors.add(success)
                         }
                         counter++
@@ -265,7 +269,7 @@ class NetworkManager {
      * Load changes from sph and save them to changes db
      */
     private fun loadAndSaveChanges(onComplete: (success: Int) -> Unit) {
-        loadSiteWithToken(applicationContext().getString(R.string.url_changes_debug), //todo
+        loadSiteWithToken(applicationContext().getString(R.string.url_changes),
                 onComplete = { success: Int, result: String? ->
                     if (success == SUCCESS) {
                         ChangesDb.instance!!.removeOld()
