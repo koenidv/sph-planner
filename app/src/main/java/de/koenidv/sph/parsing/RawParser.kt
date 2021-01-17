@@ -439,11 +439,8 @@ class RawParser {
         val functions = mutableListOf<FunctionTile>()
         val ids = mutableListOf<String>()
 
-        // Split String into list items and remove stuff we don't need
-        val rawContents = rawResponse.replace("\n", "")
-                .substring(rawResponse.indexOf("id=\"accordion\">") + 15, rawResponse.indexOf("id=\"menuelist\"") - 5)
-                .split("<li class").toMutableList()
-        rawContents.removeFirst()
+        // Get "accordion", list of all feature tiles
+        val accordion = Jsoup.parse(rawResponse).selectFirst("div#accordion")
 
         // Name-type map
         val nametypeMap = Utility.parseStringArray(R.array.tiles_name_type)
@@ -454,37 +451,46 @@ class RawParser {
         var type: String
         var icon: String
         var color: Int
-        for (content in rawContents) {
-            id = content.substring(content.indexOf("id=\"") + 4)
-            id = id.substring(0, id.indexOf("\""))
+        var styles: String
+        // Get every list element within the accordion
+        for (element in accordion.select("li")) {
+            // sph removed the elements' ids, but classes will contain it - at least for now
+            // This will break should they opt to assign different classes to the same tile,
+            // once on start and once on their correct group
+            id = element.className()
             // Only if tile with id hasn't been added yet
             if (!ids.contains(id)) {
-
-                name = content.substring(content.indexOf("<h3><span class=\"glyphicon \"></span>") + 36)
-                name = name.substring(0, name.indexOf("<")).trim()
-                locationTemp = content.substring(content.indexOf("<div class=\"textheight\"> <a href=\"") + 34)
-                locationTemp = "https://start.schulportal.hessen.de/" + locationTemp.substring(0, locationTemp.indexOf("\""))
-
-                icon = Regex(""".*((fa|glyphicon)-\S*)\s+logo"""").find(content)!!.groupValues[1]
-                /*
-                SPH spits out rgb() on desktop but hex values on mobile. interesting
-                colorTemp = content.substring(content.indexOf("background-color: rgb(") + 22)
-                colorSplits = colorTemp.substring(0, colorTemp.indexOf(")")).split(", ")
-                color = Color.rgb(colorSplits[0].toInt(), colorSplits[1].toInt(), colorSplits[2].toInt())
-                */
+                // Get the feature's name
+                name = element.select("div.textheight h3").last().ownText()
+                // Get the url this tile is directing to
+                // This (now changed: might) be something lik /meinunterricht.php?a=X&e=XXX,
+                // we'll resolve those redirects later
+                locationTemp = element.select("div.textheight a").last()
+                        .attr("href")
+                // Get the tile's logo from its logo view's class
+                // The .fa- or .glyphicon- icon will be the second-to-last class before .logo
+                icon = Regex(""".*((fa|glyphicon)-\S*)\s+logo""").find(
+                        element.selectFirst("div.logoview span.logo").className()
+                )!!.groupValues[1]
+                // Try to get the tile's color
+                // sph sometimes uses rgb, sometimes hex and sometimes provides invalid hex values
                 color = try {
-                    Color.parseColor(content.substring(content.indexOf("background-color: #") + 18, content.indexOf("background-color: #") + 25))
-                } catch (nfe: NumberFormatException) {
+                    styles = element.selectFirst("div.box").attr("style")
+                    Color.parseColor(styles.substring(
+                            styles.indexOf("background-color: #") + 18,
+                            styles.indexOf("background-color: #") + 25))
+                } catch (nfe: java.lang.Exception) {
                     // If parsing the color failed for some reason, use the current theme color
+                    // NumberFormatException or StringIndexOutOfBoundsException if uses rba
                     applicationContext()
                             .getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
                             .getInt("themeColor", 0)
                 }
 
+                // Check the tile's type using its name
                 type = nametypeMap[name] ?: "other"
-
+                // Create a feature tile with these values and add it to the return list
                 functions.add(FunctionTile(name, locationTemp, type, icon, color))
-
                 // Remember tile id
                 ids.add(id)
             }
