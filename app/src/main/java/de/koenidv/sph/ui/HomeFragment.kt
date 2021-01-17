@@ -55,7 +55,8 @@ class HomeFragment : Fragment() {
             if (intent.getStringExtra("content") == "posts") {
                 // If there wasn't any post or any task before but now is,
                 // it's easier to recreate the fragment
-                if (unreadPostsRecycler.adapter == null
+                if (!::unreadPostsRecycler.isInitialized
+                        || unreadPostsRecycler.adapter == null
                         || tasksRecycler.adapter == null) {
                     @Suppress("DEPRECATION")
                     parentFragmentManager.beginTransaction()

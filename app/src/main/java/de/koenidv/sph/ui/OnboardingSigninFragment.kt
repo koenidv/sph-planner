@@ -164,6 +164,7 @@ class OnboardingSigninFragment : Fragment() {
 
                 prefs.edit()
                         .putString("user", userText.text.toString()
+                                .trim()
                                 .replace(" ", ".")
                                 .toLowerCase(Locale.ROOT))
                         .putString("password", passText.text.toString())
