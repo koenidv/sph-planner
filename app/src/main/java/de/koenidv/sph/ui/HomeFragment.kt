@@ -43,9 +43,33 @@ class HomeFragment : Fragment() {
 
     private lateinit var tasks: MutableList<Task>
     private lateinit var tasksRecycler: RecyclerView
+    private lateinit var tasksTitle: TextView
+    private lateinit var tasksRecyclerLayout: LinearLayout
     private lateinit var posts: MutableList<Post>
     private lateinit var unreadPostsRecycler: RecyclerView
     private lateinit var messagesLayout: LinearLayout
+
+    /**
+     * Update tasks title to reflect the current number of undone tasks
+     * Also hide or show recycler layout if needed
+     */
+    fun updateTasksTitle() {
+        // Update title
+        if (tasksRecycler.adapter?.itemCount == 0) {
+            // If tasks list is now empty, update title to display everything is done
+            tasksTitle.setText(R.string.tasks_filter_none_undone)
+            // Hide recycler layout as it would just show an empty border
+            tasksRecyclerLayout.visibility = View.GONE
+        } else {
+            // Else update the title to show the number of undone tasks
+            tasksTitle.text = resources.getQuantityString(
+                    R.plurals.tasks_personalized_title_count,
+                    tasks.size,
+                    tasks.size)
+            // Make sure tasks recycler layout is visible
+            tasksRecyclerLayout.visibility = View.VISIBLE
+        }
+    }
 
     // Refresh whenever the broadcast "uichange" is received
     private val uichangeReceiver: BroadcastReceiver = object : BroadcastReceiver() {
@@ -86,6 +110,8 @@ class HomeFragment : Fragment() {
                         tasksRecycler.adapter?.notifyItemRemoved(5)
                     }
                 }
+                // Update tasks title
+                updateTasksTitle()
             }
 
             // Update tasks and posts list when a task is done
@@ -94,9 +120,10 @@ class HomeFragment : Fragment() {
                 val taskId = intent.getStringExtra("taskId")
                 val postId = intent.getStringExtra("postId")
 
-                // If tasks list contains this, notify tasks aapter
+                // If tasks list contains this, notify tasks aapter, else add it
                 val taskIndex = tasks.indexOfFirst { it.taskId == taskId }
                 if (taskIndex != -1) {
+                    // Update recycler
                     tasksRecycler.adapter?.notifyItemChanged(taskIndex)
                 } else if (!intent.getBooleanExtra("isDone", true)) {
                     val taskToAdd = TasksDb.getInstance().getByTaskId(taskId).firstOrNull()
@@ -107,6 +134,8 @@ class HomeFragment : Fragment() {
                         tasksRecycler.adapter?.notifyItemRemoved(5)
                     }
                 }
+                // Update title
+                updateTasksTitle()
 
                 if (postId != null) {
                     // If posts list contains this, notify it
@@ -226,9 +255,9 @@ class HomeFragment : Fragment() {
          */
 
         val tasksLayout = view.findViewById<LinearLayout>(R.id.tasksLayout)
-        val tasksRecyclerLayout = view.findViewById<LinearLayout>(R.id.tasksRecyclerLayout)
+        tasksRecyclerLayout = view.findViewById<LinearLayout>(R.id.tasksRecyclerLayout)
         tasksRecycler = view.findViewById(R.id.tasksRecycler)
-        val tasksTitle = view.findViewById<TextView>(R.id.tasksTitleTextView)
+        tasksTitle = view.findViewById<TextView>(R.id.tasksTitleTextView)
         val moreTasksText = view.findViewById<TextView>(R.id.moreTasksTextView)
 
         if (FunctionTilesDb.getInstance().supports(FunctionTile.FEATURE_COURSES)) {
@@ -243,6 +272,7 @@ class HomeFragment : Fragment() {
             }
 
             if (tasks.isNotEmpty()) {
+                // Set up recycler with undone tasks, shows only 5 at a time
                 tasksRecycler.adapter = CompactTasksAdapter(
                         tasks,
                         6,
@@ -264,13 +294,15 @@ class HomeFragment : Fragment() {
                                         moreTasksText.text = resources.getQuantityString(R.plurals.tasks_personalized_more, tasksOverflow, tasksOverflow)
                                     else moreTasksText.visibility = View.GONE
                                 }
+                                // Update title
+                                updateTasksTitle()
                             }
                         }
                 )
-            } else {
-                tasksTitle.setText(R.string.tasks_filter_none_undone)
-                tasksRecyclerLayout.visibility = View.GONE
             }
+            // Show the number of undone tasks or that everything is done
+            // Will also handle hiding tasks recycler layout if necessary
+            updateTasksTitle()
 
             // Open all undone tasks on click
             tasksLayout.setOnClickListener {

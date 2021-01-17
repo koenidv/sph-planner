@@ -238,5 +238,9 @@
     <string name="users_title">Lehrer</string>
     <string name="explore_collection_users">👥 Lehrer</string>
     <string name="tasks_due_change">Fälligkeit ändern</string>
+    <plurals name="tasks_personalized_title_count">
+        <item quantity="one">Eine offene Aufgabe</item>
+        <item quantity="other">%d offene Aufgaben</item>
+    </plurals>
 
 </resources>

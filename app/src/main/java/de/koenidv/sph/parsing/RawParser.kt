@@ -5,6 +5,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.toColorInt
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner.Companion.TAG
 import de.koenidv.sph.SphPlanner.Companion.applicationContext
@@ -28,8 +29,8 @@ class RawParser {
 
         // we could check the week type (a/b) here: <span class="badge woche">
 
-        // If there are any entries..
-        if (rawResponse.contains("<div class=\"panel panel-primary\"")) {
+        // Log to Crashlytics if failed
+        try {
             // Get the document
             val doc = Jsoup.parse(rawResponse)
 
@@ -55,7 +56,7 @@ class RawParser {
                 // Parse date
                 // Substring: Only get "11.01.2021" from "Vertretungen am 11.01.2021" -> Chars 16-26
                 date = dateFormat.parse(
-                        panel.select("h3").first().text()
+                        panel.selectFirst("h3").text()
                                 .substring(16, 26))!!
 
                 // We are left with a table, each row contains these columns:
@@ -159,6 +160,10 @@ class RawParser {
                 // Next day
 
             }
+        } catch (e: Error) {
+            // Log this error to Firebase Crashlytics
+            FirebaseCrashlytics.getInstance().log("Failed to parse raw changes")
+            FirebaseCrashlytics.getInstance().recordException(e)
         }
 
         return changes

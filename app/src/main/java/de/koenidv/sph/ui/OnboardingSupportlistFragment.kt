@@ -42,6 +42,9 @@ class OnboardingSupportlistFragment : Fragment() {
         // Get supported features
         NetworkManager().loadSiteWithToken("https://start.schulportal.hessen.de/index.php") { success: Int, response: String? ->
 
+            // Would otherwise crash if fragment has been detached in the meantime
+            if (host == null) return@loadSiteWithToken
+
             if (success != NetworkManager.SUCCESS) {
                 // Display error
                 // Credentials should be valid as we just checked them in the last onboarding step

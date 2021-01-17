@@ -333,7 +333,9 @@ class NetworkManager {
                                     currentItem = items.getJSONObject(index)
 
                                     // If list doesn't contain this user yet
-                                    if (!userIds.contains(currentItem.getString("id"))) {
+                                    // Also, only get teachers at this time (type=lul)
+                                    if (!userIds.contains(currentItem.getString("id"))
+                                            && currentItem.getString("type") == "lul") {
                                         // We'll only use names with "," and "(..)"
                                         // This way we'll ignore admin entries
                                         // However, this will not add anything if a school does not

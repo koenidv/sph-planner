@@ -149,6 +149,10 @@
     <string name="tasks_filter_none">No tasks found</string>
     <string name="tasks_filter_none_undone">All tasks completed ✅</string>
     <string name="tasks_personalized_title">Undone tasks</string>
+    <plurals name="tasks_personalized_title_count">
+        <item quantity="one">%d undone task</item>
+        <item quantity="other">%d undone tasks</item>
+    </plurals>
     <plurals name="tasks_personalized_more">
         <item quantity="one">%d more undone task</item>
         <item quantity="other">%d more undone tasks</item>
