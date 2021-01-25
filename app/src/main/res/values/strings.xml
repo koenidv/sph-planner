@@ -31,7 +31,7 @@
     <string name="emoji_cross" translatable="false">❌</string>
 
     <!-- General purpose network stuff -->
-    <string name="error_offline">Your are offline</string>
+    <string name="error_offline">No connection</string>
     <string name="error_maintenance">Maintenance, try again later</string>
     <string name="error_server">Try again in a few minutes</string>
 

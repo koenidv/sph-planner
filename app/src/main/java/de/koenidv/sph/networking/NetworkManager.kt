@@ -23,6 +23,7 @@ import de.koenidv.sph.objects.*
 import de.koenidv.sph.objects.FunctionTile.Companion.FEATURE_CHANGES
 import de.koenidv.sph.objects.FunctionTile.Companion.FEATURE_COURSES
 import de.koenidv.sph.objects.FunctionTile.Companion.FEATURE_MESSAGES
+import de.koenidv.sph.objects.FunctionTile.Companion.FEATURE_STUDYGROUPS
 import de.koenidv.sph.objects.FunctionTile.Companion.FEATURE_TIMETABLE
 import de.koenidv.sph.parsing.RawParser
 import de.koenidv.sph.parsing.Utility
@@ -156,7 +157,7 @@ class NetworkManager {
         // Load the feature at the current index
         loadNextFeature = {
             when (loadList[index]) {
-                "courses" -> createCourseIndex(onDone)
+                "courses" -> createCourseIndex(features, onDone)
                 "timetable" -> loadAndSaveTimetable(onDone)
                 "posts" -> loadAndSavePosts(markAsRead = true, onComplete = onDone)
                 "changes" -> loadAndSaveChanges(onDone)
@@ -169,10 +170,15 @@ class NetworkManager {
         loadNextFeature()
     }
 
+    /**
+     * Load and parse courses from timetable, studygroups and mycourses, if supported
+     * @param features: List of supported features. Defaults to values from the database
+     * @param onComplete: Callback on success or error
+     */
+    private fun createCourseIndex(
+            features: List<String?> = FunctionTilesDb.getInstance().supportedFeatures.map { it.type },
+            onComplete: (success: Int) -> Unit) {
 
-    // todo save last refresh for checks
-    // todo don't use the || success == invalid hack. Skip trying to load when feature is not available
-    private fun createCourseIndex(onComplete: (success: Int) -> Unit) {
         val prefs = applicationContext().getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
         // Remove old courses, it'll just lead to isses
         val coursesDb = CoursesDb.getInstance()
@@ -180,31 +186,84 @@ class NetworkManager {
         // Set courses last updated to 0 in case this gets cancelled
         prefs.edit().putLong("courses_last_updated", 0).apply()
 
+        // Mark each supported feature that we might need for courses loading
+        val loadList = mutableListOf<String>()
         // Firstly, load courses from timetable so we have an overview
-        loadSiteWithToken(applicationContext().getString(R.string.url_timetable), onComplete = { successTimetable: Int, responseTimetable: String? ->
-            if (successTimetable == SUCCESS || successTimetable == FAILED_INVALID_CREDENTIALS) {
-                // Save parsed courses from timetable
-                coursesDb.save(RawParser().parseCoursesFromTimetable(responseTimetable!!))
-                // Secondly, load those courses from study groups to find out where the user belongs
-                loadSiteWithToken(applicationContext().getString(R.string.url_studygroups), onComplete = { successStudygroups: Int, responseStudygroups: String? ->
-                    if (successStudygroups == SUCCESS || successStudygroups == FAILED_INVALID_CREDENTIALS) {
-                        // Save parsed courses from study groups
-                        coursesDb.setNulledNotFavorite()
-                        coursesDb.save(RawParser().parseCoursesFromStudygroups(responseStudygroups!!))
-                        // Lastly, load courses again from posts overview to get number ids
-                        loadSiteWithToken(applicationContext().getString(R.string.url_allposts), onComplete = { successOverview: Int, responseOverview: String? ->
-                            if (successOverview == SUCCESS || successOverview == FAILED_INVALID_CREDENTIALS) {
-                                // Save parsed courses from posts overview
-                                coursesDb.save(RawParser().parseCoursesFromPostsoverview(responseOverview!!))
-                                // Remember when we last updated the courses
-                                prefs.edit().putLong("courses_last_updated", Date().time).apply()
-                            }
-                            onComplete(successOverview)
-                        })
-                    } else onComplete(successStudygroups)
-                })
-            } else onComplete(successTimetable)
-        })
+        if (features.contains(FEATURE_TIMETABLE)) loadList.add("timetable")
+        // Secondly, load those courses from study groups to find out where the user belongs
+        if (features.contains(FEATURE_STUDYGROUPS)) loadList.add("studygroups")
+        // Lastly, load courses again from posts overview to get number ids
+        if (features.contains(FEATURE_COURSES)) loadList.add("mycourses")
+
+        // Load each item from loadList
+        var index = 0
+        var loadNextCourses = {}
+        val onDone: (Int) -> Unit = {
+            if (it == SUCCESS) {
+                index++
+                // If this was the last feature, save the current time and call back success
+                if (index == loadList.size) {
+                    // Remember when we last updated the courses
+                    prefs.edit().putLong("courses_last_updated", Date().time).apply()
+                    onComplete(SUCCESS)
+                }
+                // Else load the next feature
+                else loadNextCourses()
+            } else {
+                // Callback an error and stop loading
+                onComplete(it)
+                Log.d(TAG, "Error loading " + loadList[index])
+            }
+        }
+        // Load the feature at the current index
+        loadNextCourses = {
+            when (loadList[index]) {
+                "timetable" -> {
+                    loadSiteWithToken(
+                            applicationContext().getString(R.string.url_timetable),
+                            onComplete = { success: Int, response: String? ->
+                                if (success == SUCCESS) {
+                                    // Save parsed courses from timetable
+                                    coursesDb.save(RawParser().parseCoursesFromTimetable(response!!))
+                                    // Remember when we last updated the courses from the timetable
+                                    prefs.edit().putLong("courses_last_updated_timetable", Date().time).apply()
+                                }
+                                onDone(success)
+                            })
+                }
+                "studygroups" -> {
+                    loadSiteWithToken(
+                            applicationContext().getString(R.string.url_studygroups),
+                            onComplete = { success: Int, response: String? ->
+                                if (success == SUCCESS) {
+                                    // We now know which courses are favorites,
+                                    // so mark all unknown as not favorite
+                                    coursesDb.setNulledNotFavorite()
+                                    // Save parsed courses from study groups
+                                    coursesDb.save(RawParser().parseCoursesFromStudygroups(response!!))
+                                    // Remember when we last updated the courses from studygroups
+                                    prefs.edit().putLong("courses_last_updated_studygroups", Date().time).apply()
+                                }
+                                onDone(success)
+                            })
+                }
+                "mycourses" -> {
+                    loadSiteWithToken(
+                            applicationContext().getString(R.string.url_allposts),
+                            onComplete = { success: Int, response: String? ->
+                                if (success == SUCCESS) {
+                                    // Save parsed courses from posts overview
+                                    coursesDb.save(RawParser().parseCoursesFromPostsoverview(response!!))
+                                    // Remember when we last updated the courses from my courses
+                                    prefs.edit().putLong("courses_last_updated_mycourses", Date().time).apply()
+                                }
+                                onDone(success)
+                            })
+                }
+            }
+        }
+        // Begin loading
+        loadNextCourses()
     }
 
     /**

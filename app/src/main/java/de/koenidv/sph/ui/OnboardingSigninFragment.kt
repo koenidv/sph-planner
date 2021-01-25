@@ -20,6 +20,7 @@ import com.androidnetworking.interfaces.StringRequestListener
 import com.facebook.stetho.okhttp3.StethoInterceptor
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.google.android.material.textfield.TextInputLayout
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.toptoche.searchablespinnerlibrary.SearchableSpinner
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
@@ -180,6 +181,17 @@ class OnboardingSigninFragment : Fragment() {
                         if (success == NetworkManager.SUCCESS && token != null && token != "") {
                             // User signed in successfully - NOW DO SOMETHING WITH IT :)
                             prefs.edit().putBoolean("credsVerified", true).apply()
+
+                            // If this is a teacher account, meaning no "." in the user name,
+                            // remember this. Might be the cause of some future issues.
+                            if (!userText.text.contains(".")) {
+                                // Mark teacher account for Crashlytics
+                                FirebaseCrashlytics.getInstance().setCustomKey("is_teacher", true)
+                            }
+                            // Mark school id in crashlytics, for more effective debugging
+                            FirebaseCrashlytics.getInstance().setCustomKey(
+                                    "school_id", prefs.getString("schoolid", "0")!!)
+
                             // Move to next onboarding fragment
                             val ft = parentFragmentManager.beginTransaction()
                             ft.replace(R.id.fragment, OnboardingSupportlistFragment()).commit()

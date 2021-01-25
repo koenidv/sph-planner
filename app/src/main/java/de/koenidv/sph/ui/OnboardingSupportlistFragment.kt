@@ -36,9 +36,6 @@ class OnboardingSupportlistFragment : Fragment() {
         val indexLoading = view.findViewById<ProgressBar>(R.id.indexLoading)
         val nextFab = view.findViewById<FloatingActionButton>(R.id.nextFab)
 
-        // Mark signing in for Crashlytics
-        FirebaseCrashlytics.getInstance().setCustomKey("onboarding_indexing", true)
-
         // Get supported features
         NetworkManager().loadSiteWithToken("https://start.schulportal.hessen.de/index.php") { success: Int, response: String? ->
 
@@ -238,8 +235,8 @@ class OnboardingSupportlistFragment : Fragment() {
 
         // Continue button
         nextFab.setOnClickListener {
-            // Reset indexing value for Crashlytics and start MainActivity
-            FirebaseCrashlytics.getInstance().setCustomKey("onboarding_indexing", false)
+            // Mark onboarding completed for Crashlytics
+            FirebaseCrashlytics.getInstance().setCustomKey("onboarding_completed", true)
             startActivity(Intent(context, MainActivity().javaClass)); requireActivity().finish()
         }
 

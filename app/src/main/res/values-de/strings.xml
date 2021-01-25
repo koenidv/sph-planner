@@ -125,7 +125,7 @@
     <string name="greeting_random_evening_2">Was hast du heute gemacht?</string>
     <string name="greeting_random_general_3">Naa du?</string>
     <string name="attachments_pins_title">Angepinnte Elemente</string>
-    <string name="error_offline">Du bist offline</string>
+    <string name="error_offline">Keine Verbindung</string>
     <string name="error_maintenance">Wartung, versuche es später erneut</string>
     <string name="error_server">Versuche es in einigen Minuten erneut</string>
     <string name="onboard_signin_error_server">Ein Serverfehler ist aufgetreten.\nBitte versuche es in einigen Minuten erneut.</string>
