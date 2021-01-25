@@ -27,27 +27,8 @@ public class FunctionTilesDb {
 
 
     public List<FunctionTile> getAllFunctions() {
-        List<FunctionTile> returnList = new ArrayList<>();
-        final SQLiteDatabase db = dbhelper.getReadableDatabase();
-
-        String queryString = "SELECT * FROM tiles";
-
-        Cursor cursor = db.rawQuery(queryString, null);
-        if (cursor.moveToFirst()) {
-            do {
-                String name = cursor.getString(0);
-                String location = cursor.getString(1);
-                String type = cursor.getString(2);
-                String icon = cursor.getString(3);
-                int color = cursor.getInt(4);
-
-                FunctionTile newFunctionTile = new FunctionTile(name, location, type, icon, color);
-
-                returnList.add(newFunctionTile);
-            } while (cursor.moveToNext());
-        }
-        cursor.close();
-        return returnList;
+        return fromCursor(dbhelper.getReadableDatabase()
+                .rawQuery("SELECT * FROM tiles", null));
     }
 
     /**
@@ -57,28 +38,16 @@ public class FunctionTilesDb {
      * @return List of all Tiles in the db with the given type
      */
     public List<FunctionTile> getFunctionsByType(String type) {
-        List<FunctionTile> returnList = new ArrayList<>();
-        final SQLiteDatabase db = dbhelper.getReadableDatabase();
+        return fromCursor(dbhelper.getReadableDatabase()
+                .rawQuery("SELECT * FROM tiles WHERE type = '" + type + "'", null));
+    }
 
-        String queryString = "SELECT * FROM tiles WHERE type = '" + type + "'";
-
-        Cursor cursor = db.rawQuery(queryString, null);
-        if (cursor.moveToFirst()) {
-            do {
-                String name = cursor.getString(0);
-                String location = cursor.getString(1);
-                String tiletype = cursor.getString(2);
-                String icon = cursor.getString(3);
-                int color = cursor.getInt(4);
-
-                FunctionTile newFunctionTile = new FunctionTile(name, location, tiletype, icon, color);
-
-                returnList.add(newFunctionTile);
-            } while (cursor.moveToNext());
-        }
-
-        cursor.close();
-        return returnList;
+    /**
+     * Get all FunctionTiles where type is not other
+     */
+    public List<FunctionTile> getSupportedFeatures() {
+        return fromCursor(dbhelper.getReadableDatabase()
+                .rawQuery("SELECT * FROM tiles WHERE type IS NOT 'other'", null));
     }
 
     /**
@@ -122,6 +91,30 @@ public class FunctionTilesDb {
             db.update("tiles", cv, "name = '" + functionTile.getName() + "'", null);
         }
         cursor.close();
+    }
+
+    /**
+     * Get a list of FunctionTiles from a Cursor
+     */
+    private List<FunctionTile> fromCursor(Cursor cursor) {
+        List<FunctionTile> returnList = new ArrayList<>();
+
+        if (cursor.moveToFirst()) {
+            do {
+                String name = cursor.getString(0);
+                String location = cursor.getString(1);
+                String tiletype = cursor.getString(2);
+                String icon = cursor.getString(3);
+                int color = cursor.getInt(4);
+
+                FunctionTile newFunctionTile = new FunctionTile(name, location, tiletype, icon, color);
+
+                returnList.add(newFunctionTile);
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        return returnList;
     }
 
 

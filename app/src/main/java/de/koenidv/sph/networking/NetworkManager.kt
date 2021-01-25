@@ -20,6 +20,10 @@ import de.koenidv.sph.SphPlanner.Companion.TAG
 import de.koenidv.sph.SphPlanner.Companion.applicationContext
 import de.koenidv.sph.database.*
 import de.koenidv.sph.objects.*
+import de.koenidv.sph.objects.FunctionTile.Companion.FEATURE_CHANGES
+import de.koenidv.sph.objects.FunctionTile.Companion.FEATURE_COURSES
+import de.koenidv.sph.objects.FunctionTile.Companion.FEATURE_MESSAGES
+import de.koenidv.sph.objects.FunctionTile.Companion.FEATURE_TIMETABLE
 import de.koenidv.sph.parsing.RawParser
 import de.koenidv.sph.parsing.Utility
 import kotlinx.coroutines.GlobalScope
@@ -69,7 +73,7 @@ class NetworkManager {
             R.id.frag_changes -> {
                 // Changes fragment
                 // Update changes after 30sec cooldown
-                if (time - prefs.getLong("updated_changes", 0) > 30 * 1000 || true)
+                if (time - prefs.getLong("updated_changes", 0) > 30 * 1000)
                     updateList.add("changes")
             }
             R.id.frag_course_overview, R.id.frag_tasks, R.id.frag_attachments -> {
@@ -119,40 +123,55 @@ class NetworkManager {
 
     fun indexAll(onComplete: (success: Int) -> Unit) {
         // todo include tiles
-        // todo list with items, then iterate one after the other
-        // Firstly, create a index of all courses
-        createCourseIndex { courses ->
-            if (courses == SUCCESS)
-            // Load and parse timetable
-                loadAndSaveTimetable { lessons ->
-                    if (lessons == SUCCESS)
-                    // Load all posts, tasks, attachments and links from all courses
-                        loadAndSavePosts(markAsRead = true) { posts ->
-                            if (posts == SUCCESS)
-                            // Load changes, if there are any
-                                loadAndSaveChanges { changes ->
-                                    if (changes == SUCCESS)
-                                    // Fetch the number of messages to know they are not new
-                                        checkForNewMessages(markAsRead = true) { messages ->
-                                            if (messages == SUCCESS)
-                                            // Get all teachers
-                                                loadAndSaveTeachers { teachers ->
-                                                    onComplete(teachers)
-                                                }
-                                            else onComplete(messages)
-                                        }
-                                    else onComplete(changes)
-                                }
-                            else onComplete(posts)
-                        }
-                    else onComplete(lessons)
-                }
-            else onComplete(courses)
+
+        // Get all supported features as String list
+        val features = FunctionTilesDb.getInstance().supportedFeatures.map { it.type }
+        val loadList = mutableListOf("courses")
+
+        // Mark each supported feature for loading
+        if (features.contains(FEATURE_TIMETABLE)) loadList.add("timetable")
+        if (features.contains(FEATURE_COURSES)) loadList.add("posts")
+        if (features.contains(FEATURE_CHANGES)) loadList.add("changes")
+        if (features.contains(FEATURE_MESSAGES)) {
+            loadList.add("messages")
+            loadList.add("users")
         }
+
+        // Load every item in loadList
+        var index = 0
+        var loadNextFeature = {}
+        val onDone: (Int) -> Unit = {
+            if (it == SUCCESS) {
+                index++
+                // If this was the last feature, call back success
+                if (index == loadList.size) onComplete(SUCCESS)
+                // Else load the next feature
+                else loadNextFeature()
+            } else {
+                // Callback an error and stop loading
+                onComplete(it)
+                Log.d(TAG, "Error loading " + loadList[index])
+            }
+        }
+        // Load the feature at the current index
+        loadNextFeature = {
+            when (loadList[index]) {
+                "courses" -> createCourseIndex(onDone)
+                "timetable" -> loadAndSaveTimetable(onDone)
+                "posts" -> loadAndSavePosts(markAsRead = true, onComplete = onDone)
+                "changes" -> loadAndSaveChanges(onDone)
+                "messages" -> checkForNewMessages(true, onDone)
+                "users" -> loadAndSaveTeachers(onDone)
+                else -> Log.e(TAG, "Unsupported feature " + loadList[index])
+            }
+        }
+        // Begin loading
+        loadNextFeature()
     }
 
 
     // todo save last refresh for checks
+    // todo don't use the || success == invalid hack. Skip trying to load when feature is not available
     private fun createCourseIndex(onComplete: (success: Int) -> Unit) {
         val prefs = applicationContext().getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
         // Remove old courses, it'll just lead to isses
@@ -163,18 +182,18 @@ class NetworkManager {
 
         // Firstly, load courses from timetable so we have an overview
         loadSiteWithToken(applicationContext().getString(R.string.url_timetable), onComplete = { successTimetable: Int, responseTimetable: String? ->
-            if (successTimetable == SUCCESS) {
+            if (successTimetable == SUCCESS || successTimetable == FAILED_INVALID_CREDENTIALS) {
                 // Save parsed courses from timetable
                 coursesDb.save(RawParser().parseCoursesFromTimetable(responseTimetable!!))
                 // Secondly, load those courses from study groups to find out where the user belongs
                 loadSiteWithToken(applicationContext().getString(R.string.url_studygroups), onComplete = { successStudygroups: Int, responseStudygroups: String? ->
-                    if (successStudygroups == SUCCESS) {
+                    if (successStudygroups == SUCCESS || successStudygroups == FAILED_INVALID_CREDENTIALS) {
                         // Save parsed courses from study groups
                         coursesDb.setNulledNotFavorite()
                         coursesDb.save(RawParser().parseCoursesFromStudygroups(responseStudygroups!!))
                         // Lastly, load courses again from posts overview to get number ids
                         loadSiteWithToken(applicationContext().getString(R.string.url_allposts), onComplete = { successOverview: Int, responseOverview: String? ->
-                            if (successOverview == SUCCESS) {
+                            if (successOverview == SUCCESS || successOverview == FAILED_INVALID_CREDENTIALS) {
                                 // Save parsed courses from posts overview
                                 coursesDb.save(RawParser().parseCoursesFromPostsoverview(responseOverview!!))
                                 // Remember when we last updated the courses
@@ -450,6 +469,7 @@ class NetworkManager {
                                         || responseLine.contains("Schulauswahl - Schulportal Hessen")) {
                                     // Signin was not successful
                                     onComplete(FAILED_INVALID_CREDENTIALS, response)
+                                    Log.d(TAG, "Invalid credentials for " + url)
                                     prefs.edit().putLong("token_last_success", 0).apply()
                                 } else if (response.contains("Wartungsarbeiten")) {
                                     // Maintenance work

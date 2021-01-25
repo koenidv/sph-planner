@@ -62,7 +62,7 @@ class HomeFragment : Fragment() {
             tasksRecyclerLayout.visibility = View.GONE
         } else {
             // Else update the title to show the number of undone tasks
-            tasksTitle.text = resources.getQuantityString(
+            tasksTitle.text = SphPlanner.applicationContext().resources.getQuantityString(
                     R.plurals.tasks_personalized_title_count,
                     tasks.size,
                     tasks.size)
@@ -179,15 +179,15 @@ class HomeFragment : Fragment() {
          * Timetable
          */
 
-
+        val timetableLayout = view.findViewById<LinearLayout>(R.id.timetableLayout)
         val timetable = view.findViewById<FragmentContainerView>(R.id.timetableFragment)
         if (FunctionTilesDb.getInstance().supports(FunctionTile.FEATURE_TIMETABLE)) {
-            view.findViewById<LinearLayout>(R.id.timetableLayout).setOnClickListener {
+            timetableLayout.setOnClickListener {
                 Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
                         .navigate(R.id.timetableFromHomeAction, null, null,
                                 FragmentNavigatorExtras(timetable to "timetable"))
             }
-        } else timetable.visibility = View.GONE
+        } else timetableLayout.visibility = View.GONE
 
         /*
          * Possibly new messages
@@ -294,8 +294,7 @@ class HomeFragment : Fragment() {
                                         moreTasksText.text = resources.getQuantityString(R.plurals.tasks_personalized_more, tasksOverflow, tasksOverflow)
                                     else moreTasksText.visibility = View.GONE
                                 }
-                                // Update title
-                                updateTasksTitle()
+                                // Title will be updated via local broadcast
                             }
                         }
                 )

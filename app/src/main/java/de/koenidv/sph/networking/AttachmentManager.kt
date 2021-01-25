@@ -330,9 +330,9 @@ class AttachmentManager {
             if (it == NetworkManager.SUCCESS) {
                 if (onComplete != null) onComplete(task, isDone)
             } else {
-                // todo handle errors properly
                 Snackbar.make(activity.findViewById(R.id.nav_host_fragment),
-                        R.string.task_not_synchronized, Snackbar.LENGTH_SHORT)
+                        applicationContext().getString(R.string.task_not_synchronized)
+                                + " ($it)", Snackbar.LENGTH_SHORT)
                         .setAnchorView(R.id.nav_view).show()
             }
         }
