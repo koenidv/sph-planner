@@ -13,7 +13,6 @@ import com.androidnetworking.error.ANError
 import com.androidnetworking.interfaces.JSONObjectRequestListener
 import com.androidnetworking.interfaces.OkHttpResponseListener
 import com.androidnetworking.interfaces.StringRequestListener
-import com.facebook.stetho.okhttp3.StethoInterceptor
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner.Companion.TAG
@@ -30,12 +29,10 @@ import de.koenidv.sph.parsing.Utility
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import okhttp3.OkHttpClient
 import okhttp3.Response
 import org.json.JSONObject
 import org.jsoup.Jsoup
 import java.util.*
-import java.util.concurrent.TimeUnit
 
 //  Created by koenidv on 11.12.2020.
 class NetworkManager {
@@ -499,14 +496,6 @@ class NetworkManager {
                 // Setting sid cookie
                 CookieStore.setToken(token!!)
 
-                // Adding an Network Interceptor for Debugging purpose :
-                val okHttpClient = OkHttpClient.Builder()
-                        .addNetworkInterceptor(StethoInterceptor())
-                        .cookieJar(CookieStore)
-                        .connectTimeout(60, TimeUnit.SECONDS) // sph timeout is 30 seconds
-                        .build()
-                AndroidNetworking.initialize(applicationContext(), okHttpClient)
-
                 // Getting webpage
                 AndroidNetworking.get(url)
                         .setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.27 Safari/537.36")
@@ -540,7 +529,7 @@ class NetworkManager {
                                 when (error.errorDetail) {
                                     "connectionError" -> {
                                         // This will also be called if request timed out
-                                        onComplete(FAILED_NO_NETWORK, "No network available at this time")
+                                        onComplete(FAILED_NO_NETWORK, "No connection to server or timeout")
                                     }
                                     "requestCancelledError" -> {
                                         onComplete(FAILED_CANCELLED, "Network request was cancelled")
@@ -579,14 +568,6 @@ class NetworkManager {
             if (success == SUCCESS) {
                 // Setting sid cookie
                 CookieStore.setToken(token!!)
-
-                // Adding an Network Interceptor for Debugging purpose :
-                val okHttpClient = OkHttpClient.Builder()
-                        .addNetworkInterceptor(StethoInterceptor())
-                        .cookieJar(CookieStore)
-                        .connectTimeout(60, TimeUnit.SECONDS)
-                        .build()
-                AndroidNetworking.initialize(applicationContext(), okHttpClient)
 
                 // Getting webpage as OkHttp
                 AndroidNetworking.get(url)
@@ -635,10 +616,6 @@ class NetworkManager {
             if (success == SUCCESS) {
                 // Set sid cookie
                 CookieStore.setToken(token!!)
-
-                // todo initialize ANet only once
-                AndroidNetworking.initialize(applicationContext(),
-                        OkHttpClient.Builder().cookieJar(CookieStore).build())
 
                 // Send a post request to let sph know the task is done
                 AndroidNetworking.post("https://start.schulportal.hessen.de/meinunterricht.php")

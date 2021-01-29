@@ -9,7 +9,6 @@ import com.google.firebase.ktx.Firebase
 import com.google.firebase.remoteconfig.ktx.remoteConfig
 import de.koenidv.sph.networking.CookieStore
 import okhttp3.OkHttpClient
-import java.util.concurrent.TimeUnit
 
 //  Created by koenidv on 05.12.2020.
 class SphPlanner : Application() {
@@ -42,10 +41,11 @@ class SphPlanner : Application() {
         Firebase.remoteConfig.setDefaultsAsync(R.xml.remote_config_defaults)
 
         // Initialize Android Networking
+        // Adding an Network Interceptor for Debugging purpose :
         val okHttpClient = OkHttpClient.Builder()
                 .addNetworkInterceptor(StethoInterceptor())
                 .cookieJar(CookieStore)
-                .connectTimeout(60, TimeUnit.SECONDS)
+                /*.connectTimeout(60, TimeUnit.SECONDS)*/ // sph timeout is 30 seconds
                 .build()
         AndroidNetworking.initialize(applicationContext(), okHttpClient)
     }

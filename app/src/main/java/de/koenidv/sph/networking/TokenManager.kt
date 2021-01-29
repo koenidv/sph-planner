@@ -8,16 +8,13 @@ import com.androidnetworking.AndroidNetworking
 import com.androidnetworking.common.Priority
 import com.androidnetworking.error.ANError
 import com.androidnetworking.interfaces.StringRequestListener
-import com.facebook.stetho.okhttp3.StethoInterceptor
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.remoteconfig.ktx.remoteConfig
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner.Companion.TAG
 import de.koenidv.sph.SphPlanner.Companion.applicationContext
-import okhttp3.OkHttpClient
 import java.util.*
-import java.util.concurrent.TimeUnit
 
 
 //  Created by koenidv on 05.12.2020.
@@ -41,15 +38,6 @@ class TokenManager {
         } else {
             // Get a new token
             if (prefs.getString("user", "") != null && prefs.getString("password", "") != null) {
-
-                // Adding an Network Interceptor for Debugging purpose :
-                val okHttpClient = OkHttpClient.Builder()
-                        .addNetworkInterceptor(StethoInterceptor())
-                        .cookieJar(CookieStore)
-                        .cache(null)
-                        .connectTimeout(30, TimeUnit.SECONDS)
-                        .build()
-                AndroidNetworking.initialize(applicationContext(), okHttpClient)
 
                 CookieStore.clearCookies()
 
