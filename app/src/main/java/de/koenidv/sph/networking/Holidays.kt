@@ -8,6 +8,7 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner.Companion.TAG
 import de.koenidv.sph.SphPlanner.Companion.applicationContext
+import de.koenidv.sph.database.HolidaysDb
 import de.koenidv.sph.objects.Holiday
 import org.json.JSONArray
 import org.json.JSONObject
@@ -38,6 +39,7 @@ class Holidays {
                         var start: Date
                         var obj: JSONObject
                         val dateformat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'", Locale.ROOT)
+                        val holidaysDb = HolidaysDb()
                         // Parse JSON Array to list of Holiday object
                         // Check each object in the array
                         for (i in 0 until response.length()) {
@@ -48,17 +50,17 @@ class Holidays {
                             // once with dashes. Only use those with dashes
                             if (start.after(now)
                                     && !obj.getString("slug").contains(" ")) {
-                                val tempHoliday = Holiday(
+                                        // Parse object and save to Db
+                                holidaysDb.save(Holiday(
                                         obj.getString("slug"),
                                         start,
                                         dateformat.parse(obj.getString("end"))!!,
                                         obj.getString("name"),
                                         obj.getString("year")
-                                )
-                                Log.d(TAG, tempHoliday.toString())
+                                ))
                             }
-
                         }
+                        callback(NetworkManager.SUCCESS)
                     }
 
                     override fun onError(error: ANError) {

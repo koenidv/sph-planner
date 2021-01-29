@@ -74,7 +74,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // Create users (teachers) table
         db.execSQL("CREATE TABLE users(user_id TEXT, teacher_id TEXT, firstname TEXT, " +
                 "lastname TEXT, type TEXT, pinned INTEGER)");
-    }
+        // Create holidays table
+        db.execSQL("CREATE TABLE holidays(id TEXT PRIMARY KEY, start INTEGER, ende INTEGER, name TEXT, year TEXT)");
+    }//
 
     //upgrade Database
     @Override
