@@ -59,6 +59,7 @@ class NetworkManager {
                 if (time - prefs.getLong("updated_changes", 0) > 10 * 60 * 1000) updateList.add("changes")
                 if (time - prefs.getLong("updated_posts", 0) > 30 * 60 * 1000) updateList.add("posts")
                 if (time - prefs.getLong("updated_messages", 0) > 20 * 60 * 1000) updateList.add("messages")
+                updateList.add("holidays")
             }
             R.id.nav_courses -> {
                 // 2 minutes cooldown, update all posts
@@ -134,6 +135,7 @@ class NetworkManager {
             loadList.add("messages")
             loadList.add("users")
         }
+        loadList.add("holidays")
 
         // Load every item in loadList
         var index = 0
@@ -160,6 +162,7 @@ class NetworkManager {
                 "changes" -> loadAndSaveChanges(onDone)
                 "messages" -> checkForNewMessages(true, onDone)
                 "users" -> loadAndSaveTeachers(onDone)
+                "holidays" -> Holidays().fetch(onDone)
                 else -> Log.e(TAG, "Unsupported feature " + loadList[index])
             }
         }
@@ -683,6 +686,7 @@ class NetworkManager {
                             "changes" -> loadAndSaveChanges(checkDone)
                             "timetable" -> loadAndSaveTimetable(checkDone)
                             "messages" -> checkForNewMessages(onComplete = checkDone)
+                            "holidays" -> Holidays().fetch(checkDone)
                         }
                     }
                 } else onComplete(success)

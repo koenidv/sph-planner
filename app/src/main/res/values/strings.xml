@@ -14,6 +14,7 @@
     <string name="url_changes" translatable="false">https://start.schulportal.hessen.de/vertretungsplan.php</string>
     <string name="url_changes_debug" translatable="false">https://gist.githubusercontent.com/koenidv/7c0b35895d1daf86b2b00f243d687fe2/raw/13d8feb0b7216d8278f9421a06a2eeba305f4525/gistfile1.txt</string>
     <string name="url_messages" translatable="false">https://start.schulportal.hessen.de/nachrichten.php</string>
+    <string name="url_holidays" translatable="false">https://ferien-api.de/api/v1/holidays/HE.json</string>
 
     <!-- General purpose -->
     <string name="cancel">Cancel</string>
