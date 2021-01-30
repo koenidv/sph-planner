@@ -150,7 +150,7 @@ class CourseOverviewFragment : Fragment() {
             // Currently, it's not really worth updating the pinned list on click
         }
         val onAttachmentLongClick = AttachmentManager().onAttachmentLongClick(requireActivity()) { action: Int, attachment: Attachment ->
-            // Update ui (currently onyl pins recycler) according to selected action
+            // Update ui according to selected action
             when (action) {
                 AttachmentManager.ATTACHMENT_USED_PIN -> {
                     // Attachment was used.

@@ -230,6 +230,7 @@ class AttachmentManager {
 
                 // Change display name
                 rename?.setOnClickListener {
+                    sheet.dismiss()
                     // Show a dialog to rename the attachment
                     MaterialDialog(activity).show {
                         input(prefill = attachment.name()) { _, text ->
