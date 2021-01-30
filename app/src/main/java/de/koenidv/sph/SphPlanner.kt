@@ -34,14 +34,15 @@ class SphPlanner : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        // Initialize stetho for network debugging
-        Stetho.initializeWithDefaults(this)
 
         // Apply default remote configs
         Firebase.remoteConfig.setDefaultsAsync(R.xml.remote_config_defaults)
 
+        // Initialize stetho for network debugging
+        Stetho.initializeWithDefaults(this)
+
         // Initialize Android Networking
-        // Adding an Network Interceptor for Debugging purpose :
+        // Adding an Network Interceptor for Debugging purpose
         val okHttpClient = OkHttpClient.Builder()
                 .addNetworkInterceptor(StethoInterceptor())
                 .cookieJar(CookieStore)
