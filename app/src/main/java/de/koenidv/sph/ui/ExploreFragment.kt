@@ -9,6 +9,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.gridlayout.widget.GridLayout
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -31,6 +32,7 @@ class ExploreFragment : Fragment() {
          * Collections
          */
 
+        val gridLayout: GridLayout = view.findViewById(R.id.exploreGrid)
         val timetableText = view.findViewById<TextView>(R.id.timetableTextView)
         val postsText = view.findViewById<TextView>(R.id.postsTextView)
         val attachmentsText = view.findViewById<TextView>(R.id.attachmentsTextView)
@@ -38,36 +40,54 @@ class ExploreFragment : Fragment() {
         val changesText = view.findViewById<TextView>(R.id.changesTextView)
         val usersText = view.findViewById<TextView>(R.id.usersTextView)
 
-
         // Set on click listeners, open respective fragment
+
+        // Timetable
         if (features.supports(FunctionTile.FEATURE_TIMETABLE)) {
             timetableText.setOnClickListener {
                 // Open timetable
                 nav.navigate(R.id.timetableFromExploreAction)
             }
-        } else timetableText.visibility = View.GONE
-        postsText.setOnClickListener {
-            // Open all posts
-            nav.navigate(R.id.allPostsFromExploreAction)
-        }
-        attachmentsText.setOnClickListener {
-            // Open attachments
-            //nav.navigate(R.id.attachmentsFromExploreAction)
-            nav.navigate(R.id.frag_placeholder)
-        }
-        tasksText.setOnClickListener {
-            nav.navigate(R.id.tasksFromExploreAction)
-        }
+        } else gridLayout.removeView(timetableText)
+
+        // Posts
+        if (features.supports(FunctionTile.FEATURE_COURSES)) {
+            postsText.setOnClickListener {
+                // Open all posts
+                nav.navigate(R.id.allPostsFromExploreAction)
+            }
+        } else gridLayout.removeView(postsText)
+
+        // Attachments WORK IN PROGRESS, therefore hidden
+        @Suppress("SimplifyBooleanWithConstants")
+        if (false && features.supports(FunctionTile.FEATURE_COURSES)) {
+            attachmentsText.setOnClickListener {
+                // Open attachments
+                //nav.navigate(R.id.attachmentsFromExploreAction)
+                nav.navigate(R.id.frag_placeholder)
+            }
+        } else gridLayout.removeView(attachmentsText)
+
+        // Tasks
+        if (features.supports(FunctionTile.FEATURE_COURSES)) {
+            tasksText.setOnClickListener {
+                nav.navigate(R.id.tasksFromExploreAction)
+            }
+        } else gridLayout.removeView(tasksText)
+
+        // Changes
         if (features.supports(FunctionTile.FEATURE_CHANGES)) {
             changesText.setOnClickListener {
                 nav.navigate(R.id.changesFromExploreAction)
             }
-        } else changesText.visibility = View.GONE
+        } else gridLayout.removeView(changesText)
+
+        // Users
         if (features.supports(FunctionTile.FEATURE_MESSAGES)) {
             usersText.setOnClickListener {
                 nav.navigate(R.id.usersFromExploreAction)
             }
-        } else usersText.visibility = View.GONE
+        } else gridLayout.removeView(usersText)
 
 
         /*
@@ -108,6 +128,5 @@ class ExploreFragment : Fragment() {
 
         return view
     }
-
 
 }
