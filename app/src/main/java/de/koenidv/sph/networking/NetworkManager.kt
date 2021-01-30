@@ -14,6 +14,8 @@ import com.androidnetworking.interfaces.JSONObjectRequestListener
 import com.androidnetworking.interfaces.OkHttpResponseListener
 import com.androidnetworking.interfaces.StringRequestListener
 import com.google.firebase.crashlytics.FirebaseCrashlytics
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.remoteconfig.ktx.remoteConfig
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner.Companion.TAG
 import de.koenidv.sph.SphPlanner.Companion.applicationContext
@@ -150,7 +152,7 @@ class NetworkManager {
             } else {
                 // Callback an error and stop loading
                 onComplete(it)
-                Log.d(TAG, "Error loading " + loadList[index])
+                Log.e(TAG, "Error loading ${loadList[index]}: $it")
             }
         }
         // Load the feature at the current index
@@ -380,8 +382,12 @@ class NetworkManager {
                 return@generateAccessToken
             }
 
-            // Make sure session id cookie is set
-            CookieStore.setToken(token!!)
+            if (Firebase.remoteConfig.getBoolean("token_fix_0130")) {
+                CookieStore.clearCookies()
+            } else {
+                // Make sure session id cookie is set
+                CookieStore.setToken(token!!)
+            }
 
             val users = mutableListOf<User>()
             val userIds = mutableListOf<String>()
@@ -392,10 +398,15 @@ class NetworkManager {
             var completed = 0
             while (char <= 'z') {
                 // Not get the all recipients for the current character
-                AndroidNetworking.get(applicationContext().getString(R.string.url_messages))
-                        .addQueryParameter("a", "searchRecipt")
-                        .addQueryParameter("q", char.toString())
-                        .build()
+                val request = AndroidNetworking.post(applicationContext().getString(R.string.url_messages))
+                        .addBodyParameter("a", "searchRecipt")
+                        .addBodyParameter("q", char.toString())
+
+                if (Firebase.remoteConfig.getBoolean("token_fix_0130")) {
+                    request.addHeaders("Cookie", "sid=$token")
+                }
+
+                request.build()
                         .getAsJSONObject(object : JSONObjectRequestListener {
                             override fun onResponse(response: JSONObject) {
                                 var index = 0
@@ -496,14 +507,23 @@ class NetworkManager {
         // Getting an access token
         TokenManager().generateAccessToken(forceNewToken) { success: Int, token: String? ->
             if (success == SUCCESS) {
-                // Setting sid cookie
-                CookieStore.setToken(token!!)
+
+                if (Firebase.remoteConfig.getBoolean("token_fix_0130")) {
+                    CookieStore.clearCookies()
+                } else {
+                    // Setting sid cookie
+                    CookieStore.setToken(token!!)
+                }
 
                 // Getting webpage
-                AndroidNetworking.get(url)
+                val request = AndroidNetworking.get(url)
                         .setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.27 Safari/537.36")
                         .setPriority(Priority.LOW)
-                        .build()
+
+                if (Firebase.remoteConfig.getBoolean("token_fix_0130")) {
+                    request.addHeaders("Cookie", "sid=$token")
+                }
+                request.build()
                         .getAsString(object : StringRequestListener {
                             override fun onResponse(response: String) {
                                 val prefs = applicationContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
@@ -520,7 +540,7 @@ class NetworkManager {
                                         || responseLine.contains("Schulauswahl - Schulportal Hessen")) {
                                     // Signin was not successful
                                     onComplete(FAILED_INVALID_CREDENTIALS, response)
-                                    Log.d(TAG, "Invalid credentials for " + url)
+                                    Log.e(TAG, "Invalid credentials for $url")
                                     prefs.edit().putLong("token_last_success", 0).apply()
                                 } else if (response.contains("Wartungsarbeiten")) {
                                     // Maintenance work
@@ -569,14 +589,24 @@ class NetworkManager {
         // Getting an access token
         TokenManager().generateAccessToken { success: Int, token: String? ->
             if (success == SUCCESS) {
-                // Setting sid cookie
-                CookieStore.setToken(token!!)
+
+                if (Firebase.remoteConfig.getBoolean("token_fix_0130")) {
+                    CookieStore.clearCookies()
+                } else {
+                    // Make sure session id cookie is set
+                    CookieStore.setToken(token!!)
+                }
 
                 // Getting webpage as OkHttp
-                AndroidNetworking.get(url)
+                val request = AndroidNetworking.get(url)
                         .setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.27 Safari/537.36")
                         .setPriority(Priority.LOW)
-                        .build()
+
+                if (Firebase.remoteConfig.getBoolean("token_fix_0130")) {
+                    request.addHeaders("Cookie", "sid=$token")
+                }
+
+                request.build()
                         .getAsOkHttpResponse(object : OkHttpResponseListener {
                             override fun onResponse(response: Response) {
                                 // In some cases, sph redirects back to the home page (why?)
@@ -617,17 +647,27 @@ class NetworkManager {
         // We need an access token first
         TokenManager().generateAccessToken { success: Int, token: String? ->
             if (success == SUCCESS) {
-                // Set sid cookie
-                CookieStore.setToken(token!!)
+
+                if (Firebase.remoteConfig.getBoolean("token_fix_0130")) {
+                    CookieStore.clearCookies()
+                } else {
+                    // Make sure session id cookie is set
+                    CookieStore.setToken(token!!)
+                }
 
                 // Send a post request to let sph know the task is done
-                AndroidNetworking.post("https://start.schulportal.hessen.de/meinunterricht.php")
+                val request = AndroidNetworking.post("https://start.schulportal.hessen.de/meinunterricht.php")
                         .addBodyParameter("a", "sus_homeworkDone")
                         .addBodyParameter("id", numberId)
                         .addBodyParameter("entry", task.id_post.substring(task.id_post.lastIndexOf("_") + 1))
                         .addBodyParameter("b", if (isDone) "done" else "undone")
                         .setTag(task.taskId)
-                        .build()
+
+                if (Firebase.remoteConfig.getBoolean("token_fix_0130")) {
+                    request.addHeaders("Cookie", "sid=$token")
+                }
+
+                request.build()
                         .getAsString(object : StringRequestListener {
                             override fun onResponse(response: String) {
                                 if (response == "1")
@@ -800,18 +840,27 @@ class NetworkManager {
                 return@generateAccessToken
             }
 
-            // Make sure session id cookie is set
-            CookieStore.setToken(token!!)
+            if (Firebase.remoteConfig.getBoolean("token_fix_0130")) {
+                CookieStore.clearCookies()
+            } else {
+                // Make sure session id cookie is set
+                CookieStore.setToken(token!!)
+            }
 
             // Now post messages.php with a few parameters
             // a=headers - Titles only (read for entire message)
             // getType=visibleOnly - Only get visible messages (could also be unvisibleOnly)
             // last=0 - Not yet sure what that does, but it is needed to not get an error
-            AndroidNetworking.post(applicationContext().getString(R.string.url_messages))
+            val request = AndroidNetworking.post(applicationContext().getString(R.string.url_messages))
                     .addBodyParameter("a", "headers")
                     .addBodyParameter("getType", "visibleOnly")
                     .addBodyParameter("last", "0")
-                    .build()
+
+            if (Firebase.remoteConfig.getBoolean("token_fix_0130")) {
+                request.addHeaders("Cookie", "sid=$token")
+            }
+
+            request.build()
                     .getAsString(object : StringRequestListener {
                         override fun onResponse(response: String) {
                             // The response should be a json object with two values:

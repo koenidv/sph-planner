@@ -2,6 +2,10 @@
 <defaultsMap>
     <entry>
         <key>token_fix_0106</key>
+        <value>false</value>
+    </entry>
+    <entry>
+        <key>token_fix_0130</key>
         <value>true</value>
     </entry>
     <entry>

@@ -14,6 +14,12 @@ import com.google.firebase.remoteconfig.ktx.remoteConfig
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner.Companion.TAG
 import de.koenidv.sph.SphPlanner.Companion.applicationContext
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import okhttp3.MultipartBody
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody
 import java.util.*
 
 
@@ -39,55 +45,38 @@ class TokenManager {
             // Get a new token
             if (prefs.getString("user", "") != null && prefs.getString("password", "") != null) {
 
+                // Clear old cookies to make sure we get a fresh start
                 CookieStore.clearCookies()
 
-                AndroidNetworking.post(applicationContext().getString(R.string.url_login))
-                        .addBodyParameter("user", prefs.getString("schoolid", "") + "." + prefs.getString("user", ""))
-                        .addBodyParameter("password", prefs.getString("password", ""))
-                        .setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.27 Safari/537.36")
-                        .setTag("token")
-                        .setPriority(Priority.HIGH)
-                        .build()
-                        .getAsString(object : StringRequestListener {
-                            override fun onResponse(response: String) {
-                                if (Firebase.remoteConfig.getBoolean("token_fix_0106")) {
-                                    // As of 2021/01/06 we need to load the site again
-                                    // to actually get a session id
-                                    AndroidNetworking.get("https://start.schulportal.hessen.de/index.php?i="
-                                            + prefs.getString("schoolid", "5146"))
-                                            .setTag("token-2")
-                                            .setPriority(Priority.HIGH)
-                                            .build()
-                                            .getAsString(object : StringRequestListener {
-                                                override fun onResponse(response: String) {
-                                                    validateTokenResponse(response, onComplete)
-                                                }
+                // Try loading sph's sign in page and save the sid cookie
+                if (Firebase.remoteConfig.getBoolean("token_fix_0130")) {
 
-                                                override fun onError(error: ANError) {
-                                                    handleError(error, onComplete)
-                                                }
+                    // As of 2021/01/30, we now need to send the credentials data using
+                    // multipart/form-data instead of application/x-www-form-urlencoded
+                    // Why though? Don't ask me...
+                    getTokenWithMultipart(onComplete)
 
-                                            })
-                                } else {
-                                    validateTokenResponse(response, onComplete)
-                                }
-                            }
+                } else {
 
-                            override fun onError(error: ANError) {
-                                handleError(error, onComplete)
-                            }
-                        })
+                    // If sph changes this back, just use the old logic
+                    getTokenWithUrlencoded(onComplete)
+
+                }
             }
         }
     }
 
+    /**
+     * Check if the response indicates that the user is signed in
+     * and if so, save the current session id cookie
+     * else return the applicable error code
+     */
     private fun validateTokenResponse(response: String, onComplete: (success: Int, token: String?) -> Unit) {
         if (CookieStore.getCookie("schulportal.hessen.de", "sid") != null
                 && response.contains("- Schulportal Hessen")
                 && !response.contains("Login - Schulportal Hessen")
                 && !response.contains("Schulauswahl - Schulportal Hessen")
                 && !response.contains("Login failed!")) {
-            // Login success todo not always
             onComplete(NetworkManager.SUCCESS, CookieStore.getCookie("schulportal.hessen.de", "sid")!!)
             prefs.edit().putString("token", CookieStore.getCookie("schulportal.hessen.de", "sid"))
                     .putLong("token_last_success", Date().time)
@@ -111,6 +100,9 @@ class TokenManager {
         }
     }
 
+    /**
+     * Return an internal error code for an networking error
+     */
     private fun handleError(error: ANError, onComplete: (success: Int, token: String?) -> Unit) {
         if (error.errorCode == 0) {
             when (error.errorDetail) {
@@ -133,6 +125,78 @@ class TokenManager {
                 Toast.makeText(applicationContext(), error.toString(), Toast.LENGTH_LONG).show()
                 FirebaseCrashlytics.getInstance().recordException(error)
                 onComplete(NetworkManager.FAILED_UNKNOWN, null)
+            }
+        }
+    }
+
+    /**
+     * Send credentials as application/x-www-form-urlencoded,
+     * validate response and save sid cookie if possible
+     */
+    private fun getTokenWithUrlencoded(onComplete: (success: Int, token: String?) -> Unit) {
+        AndroidNetworking.post(applicationContext().getString(R.string.url_login))
+                .addBodyParameter("user", prefs.getString("schoolid", "") +
+                        "." + prefs.getString("user", ""))
+                .addBodyParameter("password", prefs.getString("password", ""))
+                .setTag("token")
+                .setPriority(Priority.HIGH)
+                .build()
+                .getAsString(object : StringRequestListener {
+                    override fun onResponse(response: String) {
+                        if (Firebase.remoteConfig.getBoolean("token_fix_0106")) {
+                            // As of 2021/01/06 we need to load the site again
+                            // to actually get a session id
+                            AndroidNetworking.get("https://start.schulportal.hessen.de/index.php?i="
+                                    + prefs.getString("schoolid", "5146"))
+                                    .setTag("token-2")
+                                    .setPriority(Priority.HIGH)
+                                    .build()
+                                    .getAsString(object : StringRequestListener {
+                                        override fun onResponse(response: String) {
+                                            validateTokenResponse(response, onComplete)
+                                        }
+
+                                        override fun onError(error: ANError) {
+                                            handleError(error, onComplete)
+                                        }
+
+                                    })
+                        } else {
+                            validateTokenResponse(response, onComplete)
+                        }
+                    }
+
+                    override fun onError(error: ANError) {
+                        handleError(error, onComplete)
+                    }
+                })
+    }
+
+    /**
+     * Send credentials as multipart/form-data,
+     * validate response and save sid cookie if possible
+     */
+    private fun getTokenWithMultipart(onComplete: (success: Int, token: String?) -> Unit) {
+        GlobalScope.launch {
+            val client = OkHttpClient().newBuilder()
+                    .cookieJar(CookieStore)
+                    .build()
+            val body: RequestBody = MultipartBody.Builder().setType(MultipartBody.FORM)
+                    .addFormDataPart("user", "5146.florian.koenig")
+                    .addFormDataPart("password", "fofleSchule03")
+                    .build()
+            val request: Request = Request.Builder()
+                    .url("https://login.schulportal.hessen.de/")
+                    .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.22 Safari/537.36")
+                    .method("POST", body)
+                    .build()
+
+            val response = client.newCall(request).execute().body()?.string()
+
+            if (response == null) {
+                onComplete(NetworkManager.FAILED_SERVER_ERROR, null)
+            } else {
+                validateTokenResponse(response, onComplete)
             }
         }
     }
