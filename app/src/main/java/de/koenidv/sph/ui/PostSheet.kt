@@ -52,7 +52,15 @@ class PostSheet internal constructor(private val post: Post) : BottomSheetDialog
                 listOf(post),
                 AttachmentManager().movementMethod(requireActivity(), R.id.frag_webview),
                 AttachmentManager().onAttachmentClick(requireActivity()) { _: Int, _: Attachment -> },
-                AttachmentManager().onAttachmentLongClick(requireActivity()) { _: Int, _: Attachment -> },
+                AttachmentManager().onAttachmentLongClick(requireActivity()) { action: Int, _: Attachment ->
+                    // Update ui when attachment was renamed
+                    if (action == AttachmentManager.ATTACHMENT_RENAMED
+                            || action == AttachmentManager.ATTACHMENT_RENAMED_PIN) {
+                        // Notify posts recycler about changed data
+                        // This will only ever be 1 item
+                        postsRecycler.adapter?.notifyItemChanged(0)
+                    }
+                },
                 AttachmentManager().onTaskCheckedChanged(requireActivity(), CoursesDb.getInstance().getNumberId(post.id_course))
         )
 

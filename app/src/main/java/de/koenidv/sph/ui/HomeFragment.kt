@@ -429,4 +429,11 @@ class HomeFragment : Fragment() {
         return view
 
     }
+
+    override fun onDestroy() {
+        // Unregister broadcast receiver
+        LocalBroadcastManager.getInstance(requireActivity()).unregisterReceiver(uichangeReceiver)
+        super.onDestroy()
+    }
+
 }

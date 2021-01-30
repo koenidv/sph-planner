@@ -638,7 +638,8 @@ class RawParser {
                             .replace("_", " ").replace("-", " ").trim()
                     fileSize = file.select("small").text()
                     fileSize = fileSize.substring(1, fileSize.length - 1) // Remove brackets
-                    fileType = fileName.substring(fileName.lastIndexOf(".") + 1)
+                    fileType = fileName.substring(
+                            fileName.lastIndexOf(".") + 1).toLowerCase(Locale.ROOT)
                     fileName = fileName.substring(0, fileName.lastIndexOf("."))
 
                     // Parse file url
