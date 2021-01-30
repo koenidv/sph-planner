@@ -16,7 +16,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static DatabaseHelper instance;
 
     private DatabaseHelper(@Nullable Context context) {
-        super(context, "database", null, 3);
+        super(context, "database", null, 4);
     }
 
     public static DatabaseHelper getInstance() {
@@ -75,19 +75,25 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("CREATE TABLE users(user_id TEXT, teacher_id TEXT, firstname TEXT, " +
                 "lastname TEXT, type TEXT, pinned INTEGER)");
         // Create holidays table
-        db.execSQL("CREATE TABLE holidays(id TEXT PRIMARY KEY, start INTEGER, ende INTEGER, name TEXT, year TEXT)");
+        db.execSQL("CREATE TABLE holidays(id TEXT PRIMARY KEY, start INTEGER," +
+                "endtime INTEGER, name TEXT, year TEXT)");
     }//
 
     //upgrade Database
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldversion, int newversion) {
-        if (oldversion == 1 && newversion == 2) {
+        if (oldversion == 1) {
             db.execSQL("ALTER TABLE postTasks RENAME TO tasks");
         }
         if (oldversion < 3) {
             // Create users (teachers) table
             db.execSQL("CREATE TABLE users(user_id TEXT, teacher_id TEXT, firstname TEXT, " +
                     "lastname TEXT, type TEXT, pinned INTEGER)");
+        }
+        if (oldversion < 4) {
+            // Create holidays table
+            db.execSQL("CREATE TABLE holidays(id TEXT PRIMARY KEY, start INTEGER," +
+                    "endtime INTEGER, name TEXT, year TEXT)");
         }
     }
 }
