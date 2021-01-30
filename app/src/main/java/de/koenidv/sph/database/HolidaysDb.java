@@ -24,7 +24,7 @@ public class HolidaysDb {
 
         cv.put("id", holiday.getId());
         cv.put("start", holiday.getStart().getTime() / 1000);
-        cv.put("ende", holiday.getEnd().getTime() / 1000);
+        cv.put("endtime", holiday.getEnd().getTime() / 1000);
         cv.put("name", holiday.getName());
         cv.put("year", holiday.getYear());
 
@@ -43,7 +43,8 @@ public class HolidaysDb {
 
     /**
      * get list of holidays from cursor
-     * @param cursor
+     *
+     * @param cursor Cursor pointing to a holidays table
      * @return List<Holiday>
      */
     private List<Holiday> getFromCursor(Cursor cursor) {
