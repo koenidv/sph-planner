@@ -33,6 +33,7 @@
     <string name="open_in_browser">Open in browser</string>
     <string name="emoji_check" translatable="false">✔</string>
     <string name="emoji_cross" translatable="false">❌</string>
+    <string name="emoji_warning" translatable="false">❗</string>
 
     <!-- General purpose network stuff -->
     <string name="error_offline">No connection</string>

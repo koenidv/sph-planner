@@ -60,8 +60,6 @@ class OnboardingSupportlistFragment : Fragment() {
                 }
 
                 // Debug option to share response on unknown error
-                // Usign text comparison because o fthe else statement
-                //if (warningText.text == getString(R.string.onboard_supported_error_unknown)) {
                 warningText.setOnLongClickListener {
                     val sendIntent: Intent = Intent().apply {
                         action = Intent.ACTION_SEND
@@ -71,7 +69,6 @@ class OnboardingSupportlistFragment : Fragment() {
                     requireActivity().startActivity(Intent.createChooser(sendIntent, null))
                     true
                 }
-                //}
                 // Debug show toast if credential are somehow wrong
                 if (success == NetworkManager.FAILED_INVALID_CREDENTIALS)
                     Toast.makeText(requireContext(), "Invalid credentials", Toast.LENGTH_LONG).show()
@@ -102,12 +99,13 @@ class OnboardingSupportlistFragment : Fragment() {
             var featurelistText = getString(R.string.onboard_supported_featurelist)
             val checkmarkText = getString(R.string.emoji_check)
             val crossmarkText = getString(R.string.emoji_cross)
+            val warnmarkText = getString(R.string.emoji_warning)
 
             // todo Better check for compatibility
             if (!features.contains("Mein Unterricht")) {
                 allFeatures = false
                 usableFeatures = false
-                featurelistText = featurelistText.replace("%mycourses", crossmarkText)
+                featurelistText = featurelistText.replace("%mycourses", warnmarkText)
             } else {
                 someFeatures = true
                 featurelistText = featurelistText.replace("%mycourses", checkmarkText)

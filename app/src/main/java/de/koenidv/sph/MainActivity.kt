@@ -66,7 +66,7 @@ class MainActivity : AppCompatActivity() {
                                     R.string.update_downloaded,
                                     Snackbar.LENGTH_INDEFINITE)
                                     .setAnchorView(R.id.nav_view)
-                                    .setAction(R.string.update_action) { _ ->
+                                    .setAction(R.string.update_action) {
                                         appUpdateManager.completeUpdate()
                                     }.show()
                         }
