@@ -24,6 +24,7 @@ import de.koenidv.sph.database.FileAttachmentsDb
 import de.koenidv.sph.database.LinkAttachmentsDb
 import de.koenidv.sph.database.PostsDb
 import de.koenidv.sph.networking.AttachmentManager
+import de.koenidv.sph.networking.Tasks
 import de.koenidv.sph.objects.Attachment
 import de.koenidv.sph.objects.Course
 import de.koenidv.sph.objects.Post
@@ -251,7 +252,7 @@ class CourseOverviewFragment : Fragment() {
                     movementMethod,
                     onAttachmentClick,
                     onAttachmentLongClick,
-                    AttachmentManager().onTaskCheckedChanged(requireActivity(), course?.number_id!!))
+                    Tasks().onCheckedChanged(requireActivity(), course?.number_id!!))
             postsRecycler.adapter = postsAdapter
 
             loadMorePostsButton.setOnClickListener {

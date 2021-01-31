@@ -20,6 +20,7 @@ import de.koenidv.sph.R
 import de.koenidv.sph.adapters.PostsAdapter
 import de.koenidv.sph.database.CoursesDb
 import de.koenidv.sph.networking.AttachmentManager
+import de.koenidv.sph.networking.Tasks
 import de.koenidv.sph.objects.Attachment
 import de.koenidv.sph.objects.Post
 
@@ -61,7 +62,7 @@ class PostSheet internal constructor(private val post: Post) : BottomSheetDialog
                         postsRecycler.adapter?.notifyItemChanged(0)
                     }
                 },
-                AttachmentManager().onTaskCheckedChanged(requireActivity(), CoursesDb.getInstance().getNumberId(post.id_course))
+                Tasks().onCheckedChanged(requireActivity(), CoursesDb.getInstance().getNumberId(post.id_course))
         )
 
         titleLayout.setOnClickListener {

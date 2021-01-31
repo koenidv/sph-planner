@@ -31,6 +31,7 @@ import de.koenidv.sph.adapters.CompactPostsAdapter
 import de.koenidv.sph.adapters.CompactTasksAdapter
 import de.koenidv.sph.database.*
 import de.koenidv.sph.networking.AttachmentManager
+import de.koenidv.sph.networking.Tasks
 import de.koenidv.sph.objects.Attachment
 import de.koenidv.sph.objects.FunctionTile
 import de.koenidv.sph.objects.Post
@@ -280,7 +281,7 @@ class HomeFragment : Fragment() {
                             // Show single task bottom sheet
                             TaskSheet(it).show(parentFragmentManager, "task")
                         },
-                        onTaskCheckedChanged = AttachmentManager().onTaskCheckedChanged(requireActivity()) { task, isDone ->
+                        onTaskCheckedChanged = Tasks().onCheckedChanged(requireActivity()) { task, isDone ->
                             if (isDone) {
                                 // Update tasks dataset
                                 val index = tasks.indexOfFirst { it.taskId == task.taskId }

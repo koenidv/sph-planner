@@ -173,7 +173,7 @@ class OnboardingSupportlistFragment : Fragment() {
                 // Resolve tile urls
                 var tilesResolved = 0
                 for (feature in featureList) {
-                    NetworkManager().resolveUrl(feature.location, onComplete = { successUrl: Int, resolvedUrl: String ->
+                    NetworkManager().resolveUrl(feature.location, callback = { successUrl: Int, resolvedUrl: String ->
                         kotlin.run {
                             // Save new url to object
                             if (successUrl == NetworkManager.SUCCESS
