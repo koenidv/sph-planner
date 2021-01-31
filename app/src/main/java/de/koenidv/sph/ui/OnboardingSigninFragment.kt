@@ -17,7 +17,6 @@ import com.androidnetworking.AndroidNetworking
 import com.androidnetworking.common.Priority
 import com.androidnetworking.error.ANError
 import com.androidnetworking.interfaces.StringRequestListener
-import com.facebook.stetho.okhttp3.StethoInterceptor
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.crashlytics.FirebaseCrashlytics
@@ -27,7 +26,6 @@ import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.networking.NetworkManager
 import de.koenidv.sph.networking.TokenManager
 import de.koenidv.sph.parsing.RawParser
-import okhttp3.OkHttpClient
 import java.util.*
 
 
@@ -62,7 +60,6 @@ class OnboardingSigninFragment : Fragment() {
 
             // Load school names and ids to display them in a spinner
             // Hide loading icon and show contents once done
-            AndroidNetworking.initialize(SphPlanner.applicationContext(), OkHttpClient.Builder().addNetworkInterceptor(StethoInterceptor()).build())
             AndroidNetworking.get("https://start.schulportal.hessen.de/")
                     .setPriority(Priority.LOW)
                     .build()

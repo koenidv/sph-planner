@@ -6,8 +6,9 @@
     <string name="title_explore">Explore</string>
 
     <!-- URLs -->
-    <string name="url_login" translatable="false">https://login.bildung.hessen.de/</string>
+    <string name="url_login" translatable="false">https://login.schulportal.hessen.de/</string>
     <string name="url_course_overview" translatable="false">https://start.schulportal.hessen.de/meinunterricht.php?a=sus_view&amp;id=%numberid</string>
+    <string name="url_start" translatable="false">https://start.schulportal.hessen.de/</string>
     <string name="url_timetable" translatable="false">https://start.schulportal.hessen.de/stundenplan.php</string>
     <string name="url_studygroups" translatable="false">https://start.schulportal.hessen.de/lerngruppen.php</string>
     <string name="url_allposts" translatable="false">https://start.schulportal.hessen.de/meinunterricht.php</string>

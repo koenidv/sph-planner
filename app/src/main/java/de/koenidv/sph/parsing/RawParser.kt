@@ -472,6 +472,10 @@ class RawParser {
                 // we'll resolve those redirects later
                 locationTemp = element.select("div.textheight a").last()
                         .attr("href")
+                // Add https://start.schulportal.hessen.de/ if that's a relative location
+                if (!locationTemp.contains("http")) {
+                    locationTemp = applicationContext().getString(R.string.url_start) + locationTemp
+                }
                 // Get the tile's logo from its logo view's class
                 // The .fa- or .glyphicon- icon will be the second-to-last class before .logo
                 icon = Regex(""".*((fa|glyphicon)-\S*)\s+logo""").find(

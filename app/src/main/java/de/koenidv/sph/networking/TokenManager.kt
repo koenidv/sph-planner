@@ -194,7 +194,10 @@ class TokenManager {
                         .method("POST", body)
                         .build()
 
+                @Suppress("BlockingMethodInNonBlockingContext")
                 val response = client.newCall(request).execute()
+
+                @Suppress("BlockingMethodInNonBlockingContext")
                 val responsebody = response.body()?.string()
 
                 if (response.isSuccessful && responsebody != null) {
@@ -208,6 +211,7 @@ class TokenManager {
 
     /** Check if device is online,
      * copied from https://developer.android.com/training/basics/network-ops/managing */
+    @Suppress("DEPRECATION")
     private fun isOnline(): Boolean {
         val connMgr = applicationContext()
                 .getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
