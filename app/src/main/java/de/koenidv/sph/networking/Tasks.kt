@@ -1,6 +1,7 @@
 package de.koenidv.sph.networking
 
-import android.app.Activity
+import android.content.Context
+import androidx.fragment.app.FragmentActivity
 import com.androidnetworking.AndroidNetworking
 import com.androidnetworking.error.ANError
 import com.androidnetworking.interfaces.StringRequestListener
@@ -12,6 +13,7 @@ import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.database.CoursesDb
 import de.koenidv.sph.database.TasksDb
 import de.koenidv.sph.objects.Task
+import de.koenidv.sph.ui.InfoSheet
 
 //  Created by koenidv on 31.01.2021.
 class Tasks {
@@ -20,7 +22,10 @@ class Tasks {
      * Get a lambda to handle task checked changes in posts
      * Will mark task as done in db and sph and show an error if that failed
      */
-    fun onCheckedChanged(activity: Activity, courseNumberId: String? = null, callback: ((Task, Boolean) -> Unit)? = null):
+    fun onCheckedChanged(
+            activity: FragmentActivity,
+            courseNumberId: String? = null,
+            callback: ((Task, Boolean) -> Unit)? = null):
             (task: Task, isDone: Boolean) -> Unit = { task, isDone ->
         val numberId = courseNumberId ?: CoursesDb.getInstance().getNumberId(task.id_course)
         complete(numberId, task, isDone) {
@@ -32,6 +37,13 @@ class Tasks {
                                 + " ($it)", Snackbar.LENGTH_SHORT)
                         .setAnchorView(R.id.nav_view).show()
             }
+        }
+        val prefs = activity.getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
+        // If this is the first time the user marked a task as done, show an info
+        if (isDone && !prefs.getBoolean("intro_tasks_sync", false)) {
+            InfoSheet(R.drawable.img_taskssync, R.string.tasks_sync_info)
+                    .show(activity.supportFragmentManager, "info-tasks")
+            prefs.edit().putBoolean("intro_tasks_sync", true).apply()
         }
     }
 
