@@ -93,6 +93,14 @@ class MainActivity : AppCompatActivity() {
                             errorSnackbar.setText(R.string.error).show()
                         else -> if (success != NetworkManager.SUCCESS) errorSnackbar.setText(R.string.error).show()
                     }
+                    // If this is due to a server error, display a link to sph's status page
+                    if (success == NetworkManager.FAILED_MAINTENANCE
+                            || success == NetworkManager.FAILED_SERVER_ERROR
+                            || success == NetworkManager.FAILED_UNKNOWN) {
+                        errorSnackbar.setAction(R.string.sph_status) {
+                            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.url_status))))
+                        }
+                    }
                     // Indicate no longer refreshing
                     swipeRefresh.isRefreshing = false
                     if (success == NetworkManager.FAILED_INVALID_CREDENTIALS) {

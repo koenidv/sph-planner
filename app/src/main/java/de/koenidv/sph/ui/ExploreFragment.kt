@@ -82,8 +82,9 @@ class ExploreFragment : Fragment() {
             }
         } else gridLayout.removeView(changesText)
 
-        // Users
-        if (features.supports(FunctionTile.FEATURE_MESSAGES)) {
+        // Users WORK IN PROGRESS, therefore hidden
+        @Suppress("SimplifyBooleanWithConstants")
+        if (false && features.supports(FunctionTile.FEATURE_MESSAGES)) {
             usersText.setOnClickListener {
                 nav.navigate(R.id.usersFromExploreAction)
             }
