@@ -25,9 +25,10 @@ class SphPlanner : Application() {
         private var instance: SphPlanner? = null
 
         // Returns the applications context for usage everywhere within the app
-        fun applicationContext() : Context {
+        fun applicationContext(): Context {
             return instance!!.applicationContext
         }
+
         // Set application tag for Log
         const val TAG = "SPH-Planner"
     }
