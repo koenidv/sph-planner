@@ -6,7 +6,7 @@
     <string name="title_explore">Explore</string>
 
     <!-- URLs -->
-    <string name="url_login" translatable="false">https://login.schulportal.hessen.de/</string>
+    <string name="url_login" translatable="false">https://login.bildung.hessen.de/</string>
     <string name="url_course_overview" translatable="false">https://start.schulportal.hessen.de/meinunterricht.php?a=sus_view&amp;id=%numberid</string>
     <string name="url_timetable" translatable="false">https://start.schulportal.hessen.de/stundenplan.php</string>
     <string name="url_studygroups" translatable="false">https://start.schulportal.hessen.de/lerngruppen.php</string>
@@ -15,6 +15,7 @@
     <string name="url_changes_debug" translatable="false">https://gist.githubusercontent.com/koenidv/7c0b35895d1daf86b2b00f243d687fe2/raw/13d8feb0b7216d8278f9421a06a2eeba305f4525/gistfile1.txt</string>
     <string name="url_messages" translatable="false">https://start.schulportal.hessen.de/nachrichten.php</string>
     <string name="url_holidays" translatable="false">https://ferien-api.de/api/v1/holidays/HE.json</string>
+    <string name="url_status" translatable="false">https://info.schulportal.hessen.de/</string>
 
     <!-- General purpose -->
     <string name="cancel">Cancel</string>
@@ -35,6 +36,7 @@
     <string name="error_offline">No connection</string>
     <string name="error_maintenance">Maintenance, try again later</string>
     <string name="error_server">Try again in a few minutes</string>
+    <string name="sph_status">Status</string>
 
     <!-- Sign in process -->
     <string name="onboard_legal_title">Before we start</string>

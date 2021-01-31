@@ -242,5 +242,6 @@
         <item quantity="one">Eine offene Aufgabe</item>
         <item quantity="other">%d offene Aufgaben</item>
     </plurals>
+    <string name="sph_status">Status</string>
 
 </resources>

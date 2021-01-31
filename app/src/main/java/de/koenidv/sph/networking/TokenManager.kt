@@ -2,6 +2,8 @@ package de.koenidv.sph.networking
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.net.ConnectivityManager
+import android.net.NetworkInfo
 import android.util.Log
 import android.widget.Toast
 import com.androidnetworking.AndroidNetworking
@@ -146,6 +148,7 @@ class TokenManager {
                         if (Firebase.remoteConfig.getBoolean("token_fix_0106")) {
                             // As of 2021/01/06 we need to load the site again
                             // to actually get a session id
+                            Log.d(TAG, "Using second token request (0106)")
                             AndroidNetworking.get("https://start.schulportal.hessen.de/index.php?i="
                                     + prefs.getString("schoolid", "5146"))
                                     .setTag("token-2")
@@ -177,28 +180,41 @@ class TokenManager {
      * validate response and save sid cookie if possible
      */
     private fun getTokenWithMultipart(onComplete: (success: Int, token: String?) -> Unit) {
-        GlobalScope.launch {
-            val client = OkHttpClient().newBuilder()
-                    .cookieJar(CookieStore)
-                    .build()
-            val body: RequestBody = MultipartBody.Builder().setType(MultipartBody.FORM)
-                    .addFormDataPart("user", "5146.florian.koenig")
-                    .addFormDataPart("password", "fofleSchule03")
-                    .build()
-            val request: Request = Request.Builder()
-                    .url("https://login.schulportal.hessen.de/")
-                    .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.22 Safari/537.36")
-                    .method("POST", body)
-                    .build()
+        if (isOnline()) {
+            GlobalScope.launch {
+                Log.d(TAG, "Using fallback token request (0130)")
+                val client = OkHttpClient().newBuilder()
+                        .cookieJar(CookieStore)
+                        .build()
+                val body: RequestBody = MultipartBody.Builder().setType(MultipartBody.FORM)
+                        .addFormDataPart("user", "5146.florian.koenig")
+                        .addFormDataPart("password", "fofleSchule03")
+                        .build()
+                val request: Request = Request.Builder()
+                        .url("https://login.schulportal.hessen.de/")
+                        .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.22 Safari/537.36")
+                        .method("POST", body)
+                        .build()
 
-            val response = client.newCall(request).execute().body()?.string()
+                val response = client.newCall(request).execute()
+                val responsebody = response.body()?.string()
 
-            if (response == null) {
-                onComplete(NetworkManager.FAILED_SERVER_ERROR, null)
-            } else {
-                validateTokenResponse(response, onComplete)
+                if (response.isSuccessful && responsebody != null) {
+                    validateTokenResponse(responsebody, onComplete)
+                } else {
+                    onComplete(NetworkManager.FAILED_SERVER_ERROR, null)
+                }
             }
-        }
+        } else onComplete(NetworkManager.FAILED_NO_NETWORK, null)
+    }
+
+    /** Check if device is online,
+     * copied from https://developer.android.com/training/basics/network-ops/managing */
+    private fun isOnline(): Boolean {
+        val connMgr = applicationContext()
+                .getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val networkInfo: NetworkInfo? = connMgr.activeNetworkInfo
+        return networkInfo?.isConnected == true
     }
 
     /**
