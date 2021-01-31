@@ -263,6 +263,10 @@
     <string name="feedback_subject" translatable="false">[SPHplanner] Feedback</string>
     <string name="feedback_body" translatable="false">\n\nApp version: %app\nAndroid version: %android</string>
 
+    <!-- In-App updates -->
+    <string name="update_downloaded">Update available</string>
+    <string name="update_action">Install</string>
+
     <!-- Translatable Arrays -->
     <!-- Only translate values (after "|"), not the keys! -->
     <!-- Spanish, Russian, Korean ? -->

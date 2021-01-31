@@ -52,13 +52,20 @@ class NetworkManager {
 
         when (destinationId) {
             R.id.nav_home, R.id.nav_explore -> {
-                // Update changes after 10min, posts after 30min, messages after 20min
-                if (time - prefs.getLong("updated_changes", 0) > 10 * 60 * 1000) updateList.add("changes")
-                if (time - prefs.getLong("updated_posts", 0) > 30 * 60 * 1000) updateList.add("posts")
-                if (time - prefs.getLong("updated_messages", 0) > 20 * 60 * 1000) updateList.add("messages")
-                updateList.add("holidays")
+                // Update changes after 10min
+                if (time - prefs.getLong("updated_changes", 0) > 10 * 60 * 1000)
+                    updateList.add("changes")
+                // posts after 30min
+                if (time - prefs.getLong("updated_posts", 0) > 30 * 60 * 1000)
+                    updateList.add("posts")
+                // messages after 20min
+                if (time - prefs.getLong("updated_messages", 0) > 20 * 60 * 1000)
+                    updateList.add("messages")
+                // holidays after 1 month
+                if (time - prefs.getLong("updated_messages", 0) > 31 * 86400000L)
+                    updateList.add("holidays")
             }
-            R.id.nav_courses -> {
+            R.id.nav_courses, R.id.frag_tasks, R.id.frag_allposts, R.id.frag_attachments -> {
                 // 2 minutes cooldown, update all posts
                 if (time - prefs.getLong("updated_posts", 0) > 2 * 60 * 100)
                     updateList.add("posts")
@@ -72,7 +79,7 @@ class NetworkManager {
                 if (time - prefs.getLong("updated_changes", 0) > 30 * 1000)
                     updateList.add("changes")
             }
-            R.id.frag_course_overview, R.id.frag_tasks, R.id.frag_attachments -> {
+            R.id.frag_course_overview -> {
                 disableList = true
                 // Course Overview fragment
                 // Update posts, tasks, files, links
