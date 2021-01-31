@@ -29,12 +29,10 @@ import com.google.android.material.snackbar.Snackbar
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner.Companion.TAG
 import de.koenidv.sph.SphPlanner.Companion.applicationContext
-import de.koenidv.sph.database.CoursesDb
 import de.koenidv.sph.database.FileAttachmentsDb
 import de.koenidv.sph.database.LinkAttachmentsDb
 import de.koenidv.sph.objects.Attachment
 import de.koenidv.sph.objects.FileAttachment
-import de.koenidv.sph.objects.Task
 import me.saket.bettermovementmethod.BetterLinkMovementMethod
 import okhttp3.Cookie
 import okhttp3.HttpUrl
@@ -320,25 +318,6 @@ class AttachmentManager {
 
                 sheet.show()
             }
-
-    /**
-     * Returns a lambda to handle task checked changes
-     */
-    fun onTaskCheckedChanged(activity: Activity, courseNumberId: String? = null, onComplete: ((Task, Boolean) -> Unit)? = null):
-            (task: Task, isDone: Boolean) -> Unit = { task, isDone ->
-        val numberId = courseNumberId ?: CoursesDb.getInstance().getNumberId(task.id_course)
-        NetworkManager().markTaskAsDone(numberId, task, isDone) {
-            if (it == NetworkManager.SUCCESS) {
-                if (onComplete != null) onComplete(task, isDone)
-            } else {
-                Snackbar.make(activity.findViewById(R.id.nav_host_fragment),
-                        applicationContext().getString(R.string.task_not_synchronized)
-                                + " ($it)", Snackbar.LENGTH_SHORT)
-                        .setAnchorView(R.id.nav_view).show()
-            }
-        }
-
-    }
 
     /**
      * Download if needed and open a file or link

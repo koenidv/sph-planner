@@ -27,7 +27,7 @@ class AllPostsFragment(private var filters: MutableList<String> = mutableListOf(
         val view = inflater.inflate(R.layout.fragment_allposts, container, false)
 
         // Set open in browser url
-        SphPlanner.openInBrowserUrl = getString(R.string.url_allposts)
+        SphPlanner.openInBrowserUrl = getString(R.string.url_mycourses)
 
 
         val filterText = view.findViewById<TextView>(R.id.filterPostsTextView)

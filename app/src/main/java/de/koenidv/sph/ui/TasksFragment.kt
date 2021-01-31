@@ -21,7 +21,7 @@ import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.adapters.TasksAdapter
 import de.koenidv.sph.database.PostsDb
 import de.koenidv.sph.database.TasksDb
-import de.koenidv.sph.networking.AttachmentManager
+import de.koenidv.sph.networking.Tasks
 import de.koenidv.sph.objects.Task
 
 
@@ -92,7 +92,7 @@ class TasksFragment : Fragment() {
         }
 
         // Set open in browser url
-        SphPlanner.openInBrowserUrl = getString(R.string.url_allposts)
+        SphPlanner.openInBrowserUrl = getString(R.string.url_mycourses)
 
         // Get passed argument
         if (arguments?.getBoolean("undone") != null) {
@@ -129,7 +129,7 @@ class TasksFragment : Fragment() {
                     Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
                             .navigate(R.id.overviewFromTasksAction, bundleOf("courseId" to it))
                 },
-                onTaskCheckedChanged = AttachmentManager().onTaskCheckedChanged(requireActivity())
+                onTaskCheckedChanged = Tasks().onCheckedChanged(requireActivity())
         )
         tasksRecycler.adapter = adapter
 

@@ -12,7 +12,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import de.koenidv.sph.R
 import de.koenidv.sph.adapters.TasksAdapter
 import de.koenidv.sph.database.PostsDb
-import de.koenidv.sph.networking.AttachmentManager
+import de.koenidv.sph.networking.Tasks
 import de.koenidv.sph.objects.Task
 
 //  Created by koenidv on 29.12.2020.
@@ -40,7 +40,7 @@ class TaskSheet internal constructor(private val task: Task) : BottomSheetDialog
                     Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
                             .navigate(R.id.overviewAction, bundleOf("courseId" to it))
                 },
-                onTaskCheckedChanged = AttachmentManager().onTaskCheckedChanged(requireActivity())
+                onTaskCheckedChanged = Tasks().onCheckedChanged(requireActivity())
         )
 
         doneButton.setOnClickListener { dismiss() }
