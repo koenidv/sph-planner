@@ -243,5 +243,10 @@
         <item quantity="other">%d offene Aufgaben</item>
     </plurals>
     <string name="sph_status">Status</string>
+    <string name="understood">Alles klar</string>
+    <string name="tasks_sync_info">Wenn du eine Aufgabe abhakst, wird sie auch im Schulportal aktualisiert.\n\nEs könnte einige Minuten dauern, bis die Änderungen dort sichtbar werden.</string>
+    <string name="imagedescr_info">Illustration</string>
+    <string name="update_downloaded">Update heruntergeladen</string>
+    <string name="update_action">Installieren</string>
 
 </resources>

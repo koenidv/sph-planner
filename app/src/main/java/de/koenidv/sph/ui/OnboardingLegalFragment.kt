@@ -1,7 +1,6 @@
 package de.koenidv.sph.ui
 
 import android.os.Bundle
-import android.text.method.LinkMovementMethod
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
+import me.saket.bettermovementmethod.BetterLinkMovementMethod
 
 class OnboardingLegalFragment : Fragment() {
 
@@ -31,7 +31,7 @@ class OnboardingLegalFragment : Fragment() {
         val sourcesCheck = view.findViewById<CheckBox>(R.id.legalSourcesCheckBox)
         val privacyCheck = view.findViewById<CheckBox>(R.id.legalPrivacyCheckBox)
 
-        privacyCheck.movementMethod = LinkMovementMethod.getInstance()
+        privacyCheck.movementMethod = BetterLinkMovementMethod.getInstance()
         val ft = parentFragmentManager.beginTransaction()
 
         // Continue to the next fragment once all conditions are checked

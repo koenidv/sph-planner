@@ -3,6 +3,7 @@ package de.koenidv.sph
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
+import android.content.IntentSender.SendIntentException
 import android.net.NetworkCapabilities
 import android.net.Uri
 import android.os.Bundle
@@ -19,6 +20,14 @@ import androidx.navigation.ui.NavigationUI
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
+import com.google.android.play.core.appupdate.AppUpdateInfo
+import com.google.android.play.core.appupdate.AppUpdateManager
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory
+import com.google.android.play.core.install.InstallStateUpdatedListener
+import com.google.android.play.core.install.model.AppUpdateType
+import com.google.android.play.core.install.model.InstallStatus
+import com.google.android.play.core.install.model.UpdateAvailability
+import com.google.android.play.core.tasks.Task
 import de.koenidv.sph.database.ChangesDb
 import de.koenidv.sph.networking.NetworkManager
 import de.koenidv.sph.ui.OnboardingActivity
@@ -31,6 +40,44 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         ChangesDb.instance!!.removeOld()
         super.onResume()
+
+
+        // In-App updates via Play Core API
+        val appUpdateManager: AppUpdateManager = AppUpdateManagerFactory.create(applicationContext)
+        val appUpdateInfoTask: Task<AppUpdateInfo> = appUpdateManager.appUpdateInfo
+        // Checks that the platform will allow the specified type of update.
+        appUpdateInfoTask.addOnSuccessListener { appUpdateInfo ->
+            if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
+                    && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.FLEXIBLE)) {
+                // Request the update
+                try {
+                    appUpdateManager.startUpdateFlowForResult(
+                            appUpdateInfo,
+                            AppUpdateType.FLEXIBLE,
+                            this,
+                            100)
+
+                    // Create a listener to track request state updates.
+                    val listener = InstallStateUpdatedListener { state ->
+                        // Show module progress, log state, or install the update.
+                        if (state.installStatus() == InstallStatus.DOWNLOADED) {
+                            Snackbar.make(
+                                    findViewById(R.id.nav_host_fragment),
+                                    R.string.update_downloaded,
+                                    Snackbar.LENGTH_INDEFINITE)
+                                    .setAnchorView(R.id.nav_view)
+                                    .setAction(R.string.update_action) {
+                                        appUpdateManager.completeUpdate()
+                                    }.show()
+                        }
+                    }
+                    appUpdateManager.registerListener(listener)
+                } catch (mE: SendIntentException) {
+                    mE.printStackTrace()
+                }
+            }
+        }
+
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

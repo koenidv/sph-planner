@@ -28,10 +28,12 @@
     <string name="error">Error</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="understood">Alright</string>
     <string name="load_more">Show more</string>
     <string name="open_in_browser">Open in browser</string>
     <string name="emoji_check" translatable="false">✔</string>
     <string name="emoji_cross" translatable="false">❌</string>
+    <string name="emoji_warning" translatable="false">❗</string>
 
     <!-- General purpose network stuff -->
     <string name="error_offline">No connection</string>
@@ -162,6 +164,7 @@
         <item quantity="other">%d more undone tasks</item>
     </plurals>
     <string name="tasks_share_template">Task for %course: %description</string>
+    <string name="tasks_sync_info">If you check a task here, it will also be updated it in the education portal.\n\nIt might take a few minutes for the changes to reflect there.</string>
 
     <!-- Attachments -->
     <string name="attachments_pins_title">Pinned attachments</string>
@@ -261,6 +264,10 @@
     <string name="feedback_subject" translatable="false">[SPHplanner] Feedback</string>
     <string name="feedback_body" translatable="false">\n\nApp version: %app\nAndroid version: %android</string>
 
+    <!-- In-App updates -->
+    <string name="update_downloaded">Update available</string>
+    <string name="update_action">Install</string>
+
     <!-- Translatable Arrays -->
     <!-- Only translate values (after "|"), not the keys! -->
     <!-- Spanish, Russian, Korean ? -->
@@ -294,4 +301,5 @@
 
     <!-- Usabilty -->
     <string name="imagedescr_expand">Expand</string>
+    <string name="imagedescr_info">Illustration</string>
 </resources>
