@@ -343,17 +343,37 @@ class HomeFragment : Fragment() {
                 unreadPostsRecycler.adapter = CompactPostsAdapter(posts, 4) { post: Post, _: View ->
                     // Show single post bottom sheet
                     PostSheet(post).show(parentFragmentManager, "post")
-                    // Remove the item from the list if it is unread
+
+                    // If the post was unread, mark as read
                     if (post.unread) {
-                        val index = posts.indexOf(post)
-                        posts.removeAt(index)
-                        unreadPostsRecycler.adapter?.notifyItemRemoved(index)
                         PostsDb.getInstance().markAsRead(post.postId)
+                        post.unread = false
                         // Update overflow counter
                         postsOverflow--
                         if (postsOverflow != 0)
                             moreUnreadText.text = resources.getQuantityString(R.plurals.posts_more_unread, postsOverflow, postsOverflow)
                         else moreUnreadText.visibility = View.GONE
+
+                        // Move the post down the list until it's at its correct position by date
+                        val index = posts.indexOf(post)
+                        var nextIndex = index
+                        var postMoved = false
+                        // Skip all indizes with posts that are also unread
+                        // Maximum 8 shifts to avoid long runtime
+                        while (nextIndex < 8
+                                && posts.getOrNull(nextIndex + 1) != null
+                                && (posts[nextIndex + 1].unread
+                                        || post.date.before(posts[nextIndex + 1].date))) {
+                            postMoved = true
+                            // Overwrite this with the next post and notify the adapter
+                            posts[nextIndex] = posts[nextIndex + 1]
+                            unreadPostsRecycler.adapter?.notifyItemMoved(nextIndex + 1, nextIndex)
+                            nextIndex++
+                        }
+                        // If the post moved, the entry at nextindex is now duplicated
+                        // and can be replaced by this post, again update adapter for this position
+                        if (postMoved) posts[nextIndex] = post
+                        unreadPostsRecycler.adapter?.notifyItemChanged(nextIndex)
                     }
                 }
             } else {
