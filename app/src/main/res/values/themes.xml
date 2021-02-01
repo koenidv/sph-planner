@@ -76,7 +76,6 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="colorPrimary">@color/textColor</item>
         <item name="colorOnPrimary">@color/white</item>
-        <item name="android:windowContentTransitions">true</item>
     </style>
 
     <style name="Theme.SPH.ModalStyle" parent="Widget.Design.BottomSheet.Modal">
