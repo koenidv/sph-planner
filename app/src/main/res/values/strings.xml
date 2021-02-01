@@ -36,11 +36,19 @@
     <string name="emoji_cross" translatable="false">❌</string>
     <string name="emoji_warning" translatable="false">❗</string>
 
-    <!-- General purpose network stuff -->
+    <!-- Network stuff -->
     <string name="error_offline">No connection</string>
     <string name="error_maintenance">Maintenance, try again later</string>
     <string name="error_server">Try again in a few minutes</string>
     <string name="sph_status">Status</string>
+    <string name="index_status_courses">Looking for course information…</string>
+    <string name="index_status_timetable">Memorizing your timetable…</string>
+    <string name="index_status_posts">Reading all posts…</string>
+    <string name="index_status_changes">Checking for changes…</string>
+    <string name="index_status_messages">Counting your messages…</string>
+    <string name="index_status_users">Finding your teachers…</string>
+    <string name="index_status_holidays">Searching for holidays…</string>
+
 
     <!-- Sign in process -->
     <string name="onboard_legal_title">Before we start</string>

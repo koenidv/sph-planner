@@ -34,6 +34,7 @@ class OnboardingSupportlistFragment : Fragment() {
         val warningText = view.findViewById<TextView>(R.id.warningTextView)
         val contactButton = view.findViewById<MaterialButton>(R.id.contactButton)
         val indexLoading = view.findViewById<ProgressBar>(R.id.indexLoading)
+        val statusText = view.findViewById<TextView>(R.id.statusTextView)
         val nextFab = view.findViewById<FloatingActionButton>(R.id.nextFab)
 
         // Get supported features
@@ -186,7 +187,13 @@ class OnboardingSupportlistFragment : Fragment() {
                                 FunctionTilesDb.getInstance().save(featureList)
 
                                 // Now index everything else
-                                NetworkManager().indexAll { indexsuccess ->
+                                NetworkManager().indexAll({
+                                    // Update status text on status update
+                                    status ->
+                                    statusText.text = status
+                                }) { indexsuccess ->
+                                    // Continue on indexing completion
+                                    statusText.visibility = View.GONE
                                     if (indexsuccess == NetworkManager.SUCCESS) {
                                         indexLoading.visibility = View.GONE
                                         nextFab.visibility = View.VISIBLE
