@@ -8,6 +8,7 @@
     <!-- URLs -->
     <string name="url_login" translatable="false">https://login.schulportal.hessen.de/</string>
     <string name="url_course_overview" translatable="false">https://start.schulportal.hessen.de/meinunterricht.php?a=sus_view&amp;id=%numberid</string>
+    <string name="url_course_overview_semester" translatable="false">https://start.schulportal.hessen.de/meinunterricht.php?a=sus_view&amp;id=%numberid&amp;halb=%semester</string>
     <string name="url_start" translatable="false">https://start.schulportal.hessen.de/</string>
     <string name="url_timetable" translatable="false">https://start.schulportal.hessen.de/stundenplan.php</string>
     <string name="url_studygroups" translatable="false">https://start.schulportal.hessen.de/lerngruppen.php</string>
@@ -35,11 +36,19 @@
     <string name="emoji_cross" translatable="false">❌</string>
     <string name="emoji_warning" translatable="false">❗</string>
 
-    <!-- General purpose network stuff -->
+    <!-- Network stuff -->
     <string name="error_offline">No connection</string>
     <string name="error_maintenance">Maintenance, try again later</string>
     <string name="error_server">Try again in a few minutes</string>
     <string name="sph_status">Status</string>
+    <string name="index_status_courses">Looking for course information…</string>
+    <string name="index_status_timetable">Memorizing your timetable…</string>
+    <string name="index_status_posts">Reading all posts…</string>
+    <string name="index_status_changes">Checking for changes…</string>
+    <string name="index_status_messages">Counting your messages…</string>
+    <string name="index_status_users">Finding your teachers…</string>
+    <string name="index_status_holidays">Searching for holidays…</string>
+
 
     <!-- Sign in process -->
     <string name="onboard_legal_title">Before we start</string>
@@ -138,6 +147,7 @@
     <string name="timetable_personal_title">Your timetable</string>
     <string name="timetable_personal_filter">Only show own courses</string>
     <string name="timetable_title">Timetable</string>
+    <string name="timetable_change_template">%shortname. %type</string>
 
     <!-- Tasks -->
     <string name="tasks_title">Tasks</string>
@@ -193,7 +203,7 @@
     <string name="changes_date_today">Today</string>
     <string name="changes_date_past">Past date</string>
     <string name="changes_date_tomorrow">Tomorrow</string>
-    <string name="changes_template_eva">%name independently</string>
+    <string name="changes_template_eva">%name self-reliant</string>
     <string name="changes_template_cancelled">%name cancelled</string>
     <string name="changes_template_freed">Freed from %name</string>
     <string name="changes_template_substitute">%name with %substitute</string>
@@ -202,6 +212,15 @@
     <string name="changes_template_switched">%name instead of %nameOld</string>
     <string name="changes_template_exam">%name exam</string>
     <string name="changes_template_other">%name: Something else</string>
+    <string name="changes_type_short_eva">EVA</string>
+    <string name="changes_type_short_cancelled">canc.</string>
+    <string name="changes_type_short_freed">freed</string>
+    <string name="changes_type_short_substitute">subs.</string>
+    <string name="changes_type_short_care">care</string>
+    <string name="changes_type_short_room">room</string>
+    <string name="changes_type_short_switched">switch</string>
+    <string name="changes_type_short_exam">exam</string>
+    <string name="changes_type_short_other">change</string>
 
     <!-- Messages and Users-->
     <string name="messages_unread_possible">✉️ You might have unread messages</string>

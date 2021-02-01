@@ -113,6 +113,7 @@ class Posts(private val networkManager: NetworkManager = NetworkManager()) {
      */
     fun load(coursesToLoad: List<Course>? = null,
              markAsRead: Boolean = false,
+             semester: String? = null,
              callback: (success: Int) -> Unit) {
         // Use all courses with number_id if nothing was specified
         val courses = coursesToLoad ?: CoursesDb.getInstance().withNumberId
@@ -125,12 +126,35 @@ class Posts(private val networkManager: NetworkManager = NetworkManager()) {
 
         val prefs = SphPlanner.applicationContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
         val time = Date().time
+        var url: String?
+        var callbackDisabled = false
+
+        // Call the callback if this was the last request
+        fun callbackIfLast() {
+            counter++
+            if (counter == courses.size) {
+                // Return success or the highest error code
+                if (errors.isEmpty()) {
+                    callback(NetworkManager.SUCCESS)
+                    prefs.edit().putLong("updated_posts", time).apply()
+                } else callback(errors.maxOf { it })
+            }
+        }
 
         // Load every course
         for (course in courses) {
-            networkManager.loadSiteWithToken(SphPlanner.applicationContext()
-                    .getString(R.string.url_course_overview)
-                    .replace("%numberid", course.number_id.toString())) { success: Int, result: String? ->
+            url = if (semester == null) {
+                SphPlanner.applicationContext()
+                        .getString(R.string.url_course_overview)
+                        .replace("%numberid", course.number_id.toString())
+            } else {
+                SphPlanner.applicationContext()
+                        .getString(R.string.url_course_overview_semester)
+                        .replace("%numberid", course.number_id.toString())
+                        .replace("%semester", semester)
+            }
+
+            networkManager.loadSiteWithToken(url) { success: Int, result: String? ->
                 if (success == NetworkManager.SUCCESS) {
                     // Parse data
                     RawParser().parsePosts(course.courseId,
@@ -147,6 +171,38 @@ class Posts(private val networkManager: NetworkManager = NetworkManager()) {
                                 FileAttachmentsDb.getInstance().save(files)
                                 LinkAttachmentsDb.getInstance().save(links)
                             })
+
+                    // If the response contains a link to another semester, also load that
+                    // Only do this if no semester was specified for this load to avoid an infinite loop
+                    if (semester == null) {
+                        val semesterMatches = Regex(
+                                """a href="meinunterricht\.php\?a=sus_view&id=\d{3,5}&halb=(\d)""""
+                        ).find(result)?.groupValues
+                        // Only make another request if a link was found
+                        // and the semester was not updated within the last 2 weeks
+                        // 2 weeks should be enough as the non-primary semester shouldn't be updated
+                        if (semesterMatches?.getOrNull(1) != null
+                                && time - prefs.getLong("updated_posts_${course.courseId}_semester_$semesterMatches[1]", 0)
+                                > 2 * 604800 * 1000) {
+                            // Disable this callback, we'll call it from the next function
+                            callbackDisabled = true
+                            // Call this function again with the corresponding semester
+                            load(coursesToLoad = listOf(course),
+                                    markAsRead = markAsRead,
+                                    semester = semesterMatches[1],
+                                    callback = {
+                                        // If there was an error, add it to our list
+                                        if (it != NetworkManager.SUCCESS) errors.add(it)
+                                        else prefs.edit().putLong(
+                                                "updated_posts_${course.courseId}_semester_$semesterMatches[1]",
+                                                time
+                                        ).apply()
+                                        callbackIfLast()
+                                    }
+                            )
+                        }
+                    }
+
                     // Remember when we last refreshed this course
                     prefs.edit().putLong("updated_posts_${course.courseId}", time).apply()
                 } else {
@@ -156,14 +212,8 @@ class Posts(private val networkManager: NetworkManager = NetworkManager()) {
                                             .toString()))
                     errors.add(success)
                 }
-                counter++
-                if (counter == courses.size) {
-                    // Return success or the highest error code
-                    if (errors.isEmpty()) {
-                        callback(NetworkManager.SUCCESS)
-                        prefs.edit().putLong("updated_posts", time).apply()
-                    } else callback(errors.maxOf { it })
-                }
+                // This callback check will be disabled if another semester needs to be loaded
+                if (!callbackDisabled) callbackIfLast()
             }
         }
     }

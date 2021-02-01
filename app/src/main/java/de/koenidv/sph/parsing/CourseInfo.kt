@@ -50,6 +50,12 @@ object CourseInfo {
     }
 
     /**
+     * Get an abbreviation for an internal course id
+     * Currently just its first character
+     */
+    fun getNameAbbreviation(courseId: String) = courseId.first().toUpperCase().toString()
+
+    /**
      * Convert different NamedIds for the same course to an uniform value
      * @param namedId NamedId to convert
      * @return Uniform NamedID

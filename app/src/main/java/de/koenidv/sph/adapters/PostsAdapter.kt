@@ -1,6 +1,5 @@
 package de.koenidv.sph.adapters
 
-import android.content.Intent
 import android.content.SharedPreferences
 import android.content.res.ColorStateList
 import android.view.LayoutInflater
@@ -10,7 +9,6 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.card.MaterialCardView
@@ -73,13 +71,6 @@ class PostsAdapter(private val posts: List<Post>,
                             // Apply theme color with 20% opacity to background
                             taskHighlight.setBackgroundColor(themeColor and 0x00FFFFFF or 0x33000000)
                         }
-                        // Send broadcast to update ui
-                        val uiBroadcast = Intent("uichange")
-                        uiBroadcast.putExtra("content", "taskDone")
-                        uiBroadcast.putExtra("taskId", it.taskId)
-                        uiBroadcast.putExtra("postId", it.id_post)
-                        uiBroadcast.putExtra("isDone", isChecked)
-                        LocalBroadcastManager.getInstance(SphPlanner.applicationContext()).sendBroadcast(uiBroadcast)
                     }
             }
         }
