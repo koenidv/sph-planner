@@ -16,6 +16,7 @@ class TimetableFragment : Fragment() {
     private var expanded: Boolean = true
     private var viewAll: Boolean = false
     private var openOnClick: Boolean = false
+    private var withChanges: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,6 +25,7 @@ class TimetableFragment : Fragment() {
             expanded = it.getBoolean("expanded")
             viewAll = it.getBoolean("viewAll")
             openOnClick = it.getBoolean("openOnClick")
+            withChanges = it.getBoolean("withChanges")
         }
     }
 
@@ -38,9 +40,11 @@ class TimetableFragment : Fragment() {
         // Show timetable
         val ft = parentFragmentManager.beginTransaction()
         val timetableFragment = TimetableViewFragment()
-        timetableFragment.arguments = bundleOf("expanded" to expanded,
+        timetableFragment.arguments = bundleOf(
+                "expanded" to expanded,
                 "viewAll" to viewAll,
-                "openOnClick" to openOnClick)
+                "openOnClick" to openOnClick,
+                "withChanges" to withChanges)
         ft.replace(R.id.timetableFragment, timetableFragment).commit()
 
         val filterSwitch = view.findViewById<SwitchMaterial>(R.id.timetableFilterSwitch)
