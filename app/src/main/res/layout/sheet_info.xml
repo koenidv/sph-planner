@@ -34,8 +34,14 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/doneButton"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
-            android:layout_width="match_parent"
+            style="@style/Widget.MaterialComponents.FloatingActionButton"
+            android:layout_width="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginBottom="8dp"
+            android:paddingEnd="48dp"
+            android:paddingStart="48dp"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Button"
+            android:textColor="?attr/colorPrimarySurface"
             android:layout_height="wrap_content"
             android:text="@string/understood" />
 
