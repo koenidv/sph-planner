@@ -200,21 +200,34 @@ class LessonsAdapter(private var dataset: List<List<TimetableEntry>>,
         val layoutManager = recyclerView?.layoutManager
         if (layoutManager != null) {
             var color: Int
-            var view: View?
+            var layout: View?
+            var text: TextView?
             // Apply each change
             for (change in changes) {
                 // Only display EVA right now
                 color = ChangeInfo.getTypeColor(change.type)
-                if (change.type == Change.TYPE_EVA) {
-                    //color = SphPlanner.applicationContext().getColor(R.color.grey_800)
-                    // Try to find the corresponding view
-                    view = layoutManager.findViewByPosition(change.lessons.first() - 1)
-                    // If the view was found, apply the background color
-                    if (view != null) {
-                        Utility.tintBackground(
-                                view.findViewById(R.id.itemLayout),
-                                color,
-                                0x80000000.toInt())
+                //color = SphPlanner.applicationContext().getColor(R.color.grey_800)
+                // Try to find the corresponding view
+                layout = layoutManager.findViewByPosition(change.lessons.first() - 1)
+                text = layout?.findViewById(R.id.courseNameTextView)
+                // If the view was found
+                if (layout != null && text != null && change.id_course != null) {
+                    // Apply a background color per type
+                    Utility.tintBackground(
+                            layout.findViewById(R.id.itemLayout),
+                            color,
+                            0x80000000.toInt())
+                    // Add change type to text
+                    if (change.type == Change.TYPE_ROOM) {
+                        text.text = SphPlanner.applicationContext()
+                                .getString(R.string.timetable_change_template)
+                                .replace("%shortname", CourseInfo.getNameAbbreviation(change.id_course!!))
+                                .replace("%type", change.room.toString())
+                    } else {
+                        text.text = SphPlanner.applicationContext()
+                                .getString(R.string.timetable_change_template)
+                                .replace("%shortname", CourseInfo.getNameAbbreviation(change.id_course!!))
+                                .replace("%type", ChangeInfo.getTypeNameAbbreviation(change.type))
                     }
                 }
             }
