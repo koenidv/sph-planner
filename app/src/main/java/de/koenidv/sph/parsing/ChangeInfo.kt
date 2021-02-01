@@ -21,4 +21,19 @@ object ChangeInfo {
         Change.TYPE_EXAM -> applicationContext().getColor(R.color.change_type_exam)
         else -> applicationContext().getColor(R.color.change_type_other)
     }
+
+    /**
+     * Get a short descriptor a change's type
+     */
+    fun getTypeNameAbbreviation(type: Int): String = when (type) {
+        Change.TYPE_EVA -> applicationContext().getString(R.string.changes_type_short_eva)
+        Change.TYPE_CANCELLED -> applicationContext().getString(R.string.changes_type_short_cancelled)
+        Change.TYPE_FREED -> applicationContext().getString(R.string.changes_type_short_freed)
+        Change.TYPE_SUBSTITUTE -> applicationContext().getString(R.string.changes_type_short_substitute)
+        Change.TYPE_CARE -> applicationContext().getString(R.string.changes_type_short_cancelled)
+        Change.TYPE_ROOM -> applicationContext().getString(R.string.changes_type_short_room)
+        Change.TYPE_SWITCHED -> applicationContext().getString(R.string.changes_type_short_switched)
+        Change.TYPE_EXAM -> applicationContext().getString(R.string.changes_type_short_exam)
+        else -> applicationContext().getString(R.string.changes_type_short_other)
+    }
 }

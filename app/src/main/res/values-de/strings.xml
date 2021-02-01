@@ -248,5 +248,15 @@
     <string name="imagedescr_info">Illustration</string>
     <string name="update_downloaded">Update heruntergeladen</string>
     <string name="update_action">Installieren</string>
+    <string name="timetable_change_template">%shortname. %type</string>
+    <string name="changes_type_short_eva">EVA</string>
+    <string name="changes_type_short_cancelled">Entf.</string>
+    <string name="changes_type_short_freed">Freist.</string>
+    <string name="changes_type_short_substitute">Vertr.</string>
+    <string name="changes_type_short_care">Aufs.</string>
+    <string name="changes_type_short_room">Raum</string>
+    <string name="changes_type_short_switched">Wechsel</string>
+    <string name="changes_type_short_exam">Klausur</string>
+    <string name="changes_type_short_other">Änderung</string>
 
 </resources>
