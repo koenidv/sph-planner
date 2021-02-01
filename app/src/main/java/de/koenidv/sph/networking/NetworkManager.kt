@@ -258,7 +258,7 @@ class NetworkManager {
      * Called on first sign in, load everything we need
      * This currently includes courses, the timetable, posts, changes, message count, users, holidays
      */
-    fun indexAll(callback: (success: Int) -> Unit) {
+    fun indexAll(status: (status: String) -> Unit, callback: (success: Int) -> Unit) {
         // todo include tiles
 
         // Get all supported features as String list
@@ -294,13 +294,34 @@ class NetworkManager {
         // Load the feature at the current index
         loadNextFeature = {
             when (loadList[index]) {
-                "courses" -> Courses(this).createIndex(onDone, features)
-                "timetable" -> Timetable().fetch(onDone)
-                "posts" -> Posts(this).fetch(onDone, true)
-                "changes" -> Changes(this).fetch(onDone)
-                "messages" -> Messages().fetch(onDone, true)
-                "users" -> Users().fetch(onDone)
-                "holidays" -> Holidays().fetch(onDone)
+                "courses" -> {
+                    Courses(this).createIndex(onDone, features)
+                    status(applicationContext().getString(R.string.index_status_courses))
+                }
+                "timetable" -> {
+                    Timetable().fetch(onDone)
+                    status(applicationContext().getString(R.string.index_status_timetable))
+                }
+                "posts" -> {
+                    Posts(this).fetch(onDone, true)
+                    status(applicationContext().getString(R.string.index_status_posts))
+                }
+                "changes" -> {
+                    Changes(this).fetch(onDone)
+                    status(applicationContext().getString(R.string.index_status_changes))
+                }
+                "messages" -> {
+                    Messages().fetch(onDone, true)
+                    status(applicationContext().getString(R.string.index_status_messages))
+                }
+                "users" -> {
+                    Users().fetch(onDone)
+                    status(applicationContext().getString(R.string.index_status_users))
+                }
+                "holidays" -> {
+                    Holidays().fetch(onDone)
+                    status(applicationContext().getString(R.string.index_status_holidays))
+                }
                 else -> Log.e(TAG, "Unsupported feature " + loadList[index])
             }
         }

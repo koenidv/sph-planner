@@ -258,5 +258,12 @@
     <string name="changes_type_short_switched">Wechsel</string>
     <string name="changes_type_short_exam">Klausur</string>
     <string name="changes_type_short_other">Änderung</string>
+    <string name="index_status_courses">Nach Kursinformationen suchen…</string>
+    <string name="index_status_timetable">Deinen Stundenplan einprägen…</string>
+    <string name="index_status_posts">Alle Beiträge lesen…</string>
+    <string name="index_status_changes">Ausschau nach Vertretungen halten…</string>
+    <string name="index_status_messages">Deine Nachrichten zählen…</string>
+    <string name="index_status_users">Deine Lehrer finden…</string>
+    <string name="index_status_holidays">Nach Ferien suchen…</string>
 
 </resources>
