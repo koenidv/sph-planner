@@ -56,7 +56,7 @@ class HomeFragment : Fragment() {
      */
     fun updateTasksTitle() {
         // Update title
-        if (tasksRecycler.adapter?.itemCount == 0) {
+        if (tasks.size == 0 || tasksRecycler.adapter?.itemCount == 0) {
             // If tasks list is now empty, update title to display everything is done
             tasksTitle.setText(R.string.tasks_filter_none_undone)
             // Hide recycler layout as it would just show an empty border
@@ -124,8 +124,9 @@ class HomeFragment : Fragment() {
                 // If tasks list contains this, notify tasks aapter, else add it
                 val taskIndex = tasks.indexOfFirst { it.taskId == taskId }
                 if (taskIndex != -1) {
-                    // Update recycler
-                    tasksRecycler.adapter?.notifyItemChanged(taskIndex)
+                    // Remove this task from the recycler
+                    tasks.removeAt(taskIndex)
+                    tasksRecycler.adapter?.notifyItemRemoved(taskIndex)
                 } else if (!intent.getBooleanExtra("isDone", true)) {
                     val taskToAdd = TasksDb.getInstance().getByTaskId(taskId).firstOrNull()
                     if (taskToAdd != null) {
@@ -256,9 +257,9 @@ class HomeFragment : Fragment() {
          */
 
         val tasksLayout = view.findViewById<LinearLayout>(R.id.tasksLayout)
-        tasksRecyclerLayout = view.findViewById<LinearLayout>(R.id.tasksRecyclerLayout)
+        tasksRecyclerLayout = view.findViewById(R.id.tasksRecyclerLayout)
         tasksRecycler = view.findViewById(R.id.tasksRecycler)
-        tasksTitle = view.findViewById<TextView>(R.id.tasksTitleTextView)
+        tasksTitle = view.findViewById(R.id.tasksTitleTextView)
         val moreTasksText = view.findViewById<TextView>(R.id.moreTasksTextView)
 
         if (FunctionTilesDb.getInstance().supports(FunctionTile.FEATURE_COURSES)) {
@@ -295,7 +296,8 @@ class HomeFragment : Fragment() {
                                         moreTasksText.text = resources.getQuantityString(R.plurals.tasks_personalized_more, tasksOverflow, tasksOverflow)
                                     else moreTasksText.visibility = View.GONE
                                 }
-                                // Title will be updated via local broadcast
+                                // Update title and hide if necessary
+                                updateTasksTitle()
                             }
                         }
                 )

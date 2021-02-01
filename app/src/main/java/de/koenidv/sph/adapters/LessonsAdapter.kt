@@ -14,9 +14,12 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
+import de.koenidv.sph.objects.Change
 import de.koenidv.sph.objects.TimetableEntry
+import de.koenidv.sph.parsing.ChangeInfo
 import de.koenidv.sph.parsing.CourseInfo
 import de.koenidv.sph.parsing.Utility
+
 
 //  Created by koenidv on 18.12.2020.
 class LessonsAdapter(private var dataset: List<List<TimetableEntry>>,
@@ -24,6 +27,8 @@ class LessonsAdapter(private var dataset: List<List<TimetableEntry>>,
                      private var multiple: Boolean = false, private var maxConcurrent: Int = 1,
                      private val onClick: (List<TimetableEntry>) -> Unit) :
         RecyclerView.Adapter<LessonsAdapter.ViewHolder>() {
+
+    private var recyclerView: RecyclerView? = null
 
     /**
      * Provides a reference to the type of view
@@ -81,12 +86,6 @@ class LessonsAdapter(private var dataset: List<List<TimetableEntry>>,
             val height = if (expanded && !multiple) 64f else if (multiple) maxConcurrent * 32f else 32f
             val extrapadding = (hourcount - 1) * 4f
             layout.layoutParams.height = Utility.dpToPx(hourcount * height + extrapadding).toInt()
-
-            /*
-             * Changes
-             */
-
-            // todo display changes
 
             /*
              * Background color
@@ -176,6 +175,11 @@ class LessonsAdapter(private var dataset: List<List<TimetableEntry>>,
     // Return the size of your dataset (invoked by the layout manager)
     override fun getItemCount() = dataset.size
 
+    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+        super.onAttachedToRecyclerView(recyclerView)
+        this.recyclerView = recyclerView
+    }
+
     fun setExpanded(expanded: Boolean) {
         this.expanded = expanded
         notifyDataSetChanged()
@@ -186,6 +190,48 @@ class LessonsAdapter(private var dataset: List<List<TimetableEntry>>,
         this.multiple = multiple
         this.maxConcurrent = maxConcurrent
         notifyDataSetChanged()
+    }
+
+    /**
+     * Display a list of changes on the timetable
+     */
+    fun applyChanges(changes: List<Change>) {
+        // Get the RecyclerView's layout manager
+        val layoutManager = recyclerView?.layoutManager
+        if (layoutManager != null) {
+            var color: Int
+            var layout: View?
+            var text: TextView?
+            // Apply each change
+            for (change in changes) {
+                // Only display EVA right now
+                color = ChangeInfo.getTypeColor(change.type)
+                //color = SphPlanner.applicationContext().getColor(R.color.grey_800)
+                // Try to find the corresponding view
+                layout = layoutManager.findViewByPosition(change.lessons.first() - 1)
+                text = layout?.findViewById(R.id.courseNameTextView)
+                // If the view was found
+                if (layout != null && text != null && change.id_course != null) {
+                    // Apply a background color per type
+                    Utility.tintBackground(
+                            layout.findViewById(R.id.itemLayout),
+                            color,
+                            0x80000000.toInt())
+                    // Add change type to text
+                    if (change.type == Change.TYPE_ROOM) {
+                        text.text = SphPlanner.applicationContext()
+                                .getString(R.string.timetable_change_template)
+                                .replace("%shortname", CourseInfo.getNameAbbreviation(change.id_course!!))
+                                .replace("%type", change.room.toString())
+                    } else {
+                        text.text = SphPlanner.applicationContext()
+                                .getString(R.string.timetable_change_template)
+                                .replace("%shortname", CourseInfo.getNameAbbreviation(change.id_course!!))
+                                .replace("%type", ChangeInfo.getTypeNameAbbreviation(change.type))
+                    }
+                }
+            }
+        }
     }
 
 }

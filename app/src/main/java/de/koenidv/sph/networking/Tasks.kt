@@ -1,7 +1,9 @@
 package de.koenidv.sph.networking
 
 import android.content.Context
+import android.content.Intent
 import androidx.fragment.app.FragmentActivity
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.androidnetworking.AndroidNetworking
 import com.androidnetworking.error.ANError
 import com.androidnetworking.interfaces.StringRequestListener
@@ -27,9 +29,13 @@ class Tasks {
             courseNumberId: String? = null,
             callback: ((Task, Boolean) -> Unit)? = null):
             (task: Task, isDone: Boolean) -> Unit = { task, isDone ->
+        // Get the course's number id
         val numberId = courseNumberId ?: CoursesDb.getInstance().getNumberId(task.id_course)
+
+        // Mark the task as done
         complete(numberId, task, isDone) {
             if (it == NetworkManager.SUCCESS) {
+                // Call back if function was specified
                 if (callback != null) callback(task, isDone)
             } else {
                 Snackbar.make(activity.findViewById(R.id.nav_host_fragment),
@@ -38,13 +44,26 @@ class Tasks {
                         .setAnchorView(R.id.nav_view).show()
             }
         }
-        val prefs = activity.getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
+
+        // If no callback was specified, send a local broadcast to update the ui
+        if (callback == null) {
+            // Send broadcast to update ui (remove from tasks list on home)
+            val uiBroadcast = Intent("uichange")
+            uiBroadcast.putExtra("content", "taskDone")
+            uiBroadcast.putExtra("taskId", task.taskId)
+            uiBroadcast.putExtra("postId", task.id_post)
+            uiBroadcast.putExtra("isDone", isDone)
+            LocalBroadcastManager.getInstance(SphPlanner.applicationContext()).sendBroadcast(uiBroadcast)
+        }
+
         // If this is the first time the user marked a task as done, show an info
+        val prefs = activity.getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
         if (isDone && !prefs.getBoolean("intro_tasks_sync", false)) {
             InfoSheet(R.drawable.img_taskssync, R.string.tasks_sync_info)
                     .show(activity.supportFragmentManager, "info-tasks")
             prefs.edit().putBoolean("intro_tasks_sync", true).apply()
         }
+
     }
 
     /**
