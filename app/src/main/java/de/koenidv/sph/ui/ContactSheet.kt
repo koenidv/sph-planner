@@ -1,5 +1,6 @@
 package de.koenidv.sph.ui
 
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -31,7 +32,9 @@ class ContactSheet internal constructor() : BottomSheetDialogFragment() {
         telegramLayout.setOnClickListener {
             try {
                 dismiss()
-                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://t.me/koenidv")))
+                startActivity(Intent(
+                        Intent.ACTION_VIEW,
+                        Uri.parse(getString(R.string.contact_telegram_data))))
             } catch (e: Exception) {
             }
         }
@@ -40,7 +43,9 @@ class ContactSheet internal constructor() : BottomSheetDialogFragment() {
         instagramLayout.setOnClickListener {
             try {
                 dismiss()
-                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://instagram.com/halbunsichtbar")))
+                startActivity(Intent(
+                        Intent.ACTION_VIEW,
+                        Uri.parse(getString(R.string.contact_instagram_data))))
             } catch (e: Exception) {
             }
         }
@@ -49,13 +54,16 @@ class ContactSheet internal constructor() : BottomSheetDialogFragment() {
         githubLayout.setOnClickListener {
             try {
                 dismiss()
-                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/koenidv/sph-planner/issues/new")))
+                startActivity(Intent(
+                        Intent.ACTION_VIEW,
+                        Uri.parse(getString(R.string.contact_github_data))))
             } catch (e: Exception) {
             }
         }
 
         // Send email with android and version code
         mailLayout.setOnClickListener {
+            val prefs = requireContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
             // Get app version
             val version: String
             version = try {
@@ -74,7 +82,10 @@ class ContactSheet internal constructor() : BottomSheetDialogFragment() {
                     .setData(Uri.parse("mailto:"))
                     .putExtra(Intent.EXTRA_EMAIL, arrayOf("koenidv@gmail.com"))
                     .putExtra(Intent.EXTRA_SUBJECT, getString(R.string.feedback_subject))
-                    .putExtra(Intent.EXTRA_TEXT, getString(R.string.feedback_body).replace("%app", version).replace("%android", Build.VERSION.SDK_INT.toString()))
+                    .putExtra(Intent.EXTRA_TEXT, getString(R.string.feedback_body)
+                            .replace("%app", version)
+                            .replace("%android", Build.VERSION.SDK_INT.toString())
+                            .replace("%school", prefs.getString("school", "0")!!))
             // Only open if email client is installed
             if (emailIntent.resolveActivity(SphPlanner.applicationContext().packageManager) != null) startActivity(emailIntent)
             dismiss()

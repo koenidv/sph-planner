@@ -176,7 +176,7 @@ class OnboardingSigninFragment : Fragment() {
 
                 // Check if credentials are valid
                 // We'll only get a token if login was successfull
-                TokenManager().generateAccessToken(true) { success: Int, token: String? ->
+                TokenManager().authenticate(true) { success: Int, token: String? ->
                     run {
                         if (success == NetworkManager.SUCCESS && token != null && token != "") {
                             // User signed in successfully - NOW DO SOMETHING WITH IT :)

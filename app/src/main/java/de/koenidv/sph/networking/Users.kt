@@ -29,16 +29,13 @@ class Users {
      */
     fun fetch(callback: (success: Int) -> Unit) {
         // We need to make sure that we have an access token
-        TokenManager().generateAccessToken { success, token ->
+        TokenManager().authenticate { success, token ->
             // If getting a token failed, call onComplete
             // with the error and return
             if (success != NetworkManager.SUCCESS) {
                 callback(success)
-                return@generateAccessToken
+                return@authenticate
             }
-
-            // Make sure session id cookie is set
-            CookieStore.setToken(token!!)
 
             val users = mutableListOf<User>()
             val userIds = mutableListOf<String>()

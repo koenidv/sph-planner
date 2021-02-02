@@ -49,7 +49,6 @@ class EmailTemplateSheet : BottomSheetDialogFragment() {
     }
 
     override fun onDismiss(dialog: DialogInterface) {
-        // todo validate email input
         // Validate input
         if ("""\S+@\S+\.\w{2,8}""".toRegex().matches(input.text.toString())) {
             // Save the input to SharedPrefs

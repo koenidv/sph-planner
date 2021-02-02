@@ -28,20 +28,37 @@ import java.util.*
 //  Created by koenidv on 05.12.2020.
 class TokenManager {
 
+    companion object {
+        var lastTokenCheck = 0L
+    }
+
     val prefs: SharedPreferences = applicationContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
 
     /**
-     * Creates an signed-in access token
+     * Creates an signed-in access token and saves it to CookieStore
      * @param forceNewToken if a new token should be generated, even if an old one should still be valid
      * @param onComplete Called when a token is ready
      */
-    fun generateAccessToken(forceNewToken: Boolean = false, onComplete: (success: Int, token: String?) -> Unit) {
+    fun authenticate(forceNewToken: Boolean = false, onComplete: (success: Int, token: String?) -> Unit) {
 
-        // Return existing, signed-in token if it was used within 15 Minutes
+        // Use existing, signed-in token if it was used within 15 Minutes
         // Else get a new token
         if (Date().time - prefs.getLong("token_last_success", 0) <= 15 * 60 * 1000
                 && Date().time - prefs.getLong("token_last_success", 0) > 0
                 && !forceNewToken) {
+
+            // If stored session id does not match the last known token,
+            // overwrite it
+            // Only check once per minute
+            if (Date().time - lastTokenCheck < 60 * 1000) {
+                if (CookieStore.getToken() !== prefs.getString("token", "")) {
+                    CookieStore.setToken(prefs.getString("token", "")!!)
+                }
+                // Save this time so we don't have to check again within a short time span
+                lastTokenCheck = Date().time
+            }
+
+            // Call back with success
             onComplete(NetworkManager.SUCCESS, prefs.getString("token", "")!!)
         } else {
             // Get a new token
@@ -219,6 +236,20 @@ class TokenManager {
                 .getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val networkInfo: NetworkInfo? = connMgr.activeNetworkInfo
         return networkInfo?.isConnected == true
+    }
+
+    // Resets the authentication token
+    fun reset() {
+        // Clear cookies
+        CookieStore.clearCookies()
+        // Remove from SharedPrefs
+        prefs.edit()
+                .remove("token")
+                .remove("token_last_success")
+                .apply()
+        // Reset last check time
+        lastTokenCheck = 0L
+
     }
 
     /**

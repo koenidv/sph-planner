@@ -22,7 +22,8 @@ object CookieStore : CookieJar {
             if (this.cookies["schulportal.hessen.de"] != null) {
                 val oldAndNew = this.cookies["schulportal.hessen.de"]!!.toMutableList()
                 oldAndNew.addAll(cookies)
-                this.cookies["schulportal.hessen.de"] = oldAndNew
+                //this.cookies["schulportal.hessen.de"] = oldAndNew
+                this.cookies["schulportal.hessen.de"] = cookies
             } else this.cookies["schulportal.hessen.de"] = cookies
         } else
             this.cookies[url.host()] = cookies
@@ -54,6 +55,12 @@ object CookieStore : CookieJar {
                         .name("sid")
                         .value(token).build()))
     }
+
+    /**
+     * Gets the current sph session id
+     */
+    fun getToken(): String? =
+            cookies["schulportal.hessen.de"]?.find { it.name() == "sid" }?.value()
 
     /**
      * Deletes all cookies for all domains

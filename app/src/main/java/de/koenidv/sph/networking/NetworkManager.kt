@@ -130,11 +130,8 @@ class NetworkManager {
                           callback: (success: Int, result: String?) -> Unit) {
 
         // Getting an access token
-        TokenManager().generateAccessToken(forceNewToken) { success: Int, token: String? ->
+        TokenManager().authenticate(forceNewToken) { success: Int, token: String? ->
             if (success == SUCCESS) {
-
-                // Setting sid cookie
-                CookieStore.setToken(token!!)
 
                 // Getting webpage
                 AndroidNetworking.get(url)
@@ -207,7 +204,7 @@ class NetworkManager {
     fun update(entries: List<String>, callback: (success: Int) -> Unit) {
         if (entries.isNotEmpty()) {
             // Prepare token
-            TokenManager().generateAccessToken { success, _ ->
+            TokenManager().authenticate { success, _ ->
                 if (success == SUCCESS) {
                     var number = 0 // Completed calls
                     var lastError: Int? = null // Last error occurred
@@ -325,11 +322,8 @@ class NetworkManager {
      */
     fun resolveUrl(url: String, callback: (success: Int, resolvedUrl: String) -> Unit) {
         // Getting an access token
-        TokenManager().generateAccessToken { success: Int, token: String? ->
+        TokenManager().authenticate { success: Int, token: String? ->
             if (success == SUCCESS) {
-
-                // Make sure session id cookie is set
-                CookieStore.setToken(token!!)
 
                 // Getting webpage as OkHttp
                 AndroidNetworking.get(url)

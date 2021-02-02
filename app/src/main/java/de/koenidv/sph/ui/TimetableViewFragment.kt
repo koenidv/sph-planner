@@ -104,51 +104,51 @@ class TimetableViewFragment : Fragment() {
         }
 
         if (withChanges) {
-            // Get all changes for favorite courses, sorted by date and lesson
-            val changes = ChangesDb.instance!!.getFavorites()
-            if (changes.isNotEmpty()) {
-                val changesByDay = mutableListOf<List<Change>>()
-                val changesThisDay = mutableListOf<Change>()
-                // Having the list already ordered means we can map it more efficently,
-                // by assuming all entries for one day will be en bloc
-                var lastDate = changes[0].date
+            GlobalScope.launch {
+                // Get all changes for favorite courses, sorted by date and lesson
+                val changes = ChangesDb.instance!!.getFavorites()
+                if (changes.isNotEmpty()) {
+                    val changesByDay = mutableListOf<List<Change>?>(null, null, null, null, null)
+                    val changesThisDay = mutableListOf<Change>()
+                    // Having the list already ordered means we can map it more efficently,
+                    // by assuming all entries for one day will be en bloc
+                    var lastDate = changes[0].date
 
-                @Suppress("DEPRECATION")
-                var lastDay = lastDate.day - 1 // Monday is first day
-                // Add each change to the corresponding day
-                for (change in changes) {
-                    // If this is the next day, save last day and continue with the next
-                    if (change.date != lastDate) {
-                        changesByDay.add(lastDay, changesThisDay.toList())
-                        changesThisDay.clear()
-                        // Update day
-                        lastDate = change.date
-                        @Suppress("DEPRECATION")
-                        lastDay = lastDate.day - 1
+                    @Suppress("DEPRECATION")
+                    var lastDay = lastDate.day - 1 // Monday is first day
+                    // Add each change to the corresponding day
+                    for (change in changes) {
+                        // If this is the next day, save last day and continue with the next
+                        if (change.date != lastDate) {
+                            changesByDay.add(lastDay, changesThisDay.toList())
+                            changesThisDay.clear()
+                            // Update day
+                            lastDate = change.date
+                            @Suppress("DEPRECATION")
+                            lastDay = lastDate.day - 1
+                        }
+                        changesThisDay.add(change)
                     }
-                    changesThisDay.add(change)
-                }
-                // Add the last day to changesByDay list
-                changesByDay.add(lastDay, changesThisDay.toList())
-                changesThisDay.clear()
+                    // Add the last day to changesByDay list
+                    changesByDay[lastDay] = changesThisDay.toList()
+                    changesThisDay.clear()
 
-                // Apply changes to the RecyclerViews
-                GlobalScope.launch {
+                    // Apply changes to the RecyclerViews
                     // Wait 200ms to avoid blocking the ui thread
                     // Will display regular lesson first and then switch to updated lesson
                     delay(200)
                     if (activity != null)
                         requireActivity().runOnUiThread {
                             if (changesByDay.getOrNull(0) != null)
-                                (monday.adapter as LessonsAdapter).applyChanges(changesByDay[0])
+                                (monday.adapter as LessonsAdapter).applyChanges(changesByDay[0]!!)
                             if (changesByDay.getOrNull(1) != null)
-                                (tuesday.adapter as LessonsAdapter).applyChanges(changesByDay[1])
+                                (tuesday.adapter as LessonsAdapter).applyChanges(changesByDay[1]!!)
                             if (changesByDay.getOrNull(2) != null)
-                                (wednesday.adapter as LessonsAdapter).applyChanges(changesByDay[2])
+                                (wednesday.adapter as LessonsAdapter).applyChanges(changesByDay[2]!!)
                             if (changesByDay.getOrNull(3) != null)
-                                (thursday.adapter as LessonsAdapter).applyChanges(changesByDay[3])
+                                (thursday.adapter as LessonsAdapter).applyChanges(changesByDay[3]!!)
                             if (changesByDay.getOrNull(4) != null)
-                                (friday.adapter as LessonsAdapter).applyChanges(changesByDay[4])
+                                (friday.adapter as LessonsAdapter).applyChanges(changesByDay[4]!!)
                         }
                 }
 
