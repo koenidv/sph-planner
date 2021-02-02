@@ -227,11 +227,12 @@
     <string name="users_title">Teachers</string>
     <string name="users_name_template" translatable="false">%lastname, %firstname</string>
     <string name="email_template_info">Once set up, you can send an email to any teacher from here.\n\nPlease enter the template your school uses for email addresses.</string>
+    <string name="email_template_error">Invalid address template</string>
     <string name="email_template_hint">Your school\'s address template</string>
     <string name="email_template_default" translatable="false">#firstname.#lastname@schule.hessen.de</string>
     <string name="email_template_chip_fname">First char of first name</string>
     <string name="email_template_chip_firstname">First name</string>
-    <string name="email_template_chip_lname">First char of last name</string>
+    <string name="email_template_chip_lname">First 3 chars of last name</string>
     <string name="email_template_chip_lastname">Last name</string>
     <string name="email_template_chip_abbr">Abbreviation</string>
     <string name="email_template_chip_id">Identifier</string>

@@ -1,7 +1,6 @@
 package de.koenidv.sph.ui
 
 import android.content.Context
-import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -38,7 +37,19 @@ class EmailTemplateSheet : BottomSheetDialogFragment() {
         }
         chipGroup.isSingleSelection = true
 
-        doneButton.setOnClickListener { dismiss() }
+        doneButton.setOnClickListener {
+            // Validate input
+            if ("""\S+@\S+\.\w{2,8}""".toRegex().matches(input.text.toString())) {
+                // Save the input to SharedPrefs
+                requireContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE).edit()
+                        .putString("users_mail_template", input.text.toString().toLowerCase(Locale.ROOT))
+                        .apply()
+                dismiss()
+            } else {
+                // Display an error
+                input.error = getString(R.string.email_template_error)
+            }
+        }
 
         // Show current template
         input.setText(prefs.getString(
@@ -48,17 +59,4 @@ class EmailTemplateSheet : BottomSheetDialogFragment() {
         return view
     }
 
-    override fun onDismiss(dialog: DialogInterface) {
-        // Validate input
-        if ("""\S+@\S+\.\w{2,8}""".toRegex().matches(input.text.toString())) {
-            // Save the input to SharedPrefs
-            requireContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE).edit()
-                    .putString("users_mail_template", input.text.toString().toLowerCase(Locale.ROOT))
-                    .apply()
-            super.onDismiss(dialog)
-        } else {
-            // Display an error
-            input.error = "test"
-        }
-    }
 }
