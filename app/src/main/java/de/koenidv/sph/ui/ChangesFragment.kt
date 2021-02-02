@@ -35,7 +35,7 @@ class ChangesFragment : Fragment() {
     // Refresh whenever the broadcast "uichange" is received
     private val uichangeReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            // Only do something changes were updated
+            // Only do something if changes were updated
             if (intent.getStringExtra("content") == "changes") {
                 if (displayed && ::changes.isInitialized) {
                     // Get changes
@@ -102,10 +102,10 @@ class ChangesFragment : Fragment() {
         else View.GONE
 
         // Set up changes recycler
-        val adapter = ChangesAdapter(changes) { couseId: String ->
+        val adapter = ChangesAdapter(changes) { courseId: String ->
             // Navigate to course
             Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
-                    .navigate(R.id.overviewFromChangesAction, bundleOf("courseId" to couseId))
+                    .navigate(R.id.overviewFromChangesAction, bundleOf("courseId" to courseId))
         }
         changesRecycler.adapter = adapter
 
