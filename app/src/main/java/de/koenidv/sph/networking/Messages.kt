@@ -8,8 +8,6 @@ import com.androidnetworking.AndroidNetworking
 import com.androidnetworking.error.ANError
 import com.androidnetworking.interfaces.StringRequestListener
 import com.google.firebase.crashlytics.FirebaseCrashlytics
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.remoteconfig.ktx.remoteConfig
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
 import java.util.*
@@ -41,27 +39,19 @@ class Messages {
                 return@generateAccessToken
             }
 
-            if (Firebase.remoteConfig.getBoolean("token_fix_0130")) {
-                CookieStore.clearCookies()
-            } else {
-                // Make sure session id cookie is set
-                CookieStore.setToken(token!!)
-            }
+            // Make sure session id cookie is set
+            CookieStore.setToken(token!!)
 
             // Now post messages.php with a few parameters
             // a=headers - Titles only (read for entire message)
             // getType=visibleOnly - Only get visible messages (could also be unvisibleOnly)
             // last=0 - Not yet sure what that does, but it is needed to not get an error
-            val request = AndroidNetworking.post(SphPlanner.applicationContext().getString(R.string.url_messages))
+            AndroidNetworking.post(SphPlanner.applicationContext().getString(R.string.url_messages))
                     .addBodyParameter("a", "headers")
                     .addBodyParameter("getType", "visibleOnly")
                     .addBodyParameter("last", "0")
-
-            if (Firebase.remoteConfig.getBoolean("token_fix_0130")) {
-                request.addHeaders("Cookie", "sid=$token")
-            }
-
-            request.build()
+                    .setUserAgent("koenidv/sph-planner")
+                    .build()
                     .getAsString(object : StringRequestListener {
                         override fun onResponse(response: String) {
                             // The response should be a json object with two values:
@@ -81,7 +71,10 @@ class Messages {
                                 Log.e(SphPlanner.TAG, "Getting messages count failed")
                                 Log.e(SphPlanner.TAG, e.stackTraceToString())
                                 FirebaseCrashlytics.getInstance().recordException(e)
-                                callback(NetworkManager.FAILED_UNKNOWN)
+                                // Still continue with a success,
+                                // sph's messages page is just too unreliable
+                                // and this data not critical
+                                callback(NetworkManager.SUCCESS)
                                 return
                             }
 

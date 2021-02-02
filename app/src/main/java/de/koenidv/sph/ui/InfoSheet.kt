@@ -17,7 +17,8 @@ import de.koenidv.sph.R
 // Bottom sheet displaying an image and text
 class InfoSheet internal constructor(
         @DrawableRes private val image: Int,
-        @StringRes private val text: Int) : BottomSheetDialogFragment() {
+        @StringRes private val text: Int,
+        private val onAccept: (() -> Unit)? = null) : BottomSheetDialogFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val view: View = inflater.inflate(R.layout.sheet_info, container, false)
@@ -31,7 +32,10 @@ class InfoSheet internal constructor(
         view.findViewById<TextView>(R.id.infoTextView).setText(text)
 
         // Done button
-        view.findViewById<Button>(R.id.doneButton).setOnClickListener { dismiss() }
+        view.findViewById<Button>(R.id.doneButton).setOnClickListener {
+            onAccept?.invoke()
+            dismiss()
+        }
 
         return view
     }

@@ -163,8 +163,11 @@ class OnboardingSigninFragment : Fragment() {
                 prefs.edit()
                         .putString("user", userText.text.toString()
                                 .trim()
+                                .toLowerCase(Locale.ROOT)
                                 .replace(" ", ".")
-                                .toLowerCase(Locale.ROOT))
+                                .replace("ä", "ae")
+                                .replace("ö", "oe")
+                                .replace("ü", "ue"))
                         .putString("password", passText.text.toString())
                         // We'll assume schools have been loaded, as ui won't let the user get here otherwise
                         // We could mitigate this by checking for schoolIds.isNotEmpty()..

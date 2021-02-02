@@ -1,11 +1,13 @@
 package de.koenidv.sph.networking
 
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.util.Log
+import android.widget.Toast
 import com.androidnetworking.AndroidNetworking
 import com.androidnetworking.error.ANError
 import com.androidnetworking.interfaces.JSONObjectRequestListener
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.remoteconfig.ktx.remoteConfig
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.database.CoursesDb
@@ -13,6 +15,7 @@ import de.koenidv.sph.database.UsersDb
 import de.koenidv.sph.objects.User
 import org.json.JSONObject
 import java.util.*
+import java.util.regex.Pattern
 
 //  Created by koenidv on 31.01.2021.
 class Users {
@@ -34,12 +37,8 @@ class Users {
                 return@generateAccessToken
             }
 
-            if (Firebase.remoteConfig.getBoolean("token_fix_0130")) {
-                CookieStore.clearCookies()
-            } else {
-                // Make sure session id cookie is set
-                CookieStore.setToken(token!!)
-            }
+            // Make sure session id cookie is set
+            CookieStore.setToken(token!!)
 
             val users = mutableListOf<User>()
             val userIds = mutableListOf<String>()
@@ -50,15 +49,10 @@ class Users {
             var completed = 0
             while (char <= 'z') {
                 // Not get the all recipients for the current character
-                val request = AndroidNetworking.post(SphPlanner.applicationContext().getString(R.string.url_messages))
+                AndroidNetworking.post(SphPlanner.applicationContext().getString(R.string.url_messages))
                         .addBodyParameter("a", "searchRecipt")
                         .addBodyParameter("q", char.toString())
-
-                if (Firebase.remoteConfig.getBoolean("token_fix_0130")) {
-                    request.addHeaders("Cookie", "sid=$token")
-                }
-
-                request.build()
+                        .build()
                         .getAsJSONObject(object : JSONObjectRequestListener {
                             override fun onResponse(response: JSONObject) {
                                 var index = 0
@@ -148,6 +142,42 @@ class Users {
             }
 
         }
+    }
+
+    /**
+     * Send en email to an adress based upon the template in SharedPrefs
+     */
+    fun sendEmail(user: User) {
+        // Get the template
+        var template = SphPlanner.applicationContext()
+                .getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
+                .getString("users_mail_template", "")!!
+
+        Toast.makeText(SphPlanner.applicationContext(), template, Toast.LENGTH_LONG).show()
+
+        // Replace placholders with data for firstname: fname(n) for first n chars
+        template = Pattern.compile("""#fname\((\d)\)""")
+                .matcher(template)
+                .replaceAll(user.firstname.toString().take("$1".toInt()).toLowerCase(Locale.ROOT))
+                .replace("#firstname", user.firstname.toString().toLowerCase(Locale.ROOT))
+        // lastname: fname(n) for first n chars
+        template = Pattern.compile("""#lname\((\d)\)""")
+                .matcher(template)
+                .replaceAll(user.lastname.toString().take("$1".toInt()).toLowerCase(Locale.ROOT))
+                .replace("#lastname", user.lastname.toString().toLowerCase(Locale.ROOT))
+        // Abbreviation and id
+        template = template.replace("#abbr", user.teacherId.toString().toLowerCase(Locale.ROOT))
+                .replace("#id", user.userId.replace("l-", ""))
+
+        // Now start an intent to send an email to that address
+        val emailIntent = Intent.createChooser(Intent(Intent.ACTION_SENDTO).apply {
+            data = Uri.parse("mailto:$template")
+
+        }, "Send feedback").apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        }
+
+        SphPlanner.applicationContext().startActivity(emailIntent)
     }
 
 }

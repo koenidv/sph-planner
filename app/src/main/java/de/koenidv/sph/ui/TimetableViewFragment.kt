@@ -141,6 +141,14 @@ class TimetableViewFragment : Fragment() {
                         requireActivity().runOnUiThread {
                             if (changesByDay.getOrNull(0) != null)
                                 (monday.adapter as LessonsAdapter).applyChanges(changesByDay[0])
+                            if (changesByDay.getOrNull(1) != null)
+                                (tuesday.adapter as LessonsAdapter).applyChanges(changesByDay[1])
+                            if (changesByDay.getOrNull(2) != null)
+                                (wednesday.adapter as LessonsAdapter).applyChanges(changesByDay[2])
+                            if (changesByDay.getOrNull(3) != null)
+                                (thursday.adapter as LessonsAdapter).applyChanges(changesByDay[3])
+                            if (changesByDay.getOrNull(4) != null)
+                                (friday.adapter as LessonsAdapter).applyChanges(changesByDay[4])
                         }
                 }
 
