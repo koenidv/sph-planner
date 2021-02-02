@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.util.Log
-import android.widget.Toast
 import com.androidnetworking.AndroidNetworking
 import com.androidnetworking.error.ANError
 import com.androidnetworking.interfaces.JSONObjectRequestListener
@@ -15,7 +14,6 @@ import de.koenidv.sph.database.UsersDb
 import de.koenidv.sph.objects.User
 import org.json.JSONObject
 import java.util.*
-import java.util.regex.Pattern
 
 //  Created by koenidv on 31.01.2021.
 class Users {
@@ -150,20 +148,22 @@ class Users {
                 .getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
                 .getString("users_mail_template", "")!!
 
-        Toast.makeText(SphPlanner.applicationContext(), template, Toast.LENGTH_LONG).show()
-
         // Replace placholders with data for firstname: fname(n) for first n chars
-        template = Pattern.compile("""#fname\((\d)\)""")
-                .matcher(template)
-                .replaceAll(user.firstname.toString().take("$1".toInt()).toLowerCase(Locale.ROOT))
-                .replace("#firstname", user.firstname.toString().toLowerCase(Locale.ROOT))
-        // lastname: fname(n) for first n chars
-        template = Pattern.compile("""#lname\((\d)\)""")
-                .matcher(template)
-                .replaceAll(user.lastname.toString().take("$1".toInt()).toLowerCase(Locale.ROOT))
+        template = Regex("""#fname\((\d)\)""").replace(template, transform = { match ->
+            user.firstname.toString()
+                    .take(match.groupValues[1].toInt())
+                    .toLowerCase(Locale.ROOT)
+        })
+        // lastname: lname(n) for first n chars
+        template = Regex("""#lname\((\d)\)""").replace(template, transform = { match ->
+            user.lastname.toString()
+                    .take(match.groupValues[1].toInt())
+                    .toLowerCase(Locale.ROOT)
+        })
+        // Full names, abbreviation and id
+        template = template.replace("#firstname", user.firstname.toString().toLowerCase(Locale.ROOT))
                 .replace("#lastname", user.lastname.toString().toLowerCase(Locale.ROOT))
-        // Abbreviation and id
-        template = template.replace("#abbr", user.teacherId.toString().toLowerCase(Locale.ROOT))
+                .replace("#abbr", user.teacherId.toString().toLowerCase(Locale.ROOT))
                 .replace("#id", user.userId.replace("l-", ""))
 
         // Now start an intent to send an email to that address

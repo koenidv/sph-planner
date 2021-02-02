@@ -50,7 +50,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:checkable="true"
-                android:tag="#lname(1)"
+                android:tag="#lname(3)"
                 android:text="@string/email_template_chip_lname" />
 
             <com.google.android.material.chip.Chip

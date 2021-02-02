@@ -269,9 +269,10 @@
     <string name="email_template_hint">Die Adressvorlage deiner Schule</string>
     <string name="email_template_chip_fname">1 Buchstabe des Vornamens</string>
     <string name="email_template_chip_firstname">Vorname</string>
-    <string name="email_template_chip_lname">1 Buchstabe des Nachnamens</string>
+    <string name="email_template_chip_lname">3 Buchstaben des Nachnamens</string>
     <string name="email_template_chip_lastname">Nachname</string>
     <string name="email_template_chip_abbr">Kürzel</string>
     <string name="email_template_chip_id">Identifikator</string>
+    <string name="email_template_error">Ungültige Adressvorlage</string>
 
 </resources>
