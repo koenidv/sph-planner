@@ -277,7 +277,7 @@ class CourseOverviewFragment : Fragment() {
             PostsDb.getInstance().markAsRead(postsToShow[0].postId, postsToShow.getOrNull(1)?.postId)
 
             // Hide load more button if there are no further posts
-            if (posts.size == 2) {
+            if (posts.size <= 2) {
                 loadMorePostsButton.visibility = View.GONE
             }
         } else {

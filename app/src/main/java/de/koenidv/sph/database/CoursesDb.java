@@ -404,6 +404,16 @@ public class CoursesDb {
         return favorite;
     }
 
+    // Get a gmb id of any course, for analytics
+    public String getGmbIdExample() {
+        Cursor cursor = dbhelper.getReadableDatabase().rawQuery(
+                "SELECT gmb_id FROM courses LIMIT 1", null);
+        if (!cursor.moveToFirst()) return "nocourses";
+        String example = cursor.getString(0);
+        cursor.close();
+        return example;
+    }
+
 
     private Course cursorToCourse(Cursor cursor) {
         String CourseId = cursor.getString(0);
