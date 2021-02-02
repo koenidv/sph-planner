@@ -9,13 +9,16 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import de.koenidv.sph.MainActivity
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
+import de.koenidv.sph.database.CoursesDb
 import de.koenidv.sph.database.FunctionTilesDb
 import de.koenidv.sph.networking.NetworkManager
 import de.koenidv.sph.networking.TokenManager
@@ -198,7 +201,20 @@ class OnboardingSupportlistFragment : Fragment() {
                                     if (indexsuccess == NetworkManager.SUCCESS) {
                                         indexLoading.visibility = View.GONE
                                         nextFab.visibility = View.VISIBLE
+                                        // Mark onboarding complete
                                         prefs.edit().putBoolean("introComplete", true).apply()
+
+                                        val analytics = FirebaseAnalytics.getInstance(requireContext())
+                                        // Log school id GA as user property
+                                        analytics.setUserProperty(
+                                                "school",
+                                                prefs.getString("schoolid", "0")!!)
+                                        // Log an school course id example to GA
+                                        analytics.setUserProperty(
+                                                "courseIdExample",
+                                                CoursesDb.getInstance().gmbIdExample)
+                                        // Log conversion to GA
+                                        analytics.logEvent("onboarding_complete", bundleOf())
                                     } else {
                                         // Display error message
                                         indexLoading.visibility = View.GONE
