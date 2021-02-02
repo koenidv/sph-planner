@@ -13,10 +13,13 @@
 
         <ImageView
             android:id="@+id/infoImageView"
-            android:layout_width="match_parent"
-            android:layout_height="128dp"
+            android:layout_width="128dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:layout_margin="8dp"
+            android:adjustViewBounds="true"
             android:contentDescription="@string/imagedescr_info"
+            android:maxHeight="128dp"
             tools:srcCompat="@drawable/img_taskssync" />
 
         <TextView
@@ -24,8 +27,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
             android:textAlignment="center"
             android:textAppearance="@style/TextAppearance.AppCompat.Body1"
@@ -36,14 +39,15 @@
             android:id="@+id/doneButton"
             style="@style/Widget.MaterialComponents.FloatingActionButton"
             android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginBottom="8dp"
+            android:backgroundTint="?attr/colorPrimary"
             android:paddingEnd="48dp"
             android:paddingStart="48dp"
+            android:text="@string/understood"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Button"
-            android:textColor="?attr/colorPrimarySurface"
-            android:layout_height="wrap_content"
-            android:text="@string/understood" />
+            android:textColor="?attr/colorOnPrimarySurface" />
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

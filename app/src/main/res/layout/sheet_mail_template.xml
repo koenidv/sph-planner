@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="8dp">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/textInputLayout"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/templateEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/email_template_hint"
+                android:singleLine="true" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/presetsChipGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_fname"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checkable="true"
+                android:tag="#fname(1)"
+                android:text="@string/email_template_chip_fname" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_firstname"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checkable="true"
+                android:tag="#firstname"
+                android:text="@string/email_template_chip_firstname" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_lname"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checkable="true"
+                android:tag="#lname(1)"
+                android:text="@string/email_template_chip_lname" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_lastname"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checkable="true"
+                android:tag="#lastname"
+                android:text="@string/email_template_chip_lastname" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_abbr"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checkable="true"
+                android:tag="#abbr"
+                android:text="@string/email_template_chip_abbr" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_id"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checkable="true"
+                android:tag="#id"
+                android:text="@string/email_template_chip_id" />
+
+        </com.google.android.material.chip.ChipGroup>
+
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/doneButton"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/save" />
+
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

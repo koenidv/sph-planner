@@ -235,8 +235,8 @@
     <string name="tasks_due_setdate">Fälligkeitsdatum hinzufügen</string>
     <string name="tasks_share_template">Aufgabe für %course: %description</string>
     <string name="messages_unread_possible">✉️ Du könntest ungelesene Nachrichten haben</string>
-    <string name="users_title">Lehrer</string>
-    <string name="explore_collection_users">👥 Lehrer</string>
+    <string name="users_title">Lehrende</string>
+    <string name="explore_collection_users">👥 Lehrende</string>
     <string name="tasks_due_change">Fälligkeit ändern</string>
     <plurals name="tasks_personalized_title_count">
         <item quantity="one">Eine offene Aufgabe</item>
@@ -263,7 +263,15 @@
     <string name="index_status_posts">Alle Beiträge lesen…</string>
     <string name="index_status_changes">Ausschau nach Vertretungen halten…</string>
     <string name="index_status_messages">Deine Nachrichten zählen…</string>
-    <string name="index_status_users">Deine Lehrer finden…</string>
+    <string name="index_status_users">Deine Lehrkräfte finden…</string>
     <string name="index_status_holidays">Nach Ferien suchen…</string>
+    <string name="email_template_info">Einmal eingerichtet kannst du hier E-Mails an alle Lehrkräfte senden.\nBitte lege das Muster fest, nach welchem deine Schule E-Mail-Adressen vergibt.</string>
+    <string name="email_template_hint">Die Adressvorlage deiner Schule</string>
+    <string name="email_template_chip_fname">1 Buchstabe des Vornamens</string>
+    <string name="email_template_chip_firstname">Vorname</string>
+    <string name="email_template_chip_lname">1 Buchstabe des Nachnamens</string>
+    <string name="email_template_chip_lastname">Nachname</string>
+    <string name="email_template_chip_abbr">Kürzel</string>
+    <string name="email_template_chip_id">Identifikator</string>
 
 </resources>

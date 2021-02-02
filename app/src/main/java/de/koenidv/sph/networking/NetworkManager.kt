@@ -12,8 +12,6 @@ import com.androidnetworking.error.ANError
 import com.androidnetworking.interfaces.OkHttpResponseListener
 import com.androidnetworking.interfaces.StringRequestListener
 import com.google.firebase.crashlytics.FirebaseCrashlytics
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.remoteconfig.ktx.remoteConfig
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner.Companion.TAG
 import de.koenidv.sph.SphPlanner.Companion.applicationContext
@@ -135,22 +133,14 @@ class NetworkManager {
         TokenManager().generateAccessToken(forceNewToken) { success: Int, token: String? ->
             if (success == SUCCESS) {
 
-                if (Firebase.remoteConfig.getBoolean("token_fix_0130")) {
-                    CookieStore.clearCookies()
-                } else {
-                    // Setting sid cookie
-                    CookieStore.setToken(token!!)
-                }
+                // Setting sid cookie
+                CookieStore.setToken(token!!)
 
                 // Getting webpage
-                val request = AndroidNetworking.get(url)
-                        .setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.27 Safari/537.36")
+                AndroidNetworking.get(url)
+                        .setUserAgent("koenidv/sph-planner")
                         .setPriority(Priority.LOW)
-
-                if (Firebase.remoteConfig.getBoolean("token_fix_0130")) {
-                    request.addHeaders("Cookie", "sid=$token")
-                }
-                request.build()
+                        .build()
                         .getAsString(object : StringRequestListener {
                             override fun onResponse(response: String) {
                                 val prefs = applicationContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
@@ -338,23 +328,14 @@ class NetworkManager {
         TokenManager().generateAccessToken { success: Int, token: String? ->
             if (success == SUCCESS) {
 
-                if (Firebase.remoteConfig.getBoolean("token_fix_0130")) {
-                    CookieStore.clearCookies()
-                } else {
-                    // Make sure session id cookie is set
-                    CookieStore.setToken(token!!)
-                }
+                // Make sure session id cookie is set
+                CookieStore.setToken(token!!)
 
                 // Getting webpage as OkHttp
-                val request = AndroidNetworking.get(url)
-                        .setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.27 Safari/537.36")
+                AndroidNetworking.get(url)
+                        .setUserAgent("koenidv/sph-planner")
                         .setPriority(Priority.LOW)
-
-                if (Firebase.remoteConfig.getBoolean("token_fix_0130")) {
-                    request.addHeaders("Cookie", "sid=$token")
-                }
-
-                request.build()
+                        .build()
                         .getAsOkHttpResponse(object : OkHttpResponseListener {
                             override fun onResponse(response: Response) {
                                 // In some cases, sph redirects back to the home page (why?)

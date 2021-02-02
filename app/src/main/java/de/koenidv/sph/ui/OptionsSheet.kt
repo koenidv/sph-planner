@@ -44,6 +44,8 @@ class OptionsSheet internal constructor() : BottomSheetDialogFragment() {
                             // Clear SharedPrefs
                             // todo check if we still need something
                             prefs.edit().clear().apply()
+                            // Clear cookies (especcially sid token)
+                            de.koenidv.sph.networking.CookieStore.clearCookies()
                             // todo Delete database
                             // requireContext().deleteDatabase("database")
                             DatabaseHelper.newInstance()

@@ -8,8 +8,6 @@ import com.androidnetworking.AndroidNetworking
 import com.androidnetworking.error.ANError
 import com.androidnetworking.interfaces.StringRequestListener
 import com.google.android.material.snackbar.Snackbar
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.remoteconfig.ktx.remoteConfig
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.database.CoursesDb
@@ -83,28 +81,18 @@ class Tasks {
         TokenManager().generateAccessToken { success: Int, token: String? ->
             if (success == NetworkManager.SUCCESS) {
 
-                if (Firebase.remoteConfig.getBoolean("token_fix_0130")) {
-                    CookieStore.clearCookies()
-                } else {
-                    // Make sure session id cookie is set
-                    CookieStore.setToken(token!!)
-                }
+                // Make sure session id cookie is set
+                CookieStore.setToken(token!!)
 
                 // Send a post request to let sph know the task is done
-                val request = AndroidNetworking.post(
-                        SphPlanner.applicationContext().getString(R.string.url_mycourses)
-                )
+                AndroidNetworking.post(
+                        SphPlanner.applicationContext().getString(R.string.url_mycourses))
                         .addBodyParameter("a", "sus_homeworkDone")
                         .addBodyParameter("id", numberId)
                         .addBodyParameter("entry", task.id_post.substring(task.id_post.lastIndexOf("_") + 1))
                         .addBodyParameter("b", if (isDone) "done" else "undone")
                         .setTag(task.taskId)
-
-                if (Firebase.remoteConfig.getBoolean("token_fix_0130")) {
-                    request.addHeaders("Cookie", "sid=$token")
-                }
-
-                request.build()
+                        .build()
                         .getAsString(object : StringRequestListener {
                             override fun onResponse(response: String) {
                                 if (response == "1")
