@@ -18,6 +18,7 @@ import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.database.FunctionTilesDb
 import de.koenidv.sph.networking.NetworkManager
+import de.koenidv.sph.networking.TokenManager
 import de.koenidv.sph.parsing.RawParser
 
 class OnboardingSupportlistFragment : Fragment() {
@@ -210,6 +211,8 @@ class OnboardingSupportlistFragment : Fragment() {
                                         warningText.visibility = View.VISIBLE
                                         warningText.setTextColor(requireContext().getColor(R.color.colorAccent))
                                         warningText.setOnClickListener {
+                                            // Clear session id
+                                            TokenManager().reset()
                                             // Recreate to try again
                                             requireActivity().recreate()
                                         }
@@ -220,7 +223,8 @@ class OnboardingSupportlistFragment : Fragment() {
                                                 action = Intent.ACTION_SEND
                                                 putExtra(Intent.EXTRA_TEXT,
                                                         indexsuccess.toString()
-                                                                + "\n--- Server Response ---"
+                                                                + "@" + statusText.text
+                                                                + "\n--- Server Response ---\n"
                                                                 + response)
                                                 this.type = "text/plain"
                                             }

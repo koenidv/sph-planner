@@ -78,11 +78,8 @@ class Tasks {
         // Cancel potential pending requests for this same task, just to be sure
         AndroidNetworking.cancel(task.taskId)
         // We need an access token first
-        TokenManager().generateAccessToken { success: Int, token: String? ->
+        TokenManager().authenticate { success: Int, token: String? ->
             if (success == NetworkManager.SUCCESS) {
-
-                // Make sure session id cookie is set
-                CookieStore.setToken(token!!)
 
                 // Send a post request to let sph know the task is done
                 AndroidNetworking.post(

@@ -281,16 +281,18 @@
     <!-- Contact -->
     <string name="contact_telegram_icon" translatable="false">paper-plane</string>
     <string name="contact_telegram_text">Telegram</string>
+    <string name="contact_telegram_data" translatable="false">https://t.me/koenidv</string>
     <string name="contact_instagram_icon" translatable="false">comment</string>
     <string name="contact_instagram_text">Instagram</string>
+    <string name="contact_instagram_data" translatable="false">https://instagram.com/halbunsichtbar</string>
     <string name="contact_github_icon" translatable="false">code-branch</string>
     <string name="contact_github_text">GitHub</string>
+    <string name="contact_github_data" translatable="false">https://github.com/koenidv/sph-planner/issues/new</string>
     <string name="contact_mail_icon" translatable="false">envelope</string>
     <string name="contact_mail_text">Email</string>
-
-    <!-- Feedback -->
+    <string name="contact_mail_data" translatable="false">sph#atkoenidv.de</string>
     <string name="feedback_subject" translatable="false">[SPHplanner] Feedback</string>
-    <string name="feedback_body" translatable="false">\n\nApp version: %app\nAndroid version: %android</string>
+    <string name="feedback_body" translatable="false">\n\nApp: v%app\nSDK: v%android\n School: %school</string>
 
     <!-- In-App updates -->
     <string name="update_downloaded">Update available</string>

@@ -31,16 +31,13 @@ class Messages {
          */
 
         // Firstly, get an access token
-        TokenManager().generateAccessToken { success, token ->
+        TokenManager().authenticate { success, token ->
             // If getting a token failed, call onComplete
             // with the error and return
             if (success != NetworkManager.SUCCESS) {
                 callback(success)
-                return@generateAccessToken
+                return@authenticate
             }
-
-            // Make sure session id cookie is set
-            CookieStore.setToken(token!!)
 
             // Now post messages.php with a few parameters
             // a=headers - Titles only (read for entire message)
@@ -50,6 +47,10 @@ class Messages {
                     .addBodyParameter("a", "headers")
                     .addBodyParameter("getType", "visibleOnly")
                     .addBodyParameter("last", "0")
+                    .addHeaders(mapOf(
+                            "X-Requested-With" to "XMLHttpRequest",
+                            "Comment" to "Contact us at sph@koenidv.de"
+                    ))
                     .setUserAgent("koenidv/sph-planner")
                     .build()
                     .getAsString(object : StringRequestListener {
@@ -74,7 +75,7 @@ class Messages {
                                 // Still continue with a success,
                                 // sph's messages page is just too unreliable
                                 // and this data not critical
-                                callback(NetworkManager.SUCCESS)
+                                callback(NetworkManager.FAILED_UNKNOWN)
                                 return
                             }
 

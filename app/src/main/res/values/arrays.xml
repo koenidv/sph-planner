@@ -8,8 +8,11 @@
         <item>Mein Unterricht|mycourses</item>
         <item>Nachrichten|messages</item>
         <item>Stundenplan|timetable</item>
+        <item>Stundenpläne|timetable</item>
+        <item>Schülerstundenplan|timetable</item>
         <item>Testphase Vertretungsplan|changes</item>
         <item>Vertretungsplan|changes</item>
+        <item>Vertretungspläne|changes</item>
         <item>Lerngruppen|studygroups</item>
     </string-array>
     <string-array name="course_colors">
