@@ -105,16 +105,20 @@ class TokenManager {
             // Login not successful
             onComplete(NetworkManager.FAILED_INVALID_CREDENTIALS, null)
             prefs.edit().putLong("token_last_success", 0).apply()
+            Log.e(TAG, "Login failed; Invalid credentials")
         } else if (response.contains("Wartungsarbeiten")) {
             // Cannot login at the moment
             onComplete(NetworkManager.FAILED_MAINTENANCE, null)
+            Log.d(TAG, "Login failed; Maintenance")
         } else if (response.contains("Login failed!")
-                || response.contains("nonce is empty")) {
+                || response.contains("nonce is empty")
+                || response.contains("Aktuell ist leider kein Zugriff möglich. " +
+                        "Bitte versuchen Sie es später erneut.")) {
             onComplete(NetworkManager.FAILED_SERVER_ERROR, null)
-            Log.d(TAG, "Login failed :/")
+            Log.d(TAG, "Login failed; Server error")
         } else {
             onComplete(NetworkManager.FAILED_UNKNOWN, null)
-            Log.d(TAG, "Login failed; Reason unknown!")
+            Log.e(TAG, "Login failed; Reason unknown!")
             Log.d(TAG, response)
         }
     }

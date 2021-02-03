@@ -109,7 +109,7 @@ class AttachmentManager {
                     delete?.visibility = GONE
                 } else {
                     // Check if file exists
-                    if (File(applicationContext().filesDir.toString() + "/" + attachment.file().localPath()).exists())
+                    if (File(attachment.file().localPath()).exists())
                         download?.visibility = GONE
                     else delete?.visibility = GONE
                 }
@@ -179,7 +179,7 @@ class AttachmentManager {
                 // Remove from device option
                 delete?.setOnClickListener {
                     // File to remove
-                    val file = File(applicationContext().filesDir.toString() + "/" + attachment.file().localPath())
+                    val file = File(attachment.file().localPath())
                     // Try to delete file
                     if (file.delete())
                         doneSnackbar.setText(R.string.attachments_options_delete_complete)
@@ -253,7 +253,7 @@ class AttachmentManager {
                     if (type == "file") {
                         // Share file
                         // If file exists, share, else download and share
-                        if (File(applicationContext().filesDir.toString() + "/" + attachment.file().localPath()).exists()) {
+                        if (File(attachment.file().localPath()).exists()) {
                             shareAttachmentFile(attachment.file(), activity)
                             sheet.dismiss()
                         } else {
@@ -385,7 +385,7 @@ class AttachmentManager {
      */
     private fun handleFileAttachment(attachment: FileAttachment, onComplete: (success: Int) -> Unit) {
         // Check if file already exists
-        val file = File(applicationContext().filesDir.toString() + "/" + attachment.localPath())
+        val file = File(attachment.localPath())
 
         if (!file.exists()) {
             // Download file, then open it
@@ -422,7 +422,7 @@ class AttachmentManager {
                 AndroidNetworking.initialize(applicationContext(), okHttpClient)
 
                 // Download attachment
-                AndroidNetworking.download(file.url, applicationContext().filesDir.toString(), file.localPath())
+                AndroidNetworking.download(file.url, file.localDirectory(), file.localFileName())
                         .setPriority(Priority.HIGH)
                         .setTag(file.attachmentId)
                         // There's no real need to cache the downloaded file
@@ -447,12 +447,12 @@ class AttachmentManager {
                                     // error.getErrorCode() - the ANError code from server
                                     // error.getErrorBody() - the ANError body from server
                                     // error.getErrorDetail() - just an ANError detail
-                                    Log.d(TAG, "onError errorCode : " + error.errorCode)
-                                    Log.d(TAG, "onError errorBody : " + error.errorBody)
-                                    Log.d(TAG, "onError errorDetail : " + error.errorDetail)
+                                    Log.d(TAG, "downloadFile@AttachM errorCode : " + error.errorCode)
+                                    Log.d(TAG, "downloadFile@AttachM errorBody : " + error.errorBody)
+                                    Log.d(TAG, "downloadFile@AttachM errorDetail : " + error.errorDetail)
                                 } else {
                                     // error.getErrorDetail() : connectionError, parseError, requestCancelledError
-                                    Log.d(TAG, "onError errorDetail : " + error.errorDetail)
+                                    Log.d(TAG, "downloadFile@AttachM errorDetail : " + error.errorDetail)
                                 }
                             }
                         })
@@ -466,7 +466,7 @@ class AttachmentManager {
      * Open a file included in a postAttachment
      */
     private fun openAttachmentFile(attachment: FileAttachment) {
-        val fileToOpen = File(applicationContext().filesDir.toString() + "/" + attachment.localPath())
+        val fileToOpen = File(attachment.localPath())
         val path = FileProvider.getUriForFile(applicationContext(), applicationContext().packageName + ".provider", fileToOpen)
 
         val fileIntent = Intent(Intent.ACTION_VIEW)
@@ -491,7 +491,7 @@ class AttachmentManager {
      */
     private fun shareAttachmentFile(attachment: FileAttachment, activity: Activity) {
         // Get a uri to the file
-        val fileToShare = File(applicationContext().filesDir.toString() + "/" + attachment.localPath())
+        val fileToShare = File(attachment.localPath())
         val uri = FileProvider.getUriForFile(applicationContext(), applicationContext().packageName + ".provider", fileToShare)
         // Check if the file actually exists
         if (fileToShare.exists()) {
