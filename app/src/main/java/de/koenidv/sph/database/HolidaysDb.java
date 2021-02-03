@@ -33,12 +33,24 @@ public class HolidaysDb {
 
     /**
      * get list of future holidays
+     *
      * @return List<Holiday>
      */
     public List<Holiday> getFuture() {
         return getFromCursor(writable.rawQuery(
                 "SELECT * FROM holidays WHERE start > " + new Date().getTime() / 1000,
                 null));
+    }
+
+    /**
+     * Get the next holiday entry
+     */
+    public Holiday getNext() {
+        List<Holiday> nextHoliday = getFromCursor(writable.rawQuery(
+                "SELECT * FROM holidays WHERE start > " + new Date().getTime() / 1000
+                        + " LIMIT 1", null));
+        if (nextHoliday.isEmpty()) return null;
+        else return nextHoliday.get(0);
     }
 
     /**

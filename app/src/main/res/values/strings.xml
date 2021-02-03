@@ -71,7 +71,7 @@
     <string name="onboard_signin_error_server">A server error occurred.\nPlease try again in a few minutes.</string>
     <string name="onboard_signin_error_unknown">Something went wrong.\nPlease try again.</string>
     <string name="onboard_supported_schooltested">✔ We tested the app with your school and it should work.</string>
-    <string name="onboard_supported_features_full">"✔ Your school supports all the features we need, but we didn't test it yet.\nPlease contact us via the options menu!"</string>
+    <string name="onboard_supported_features_full">"✔ Your school supports all the features we need, but we didn't test it yet.\nPlease contact us if you encounter any issues!"</string>
     <string name="onboard_supported_features_partly_manual">✔ Your school supports some of the features we need, but you will need to enter some data manually.</string>
     <string name="onboard_supported_features_partly_hidden">✔ Your school supports some of the features we need.</string>
     <string name="onboard_supported_features_partly_not">❌ Your school does not support all the features we need. Please get in touch to see how you can help us support your school!</string><!--todo link to contact-->
@@ -221,6 +221,7 @@
     <string name="changes_type_short_switched">switch</string>
     <string name="changes_type_short_exam">exam</string>
     <string name="changes_type_short_other">change</string>
+    <string name="changes_holidays_description">Only %d days left!</string>
 
     <!-- Messages and Users-->
     <string name="messages_unread_possible">✉️ You might have unread messages</string>

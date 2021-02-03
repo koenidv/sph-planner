@@ -20,7 +20,9 @@ import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.adapters.ChangesAdapter
 import de.koenidv.sph.database.ChangesDb
+import de.koenidv.sph.database.HolidaysDb
 import de.koenidv.sph.objects.Change
+import java.util.*
 
 
 // Created by koenidv on 18.12.2020.
@@ -38,12 +40,8 @@ class ChangesFragment : Fragment() {
             // Only do something if changes were updated
             if (intent.getStringExtra("content") == "changes") {
                 if (displayed && ::changes.isInitialized) {
-                    // Get changes
-                    changes.clear()
-                    changes.addAll(if (favorites) ChangesDb.instance!!.getFavorites().toMutableList()
-                    else ChangesDb.instance!!.getAllCurrent().toMutableList())
-                    noDataText.visibility = if (changes.isEmpty()) View.VISIBLE
-                    else View.GONE
+                    // Update with new changes
+                    setDataset()
                     // Notify recyclerview
                     changesRecycler.adapter?.notifyDataSetChanged()
                 } else {
@@ -66,6 +64,40 @@ class ChangesFragment : Fragment() {
                 IntentFilter("uichange"))
     }
 
+    fun setDataset() {
+        // Get changes
+        if (::changes.isInitialized) {
+            changes.clear()
+        } else {
+            changes = mutableListOf()
+        }
+        // Add favorite or all changes to the list
+        changes.addAll(if (favorites) ChangesDb.instance!!.getFavorites()
+        else ChangesDb.instance!!.getAllCurrent())
+
+        // Add the next holiday
+        val nextHoliday = HolidaysDb().next
+        if (nextHoliday != null) {
+            // Get the number of days left until this holiday
+            val daysLeft = (nextHoliday.start.time - Date().time) / (86400 * 1000)
+            // Only display if the next holiday is within 6 weeks / 42 days
+            if (daysLeft <= 42) {
+                changes.add(Change(
+                        date = nextHoliday.start,
+                        lessons = emptyList(),
+                        type = Change.TYPE_HOLIDAYS,
+                        className = nextHoliday.name.capitalize(Locale.getDefault()) +
+                                " " + nextHoliday.year,
+                        description = getString(R.string.changes_holidays_description, daysLeft)
+                ))
+            }
+        }
+
+        // If no changes are to be displayed, show a text explaining that
+        noDataText.visibility = if (changes.isEmpty()) View.VISIBLE
+        else View.GONE
+    }
+
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
@@ -74,15 +106,6 @@ class ChangesFragment : Fragment() {
         noDataText = view.findViewById<TextView>(R.id.noDataTextView)
         changesRecycler = view.findViewById(R.id.changesRecycler)
         val favoritesSwitch = view.findViewById<SwitchMaterial>(R.id.favoritesSwitch)
-
-        // Firstly, check if there are any changes to be displayed
-        if (!ChangesDb.instance!!.existAny()) {
-            noDataText.visibility = View.VISIBLE
-            favoritesSwitch.visibility = View.GONE
-            changesRecycler.visibility = View.GONE
-            displayed = false
-            return view
-        }
 
         // Set open in browser url
         SphPlanner.openInBrowserUrl = getString(R.string.url_changes)
@@ -96,10 +119,15 @@ class ChangesFragment : Fragment() {
         favoritesSwitch.isChecked = favorites
 
         // Get changes
-        changes = if (favorites) ChangesDb.instance!!.getFavorites().toMutableList()
-        else ChangesDb.instance!!.getAllCurrent().toMutableList()
-        noDataText.visibility = if (changes.isEmpty()) View.VISIBLE
-        else View.GONE
+        setDataset()
+
+        // Check if there are any changes to be displayed
+        // If no changes should be displayed, also hide switch
+        if (changes.isEmpty()) {
+            favoritesSwitch.visibility = View.GONE
+            displayed = false
+            return view
+        }
 
         // Set up changes recycler
         val adapter = ChangesAdapter(changes) { courseId: String ->
@@ -113,11 +141,7 @@ class ChangesFragment : Fragment() {
         favoritesSwitch.setOnCheckedChangeListener { _: CompoundButton, checked: Boolean ->
             favorites = checked
             // Update data
-            changes.clear()
-            changes.addAll(if (favorites) ChangesDb.instance!!.getFavorites()
-            else ChangesDb.instance!!.getAllCurrent())
-            noDataText.visibility = if (changes.isEmpty()) View.VISIBLE
-            else View.GONE
+            setDataset()
             // Notify recyclerview
             // Should do this with notifyItemRemoved/Inserted..
             changesRecycler.adapter?.notifyDataSetChanged()
