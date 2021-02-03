@@ -19,6 +19,7 @@ object ChangeInfo {
         Change.TYPE_ROOM -> applicationContext().getColor(R.color.change_type_room)
         Change.TYPE_SWITCHED -> applicationContext().getColor(R.color.change_type_switched)
         Change.TYPE_EXAM -> applicationContext().getColor(R.color.change_type_exam)
+        Change.TYPE_HOLIDAYS -> applicationContext().getColor(R.color.change_type_holidays)
         else -> applicationContext().getColor(R.color.change_type_other)
     }
 

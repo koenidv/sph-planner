@@ -39,6 +39,7 @@ class ChangesAdapter(private val changes: List<Change>,
 
         private var currentChange: Change? = null
         private val otherDateFormat = SimpleDateFormat("EEEE", Locale.getDefault())
+        private val futureDateFormat = SimpleDateFormat("dd.MM.", Locale.getDefault())
 
         init {
             courseLayout.setOnClickListener {
@@ -73,30 +74,53 @@ class ChangesAdapter(private val changes: List<Change>,
                     .replace("%room", change.room ?: "?")
                     .replace("%nameOld", change.id_course_external_before ?: "?")
 
-            titletext = if (isFavorite == true) {
-                titletext.replace("%name",
-                        CoursesDb.getInstance().getFullname(change.id_course) ?: "?")
-            } else {
-                titletext.replace("%name",
-                        CourseInfo.getFullnameFromInternald(change.id_course ?: "?")
-                                + if (change.id_teacher != null) " (${change.id_teacher!!.capitalize(Locale.getDefault())})" else "")
+            titletext = when {
+                isFavorite == true -> {
+                    // Favorite courses: Use course name
+                    titletext.replace("%name",
+                            CoursesDb.getInstance().getFullname(change.id_course) ?: "?")
+                }
+                change.type == Change.TYPE_HOLIDAYS -> {
+                    // Special holidays type: Use provided classname with holiday description
+                    change.className ?: "Holidays"
+                }
+                else -> {
+                    // Non-favorite courses: Use course name and teacher id
+                    titletext.replace("%name",
+                            CourseInfo.getFullnameFromInternald(change.id_course ?: "?")
+                                    + if (change.id_teacher != null) " (${change.id_teacher!!.capitalize(Locale.getDefault())})" else "")
+                }
             }
 
             title.text = titletext
 
             // Set lessons
             @SuppressLint("SetTextI18n")
-            if (change.lessons.size == 1)
-                lessons.text = change.lessons[0].toString()
-            else
-                lessons.text = "${change.lessons[0]} - ${change.lessons[change.lessons.size - 1]}"
+            when {
+                change.lessons.size == 1 -> {
+                    lessons.text = change.lessons[0].toString()
+                    lessons.visibility = View.VISIBLE
+                }
+                change.lessons.isNotEmpty() -> {
+                    lessons.text = "${change.lessons[0]} - ${change.lessons[change.lessons.size - 1]}"
+                    lessons.visibility = View.VISIBLE
+                }
+                else -> {
+                    lessons.visibility = View.GONE
+                }
+            }
 
             // Set description
             if (change.description != null) {
                 description.visibility = View.VISIBLE
-                description.text = if (isFavorite || change.id_course_external == null) change.description
-                else "${change.id_course_external!!.toUpperCase(Locale.getDefault())}: ${change.description}"
-            } else description.visibility = View.GONE
+                description.text = if (isFavorite == true || change.id_course_external == null) {
+                    change.description
+                } else {
+                    "${change.id_course_external!!.toUpperCase(Locale.getDefault())}: ${change.description}"
+                }
+            } else {
+                description.visibility = View.GONE
+            }
 
             // Set date
             if (change.date.time != currentDate) {
@@ -112,15 +136,19 @@ class ChangesAdapter(private val changes: List<Change>,
                     change.date.time - time <= 24 * 60 * 60 * 1000 ->
                         // Tomorrow
                         applicationContext().getString(R.string.changes_date_tomorrow)
-                    else -> otherDateFormat.format(change.date)
+                    change.date.time - time <= 7 * 86400 * 1000 ->
+                        // Next week
+                        otherDateFormat.format(change.date)
+                    else -> futureDateFormat.format(change.date)
                 }
             } else {
                 date.visibility = View.GONE
             }
 
             // Set course
-            if (isFavorite != true || change.id_course == null) courseLayout.visibility = View.GONE
-            else {
+            if (isFavorite != true || change.id_course == null) {
+                courseLayout.visibility = View.GONE
+            } else {
                 courseLayout.visibility = View.VISIBLE
                 course.text = CoursesDb.getInstance().getFullname(change.id_course)
                 // Adjust course background color

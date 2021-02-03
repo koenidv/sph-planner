@@ -397,6 +397,7 @@ public class CoursesDb {
      * @return null if the course is not in the db, true/false if it's favorite or not
      */
     public Boolean isFavorite(String internalId) {
+        if (internalId == null) return null;
         Cursor cursor = dbhelper.getReadableDatabase().rawQuery("SELECT isFavorite FROM courses WHERE course_id=\"" + internalId.toLowerCase() + "\"", null);
         if (!cursor.moveToFirst()) return null;
         boolean favorite = cursor.getInt(0) == 1;

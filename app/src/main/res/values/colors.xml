@@ -56,5 +56,6 @@
     <color name="change_type_room">#59abe3</color>
     <color name="change_type_exam">#e45da9</color>
     <color name="change_type_other">#47e6ab</color>
+    <color name="change_type_holidays">#aeaeae</color>
 
 </resources>

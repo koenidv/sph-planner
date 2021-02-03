@@ -26,14 +26,18 @@ data class Change(
 ) {
 
     init {
-        sortLesson =
-                if (lessons.size == 1) lessons[0].toDouble()
-                else (lessons[0] + 0.01 * lessons[lessons.size - 1])
+        if (lessons.isNotEmpty()) {
+            sortLesson =
+                    if (lessons.size == 1) lessons[0].toDouble()
+                    else (lessons[0] + 0.01 * lessons[lessons.size - 1])
+        }
+        // Remove cancelled from description, its a duplicate in sphs
         if (description == "Entfällt" || description == "Entfällt; Verlegung auf Entfall für Lehrer")
             description = null
     }
 
     companion object {
+        const val TYPE_HOLIDAYS = -2
         const val TYPE_OTHER = -1
         const val TYPE_EVA = 0
         const val TYPE_CANCELLED = 1
