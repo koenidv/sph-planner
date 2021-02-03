@@ -11,6 +11,7 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.os.bundleOf
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import com.androidnetworking.AndroidNetworking
@@ -19,6 +20,7 @@ import com.androidnetworking.error.ANError
 import com.androidnetworking.interfaces.StringRequestListener
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.google.android.material.textfield.TextInputLayout
+import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.toptoche.searchablespinnerlibrary.SearchableSpinner
 import de.koenidv.sph.R
@@ -191,6 +193,14 @@ class OnboardingSigninFragment : Fragment() {
                             // Mark school id in crashlytics, for more effective debugging
                             FirebaseCrashlytics.getInstance().setCustomKey(
                                     "school_id", prefs.getString("schoolid", "0")!!)
+
+                            val analytics = FirebaseAnalytics.getInstance(requireContext())
+                            // Log school id GA as user property
+                            analytics.setUserProperty(
+                                    "school",
+                                    prefs.getString("schoolid", "0")!!)
+                            // Log conversion to GA
+                            analytics.logEvent("login_complete", bundleOf())
 
                             // Move to next onboarding fragment
                             val ft = parentFragmentManager.beginTransaction()

@@ -181,7 +181,7 @@
     <string name="attachments_pins_none">Your pinned attachments will show up here</string>
     <string name="attachments_title">Files &amp; Links</string>
     <string name="attachments_namereplace_picture">Picture</string>
-    <string name="attachments_downloading_size">Downlaoding %s</string>
+    <string name="attachments_downloading_size">Downloading %s</string>
     <string name="attachments_options_open">Open</string>
     <string name="attachments_options_download">Download</string>
     <string name="attachments_options_download_complete">Download complete</string>

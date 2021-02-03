@@ -205,10 +205,6 @@ class OnboardingSupportlistFragment : Fragment() {
                                         prefs.edit().putBoolean("introComplete", true).apply()
 
                                         val analytics = FirebaseAnalytics.getInstance(requireContext())
-                                        // Log school id GA as user property
-                                        analytics.setUserProperty(
-                                                "school",
-                                                prefs.getString("schoolid", "0")!!)
                                         // Log an school course id example to GA
                                         analytics.setUserProperty(
                                                 "courseIdExample",

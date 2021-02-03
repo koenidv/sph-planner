@@ -1,5 +1,6 @@
 package de.koenidv.sph.objects
 
+import de.koenidv.sph.SphPlanner
 import java.util.*
 
 //  Created by koenidv on 07.12.2020.
@@ -16,5 +17,7 @@ data class FileAttachment(
         var pinned: Boolean, // Whether the file is pinned by user
         var lastUse: Date? // Last usage of this file
 ) {
-    fun localPath() = "${attachmentId}.${fileType}"
+    fun localDirectory() = SphPlanner.applicationContext().filesDir.toString() + "/attachments/"
+    fun localFileName() = "${attachmentId}.${fileType}"
+    fun localPath() = localDirectory() + localFileName()
 }

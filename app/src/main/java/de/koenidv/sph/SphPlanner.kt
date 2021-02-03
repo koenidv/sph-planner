@@ -5,8 +5,10 @@ import android.content.Context
 import com.androidnetworking.AndroidNetworking
 import com.facebook.stetho.Stetho
 import com.facebook.stetho.okhttp3.StethoInterceptor
+import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.remoteconfig.ktx.remoteConfig
+import de.koenidv.sph.database.CoursesDb
 import de.koenidv.sph.networking.CookieStore
 import okhttp3.OkHttpClient
 
@@ -50,6 +52,39 @@ class SphPlanner : Application() {
                 /*.connectTimeout(60, TimeUnit.SECONDS)*/ // sph timeout is 30 seconds
                 .build()
         AndroidNetworking.initialize(applicationContext(), okHttpClient)
+
+        // Upgrade from previous version
+        val prefs = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
+        // Upgrade to 120 if user is signed in
+        if (prefs.getBoolean("introComplete", false) &&
+                prefs.getInt("appVersion", 0) < 121) {
+
+            // Set new analytics properties
+            val analytics = FirebaseAnalytics.getInstance(this)
+            // Log school id GA as user property
+            analytics.setUserProperty(
+                    "school",
+                    prefs.getString("schoolid", "0")!!)
+            // Log an school course id example to GA
+            analytics.setUserProperty(
+                    "courseIdExample",
+                    CoursesDb.getInstance().gmbIdExample)
+
+            // Attachments were moved to files/attachments/
+            // Delete all attachments in the old directory, but keep Firebase files
+            val files = filesDir.listFiles()
+            if (files != null) {
+                for (f in files) {
+                    if (!f.name.startsWith("generate") &&
+                            !f.name.startsWith("Persisted") &&
+                            !f.name.startsWith("frc")) {
+                        f.delete()
+                    }
+                }
+            }
+
+            prefs.edit().putInt("appVersion", 120).apply()
+        }
     }
 
 
