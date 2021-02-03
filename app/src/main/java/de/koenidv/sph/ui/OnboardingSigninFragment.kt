@@ -179,62 +179,60 @@ class OnboardingSigninFragment : Fragment() {
                 // Check if credentials are valid
                 // We'll only get a token if login was successfull
                 TokenManager().authenticate(true) { success: Int, token: String? ->
-                    run {
-                        if (success == NetworkManager.SUCCESS && token != null && token != "") {
-                            // User signed in successfully - NOW DO SOMETHING WITH IT :)
-                            prefs.edit().putBoolean("credsVerified", true).apply()
+                    if (success == NetworkManager.SUCCESS && token != null && token != "") {
+                        // User signed in successfully - NOW DO SOMETHING WITH IT :)
+                        prefs.edit().putBoolean("credsVerified", true).apply()
 
-                            // If this is a teacher account, meaning no "." in the user name,
-                            // remember this. Might be the cause of some future issues.
-                            if (!userText.text.contains(".")) {
-                                // Mark teacher account for Crashlytics
-                                FirebaseCrashlytics.getInstance().setCustomKey("is_teacher", true)
-                            }
-                            // Mark school id in crashlytics, for more effective debugging
-                            FirebaseCrashlytics.getInstance().setCustomKey(
-                                    "school_id", prefs.getString("schoolid", "0")!!)
+                        // If this is a teacher account, meaning no "." in the user name,
+                        // remember this. Might be the cause of some future issues.
+                        if (!userText.text.contains(".")) {
+                            // Mark teacher account for Crashlytics
+                            FirebaseCrashlytics.getInstance().setCustomKey("is_teacher", true)
+                        }
+                        // Mark school id in crashlytics, for more effective debugging
+                        FirebaseCrashlytics.getInstance().setCustomKey(
+                                "school_id", prefs.getString("schoolid", "0")!!)
 
-                            val analytics = FirebaseAnalytics.getInstance(requireContext())
-                            // Log school id GA as user property
-                            analytics.setUserProperty(
-                                    "school",
-                                    prefs.getString("schoolid", "0")!!)
-                            // Log conversion to GA
-                            analytics.logEvent("login_complete", bundleOf())
+                        val analytics = FirebaseAnalytics.getInstance(requireContext())
+                        // Log school id GA as user property
+                        analytics.setUserProperty(
+                                "school",
+                                prefs.getString("schoolid", "0")!!)
+                        // Log conversion to GA
+                        analytics.logEvent("login_complete", bundleOf())
 
-                            // Move to next onboarding fragment
-                            val ft = parentFragmentManager.beginTransaction()
-                            ft.replace(R.id.fragment, OnboardingSupportlistFragment()).commit()
+                        // Move to next onboarding fragment
+                        val ft = parentFragmentManager.beginTransaction()
+                        ft.replace(R.id.fragment, OnboardingSupportlistFragment()).commit()
+                    } else {
+                        // Sign in failed, reshow ui
+                        loadicon.visibility = View.GONE
+                        title.visibility = View.VISIBLE
+                        description.visibility = View.VISIBLE
+                        schoolid.visibility = View.VISIBLE
+                        textlayout1.visibility = View.VISIBLE
+                        textlayout2.visibility = View.VISIBLE
+                        signinButton.visibility = View.VISIBLE
+
+                        // Show an error message
+                        description.setTextColor(requireContext().getColor(R.color.colorAccent))
+                        description.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f)
+                        if (success == NetworkManager.FAILED_INVALID_CREDENTIALS) {
+                            // Incorrect user/password
+                            description.text = getString(R.string.onboard_signin_error_credentials)
+                        } else if (success == NetworkManager.FAILED_NO_NETWORK
+                                || success == NetworkManager.FAILED_CANCELLED) {
+                            // No connectivity, request timed out or got cancelled
+                            description.text = getString(R.string.onboard_signin_error_network)
+                        } else if (success == NetworkManager.FAILED_MAINTENANCE) {
+                            // sph is under maintenance
+                            description.text = getString(R.string.onboard_signin_error_maintenance)
+                        } else if (success == NetworkManager.FAILED_SERVER_ERROR) {
+                            // An server error occurred
+                            description.text = getString(R.string.onboard_signin_error_server)
                         } else {
-                            // Sign in failed, reshow ui
-                            loadicon.visibility = View.GONE
-                            title.visibility = View.VISIBLE
-                            description.visibility = View.VISIBLE
-                            schoolid.visibility = View.VISIBLE
-                            textlayout1.visibility = View.VISIBLE
-                            textlayout2.visibility = View.VISIBLE
-                            signinButton.visibility = View.VISIBLE
-
-                            // Show an error message
-                            description.setTextColor(requireContext().getColor(R.color.colorAccent))
-                            description.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f)
-                            if (success == NetworkManager.FAILED_INVALID_CREDENTIALS) {
-                                // Incorrect user/password
-                                description.text = getString(R.string.onboard_signin_error_credentials)
-                            } else if (success == NetworkManager.FAILED_NO_NETWORK
-                                    || success == NetworkManager.FAILED_CANCELLED) {
-                                // No connectivity, request timed out or got cancelled
-                                description.text = getString(R.string.onboard_signin_error_network)
-                            } else if (success == NetworkManager.FAILED_MAINTENANCE) {
-                                // sph is under maintenance
-                                description.text = getString(R.string.onboard_signin_error_maintenance)
-                            } else if (success == NetworkManager.FAILED_SERVER_ERROR) {
-                                // An server error occurred
-                                description.text = getString(R.string.onboard_signin_error_server)
-                            } else {
-                                // Some other error occurred
-                                description.text = getString(R.string.onboard_signin_error_unknown)
-                            }
+                            // Some other error occurred
+                            description.text = getString(R.string.onboard_signin_error_unknown)
                         }
                     }
                 }

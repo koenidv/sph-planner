@@ -227,6 +227,7 @@
     <string name="messages_unread_possible">✉️ You might have unread messages</string>
     <string name="users_title">Teachers</string>
     <string name="users_name_template" translatable="false">%lastname, %firstname</string>
+    <string name="users_email_title">Send an email to %firstname %lastname</string>
     <string name="email_template_info">Once set up, you can send an email to any teacher from here.\n\nPlease enter the template your school uses for email addresses.</string>
     <string name="email_template_error">Invalid address template</string>
     <string name="email_template_hint">Your school\'s address template</string>

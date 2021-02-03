@@ -15,6 +15,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.database.DatabaseHelper
+import java.io.File
 
 //  Created by koenidv on 16.02.2020.
 // Sorry for horrible code - was imported from GMB-Planner
@@ -46,6 +47,8 @@ class OptionsSheet internal constructor() : BottomSheetDialogFragment() {
                             prefs.edit().clear().apply()
                             // Clear cookies (especcially sid token)
                             de.koenidv.sph.networking.CookieStore.clearCookies()
+                            // Delete all downloaded attachments
+                            File(requireContext().filesDir.toString() + "/attachments/").deleteRecursively()
                             // todo Delete database
                             // requireContext().deleteDatabase("database")
                             DatabaseHelper.newInstance()
