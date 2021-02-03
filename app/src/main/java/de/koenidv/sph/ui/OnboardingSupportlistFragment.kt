@@ -251,6 +251,13 @@ class OnboardingSupportlistFragment : Fragment() {
                         }
                     })
                 }
+            } else {
+                // School unsupported. Log to analytics
+                FirebaseAnalytics.getInstance(requireContext()).logEvent(
+                        "school_unsupported",
+                        bundleOf(
+                                "school" to prefs.getString("schoolid", "0")!!
+                        ))
             }
         }
 

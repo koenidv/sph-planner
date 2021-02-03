@@ -71,43 +71,47 @@ class Tasks {
      * @param isDone Whether the task is now done or not
      */
     // todo retry later on error
-    private fun complete(numberId: String, task: Task, isDone: Boolean, callback: (success: Int) -> Unit) {
+    private fun complete(numberId: String?, task: Task, isDone: Boolean, callback: (success: Int) -> Unit) {
         // Mark as (un)done in the db
         TasksDb.getInstance().setDone(task.taskId, isDone)
         // Mark as done on sph
         // Cancel potential pending requests for this same task, just to be sure
         AndroidNetworking.cancel(task.taskId)
-        // We need an access token first
-        TokenManager().authenticate { success: Int, token: String? ->
-            if (success == NetworkManager.SUCCESS) {
+        // Only post to sph if we know the number id
+        // May be null if it's a custom task, or for some weird reason that we don't know yet
+        if (numberId != null) {
+            // We need an access token first
+            TokenManager().authenticate { success: Int, token: String? ->
+                if (success == NetworkManager.SUCCESS) {
 
-                // Send a post request to let sph know the task is done
-                AndroidNetworking.post(
-                        SphPlanner.applicationContext().getString(R.string.url_mycourses))
-                        .addBodyParameter("a", "sus_homeworkDone")
-                        .addBodyParameter("id", numberId)
-                        .addBodyParameter("entry", task.id_post.substring(task.id_post.lastIndexOf("_") + 1))
-                        .addBodyParameter("b", if (isDone) "done" else "undone")
-                        .setTag(task.taskId)
-                        .build()
-                        .getAsString(object : StringRequestListener {
-                            override fun onResponse(response: String) {
-                                if (response == "1")
-                                    callback(NetworkManager.SUCCESS)
-                                else
-                                    callback(NetworkManager.FAILED_UNKNOWN)
-                            }
-
-                            override fun onError(error: ANError) {
-                                when (error.errorDetail) {
-                                    "connectionError" -> callback(NetworkManager.FAILED_NO_NETWORK)
-                                    "requestCancelledError" -> callback(NetworkManager.FAILED_CANCELLED)
-                                    else -> callback(NetworkManager.FAILED_UNKNOWN)
+                    // Send a post request to let sph know the task is done
+                    AndroidNetworking.post(
+                            SphPlanner.applicationContext().getString(R.string.url_mycourses))
+                            .addBodyParameter("a", "sus_homeworkDone")
+                            .addBodyParameter("id", numberId)
+                            .addBodyParameter("entry", task.id_post.substring(task.id_post.lastIndexOf("_") + 1))
+                            .addBodyParameter("b", if (isDone) "done" else "undone")
+                            .setTag(task.taskId)
+                            .build()
+                            .getAsString(object : StringRequestListener {
+                                override fun onResponse(response: String) {
+                                    if (response == "1")
+                                        callback(NetworkManager.SUCCESS)
+                                    else
+                                        callback(NetworkManager.FAILED_UNKNOWN)
                                 }
-                            }
-                        })
 
-            } else callback(success)
+                                override fun onError(error: ANError) {
+                                    when (error.errorDetail) {
+                                        "connectionError" -> callback(NetworkManager.FAILED_NO_NETWORK)
+                                        "requestCancelledError" -> callback(NetworkManager.FAILED_CANCELLED)
+                                        else -> callback(NetworkManager.FAILED_UNKNOWN)
+                                    }
+                                }
+                            })
+
+                } else callback(success)
+            }
         }
     }
 

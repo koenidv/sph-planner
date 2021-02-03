@@ -167,12 +167,16 @@ class Users {
                 .replace("#id", user.userId.replace("l-", ""))
 
         // Now start an intent to send an email to that address
-        val emailIntent = Intent.createChooser(Intent(Intent.ACTION_SENDTO).apply {
-            data = Uri.parse("mailto:$template")
-
-        }, "Send feedback").apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        }
+        val emailIntent = Intent.createChooser(Intent(Intent.ACTION_SENDTO)
+                .apply {
+                    data = Uri.parse("mailto:$template")
+                },
+                SphPlanner.applicationContext().getString(R.string.users_email_title)
+                        .replace("%firstname", user.firstname.toString())
+                        .replace("%lastname", user.lastname.toString()))
+                .apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                }
 
         SphPlanner.applicationContext().startActivity(emailIntent)
     }

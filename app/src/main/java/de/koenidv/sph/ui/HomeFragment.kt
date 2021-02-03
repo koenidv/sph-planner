@@ -83,11 +83,13 @@ class HomeFragment : Fragment() {
                 if (!::unreadPostsRecycler.isInitialized
                         || unreadPostsRecycler.adapter == null
                         || tasksRecycler.adapter == null) {
-                    @Suppress("DEPRECATION")
-                    parentFragmentManager.beginTransaction()
-                            .replace(R.id.nav_host_fragment,
-                                    instantiate(context, HomeFragment().javaClass.name))
-                            .commit()
+                    view?.post {
+                        @Suppress("DEPRECATION")
+                        parentFragmentManager.beginTransaction()
+                                .replace(R.id.nav_host_fragment,
+                                        instantiate(context, HomeFragment().javaClass.name))
+                                .commit()
+                    }
                     return
                 }
 
