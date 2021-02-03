@@ -12,8 +12,8 @@ android {
         applicationId "de.koenidv.sph"
         minSdkVersion 23
         targetSdkVersion 30
-        versionCode 119
-        versionName "1.2-dev"
+        versionCode 120
+        versionName "1.2"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
