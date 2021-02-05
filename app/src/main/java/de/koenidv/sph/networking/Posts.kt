@@ -3,10 +3,13 @@ package de.koenidv.sph.networking
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import androidx.core.os.bundleOf
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.database.*
+import de.koenidv.sph.debugging.DebugLog
+import de.koenidv.sph.debugging.Debugger
 import de.koenidv.sph.objects.*
 import de.koenidv.sph.parsing.RawParser
 import de.koenidv.sph.parsing.Utility
@@ -32,6 +35,10 @@ class Posts(private val networkManager: NetworkManager = NetworkManager()) {
      * Therefore we also load courses that haven't been loaded within the last 48 hours
      */
     private fun update(callback: (success: Int) -> Unit) {
+        // Log updating posts
+        if (Debugger.DEBUGGING_ENABLED)
+            DebugLog("Posts", "Updating posts").log()
+
         // Get my courses page
         networkManager.loadSiteWithToken(SphPlanner.applicationContext()
                 .getString(R.string.url_mycourses)) { success, response ->
@@ -102,6 +109,12 @@ class Posts(private val networkManager: NetworkManager = NetworkManager()) {
                         LocalBroadcastManager.getInstance(SphPlanner.applicationContext()).sendBroadcast(uiBroadcast)
                         callback(it)
                     }
+
+                    // Log updating posts
+                    if (Debugger.DEBUGGING_ENABLED)
+                        DebugLog("Posts", "Updating posts for courses",
+                                bundleOf("courses" to courses)).log()
+
                 } else callback(NetworkManager.SUCCESS)
             } else callback(success)
         }
@@ -123,21 +136,33 @@ class Posts(private val networkManager: NetworkManager = NetworkManager()) {
         val allPosts = PostsDb.getInstance().all
         // Counter for done courses
         var counter = 0
+        var coursesSize = courses.size // Will be increased with more semesters
+
+        // Log loading posts
+        if (Debugger.DEBUGGING_ENABLED)
+            DebugLog("Posts", "Loading posts and post data",
+                    bundleOf("courses" to coursesToLoad,
+                            "markAsRead" to markAsRead,
+                            "semester" to semester)).log()
 
         val prefs = SphPlanner.applicationContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
         val time = Date().time
         var url: String?
-        var callbackDisabled = false
 
         // Call the callback if this was the last request
         fun callbackIfLast() {
             counter++
-            if (counter == courses.size) {
+            if (counter == coursesSize) {
                 // Return success or the highest error code
                 if (errors.isEmpty()) {
                     callback(NetworkManager.SUCCESS)
                     prefs.edit().putLong("updated_posts", time).apply()
                 } else callback(errors.maxOf { it })
+                // Log
+                if (Debugger.DEBUGGING_ENABLED)
+                    DebugLog("Posts", "Loaded posts",
+                            bundleOf("errors" to errors),
+                            Debugger.LOG_TYPE_VAR).log()
             }
         }
 
@@ -154,8 +179,17 @@ class Posts(private val networkManager: NetworkManager = NetworkManager()) {
                         .replace("%semester", semester)
             }
 
+            // Log loading posts
+            if (Debugger.DEBUGGING_ENABLED)
+                DebugLog("Posts", "Loading posts for ${course.courseId}",
+                        bundleOf("url" to url)).log()
+
             networkManager.loadSiteWithToken(url) { success: Int, result: String? ->
                 if (success == NetworkManager.SUCCESS) {
+                    // Log parsing posts
+                    if (Debugger.DEBUGGING_ENABLED)
+                        DebugLog("Posts", "Parsing data for ${course.courseId}").log()
+
                     // Parse data
                     RawParser().parsePosts(course.courseId,
                             result!!,
@@ -184,8 +218,13 @@ class Posts(private val networkManager: NetworkManager = NetworkManager()) {
                         if (semesterMatches?.getOrNull(1) != null
                                 && time - prefs.getLong("updated_posts_${course.courseId}_semester_$semesterMatches[1]", 0)
                                 > 2 * 604800 * 1000) {
-                            // Disable this callback, we'll call it from the next function
-                            callbackDisabled = true
+                            // One more course to load
+                            coursesSize++
+
+                            // Log loading posts from another semester
+                            if (Debugger.DEBUGGING_ENABLED)
+                                DebugLog("Posts", "2nd semester posts for ${course.courseId}").log()
+
                             // Call this function again with the corresponding semester
                             load(coursesToLoad = listOf(course),
                                     markAsRead = markAsRead,
@@ -213,7 +252,7 @@ class Posts(private val networkManager: NetworkManager = NetworkManager()) {
                     errors.add(success)
                 }
                 // This callback check will be disabled if another semester needs to be loaded
-                if (!callbackDisabled) callbackIfLast()
+                callbackIfLast()
             }
         }
     }

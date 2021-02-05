@@ -6,6 +6,8 @@ import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.database.CoursesDb
 import de.koenidv.sph.database.FunctionTilesDb
+import de.koenidv.sph.debugging.DebugLog
+import de.koenidv.sph.debugging.Debugger
 import de.koenidv.sph.objects.FunctionTile
 import de.koenidv.sph.parsing.RawParser
 import java.util.*
@@ -21,6 +23,9 @@ class Courses(private val networkManager: NetworkManager = NetworkManager()) {
     fun createIndex(
             callback: (success: Int) -> Unit,
             features: List<String?> = FunctionTilesDb.getInstance().supportedFeatures.map { it.type }) {
+        // Log creating course index
+        if (Debugger.DEBUGGING_ENABLED)
+            DebugLog("Courses", "Starting course indexing").log()
 
         val prefs = SphPlanner.applicationContext().getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
         // Remove old courses, it'll just lead to isses
@@ -60,6 +65,10 @@ class Courses(private val networkManager: NetworkManager = NetworkManager()) {
         }
         // Load the feature at the current index
         loadNextCourses = {
+            // Log loading courses
+            if (Debugger.DEBUGGING_ENABLED)
+                DebugLog("Changes", "Loading courses from ${loadList[index]}").log()
+
             when (loadList[index]) {
                 "timetable" -> {
                     networkManager.loadSiteWithToken(
@@ -72,6 +81,11 @@ class Courses(private val networkManager: NetworkManager = NetworkManager()) {
                                     prefs.edit().putLong("courses_last_updated_timetable", Date().time).apply()
                                 }
                                 onDone(success)
+                                // Log success
+                                if (Debugger.DEBUGGING_ENABLED)
+                                    DebugLog("Courses",
+                                            "Loaded courses from timetable: $success",
+                                            type = Debugger.LOG_TYPE_VAR).log()
                             })
                 }
                 "studygroups" -> {
@@ -88,6 +102,11 @@ class Courses(private val networkManager: NetworkManager = NetworkManager()) {
                                     prefs.edit().putLong("courses_last_updated_studygroups", Date().time).apply()
                                 }
                                 onDone(success)
+                                // Log success
+                                if (Debugger.DEBUGGING_ENABLED)
+                                    DebugLog("Courses",
+                                            "Loaded courses from studygroups: $success",
+                                            type = Debugger.LOG_TYPE_VAR).log()
                             })
                 }
                 "mycourses" -> {
@@ -101,6 +120,11 @@ class Courses(private val networkManager: NetworkManager = NetworkManager()) {
                                     prefs.edit().putLong("courses_last_updated_mycourses", Date().time).apply()
                                 }
                                 onDone(success)
+                                // Log success
+                                if (Debugger.DEBUGGING_ENABLED)
+                                    DebugLog("Courses",
+                                            "Loaded courses from mycourses: $success",
+                                            type = Debugger.LOG_TYPE_VAR).log()
                             })
                 }
             }

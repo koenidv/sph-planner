@@ -233,6 +233,12 @@ class OnboardingSupportlistFragment : Fragment() {
                                         analytics.setUserProperty(
                                                 "courseIdExample",
                                                 CoursesDb.getInstance().gmbIdExample)
+                                        if (Debugger.DEBUGGING_ENABLED)
+                                            DebugLog("FeaturesFrag",
+                                                    "EXAMPLE GMBID: " +
+                                                            CoursesDb.getInstance().gmbIdExample,
+                                                    type = Debugger.LOG_TYPE_VAR)
+                                                    .log()
                                         // Log conversion to GA
                                         analytics.logEvent("onboarding_complete", bundleOf())
                                     } else {
