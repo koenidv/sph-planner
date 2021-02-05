@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import androidx.core.os.bundleOf
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.androidnetworking.AndroidNetworking
 import com.androidnetworking.common.Priority
@@ -17,6 +18,8 @@ import de.koenidv.sph.SphPlanner.Companion.TAG
 import de.koenidv.sph.SphPlanner.Companion.applicationContext
 import de.koenidv.sph.database.CoursesDb
 import de.koenidv.sph.database.FunctionTilesDb
+import de.koenidv.sph.debugging.DebugLog
+import de.koenidv.sph.debugging.Debugger
 import de.koenidv.sph.objects.FunctionTile.Companion.FEATURE_CHANGES
 import de.koenidv.sph.objects.FunctionTile.Companion.FEATURE_COURSES
 import de.koenidv.sph.objects.FunctionTile.Companion.FEATURE_MESSAGES
@@ -47,6 +50,12 @@ class NetworkManager {
         val time = Date().time
         val updateList = mutableListOf<String>()
         var disableList = false
+
+        // Log pull to refresh
+        if (Debugger.DEBUGGING_ENABLED)
+            DebugLog("NetMgr", "Handling PTR",
+                    bundleOf("destination" to destinationId,
+                            "args" to arguments)).log()
 
         when (destinationId) {
             R.id.nav_home, R.id.nav_explore -> {
@@ -131,6 +140,14 @@ class NetworkManager {
 
         // Getting an access token
         TokenManager().authenticate(forceNewToken) { success: Int, token: String? ->
+
+            // Log loading the page
+            if (Debugger.DEBUGGING_ENABLED)
+                DebugLog("NetMgr", "Loading url authenticated",
+                        bundleOf("url" to url,
+                                "forceNewToken" to forceNewToken,
+                                "tokenCb" to success)).log()
+
             if (success == SUCCESS) {
 
                 // Getting webpage
@@ -142,27 +159,60 @@ class NetworkManager {
                             override fun onResponse(response: String) {
                                 val prefs = applicationContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
                                 val responseLine = response.replace("\n", "")
+
                                 if (responseLine.contains("- Schulportal Hessen")
                                         && !responseLine.contains("Login - Schulportal Hessen")
                                         && !responseLine.contains("Fehler - Schulportal Hessen")
                                         && !responseLine.contains("Schulauswahl - Schulportal Hessen")) {
                                     // Getting site was successful
+                                    // Log site loaded
+                                    if (Debugger.DEBUGGING_ENABLED)
+                                        DebugLog("NetMgr", "Loaded url: Success",
+                                                bundleOf("url" to url,
+                                                        "title" to Debugger.responseTitle(response)),
+                                                Debugger.LOG_TYPE_SUCCESS).log()
+
                                     callback(SUCCESS, response)
                                     prefs.edit().putLong("token_last_success", Date().time).apply()
                                 } else if (responseLine.contains("Login - Schulportal Hessen")
                                         || responseLine.contains("Fehler - Schulportal Hessen")
                                         || responseLine.contains("Schulauswahl - Schulportal Hessen")) {
                                     // Signin was not successful
-                                    callback(FAILED_INVALID_CREDENTIALS, response)
+                                    // Log error
+                                    if (Debugger.DEBUGGING_ENABLED)
+                                        DebugLog("NetMgr",
+                                                "Error loading url, invalid credentials",
+                                                bundleOf("url" to url,
+                                                        "title" to Debugger.responseTitle(response)),
+                                                Debugger.LOG_TYPE_ERROR).log()
+
                                     Log.e(TAG, "Invalid credentials for $url")
                                     prefs.edit().putLong("token_last_success", 0).apply()
+                                    callback(FAILED_INVALID_CREDENTIALS, response)
                                 } else if (response.contains("Wartungsarbeiten")) {
                                     // Maintenance work
                                     callback(FAILED_MAINTENANCE, response)
+
+                                    // Log maintenance
+                                    if (Debugger.DEBUGGING_ENABLED)
+                                        DebugLog("NetMgr",
+                                                "Error loading url, maintenance",
+                                                bundleOf("url" to url,
+                                                        "title" to Debugger.responseTitle(response)),
+                                                Debugger.LOG_TYPE_ERROR).log()
                                 }
                             }
 
                             override fun onError(error: ANError) {
+                                // Log network error
+                                if (Debugger.DEBUGGING_ENABLED)
+                                    DebugLog("TokenMgr",
+                                            "NetError loading url authenticated",
+                                            error, bundleOf(
+                                            "url" to url
+                                    )
+                                    ).log()
+
                                 when (error.errorDetail) {
                                     "connectionError" -> {
                                         // This will also be called if request timed out
@@ -202,6 +252,11 @@ class NetworkManager {
      * (See in when below for what's supported)
      */
     fun update(entries: List<String>, callback: (success: Int) -> Unit) {
+        // Log updating
+        if (Debugger.DEBUGGING_ENABLED)
+            DebugLog("NetMgr", "Updating invoked",
+                    bundleOf("updateList" to entries)).log()
+
         if (entries.isNotEmpty()) {
             // Prepare token
             TokenManager().authenticate { success, _ ->
@@ -262,6 +317,11 @@ class NetworkManager {
         }
         loadList.add("holidays")
 
+        // Log indexing status
+        if (Debugger.DEBUGGING_ENABLED)
+            DebugLog("NetMgr", "Indexing list assembled",
+                    bundleOf("loadList" to loadList)).log()
+
         // Load every item in loadList
         var index = 0
         var loadNextFeature = {}
@@ -280,36 +340,47 @@ class NetworkManager {
         }
         // Load the feature at the current index
         loadNextFeature = {
+            // Log feature loading
+            // Log indexing status
+            if (Debugger.DEBUGGING_ENABLED)
+                DebugLog("NetMgr", "Fetching ${loadList[index]}").log()
             when (loadList[index]) {
                 "courses" -> {
-                    Courses(this).createIndex(onDone, features)
                     status(applicationContext().getString(R.string.index_status_courses))
+                    Courses(this).createIndex(onDone, features)
                 }
                 "timetable" -> {
-                    Timetable().fetch(onDone)
                     status(applicationContext().getString(R.string.index_status_timetable))
+                    Timetable().fetch(onDone)
                 }
                 "posts" -> {
-                    Posts(this).fetch(onDone, true)
                     status(applicationContext().getString(R.string.index_status_posts))
+                    Posts(this).fetch(onDone, true)
                 }
                 "changes" -> {
-                    Changes(this).fetch(onDone)
                     status(applicationContext().getString(R.string.index_status_changes))
+                    Changes(this).fetch(onDone)
                 }
                 "messages" -> {
-                    Messages().fetch(onDone, true)
                     status(applicationContext().getString(R.string.index_status_messages))
+                    Messages().fetch(onDone, true)
                 }
                 "users" -> {
-                    Users().fetch(onDone)
                     status(applicationContext().getString(R.string.index_status_users))
+                    Users().fetch(onDone)
                 }
                 "holidays" -> {
-                    Holidays().fetch(onDone)
                     status(applicationContext().getString(R.string.index_status_holidays))
+                    Holidays().fetch(onDone)
                 }
-                else -> Log.e(TAG, "Unsupported feature " + loadList[index])
+                else -> {
+                    // Log unsupported feature
+                    if (Debugger.DEBUGGING_ENABLED)
+                        DebugLog("NetMgr",
+                                "Unsupported feature ${loadList[index]}",
+                                type = Debugger.LOG_TYPE_ERROR).log()
+                    Log.e(TAG, "Unsupported feature " + loadList[index])
+                }
             }
         }
         // Begin loading
@@ -321,6 +392,12 @@ class NetworkManager {
      * @return resolved url or given url if there was an error
      */
     fun resolveUrl(url: String, callback: (success: Int, resolvedUrl: String) -> Unit) {
+        // Log resolving url
+        if (Debugger.DEBUGGING_ENABLED)
+            DebugLog("NetMgr", "Resolving url", bundleOf(
+                    "url" to url
+            )).log()
+
         // Getting an access token
         TokenManager().authenticate { success: Int, token: String? ->
             if (success == SUCCESS) {
@@ -336,8 +413,24 @@ class NetworkManager {
                                 // In this case, ignore the new response
                                 if (response.request().url().toString() != "https://start.schulportal.hessen.de/index.php") {
                                     callback(SUCCESS, response.request().url().toString())
+
+                                    // Log success
+                                    if (Debugger.DEBUGGING_ENABLED)
+                                        DebugLog("NetMgr", "Url resolving: success",
+                                                bundleOf(
+                                                        "url" to url,
+                                                        "resolvedUrl" to response.request().url()
+                                                ), Debugger.LOG_TYPE_SUCCESS).log()
                                 } else {
                                     callback(FAILED_UNKNOWN, url)
+
+                                    // Log warning
+                                    if (Debugger.DEBUGGING_ENABLED)
+                                        DebugLog("NetMgr", "Url resolving failed",
+                                                bundleOf(
+                                                        "url" to url,
+                                                        "resolvedUrl" to response.request().url()
+                                                ), Debugger.LOG_TYPE_WARNING).log()
                                 }
                             }
 
@@ -347,6 +440,12 @@ class NetworkManager {
                                 // Not a huge deal though, the unresolved url will work as well. For now.
                                 Log.e(TAG, anError!!.errorDetail + ": " + url)
                                 callback(FAILED_UNKNOWN, url)
+
+                                // Log warning
+                                if (Debugger.DEBUGGING_ENABLED)
+                                    DebugLog("NetMgr", "Url resolving failed",
+                                            anError, bundleOf("url" to url),
+                                            Debugger.LOG_TYPE_WARNING).log()
                             }
 
                         })

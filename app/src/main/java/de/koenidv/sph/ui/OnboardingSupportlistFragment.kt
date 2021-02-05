@@ -20,6 +20,8 @@ import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.database.CoursesDb
 import de.koenidv.sph.database.FunctionTilesDb
+import de.koenidv.sph.debugging.DebugLog
+import de.koenidv.sph.debugging.Debugger
 import de.koenidv.sph.networking.NetworkManager
 import de.koenidv.sph.networking.TokenManager
 import de.koenidv.sph.parsing.RawParser
@@ -40,6 +42,10 @@ class OnboardingSupportlistFragment : Fragment() {
         val indexLoading = view.findViewById<ProgressBar>(R.id.indexLoading)
         val statusText = view.findViewById<TextView>(R.id.statusTextView)
         val nextFab = view.findViewById<FloatingActionButton>(R.id.nextFab)
+
+        // Log loading features
+        if (Debugger.DEBUGGING_ENABLED)
+            DebugLog("FeaturesFrag", "Loading features list").log()
 
         // Get supported features
         NetworkManager().loadSiteWithToken("https://start.schulportal.hessen.de/index.php") { success: Int, response: String? ->
@@ -92,6 +98,12 @@ class OnboardingSupportlistFragment : Fragment() {
             val featureList = RawParser().parseFeatureList(response!!)
             // Get string list of supported features
             val features = featureList.map { it.name }
+
+            // Log supported features
+            if (Debugger.DEBUGGING_ENABLED)
+                DebugLog("FeaturesFrag", "Loaded features list",
+                        bundleOf("features" to featureList),
+                        Debugger.LOG_TYPE_VAR).log()
 
             if (context == null) return@loadSiteWithToken
 
@@ -173,6 +185,12 @@ class OnboardingSupportlistFragment : Fragment() {
                  * Start indexing
                  */
 
+                // Log index starting
+                if (Debugger.DEBUGGING_ENABLED) {
+                    DebugLog("FeaturesFrag", "INDEXING START").log()
+                    DebugLog("FeaturesFrag", "Resolving tile urls").log()
+                }
+
                 // Resolve tile urls
                 var tilesResolved = 0
                 for (feature in featureList) {
@@ -196,6 +214,12 @@ class OnboardingSupportlistFragment : Fragment() {
                                     status ->
                                     statusText.text = status
                                 }) { indexsuccess ->
+                                    // Log index status
+                                    if (Debugger.DEBUGGING_ENABLED)
+                                        DebugLog("FeaturesFrag",
+                                                "INDEXING DONE: $indexsuccess",
+                                                type = Debugger.LOG_TYPE_VAR).log()
+
                                     // Continue on indexing completion
                                     statusText.visibility = View.GONE
                                     if (indexsuccess == NetworkManager.SUCCESS) {
@@ -223,13 +247,17 @@ class OnboardingSupportlistFragment : Fragment() {
                                         warningText.visibility = View.VISIBLE
                                         warningText.setTextColor(requireContext().getColor(R.color.colorAccent))
                                         warningText.setOnClickListener {
+                                            // Log retrying
+                                            if (Debugger.DEBUGGING_ENABLED)
+                                                DebugLog("FeaturesFrag",
+                                                        "Recreating on user input").log()
+
                                             // Clear session id
                                             TokenManager().reset()
                                             // Recreate to try again
                                             requireActivity().recreate()
                                         }
                                         // Debug option to share response on unknown error
-                                        // Usign text comparison because o fthe else statement
                                         warningText.setOnLongClickListener {
                                             val sendIntent: Intent = Intent().apply {
                                                 action = Intent.ACTION_SEND
@@ -252,6 +280,11 @@ class OnboardingSupportlistFragment : Fragment() {
                     })
                 }
             } else {
+                // Log unsupported school
+                if (Debugger.DEBUGGING_ENABLED)
+                    DebugLog("FeaturesFrag", "School unsupported",
+                            bundleOf("schoolid" to prefs.getString("schoolid", "0")),
+                            Debugger.LOG_TYPE_ERROR).log()
                 // School unsupported. Log to analytics
                 FirebaseAnalytics.getInstance(requireContext()).logEvent(
                         "school_unsupported",
@@ -263,8 +296,14 @@ class OnboardingSupportlistFragment : Fragment() {
 
         // Continue button
         nextFab.setOnClickListener {
+            // Log onboarding complete
+            if (Debugger.DEBUGGING_ENABLED)
+                DebugLog("FeaturesFrag",
+                        "ONBOARDING COMPLETE",
+                        type = Debugger.LOG_TYPE_SUCCESS).log()
             // Mark onboarding completed for Crashlytics
             FirebaseCrashlytics.getInstance().setCustomKey("onboarding_completed", true)
+
             startActivity(Intent(context, MainActivity().javaClass)); requireActivity().finish()
         }
 
