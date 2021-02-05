@@ -61,12 +61,10 @@
     <string name="onboard_signin_error_network">Bitte überprüfe deine Netzwerkverbindung und versuche es erneut.</string>
     <string name="onboard_signin_error_credentials">Bitte überprüfe deine Zugangsdaten.</string>
     <string name="onboard_signin_error_maintenance">Das Schulportal wird im Moment gewartet.\nBitte versuche es später erneut.</string>
-    <!--<string name="onboard_supported_features_partly_not">"❌ Deine Schule unterstützt nicht alle benötigten Funktionen. Bitte nimm mit uns <a href="https://instagram.com/halbunsichtbar">über Instagram</a> oder <a href="mailto:koenidv@gmail.com">E-Mail</a> Konakt auf, um herauszufinden, wie du uns dabei helfen kannst, deine Schule zu untersützen!"</string>
-    <string name="onboard_supported_features_full">"✔ Deine Schule untersützt alle benötigten Funktionen, aber wir haben sie noch nicht getestet.\nBitte kontaktiere uns über <a href="https://instagram.com/halbunsichtbar">Instagram</a>, <a href="mailto:koenidv@gmail.com">E-Mail</a> oder die Option im Menü!"</string>-->
     <string name="onboard_supported_schooltested">✔ Wir haben die App mit deiner Schule getestet und sie sollte funktionieren.</string>
     <string name="onboard_supported_warning">Bitte teile uns mögliche Fehler über die Option im Menü mit!</string>
     <string name="onboard_supported_features_none">❌ Sorry, deine Schule untersützt die benötigten Funktionen nicht.</string>
-    <string name="onboard_supported_features_partly_not">"❌ Deine Schule unterstützt nicht alle benötigten Funktionen. Bitte nimm mit uns Konakt auf, um herauszufinden, wie du uns dabei helfen kannst, deine Schule zu untersützen!"</string>
+    <string name="onboard_supported_features_partly_not">"❌ Deine Schule unterstützt nicht alle benötigten Funktionen. Bitte nimm mit uns Kontakt auf, um herauszufinden, wie du uns dabei helfen kannst, deine Schule zu untersützen!"</string>
     <string name="onboard_supported_features_partly_hidden">✔ Deine Schule unterstützt einige der Funktionen, die wir benötigen.</string>
     <string name="onboard_supported_features_full">"✔ Deine Schule untersützt alle benötigten Funktionen, aber wir haben sie noch nicht getestet.\nBitte kontaktiere uns, wenn du einen Fehler bemerkst!"</string>
     <string name="onboard_supported_featurelist">%mycourses Mein Unterricht\n%studygroups Lerngruppen\n%timetable Stundenplan\n%changes Vertretungsplan\n%messages Nachrichten</string>
