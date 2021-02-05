@@ -1,3 +1,4 @@
+apikeys.properties
 *.iml
 .gradle
 /local.properties

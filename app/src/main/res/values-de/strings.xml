@@ -274,5 +274,7 @@
     <string name="email_template_error">Ungültige Adressvorlage</string>
     <string name="changes_holidays_description">Nur noch %d Tage!</string>
     <string name="users_email_title">Sende eine E-Mail an %firstname %lastname</string>
+    <string name="debugger_share">Debug-Protokoll teilen</string>
+    <string name="debugger_uploading">Hochladen…</string>
 
 </resources>
