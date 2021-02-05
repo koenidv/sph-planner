@@ -16,13 +16,16 @@ data class DebugLog(
         val timestamp: Long = Date().time,
 ) {
 
-    constructor(source: String, description: String, ANerror: ANError) : this(
-            source, description, bundleOf(
-            "errorCode" to ANerror.errorCode,
-            "errorBody" to ANerror.errorBody,
-            "errorDetail" to ANerror.errorBody),
-            LOG_TYPE_ERROR
-    )
+    constructor(source: String, description: String, ANerror: ANError, data: Bundle = bundleOf(), type: Int = LOG_TYPE_ERROR) :
+            this(
+                    source, description,
+                    bundleOf(
+                            "errorCode" to ANerror.errorCode,
+                            "errorBody" to ANerror.errorBody,
+                            "errorDetail" to ANerror.errorBody,
+                    ).apply { putAll(data) },
+                    type
+            )
 
     fun log() {
         Debugger.log(this)
