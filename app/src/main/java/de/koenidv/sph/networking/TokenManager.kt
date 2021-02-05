@@ -6,6 +6,7 @@ import android.net.ConnectivityManager
 import android.net.NetworkInfo
 import android.util.Log
 import android.widget.Toast
+import androidx.core.os.bundleOf
 import com.androidnetworking.AndroidNetworking
 import com.androidnetworking.common.Priority
 import com.androidnetworking.error.ANError
@@ -16,6 +17,10 @@ import com.google.firebase.remoteconfig.ktx.remoteConfig
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner.Companion.TAG
 import de.koenidv.sph.SphPlanner.Companion.applicationContext
+import de.koenidv.sph.debugging.DebugLog
+import de.koenidv.sph.debugging.Debugger
+import de.koenidv.sph.debugging.Debugger.LOG_TYPE_ERROR
+import de.koenidv.sph.debugging.Debugger.LOG_TYPE_WARNING
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import okhttp3.MultipartBody
@@ -47,12 +52,20 @@ class TokenManager {
                 && Date().time - prefs.getLong("token_last_success", 0) > 0
                 && !forceNewToken) {
 
+            // Log using old access token
+            if (Debugger.DEBUGGING_ENABLED)
+                DebugLog("TokenMgr", "Using known sid token").log()
+
             // If stored session id does not match the last known token,
             // overwrite it
             // Only check once per minute
             if (Date().time - lastTokenCheck < 60 * 1000) {
                 if (CookieStore.getToken() !== prefs.getString("token", "")) {
                     CookieStore.setToken(prefs.getString("token", "")!!)
+
+                    // Log writing token to cookiestore
+                    if (Debugger.DEBUGGING_ENABLED)
+                        DebugLog("TokenMgr", "Rewriting sid cookie").log()
                 }
                 // Save this time so we don't have to check again within a short time span
                 lastTokenCheck = Date().time
@@ -63,6 +76,9 @@ class TokenManager {
         } else {
             // Get a new token
             if (prefs.getString("user", "") != null && prefs.getString("password", "") != null) {
+                // Log creating new access token
+                if (Debugger.DEBUGGING_ENABLED)
+                    DebugLog("TokenMgr", "Authorizing new sid token").log()
 
                 // Clear old cookies to make sure we get a fresh start
                 CookieStore.clearCookies()
@@ -81,6 +97,13 @@ class TokenManager {
                     getTokenWithUrlencoded(onComplete)
 
                 }
+            } else {
+                // Log token failure
+                if (Debugger.DEBUGGING_ENABLED) {
+                    DebugLog("TokenMgr",
+                            "Cannot authorize token, no credentials provided",
+                            type = LOG_TYPE_ERROR).log()
+                }
             }
         }
     }
@@ -96,30 +119,66 @@ class TokenManager {
                 && !response.contains("Login - Schulportal Hessen")
                 && !response.contains("Schulauswahl - Schulportal Hessen")
                 && !response.contains("Login failed!")) {
-            onComplete(NetworkManager.SUCCESS, CookieStore.getCookie("schulportal.hessen.de", "sid")!!)
+
+            // Login was successful!
             prefs.edit().putString("token", CookieStore.getCookie("schulportal.hessen.de", "sid"))
                     .putLong("token_last_success", Date().time)
                     .apply()
+
+            // Log success
+            if (Debugger.DEBUGGING_ENABLED)
+                DebugLog("TokenMgr", "Sid token authenticated: Success",
+                        type = Debugger.LOG_TYPE_SUCCESS).log()
+
+            onComplete(NetworkManager.SUCCESS, CookieStore.getCookie("schulportal.hessen.de", "sid")!!)
+
         } else if (response.contains("Login - Schulportal Hessen")
                 || response.contains("Schulauswahl - Schulportal Hessen")) {
             // Login not successful
-            onComplete(NetworkManager.FAILED_INVALID_CREDENTIALS, null)
+
             prefs.edit().putLong("token_last_success", 0).apply()
+
+            // Log failure
+            if (Debugger.DEBUGGING_ENABLED)
+                DebugLog("TokenMgr", "Sid auth failed: Invalid credentials",
+                        bundleOf("response" to response), LOG_TYPE_ERROR).log()
             Log.e(TAG, "Login failed; Invalid credentials")
+
+            onComplete(NetworkManager.FAILED_INVALID_CREDENTIALS, null)
         } else if (response.contains("Wartungsarbeiten")) {
             // Cannot login at the moment
-            onComplete(NetworkManager.FAILED_MAINTENANCE, null)
+
+            // Log failure
+            if (Debugger.DEBUGGING_ENABLED)
+                DebugLog("TokenMgr", "Sid auth failed: Maintenance",
+                        bundleOf("response" to response), LOG_TYPE_ERROR).log()
             Log.d(TAG, "Login failed; Maintenance")
+
+            onComplete(NetworkManager.FAILED_MAINTENANCE, null)
         } else if (response.contains("Login failed!")
                 || response.contains("nonce is empty")
                 || response.contains("Aktuell ist leider kein Zugriff möglich. " +
                         "Bitte versuchen Sie es später erneut.")) {
-            onComplete(NetworkManager.FAILED_SERVER_ERROR, null)
+            // Server error
+
+            // Log failure
+            if (Debugger.DEBUGGING_ENABLED)
+                DebugLog("TokenMgr", "Sid auth failed: Server error",
+                        bundleOf("response" to response), LOG_TYPE_ERROR).log()
             Log.d(TAG, "Login failed; Server error")
+
+            onComplete(NetworkManager.FAILED_SERVER_ERROR, null)
         } else {
-            onComplete(NetworkManager.FAILED_UNKNOWN, null)
+            // Some other error
+
+            // Log failure
+            if (Debugger.DEBUGGING_ENABLED)
+                DebugLog("TokenMgr", "Sid auth failed: Unknown error",
+                        bundleOf("response" to response), LOG_TYPE_ERROR).log()
             Log.e(TAG, "Login failed; Reason unknown!")
             Log.d(TAG, response)
+
+            onComplete(NetworkManager.FAILED_UNKNOWN, null)
         }
     }
 
@@ -127,6 +186,13 @@ class TokenManager {
      * Return an internal error code for an networking error
      */
     private fun handleError(error: ANError, onComplete: (success: Int, token: String?) -> Unit) {
+        // Log network error
+        if (Debugger.DEBUGGING_ENABLED)
+            DebugLog("TokenMgr",
+                    "NetError getting a sid token",
+                    error
+            ).log()
+
         if (error.errorCode == 0) {
             when (error.errorDetail) {
                 "connectionError" -> {
@@ -169,6 +235,9 @@ class TokenManager {
                         if (Firebase.remoteConfig.getBoolean("token_fix_0106")) {
                             // As of 2021/01/06 we need to load the site again
                             // to actually get a session id
+                            // Log 0106 fix
+                            if (Debugger.DEBUGGING_ENABLED)
+                                DebugLog("TokenMgr", "Using 0106 fix").log()
                             Log.d(TAG, "Using second token request (0106)")
                             AndroidNetworking.get("https://start.schulportal.hessen.de/index.php?i="
                                     + prefs.getString("schoolid", "5146"))
@@ -201,6 +270,9 @@ class TokenManager {
      * validate response and save sid cookie if possible
      */
     private fun getTokenWithMultipart(onComplete: (success: Int, token: String?) -> Unit) {
+        // Log 0130 fix
+        if (Debugger.DEBUGGING_ENABLED) DebugLog("TokenMgr", "Using 0130 fix").log()
+
         if (isOnline()) {
             GlobalScope.launch {
                 Log.d(TAG, "Using fallback token request (0130)")
@@ -244,6 +316,12 @@ class TokenManager {
 
     // Resets the authentication token
     fun reset() {
+        // Log resetting
+        if (Debugger.DEBUGGING_ENABLED)
+            DebugLog("TokenMgr",
+                    "TokenManager reset",
+                    type = LOG_TYPE_WARNING).log()
+
         // Clear cookies
         CookieStore.clearCookies()
         // Remove from SharedPrefs
