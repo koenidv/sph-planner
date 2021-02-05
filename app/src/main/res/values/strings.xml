@@ -49,7 +49,6 @@
     <string name="index_status_users">Finding your teachers…</string>
     <string name="index_status_holidays">Searching for holidays…</string>
 
-
     <!-- Sign in process -->
     <string name="onboard_legal_title">Before we start</string>
     <string name="onboard_legal_description">You should know a few things so that we\'ll along well 😊</string>
@@ -298,6 +297,10 @@
     <!-- In-App updates -->
     <string name="update_downloaded">Update available</string>
     <string name="update_action">Install</string>
+
+    <!-- Debugging -->
+    <string name="debugger_share">Share debugging log</string>
+    <string name="debugger_uploading">Uploading…</string>
 
     <!-- Translatable Arrays -->
     <!-- Only translate values (after "|"), not the keys! -->

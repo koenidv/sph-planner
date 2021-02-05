@@ -25,6 +25,7 @@ import de.koenidv.sph.debugging.Debugger
 import de.koenidv.sph.networking.NetworkManager
 import de.koenidv.sph.networking.TokenManager
 import de.koenidv.sph.parsing.RawParser
+import kotlinx.coroutines.*
 
 class OnboardingSupportlistFragment : Fragment() {
 
@@ -179,6 +180,26 @@ class OnboardingSupportlistFragment : Fragment() {
                 warningText.visibility = View.VISIBLE
                 // todo start indexing
                 indexLoading.visibility = View.VISIBLE
+
+
+                /*
+                 * After being ready for indexing, wait 30s and display share debug log button
+                 */
+
+                CoroutineScope(Dispatchers.Unconfined).launch {
+                    delay(30000)
+                    withContext(Dispatchers.Main) {
+                        // Set up share debug log button
+                        view.findViewById<MaterialButton>(R.id.shareDebugButton).apply {
+                            visibility = View.VISIBLE
+                            setOnClickListener {
+                                this.setText(R.string.debugger_uploading)
+                                Debugger.share()
+                            }
+                        }
+
+                    }
+                }
 
 
                 /*
