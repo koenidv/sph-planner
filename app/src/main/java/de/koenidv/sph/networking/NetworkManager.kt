@@ -419,7 +419,7 @@ class NetworkManager {
                                         DebugLog("NetMgr", "Url resolving: success",
                                                 bundleOf(
                                                         "url" to url,
-                                                        "resolvedUrl" to response.request().url()
+                                                        "resolvedUrl" to response.request().url().toString()
                                                 ), Debugger.LOG_TYPE_SUCCESS).log()
                                 } else {
                                     callback(FAILED_UNKNOWN, url)
@@ -429,7 +429,7 @@ class NetworkManager {
                                         DebugLog("NetMgr", "Url resolving failed",
                                                 bundleOf(
                                                         "url" to url,
-                                                        "resolvedUrl" to response.request().url()
+                                                        "resolvedUrl" to response.request().url().toString()
                                                 ), Debugger.LOG_TYPE_WARNING).log()
                                 }
                             }
