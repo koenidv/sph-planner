@@ -50,7 +50,7 @@ class TokenManager {
             // If stored session id does not match the last known token,
             // overwrite it
             // Only check once per minute
-            if (Date().time - lastTokenCheck < 60 * 1000) {
+            if (Date().time - lastTokenCheck > 60 * 1000) {
                 if (CookieStore.getToken() !== prefs.getString("token", "")) {
                     CookieStore.setToken(prefs.getString("token", "")!!)
                 }
@@ -96,10 +96,10 @@ class TokenManager {
                 && !response.contains("Login - Schulportal Hessen")
                 && !response.contains("Schulauswahl - Schulportal Hessen")
                 && !response.contains("Login failed!")) {
-            onComplete(NetworkManager.SUCCESS, CookieStore.getCookie("schulportal.hessen.de", "sid")!!)
             prefs.edit().putString("token", CookieStore.getCookie("schulportal.hessen.de", "sid"))
                     .putLong("token_last_success", Date().time)
                     .apply()
+            onComplete(NetworkManager.SUCCESS, CookieStore.getCookie("schulportal.hessen.de", "sid")!!)
         } else if (response.contains("Login - Schulportal Hessen")
                 || response.contains("Schulauswahl - Schulportal Hessen")) {
             // Login not successful

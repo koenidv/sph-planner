@@ -40,6 +40,7 @@ class NetworkManager {
         const val FAILED_MAINTENANCE = 3
         const val FAILED_SERVER_ERROR = 4
         const val FAILED_CANCELLED = 5
+        const val FAILED_CRYPTION = 6
     }
 
     fun handlePullToRefresh(destinationId: Int,
@@ -137,7 +138,7 @@ class NetworkManager {
 
                 // Getting webpage
                 AndroidNetworking.get(url)
-                        .setUserAgent("koenidv/sph-planner")
+                        .setUserAgent("sph-planner")
                         .setPriority(Priority.LOW)
                         .build()
                         .getAsString(object : StringRequestListener {

@@ -4,6 +4,8 @@ import android.app.Application
 import android.content.Context
 import android.util.Log
 import com.androidnetworking.AndroidNetworking
+import com.androidnetworking.error.ANError
+import com.androidnetworking.interfaces.JSONObjectRequestListener
 import com.facebook.stetho.Stetho
 import com.facebook.stetho.okhttp3.StethoInterceptor
 import com.google.firebase.analytics.FirebaseAnalytics
@@ -12,7 +14,12 @@ import com.google.firebase.remoteconfig.ktx.remoteConfig
 import de.koenidv.sph.database.CoursesDb
 import de.koenidv.sph.networking.CookieStore
 import de.koenidv.sph.networking.Cryption
+import de.koenidv.sph.networking.TokenManager
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
+import org.json.JSONObject
 
 //  Created by koenidv on 05.12.2020.
 class SphPlanner : Application() {
@@ -40,12 +47,6 @@ class SphPlanner : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        /*
-         * Testing with JS
-         */
-
-        Cryption().authenticate { Log.d(TAG, it.toString()) }
-
         // Apply default remote configs
         Firebase.remoteConfig.setDefaultsAsync(R.xml.remote_config_defaults)
 
@@ -60,6 +61,41 @@ class SphPlanner : Application() {
                 /*.connectTimeout(60, TimeUnit.SECONDS)*/ // sph timeout is 30 seconds
                 .build()
         AndroidNetworking.initialize(applicationContext(), okHttpClient)
+
+
+        /*
+         * Testing with JS
+         */
+        GlobalScope.launch {
+            delay(3000)
+            TokenManager().authenticate { success: Int, token: String? ->
+                if (success == 0) {
+                    Cryption.start { cryptsuccess, cryption ->
+                        AndroidNetworking.post(applicationContext().getString(R.string.url_messages))
+                                .addBodyParameter("a", "headers")
+                                .addBodyParameter("getType", "visibleOnly")
+                                .addBodyParameter("last", "0")
+                                .addHeaders("X-Requested-With", "XMLHttpRequest")
+                                .build()
+                                .getAsJSONObject(object : JSONObjectRequestListener {
+                                    override fun onResponse(response: JSONObject) {
+                                        Log.d(TAG, "Messages response below")
+                                        cryption!!.decrypt(response.get("rows").toString()) {
+                                            Log.d(TAG, it.toString())
+                                            cryption.stop()
+                                        }
+                                    }
+
+                                    override fun onError(error: ANError) {
+                                        Log.e(TAG, error.stackTraceToString())
+                                    }
+
+                                })
+                    }
+                }
+            }
+        }
+
 
         // Upgrade from previous version
         val prefs = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
