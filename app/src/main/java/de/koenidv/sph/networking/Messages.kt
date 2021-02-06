@@ -9,6 +9,7 @@ import com.androidnetworking.AndroidNetworking
 import com.androidnetworking.error.ANError
 import com.androidnetworking.interfaces.StringRequestListener
 import com.google.firebase.crashlytics.FirebaseCrashlytics
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.debugging.DebugLog
@@ -87,7 +88,12 @@ class Messages {
                                 // Still continue with a success,
                                 // sph's messages page is just too unreliable
                                 // and this data not critical
-                                callback(NetworkManager.FAILED_UNKNOWN)
+                                if (FirebaseRemoteConfig.getInstance()
+                                                .getBoolean("messages_mandatory")) {
+                                    callback(NetworkManager.SUCCESS)
+                                } else {
+                                    callback(NetworkManager.FAILED_UNKNOWN)
+                                }
                                 return
                             }
 

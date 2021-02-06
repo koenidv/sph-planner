@@ -12,4 +12,8 @@
         <key>messages_display_possible</key>
         <value>true</value>
     </entry>
+    <entry>
+        <key>messages_mandatory</key>
+        <value>true</value>
+    </entry>
 </defaultsMap>
