@@ -216,93 +216,92 @@ class OnboardingSupportlistFragment : Fragment() {
                 var tilesResolved = 0
                 for (feature in featureList) {
                     NetworkManager().resolveUrl(feature.location, callback = { successUrl: Int, resolvedUrl: String ->
-                        kotlin.run {
-                            // Save new url to object
-                            if (successUrl == NetworkManager.SUCCESS
-                                    || successUrl == NetworkManager.FAILED_UNKNOWN // If sph redirected back to home
-                            )
-                                feature.location = resolvedUrl
-                            // Save number of tiles resolved
-                            tilesResolved++
-                            // If this was the last tile
-                            if (tilesResolved == featureList.size) {
-                                // Save features in case we need them later
-                                FunctionTilesDb.getInstance().save(featureList)
+                        // Save new url to object
+                        if (successUrl == NetworkManager.SUCCESS
+                                || successUrl == NetworkManager.FAILED_UNKNOWN) {
+                            // If success or sph redirected back to home
+                            feature.location = resolvedUrl
+                        }
+                        // Save number of tiles resolved
+                        tilesResolved++
+                        // If this was the last tile
+                        if (tilesResolved == featureList.size) {
+                            // Save features in case we need them later
+                            FunctionTilesDb.getInstance().save(featureList)
 
-                                // Now index everything else
-                                NetworkManager().indexAll({
-                                    // Update status text on status update
-                                    status ->
-                                    statusText.text = status
-                                }) { indexsuccess ->
-                                    // Log index status
+                            // Now index everything else
+                            NetworkManager().indexAll({
+                                // Update status text on status update
+                                status ->
+                                statusText.text = status
+                            }) { indexsuccess ->
+                                // Log index status
+                                if (Debugger.DEBUGGING_ENABLED)
+                                    DebugLog("FeaturesFrag",
+                                            "INDEXING DONE: $indexsuccess",
+                                            type = Debugger.LOG_TYPE_VAR).log()
+
+                                // Continue on indexing completion
+                                statusText.visibility = View.GONE
+                                if (indexsuccess == NetworkManager.SUCCESS) {
+                                    indexLoading.visibility = View.GONE
+                                    nextFab.visibility = View.VISIBLE
+                                    // Mark onboarding complete
+                                    prefs.edit().putBoolean("introComplete", true).apply()
+
+                                    val analytics = FirebaseAnalytics.getInstance(requireContext())
+                                    // Log an school course id example to GA
+                                    analytics.setUserProperty(
+                                            "courseIdExample",
+                                            CoursesDb.getInstance().gmbIdExample)
                                     if (Debugger.DEBUGGING_ENABLED)
                                         DebugLog("FeaturesFrag",
-                                                "INDEXING DONE: $indexsuccess",
-                                                type = Debugger.LOG_TYPE_VAR).log()
-
-                                    // Continue on indexing completion
-                                    statusText.visibility = View.GONE
-                                    if (indexsuccess == NetworkManager.SUCCESS) {
-                                        indexLoading.visibility = View.GONE
-                                        nextFab.visibility = View.VISIBLE
-                                        // Mark onboarding complete
-                                        prefs.edit().putBoolean("introComplete", true).apply()
-
-                                        val analytics = FirebaseAnalytics.getInstance(requireContext())
-                                        // Log an school course id example to GA
-                                        analytics.setUserProperty(
-                                                "courseIdExample",
-                                                CoursesDb.getInstance().gmbIdExample)
+                                                "EXAMPLE GMBID: " +
+                                                        CoursesDb.getInstance().gmbIdExample,
+                                                type = Debugger.LOG_TYPE_VAR)
+                                                .log()
+                                    // Log conversion to GA
+                                    analytics.logEvent("onboarding_complete", bundleOf())
+                                } else {
+                                    // Display error message
+                                    indexLoading.visibility = View.GONE
+                                    warningText.text = when (indexsuccess) {
+                                        NetworkManager.FAILED_NO_NETWORK -> getString(R.string.onboard_supported_error_network)
+                                        NetworkManager.FAILED_MAINTENANCE -> getString(R.string.onboard_supported_error_maintenance)
+                                        NetworkManager.FAILED_SERVER_ERROR -> getString(R.string.onboard_supported_error_server)
+                                        else -> getString(R.string.onboard_supported_error_unknown)
+                                    }
+                                    warningText.visibility = View.VISIBLE
+                                    warningText.setTextColor(requireContext().getColor(R.color.colorAccent))
+                                    warningText.setOnClickListener {
+                                        // Log retrying
                                         if (Debugger.DEBUGGING_ENABLED)
                                             DebugLog("FeaturesFrag",
-                                                    "EXAMPLE GMBID: " +
-                                                            CoursesDb.getInstance().gmbIdExample,
-                                                    type = Debugger.LOG_TYPE_VAR)
-                                                    .log()
-                                        // Log conversion to GA
-                                        analytics.logEvent("onboarding_complete", bundleOf())
-                                    } else {
-                                        // Display error message
-                                        indexLoading.visibility = View.GONE
-                                        warningText.text = when (indexsuccess) {
-                                            NetworkManager.FAILED_NO_NETWORK -> getString(R.string.onboard_supported_error_network)
-                                            NetworkManager.FAILED_MAINTENANCE -> getString(R.string.onboard_supported_error_maintenance)
-                                            NetworkManager.FAILED_SERVER_ERROR -> getString(R.string.onboard_supported_error_server)
-                                            else -> getString(R.string.onboard_supported_error_unknown)
-                                        }
-                                        warningText.visibility = View.VISIBLE
-                                        warningText.setTextColor(requireContext().getColor(R.color.colorAccent))
-                                        warningText.setOnClickListener {
-                                            // Log retrying
-                                            if (Debugger.DEBUGGING_ENABLED)
-                                                DebugLog("FeaturesFrag",
-                                                        "Recreating on user input").log()
+                                                    "Recreating on user input").log()
 
-                                            // Clear session id
-                                            TokenManager().reset()
-                                            // Recreate to try again
-                                            requireActivity().recreate()
+                                        // Clear session id
+                                        TokenManager().reset()
+                                        // Recreate to try again
+                                        requireActivity().recreate()
+                                    }
+                                    // Debug option to share response on unknown error
+                                    warningText.setOnLongClickListener {
+                                        val sendIntent: Intent = Intent().apply {
+                                            action = Intent.ACTION_SEND
+                                            putExtra(Intent.EXTRA_TEXT,
+                                                    indexsuccess.toString()
+                                                            + "@" + statusText.text
+                                                            + "\n--- Server Response ---\n"
+                                                            + response)
+                                            this.type = "text/plain"
                                         }
-                                        // Debug option to share response on unknown error
-                                        warningText.setOnLongClickListener {
-                                            val sendIntent: Intent = Intent().apply {
-                                                action = Intent.ACTION_SEND
-                                                putExtra(Intent.EXTRA_TEXT,
-                                                        indexsuccess.toString()
-                                                                + "@" + statusText.text
-                                                                + "\n--- Server Response ---\n"
-                                                                + response)
-                                                this.type = "text/plain"
-                                            }
-                                            requireActivity().startActivity(Intent.createChooser(sendIntent, null))
-                                            true
-                                        }
+                                        requireActivity().startActivity(Intent.createChooser(sendIntent, null))
+                                        true
                                     }
                                 }
-
-
                             }
+
+
                         }
                     })
                 }
