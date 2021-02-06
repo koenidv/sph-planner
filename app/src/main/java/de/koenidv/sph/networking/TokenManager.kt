@@ -256,15 +256,4 @@ class TokenManager {
 
     }
 
-    /**
-     * Creates an AES key for encryption / decryption
-     */
-    /*fun generateAesKey(forceNewKey: Boolean = false, onComplete: (success: Int, key: String?) -> Unit) {
-        if (forceNewKey || prefs.getString("token", "token") != prefs.getString("aes_for_token", "aes")) {
-
-            // Creates a (sudo-)random password that will be used
-            var password = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx-xxxxxx3xx".replace("[xy]".toRegex(), Integer.toHexString((floor(Math.random() * 17)).toInt()))
-
-        }
-    }*/
 }

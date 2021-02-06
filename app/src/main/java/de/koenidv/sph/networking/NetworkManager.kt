@@ -9,6 +9,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.androidnetworking.AndroidNetworking
 import com.androidnetworking.common.Priority
 import com.androidnetworking.error.ANError
+import com.androidnetworking.interfaces.JSONObjectRequestListener
 import com.androidnetworking.interfaces.OkHttpResponseListener
 import com.androidnetworking.interfaces.StringRequestListener
 import com.google.firebase.crashlytics.FirebaseCrashlytics
@@ -25,6 +26,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import okhttp3.Response
+import org.json.JSONObject
 import java.util.*
 
 //  Created by koenidv on 11.12.2020.
@@ -193,6 +195,34 @@ class NetworkManager {
                         })
             } else callback(success, null)
         }
+    }
+
+    /**
+     * Load a webpage.
+     * Sph pages might be loaded with a token, but they're not guaranteed to be
+     */
+    fun getJSON(url: String, callback: (success: Int, result: JSONObject?) -> Unit) {
+        // Get the site using FAN
+        AndroidNetworking.get(url).build()
+                .getAsJSONObject(object : JSONObjectRequestListener {
+                    override fun onResponse(response: JSONObject) {
+                        // Call back with the JSONObject
+                        callback(SUCCESS, response)
+                    }
+
+                    override fun onError(error: ANError) {
+                        // Log error
+                        Log.e(TAG, "Loading $url failed")
+                        FirebaseCrashlytics.getInstance().recordException(error)
+                        // Callback
+                        callback(when (error.errorDetail) {
+                            "connectionError" -> FAILED_NO_NETWORK
+                            "requestCancelledError" -> FAILED_CANCELLED
+                            else -> FAILED_UNKNOWN
+                        }, null)
+                    }
+
+                })
     }
 
 
