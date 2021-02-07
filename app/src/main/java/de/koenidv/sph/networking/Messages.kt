@@ -3,13 +3,17 @@ package de.koenidv.sph.networking
 import android.content.Intent
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.os.bundleOf
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.androidnetworking.AndroidNetworking
 import com.androidnetworking.error.ANError
 import com.androidnetworking.interfaces.StringRequestListener
 import com.google.firebase.crashlytics.FirebaseCrashlytics
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
+import de.koenidv.sph.debugging.DebugLog
+import de.koenidv.sph.debugging.Debugger
 import java.util.*
 
 //  Created by koenidv on 31.01.2021.
@@ -29,6 +33,10 @@ class Messages {
          * This will require them to sign in again, should they opt
          * not to use the AutoSPH signin service.
          */
+
+        // Log fetching messages
+        if (Debugger.DEBUGGING_ENABLED)
+            DebugLog("Messages", "Fetching messages").log()
 
         // Firstly, get an access token
         TokenManager().authenticate { success, token ->
@@ -72,10 +80,20 @@ class Messages {
                                 Log.e(SphPlanner.TAG, "Getting messages count failed")
                                 Log.e(SphPlanner.TAG, e.stackTraceToString())
                                 FirebaseCrashlytics.getInstance().recordException(e)
+                                // Log error
+                                if (Debugger.DEBUGGING_ENABLED)
+                                    DebugLog("Messages", "Error fetching messages",
+                                            bundleOf("exception" to e.stackTraceToString()),
+                                            Debugger.LOG_TYPE_ERROR).log()
                                 // Still continue with a success,
                                 // sph's messages page is just too unreliable
                                 // and this data not critical
-                                callback(NetworkManager.FAILED_UNKNOWN)
+                                if (FirebaseRemoteConfig.getInstance()
+                                                .getBoolean("messages_mandatory")) {
+                                    callback(NetworkManager.SUCCESS)
+                                } else {
+                                    callback(NetworkManager.FAILED_UNKNOWN)
+                                }
                                 return
                             }
 
@@ -104,11 +122,23 @@ class Messages {
                                     .putLong("updated_messages", Date().time)
                                     .apply()
 
+                            // Log success
+                            // Log fetching messages
+                            if (Debugger.DEBUGGING_ENABLED)
+                                DebugLog("Messages", "Messages fetched: Success",
+                                        bundleOf("messagesCount" to messagesCount),
+                                        Debugger.LOG_TYPE_SUCCESS).log()
+
                             // Finally, call back with a success
                             callback(NetworkManager.SUCCESS)
                         }
 
                         override fun onError(error: ANError) {
+                            // Log error
+                            if (Debugger.DEBUGGING_ENABLED)
+                                DebugLog("Messages", "Error loading messages",
+                                        error).log()
+
                             // Basic error handling should be enough,
                             // as this method failing will not cause
                             // any big issues

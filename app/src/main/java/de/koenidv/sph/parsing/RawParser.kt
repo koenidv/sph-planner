@@ -211,7 +211,7 @@ class RawParser {
                         courseId = courseInternalId,
                         gmb_id = courseGmbId,
                         id_teacher = teacherId,
-                        isLK = courseGmbId.contains("lk")
+                        isLK = courseGmbId.contains("(lk|pf)".toRegex())
                 ))
             }
         }
@@ -258,7 +258,7 @@ class RawParser {
                 sphId = entry.substring(entry.indexOf("<small>") + 8, entry.indexOf("</small>") - 1)
                 teacherId = entry.substring(Utility.ordinalIndexOf(entry, "<td>", 2))
                 teacherId = teacherId.substring(teacherId.indexOf("(") + 1, teacherId.indexOf(")")).toLowerCase(Locale.ROOT)
-                internalId = IdParser().getCourseIdWithSph(sphId, teacherId, entry.contains("LK"))
+                internalId = IdParser().getCourseIdWithSph(sphId, teacherId, entry.contains("(LK|PF)".toRegex()))
 
                 courses.add(Course(
                         courseId = internalId,
@@ -267,7 +267,7 @@ class RawParser {
                         id_teacher = teacherId,
                         fullname = CourseInfo.getFullnameFromInternald(internalId),
                         isFavorite = true,
-                        isLK = entry.contains("LK"),
+                        isLK = entry.contains("(LK|PF)".toRegex()),
                         color = (nameColorMap[uniformNamedId.substring(0, uniformNamedId.indexOf(" "))]
                                 ?: nameColorMap["default"])!!.toColorInt()
                 ))
@@ -303,7 +303,7 @@ class RawParser {
             courseName = row.select("span.name").text()
             teacherId = row.select("span.teacher button")
                     .first().ownText().toLowerCase(Locale.ROOT)
-            isLK = courseName.contains("LK")
+            isLK = courseName.contains("(LK|PF)".toRegex())
 
             // Add the course to the list
             courseToAdd = getCourseFromPostsoverviewData(courseName, teacherId, isLK, numberId, nameColorMap)

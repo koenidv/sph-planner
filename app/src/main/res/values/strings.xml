@@ -51,7 +51,6 @@
     <string name="index_status_users">Finding your teachers…</string>
     <string name="index_status_holidays">Searching for holidays…</string>
 
-
     <!-- Sign in process -->
     <string name="onboard_legal_title">Before we start</string>
     <string name="onboard_legal_description">You should know a few things so that we\'ll along well 😊</string>
@@ -84,8 +83,6 @@
     <string name="onboard_supported_error_maintenance">The education portal is currently under maintenance.\nTap to retry.</string>
     <string name="onboard_supported_error_server">A server error occurred.\nPlease try again in a few minutes.</string>
     <string name="onboard_supported_error_unknown">Something went wrong.\nTap to retry.</string>
-    <!--<string name="onboard_supported_features_full">"✔ Your school supports all the features we need, but we didn't test it yet.\nPlease contact us <a href="https://instagram.com/halbunsichtbar">on Instagram</a>, <a href="mailto:koenidv@gmail.com">by email</a> or via the options menu!"</string>
-        <string name="onboard_supported_features_partly_not">❌ Your school does not support all the features we need. Please get in touch <a href="https://instagram.com/halbunsichtbar">on Instagram</a> or <a href="mailto:koenidv@gmail.com">via email</a> to see how you can help us support your school!</string>-->
 
     <!-- Greetings -->
     <string name="greeting_general">Hey %name</string>
@@ -302,6 +299,10 @@
     <!-- In-App updates -->
     <string name="update_downloaded">Update available</string>
     <string name="update_action">Install</string>
+
+    <!-- Debugging -->
+    <string name="debugger_share">Share debugging log</string>
+    <string name="debugger_uploading">Uploading…</string>
 
     <!-- Translatable Arrays -->
     <!-- Only translate values (after "|"), not the keys! -->

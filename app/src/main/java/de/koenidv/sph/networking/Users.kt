@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.util.Log
+import androidx.core.os.bundleOf
 import com.androidnetworking.AndroidNetworking
 import com.androidnetworking.error.ANError
 import com.androidnetworking.interfaces.JSONObjectRequestListener
@@ -11,6 +12,8 @@ import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.database.CoursesDb
 import de.koenidv.sph.database.UsersDb
+import de.koenidv.sph.debugging.DebugLog
+import de.koenidv.sph.debugging.Debugger
 import de.koenidv.sph.objects.User
 import org.json.JSONObject
 import java.util.*
@@ -26,6 +29,10 @@ class Users {
      * be able to just filter for type=lul
      */
     fun fetch(callback: (success: Int) -> Unit) {
+        // Log fetching users
+        if (Debugger.DEBUGGING_ENABLED)
+            DebugLog("Users", "Fetching users").log()
+
         // We need to make sure that we have an access token
         TokenManager().authenticate { success, token ->
             // If getting a token failed, call onComplete
@@ -43,6 +50,9 @@ class Users {
             var char = 'a'
             var completed = 0
             while (char <= 'z') {
+                // Log fetching users
+                if (Debugger.DEBUGGING_ENABLED)
+                    DebugLog("Users", "Loading users for $char").log()
                 // Not get the all recipients for the current character
                 AndroidNetworking.post(SphPlanner.applicationContext().getString(R.string.url_messages))
                         .addBodyParameter("a", "searchRecipt")
@@ -111,13 +121,25 @@ class Users {
                                     // and call back success
                                     UsersDb().save(users)
                                     callback(NetworkManager.SUCCESS)
+
+                                    // Log success
+                                    if (Debugger.DEBUGGING_ENABLED)
+                                        DebugLog("Users", "Loaded users",
+                                                bundleOf("usersCount" to users.size),
+                                                type = Debugger.LOG_TYPE_SUCCESS).log()
                                 }
 
                             }
 
                             override fun onError(error: ANError) {
                                 // Handle request errors
+
+                                // Log error
+                                if (Debugger.DEBUGGING_ENABLED)
+                                    DebugLog("Users", "Error loading users",
+                                            error).log()
                                 Log.d(SphPlanner.TAG, error.errorDetail)
+
                                 when (error.errorDetail) {
                                     "connectionError" -> {
                                         callback(NetworkManager.FAILED_NO_NETWORK)

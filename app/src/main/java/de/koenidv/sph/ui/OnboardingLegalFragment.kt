@@ -5,10 +5,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
+import android.widget.CompoundButton
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
+import de.koenidv.sph.debugging.DebugLog
+import de.koenidv.sph.debugging.Debugger
 import me.saket.bettermovementmethod.BetterLinkMovementMethod
 
 class OnboardingLegalFragment : Fragment() {
@@ -22,6 +25,9 @@ class OnboardingLegalFragment : Fragment() {
         // If user already agreed to the legal stuff but then cancelled the setup,
         // continue to the next step
         if (prefs.getBoolean("legalVerified", false)) {
+            // If logging is enabled, log this
+            if (Debugger.DEBUGGING_ENABLED)
+                DebugLog("LegalFrag", "Legal already verified, skipping").log()
             val ft = parentFragmentManager.beginTransaction()
             ft.replace(R.id.fragment, OnboardingSigninFragment()).commit()
             return null
@@ -34,33 +40,21 @@ class OnboardingLegalFragment : Fragment() {
         privacyCheck.movementMethod = BetterLinkMovementMethod.getInstance()
         val ft = parentFragmentManager.beginTransaction()
 
-        // Continue to the next fragment once all conditions are checked
-        liabilityCheck.setOnCheckedChangeListener { _, _ ->
+        // If all checkboxes are checked, update sharedprefs and head to next fragment
+        val continueCheck = { _: CompoundButton, _: Boolean ->
             if (liabilityCheck.isChecked && sourcesCheck.isChecked && privacyCheck.isChecked) {
                 prefs.edit().putBoolean("legalVerified", true).apply()
-                ft.replace(R.id.fragment, OnboardingSigninFragment()).commit()
-            }
-        }
-        sourcesCheck.setOnCheckedChangeListener { _, _ ->
-            if (liabilityCheck.isChecked && sourcesCheck.isChecked && privacyCheck.isChecked) {
-                prefs.edit().putBoolean("legalVerified", true).apply()
-                ft.replace(R.id.fragment, OnboardingSigninFragment()).commit()
-            }
-        }
-        privacyCheck.setOnCheckedChangeListener { _, _ ->
-            if (liabilityCheck.isChecked && sourcesCheck.isChecked && privacyCheck.isChecked) {
-                prefs.edit().putBoolean("legalVerified", true).apply()
+                // If logging is enabled, log this
+                if (Debugger.DEBUGGING_ENABLED)
+                    DebugLog("LegalFrag", "Verified legal conditions").log()
                 ft.replace(R.id.fragment, OnboardingSigninFragment()).commit()
             }
         }
 
-        // Prefetch school picker
-        // Next stop will load faster if user stayed long enough in this fragment
-        /*AndroidNetworking.get("https://start.schulportal.hessen.de/")
-                .setPriority(Priority.LOW)
-                .build()
-                .prefetch()*/
-        // Useless, sph disallows cache, even on public pages
+        // Continue to the next fragment once all conditions are checked
+        liabilityCheck.setOnCheckedChangeListener(continueCheck)
+        sourcesCheck.setOnCheckedChangeListener(continueCheck)
+        privacyCheck.setOnCheckedChangeListener(continueCheck)
 
         return view
     }

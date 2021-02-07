@@ -245,7 +245,6 @@ class CourseOverviewFragment : Fragment() {
                     true
                 } else false
             }
-            // todo on long click, attachment bottom sheet
 
             val postsAdapter = PostsAdapter(
                     postsToShow,

@@ -31,7 +31,12 @@ class EmailTemplateSheet : BottomSheetDialogFragment() {
         chipGroup.setOnCheckedChangeListener { group, checkedId ->
             val checked = group.findViewById<Chip>(checkedId)
             if (checked != null && checked.isChecked) {
-                input.append(checked.tag.toString())
+                // Get current cursor position
+                val position = input.selectionStart
+                // Add the preset to the current cursor position
+                input.text = input.text.insert(position, checked.tag.toString())
+                // Move the cursor to behind the preset
+                input.setSelection(position + checked.tag.toString().length)
                 checked.isChecked = false
             }
         }
