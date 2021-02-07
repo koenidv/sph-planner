@@ -53,6 +53,7 @@ class SphPlanner : Application() {
                 .build()
         AndroidNetworking.initialize(applicationContext(), okHttpClient)
 
+
         // Upgrade from previous version
         val prefs = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
         // Upgrade to 120 if user is signed in

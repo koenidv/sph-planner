@@ -40,7 +40,7 @@ class Posts(private val networkManager: NetworkManager = NetworkManager()) {
             DebugLog("Posts", "Updating posts").log()
 
         // Get my courses page
-        networkManager.loadSiteWithToken(SphPlanner.applicationContext()
+        networkManager.getSiteAuthed(SphPlanner.applicationContext()
                 .getString(R.string.url_mycourses)) { success, response ->
             if (success == NetworkManager.SUCCESS) {
                 // Check which courses should be updated
@@ -183,8 +183,9 @@ class Posts(private val networkManager: NetworkManager = NetworkManager()) {
             if (Debugger.DEBUGGING_ENABLED)
                 DebugLog("Posts", "Loading posts for ${course.courseId}",
                         bundleOf("url" to url)).log()
+          
+            networkManager.getSiteAuthed(url) { success: Int, result: String? ->
 
-            networkManager.loadSiteWithToken(url) { success: Int, result: String? ->
                 if (success == NetworkManager.SUCCESS) {
                     // Log parsing posts
                     if (Debugger.DEBUGGING_ENABLED)

@@ -71,7 +71,7 @@ class Courses(private val networkManager: NetworkManager = NetworkManager()) {
 
             when (loadList[index]) {
                 "timetable" -> {
-                    networkManager.loadSiteWithToken(
+                    networkManager.getSiteAuthed(
                             SphPlanner.applicationContext().getString(R.string.url_timetable),
                             callback = { success: Int, response: String? ->
                                 if (success == NetworkManager.SUCCESS) {
@@ -89,7 +89,7 @@ class Courses(private val networkManager: NetworkManager = NetworkManager()) {
                             })
                 }
                 "studygroups" -> {
-                    networkManager.loadSiteWithToken(
+                    networkManager.getSiteAuthed(
                             SphPlanner.applicationContext().getString(R.string.url_studygroups),
                             callback = { success: Int, response: String? ->
                                 if (success == NetworkManager.SUCCESS) {
@@ -110,7 +110,7 @@ class Courses(private val networkManager: NetworkManager = NetworkManager()) {
                             })
                 }
                 "mycourses" -> {
-                    networkManager.loadSiteWithToken(
+                    networkManager.getSiteAuthed(
                             SphPlanner.applicationContext().getString(R.string.url_mycourses),
                             callback = { success: Int, response: String? ->
                                 if (success == NetworkManager.SUCCESS) {
