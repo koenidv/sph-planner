@@ -59,7 +59,7 @@ class TokenManager {
             // If stored session id does not match the last known token,
             // overwrite it
             // Only check once per minute
-            if (Date().time - lastTokenCheck < 60 * 1000) {
+            if (Date().time - lastTokenCheck > 60 * 1000) {
                 if (CookieStore.getToken() !== prefs.getString("token", "")) {
                     CookieStore.setToken(prefs.getString("token", "")!!)
 
@@ -131,7 +131,7 @@ class TokenManager {
                         type = Debugger.LOG_TYPE_SUCCESS).log()
 
             onComplete(NetworkManager.SUCCESS, CookieStore.getCookie("schulportal.hessen.de", "sid")!!)
-
+          
         } else if (response.contains("Login - Schulportal Hessen")
                 || response.contains("Schulauswahl - Schulportal Hessen")) {
             // Login not successful
@@ -332,15 +332,4 @@ class TokenManager {
 
     }
 
-    /**
-     * Creates an AES key for encryption / decryption
-     */
-    /*fun generateAesKey(forceNewKey: Boolean = false, onComplete: (success: Int, key: String?) -> Unit) {
-        if (forceNewKey || prefs.getString("token", "token") != prefs.getString("aes_for_token", "aes")) {
-
-            // Creates a (sudo-)random password that will be used
-            var password = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx-xxxxxx3xx".replace("[xy]".toRegex(), Integer.toHexString((floor(Math.random() * 17)).toInt()))
-
-        }
-    }*/
 }

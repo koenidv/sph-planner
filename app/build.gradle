@@ -67,6 +67,7 @@ dependencies {
     implementation 'com.afollestad.material-dialogs:color:3.2.1'
     implementation 'com.afollestad.material-dialogs:datetime:3.2.1'
     implementation 'com.reddit:indicator-fast-scroll:1.3.0'
+    implementation files('libs/rhino.jar')
 
     testImplementation 'junit:junit:4.13.1'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'

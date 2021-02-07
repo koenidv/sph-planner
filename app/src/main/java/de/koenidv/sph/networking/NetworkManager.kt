@@ -10,6 +10,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.androidnetworking.AndroidNetworking
 import com.androidnetworking.common.Priority
 import com.androidnetworking.error.ANError
+import com.androidnetworking.interfaces.JSONObjectRequestListener
 import com.androidnetworking.interfaces.OkHttpResponseListener
 import com.androidnetworking.interfaces.StringRequestListener
 import com.google.firebase.crashlytics.FirebaseCrashlytics
@@ -28,6 +29,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import okhttp3.Response
+import org.json.JSONObject
 import java.util.*
 
 //  Created by koenidv on 11.12.2020.
@@ -41,6 +43,7 @@ class NetworkManager {
         const val FAILED_MAINTENANCE = 3
         const val FAILED_SERVER_ERROR = 4
         const val FAILED_CANCELLED = 5
+        const val FAILED_CRYPTION = 6
     }
 
     fun handlePullToRefresh(destinationId: Int,
@@ -134,12 +137,12 @@ class NetworkManager {
      * Loads a url within the sph and handles authentication
      * @param url URL to load
      */
-    fun loadSiteWithToken(url: String,
-                          forceNewToken: Boolean = false,
-                          callback: (success: Int, result: String?) -> Unit) {
+    fun getSiteAuthed(url: String,
+                      forceNewToken: Boolean = false,
+                      callback: (success: Int, result: String?) -> Unit) {
 
         // Getting an access token
-        TokenManager().authenticate(forceNewToken) { success: Int, token: String? ->
+        TokenManager().authenticate(forceNewToken) { success: Int, _ ->
 
             // Log loading the page
             if (Debugger.DEBUGGING_ENABLED)
@@ -147,12 +150,12 @@ class NetworkManager {
                         bundleOf("url" to url,
                                 "forceNewToken" to forceNewToken,
                                 "tokenCb" to success)).log()
-
+                                                    
             if (success == SUCCESS) {
 
                 // Getting webpage
                 AndroidNetworking.get(url)
-                        .setUserAgent("koenidv/sph-planner")
+                        .setUserAgent("sph-planner")
                         .setPriority(Priority.LOW)
                         .build()
                         .getAsString(object : StringRequestListener {
@@ -242,6 +245,80 @@ class NetworkManager {
 
                         })
             } else callback(success, null)
+        }
+    }
+
+    /**
+     * Load a webpage.
+     * Sph pages might be loaded with a token, but they're not guaranteed to be
+     */
+    fun getJson(url: String, callback: (success: Int, result: JSONObject?) -> Unit) {
+        // Get the site using FAN
+        AndroidNetworking.get(url)
+                .build()
+                .getAsJSONObject(object : JSONObjectRequestListener {
+                    override fun onResponse(response: JSONObject) {
+                        // Call back with the JSONObject
+                        callback(SUCCESS, response)
+                    }
+
+                    override fun onError(error: ANError) {
+                        // Log error
+                        Log.e(TAG, "Loading $url failed")
+                        FirebaseCrashlytics.getInstance().recordException(error)
+                        // Callback
+                        callback(when (error.errorDetail) {
+                            "connectionError" -> FAILED_NO_NETWORK
+                            "requestCancelledError" -> FAILED_CANCELLED
+                            else -> FAILED_UNKNOWN
+                        }, null)
+                    }
+                })
+    }
+
+    /**
+     * Authenticates with sph, posts the specified body and returns json response
+     */
+    fun postJsonAuthed(url: String, body: Map<String, String> = mapOf(),
+                       callback: (success: Int, result: JSONObject?) -> Unit,
+                       headers: Map<String, String> = mapOf()) {
+        // Authenticate
+        TokenManager().authenticate { success, _ ->
+            // Cancel if authentication was not successful
+            if (success != SUCCESS) {
+                callback(success, null)
+                return@authenticate
+            }
+
+            // Add default headers
+            val allHeaders = mutableMapOf(
+                    "X-Requested-With" to "XMLHttpRequest",
+                    "User-Agent" to "koenidv/sph-planner")
+            allHeaders.putAll(headers)
+
+            // Post using FAN
+            AndroidNetworking.post(url)
+                    .addBodyParameter(body)
+                    .addHeaders(allHeaders)
+                    .build()
+                    .getAsJSONObject(object : JSONObjectRequestListener {
+                        override fun onResponse(response: JSONObject) {
+                            // Call back with the JSONObject
+                            callback(SUCCESS, response)
+                        }
+
+                        override fun onError(error: ANError) {
+                            // Log error
+                            Log.e(TAG, "Loading $url failed")
+                            FirebaseCrashlytics.getInstance().recordException(error)
+                            // Callback
+                            callback(when (error.errorDetail) {
+                                "connectionError" -> FAILED_NO_NETWORK
+                                "requestCancelledError" -> FAILED_CANCELLED
+                                else -> FAILED_UNKNOWN
+                            }, null)
+                        }
+                    })
         }
     }
 
@@ -399,7 +476,7 @@ class NetworkManager {
             )).log()
 
         // Getting an access token
-        TokenManager().authenticate { success: Int, token: String? ->
+        TokenManager().authenticate { success: Int, _ ->
             if (success == SUCCESS) {
 
                 // Getting webpage as OkHttp

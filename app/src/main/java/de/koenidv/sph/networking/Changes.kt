@@ -18,12 +18,14 @@ class Changes(private val networkManager: NetworkManager = NetworkManager()) {
      * Load changes from sph and save them to changes db
      */
     fun fetch(callback: (success: Int) -> Unit) {
+      
         // Log fetching changes
         if (Debugger.DEBUGGING_ENABLED)
             DebugLog("Changes", "Fetching changes").log()
-
-        networkManager.loadSiteWithToken(SphPlanner.applicationContext().getString(R.string.url_changes),
+      
+        networkManager.getSiteAuthed(SphPlanner.applicationContext().getString(R.string.url_changes),
                 callback = { success: Int, result: String? ->
+                            
                     if (success == NetworkManager.SUCCESS) {
                         ChangesDb.instance!!.removeOld()
                         ChangesDb.instance!!.save(RawParser().parseChanges(result!!))
