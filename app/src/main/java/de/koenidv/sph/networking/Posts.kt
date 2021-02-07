@@ -33,7 +33,7 @@ class Posts(private val networkManager: NetworkManager = NetworkManager()) {
      */
     private fun update(callback: (success: Int) -> Unit) {
         // Get my courses page
-        networkManager.loadSiteWithToken(SphPlanner.applicationContext()
+        networkManager.getSiteAuthed(SphPlanner.applicationContext()
                 .getString(R.string.url_mycourses)) { success, response ->
             if (success == NetworkManager.SUCCESS) {
                 // Check which courses should be updated
@@ -154,7 +154,7 @@ class Posts(private val networkManager: NetworkManager = NetworkManager()) {
                         .replace("%semester", semester)
             }
 
-            networkManager.loadSiteWithToken(url) { success: Int, result: String? ->
+            networkManager.getSiteAuthed(url) { success: Int, result: String? ->
                 if (success == NetworkManager.SUCCESS) {
                     // Parse data
                     RawParser().parsePosts(course.courseId,

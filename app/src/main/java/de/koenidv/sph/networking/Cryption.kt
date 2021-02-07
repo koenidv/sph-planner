@@ -63,6 +63,7 @@ class Cryption {
             // VM hasn't been started
         }
         // Close coroutine context
+        @Suppress("EXPERIMENTAL_API_USAGE")
         cryptionCoroutine.close()
     }
 
@@ -94,8 +95,15 @@ class Cryption {
                 // We need to create a new secret and authenticate it
                 authenticate { success ->
                     // If authentication was successful, call back with this authenticated Cryption
-                    if (success == SUCCESS) callback(SUCCESS, this)
-                    else {
+                    if (success == SUCCESS) {
+                        // Save the secret in sharedPrefs for use within the next 15 minutes
+                        prefs.edit().putLong("cryption_time", Date().time)
+                                .putString("cryption_token", token)
+                                .putString("cryption_secret", privateKey)
+                                .apply()
+                        // Callback with this Cryption object, which is now authenticated with privateKey
+                        callback(SUCCESS, this)
+                    } else {
                         callback(success, null)
                         // Stop the vm as it will not be needed anymore
                         stop()
@@ -163,7 +171,7 @@ class Cryption {
      * @param callback Sph's public key
      */
     private fun getPublicKey(callback: (publicKey: String?) -> Unit) {
-        NetworkManager().getJSON(
+        NetworkManager().getJson(
                 applicationContext().getString(R.string.url_cryption_publickey)) { success, result ->
             if (success == SUCCESS && result?.get("publickey") != null) {
                 callback(result.get("publickey").toString())
@@ -289,6 +297,7 @@ class Cryption {
                         params: Array<Any> = emptyArray(),
                         callback: (String) -> Unit) {
         // Run asynchronously
+        @Suppress("EXPERIMENTAL_API_USAGE")
         CoroutineScope(cryptionCoroutine).launch {
 
             // If the vm wasn't already started, start it now

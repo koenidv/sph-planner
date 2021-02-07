@@ -128,12 +128,12 @@ class NetworkManager {
      * Loads a url within the sph and handles authentication
      * @param url URL to load
      */
-    fun loadSiteWithToken(url: String,
-                          forceNewToken: Boolean = false,
-                          callback: (success: Int, result: String?) -> Unit) {
+    fun getSiteAuthed(url: String,
+                      forceNewToken: Boolean = false,
+                      callback: (success: Int, result: String?) -> Unit) {
 
         // Getting an access token
-        TokenManager().authenticate(forceNewToken) { success: Int, token: String? ->
+        TokenManager().authenticate(forceNewToken) { success: Int, _ ->
             if (success == SUCCESS) {
 
                 // Getting webpage
@@ -202,9 +202,10 @@ class NetworkManager {
      * Load a webpage.
      * Sph pages might be loaded with a token, but they're not guaranteed to be
      */
-    fun getJSON(url: String, callback: (success: Int, result: JSONObject?) -> Unit) {
+    fun getJson(url: String, callback: (success: Int, result: JSONObject?) -> Unit) {
         // Get the site using FAN
-        AndroidNetworking.get(url).build()
+        AndroidNetworking.get(url)
+                .build()
                 .getAsJSONObject(object : JSONObjectRequestListener {
                     override fun onResponse(response: JSONObject) {
                         // Call back with the JSONObject
@@ -222,8 +223,53 @@ class NetworkManager {
                             else -> FAILED_UNKNOWN
                         }, null)
                     }
-
                 })
+    }
+
+    /**
+     * Authenticates with sph, posts the specified body and returns json response
+     */
+    fun postJsonAuthed(url: String, body: Map<String, String> = mapOf(),
+                       callback: (success: Int, result: JSONObject?) -> Unit,
+                       headers: Map<String, String> = mapOf()) {
+        // Authenticate
+        TokenManager().authenticate { success, _ ->
+            // Cancel if authentication was not successful
+            if (success != SUCCESS) {
+                callback(success, null)
+                return@authenticate
+            }
+
+            // Add default headers
+            val allHeaders = mutableMapOf(
+                    "X-Requested-With" to "XMLHttpRequest",
+                    "User-Agent" to "koenidv/sph-planner")
+            allHeaders.putAll(headers)
+
+            // Post using FAN
+            AndroidNetworking.post(url)
+                    .addBodyParameter(body)
+                    .addHeaders(allHeaders)
+                    .build()
+                    .getAsJSONObject(object : JSONObjectRequestListener {
+                        override fun onResponse(response: JSONObject) {
+                            // Call back with the JSONObject
+                            callback(SUCCESS, response)
+                        }
+
+                        override fun onError(error: ANError) {
+                            // Log error
+                            Log.e(TAG, "Loading $url failed")
+                            FirebaseCrashlytics.getInstance().recordException(error)
+                            // Callback
+                            callback(when (error.errorDetail) {
+                                "connectionError" -> FAILED_NO_NETWORK
+                                "requestCancelledError" -> FAILED_CANCELLED
+                                else -> FAILED_UNKNOWN
+                            }, null)
+                        }
+                    })
+        }
     }
 
 
@@ -353,7 +399,7 @@ class NetworkManager {
      */
     fun resolveUrl(url: String, callback: (success: Int, resolvedUrl: String) -> Unit) {
         // Getting an access token
-        TokenManager().authenticate { success: Int, token: String? ->
+        TokenManager().authenticate { success: Int, _ ->
             if (success == SUCCESS) {
 
                 // Getting webpage as OkHttp

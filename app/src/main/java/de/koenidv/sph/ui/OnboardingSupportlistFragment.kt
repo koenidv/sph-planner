@@ -42,10 +42,10 @@ class OnboardingSupportlistFragment : Fragment() {
         val nextFab = view.findViewById<FloatingActionButton>(R.id.nextFab)
 
         // Get supported features
-        NetworkManager().loadSiteWithToken("https://start.schulportal.hessen.de/index.php") { success: Int, response: String? ->
+        NetworkManager().getSiteAuthed("https://start.schulportal.hessen.de/index.php") { success: Int, response: String? ->
 
             // Would otherwise crash if fragment has been detached in the meantime
-            if (host == null) return@loadSiteWithToken
+            if (host == null) return@getSiteAuthed
 
             if (success != NetworkManager.SUCCESS) {
                 // Display error
@@ -77,7 +77,7 @@ class OnboardingSupportlistFragment : Fragment() {
                 // Debug show toast if credential are somehow wrong
                 if (success == NetworkManager.FAILED_INVALID_CREDENTIALS)
                     Toast.makeText(requireContext(), "Invalid credentials", Toast.LENGTH_LONG).show()
-                return@loadSiteWithToken
+                return@getSiteAuthed
             }
 
             // Get real name from result
@@ -93,7 +93,7 @@ class OnboardingSupportlistFragment : Fragment() {
             // Get string list of supported features
             val features = featureList.map { it.name }
 
-            if (context == null) return@loadSiteWithToken
+            if (context == null) return@getSiteAuthed
 
             // Supported tags
             val schoolTested = requireContext().resources.getStringArray(R.array.tested_schools).contains(prefs.getString("schoolid", ""))

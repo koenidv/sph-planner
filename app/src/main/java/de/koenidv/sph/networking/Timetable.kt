@@ -15,7 +15,7 @@ class Timetable {
      * This will replace any current lessons in the timetable
      */
     fun fetch(callback: (success: Int) -> Unit) {
-        NetworkManager().loadSiteWithToken(applicationContext().getString(R.string.url_timetable),
+        NetworkManager().getSiteAuthed(applicationContext().getString(R.string.url_timetable),
                 callback = { success: Int, result: String? ->
                     if (success == NetworkManager.SUCCESS) {
                         TimetableDb.instance!!.clear()
