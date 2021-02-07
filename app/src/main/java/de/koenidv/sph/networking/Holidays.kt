@@ -1,14 +1,14 @@
 package de.koenidv.sph.networking
 
-import android.util.Log
 import com.androidnetworking.AndroidNetworking
 import com.androidnetworking.error.ANError
 import com.androidnetworking.interfaces.JSONArrayRequestListener
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import de.koenidv.sph.R
-import de.koenidv.sph.SphPlanner.Companion.TAG
 import de.koenidv.sph.SphPlanner.Companion.applicationContext
 import de.koenidv.sph.database.HolidaysDb
+import de.koenidv.sph.debugging.DebugLog
+import de.koenidv.sph.debugging.Debugger
 import de.koenidv.sph.objects.Holiday
 import org.json.JSONArray
 import org.json.JSONObject
@@ -23,6 +23,10 @@ class Holidays {
      * @param callback Called on completion with status code
      */
     fun fetch(callback: (success: Int) -> Unit) {
+        // Log fetching holidays
+        if (Debugger.DEBUGGING_ENABLED)
+            DebugLog("Holidays", "Fetching holidays").log()
+
         // Get all holidays for HE from ferien-api.de
         AndroidNetworking.get(applicationContext().getString(R.string.url_holidays))
                 .build()
@@ -31,6 +35,11 @@ class Holidays {
                         // Return if response is somehow null
                         if (response == null) {
                             callback(NetworkManager.FAILED_UNKNOWN)
+                            // Log error
+                            if (Debugger.DEBUGGING_ENABLED)
+                                DebugLog("Holidays",
+                                        "Error fetching holidays: Response is null",
+                                        type = Debugger.LOG_TYPE_ERROR).log()
                             return
                         }
 
@@ -50,7 +59,7 @@ class Holidays {
                             // once with dashes. Only use those with dashes
                             if (start.after(now)
                                     && !obj.getString("slug").contains(" ")) {
-                                        // Parse object and save to Db
+                                // Parse object and save to Db
                                 holidaysDb.save(Holiday(
                                         obj.getString("slug"),
                                         start,
@@ -61,9 +70,18 @@ class Holidays {
                             }
                         }
                         callback(NetworkManager.SUCCESS)
+                        // Log success
+                        if (Debugger.DEBUGGING_ENABLED)
+                            DebugLog("Holidays", "Holidays fetched: Success",
+                                    type = Debugger.LOG_TYPE_SUCCESS).log()
                     }
 
                     override fun onError(error: ANError) {
+                        // Log error
+                        if (Debugger.DEBUGGING_ENABLED)
+                            DebugLog("Holidays", "Error loading holidays",
+                                    error).log()
+
                         when (error.errorDetail) {
                             "connectionError" -> {
                                 // This will also be called if request timed out

@@ -25,6 +25,8 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.toptoche.searchablespinnerlibrary.SearchableSpinner
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
+import de.koenidv.sph.debugging.DebugLog
+import de.koenidv.sph.debugging.Debugger
 import de.koenidv.sph.networking.NetworkManager
 import de.koenidv.sph.networking.TokenManager
 import de.koenidv.sph.parsing.RawParser
@@ -40,6 +42,9 @@ class OnboardingSigninFragment : Fragment() {
         // we can just skip to the next fragment
         val prefs = SphPlanner.applicationContext().getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
         if (prefs.getBoolean("credsVerified", false)) {
+            // If logging is enabled, log this
+            if (Debugger.DEBUGGING_ENABLED)
+                DebugLog("SigninFrag", "Already signed in, skipping").log()
             val ft = parentFragmentManager.beginTransaction()
             ft.replace(R.id.fragment, OnboardingSupportlistFragment()).commit()
             return null
@@ -60,6 +65,11 @@ class OnboardingSigninFragment : Fragment() {
 
             signinButton.shrink()
 
+
+            // If logging is enabled, log loading the start page
+            if (Debugger.DEBUGGING_ENABLED)
+                DebugLog("SigninFrag", "Loading list of schools").log()
+
             // Load school names and ids to display them in a spinner
             // Hide loading icon and show contents once done
             AndroidNetworking.get("https://start.schulportal.hessen.de/")
@@ -77,9 +87,21 @@ class OnboardingSigninFragment : Fragment() {
                                 description.text = getString(R.string.onboard_welcome_error_maintenance)
                                 description.setTextColor(requireContext().getColor(R.color.colorAccent))
                                 description.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f)
+                                // If logging is enabled, log maintenance
+                                if (Debugger.DEBUGGING_ENABLED)
+                                    DebugLog("SigninFrag",
+                                            "School list loading failed, maintenance",
+                                            bundleOf("response" to response)
+                                    ).log()
                                 description.setOnClickListener {
+                                    // Log trying again
+                                    if (Debugger.DEBUGGING_ENABLED)
+                                        DebugLog("SigninFrag",
+                                                "User Input: Trying again after maintenance"
+                                        ).log()
                                     val ft = parentFragmentManager.beginTransaction()
-                                    ft.detach(this@OnboardingSigninFragment).attach(this@OnboardingSigninFragment).commit()
+                                    ft.detach(this@OnboardingSigninFragment).attach(
+                                            this@OnboardingSigninFragment).commit()
                                 }
                             } else {
                                 // Show sign in ui
@@ -87,7 +109,8 @@ class OnboardingSigninFragment : Fragment() {
                                 schoolid.adapter = SpinAdapter(requireContext(), schoolIds)
                                 schoolid.setPositiveButton(getString(R.string.cancel))
                                 schoolid.setTitle(getString(R.string.onboard_select_school))
-                                schoolid.setSelection(schoolIds.indexOf("Gymnasium am Mosbacher Berg, Wiesbaden" to "5146"))
+                                schoolid.setSelection(schoolIds.indexOf(
+                                        "Gymnasium am Mosbacher Berg, Wiesbaden" to "5146"))
 
                                 // Set component visibility
                                 loadicon.visibility = View.GONE
@@ -97,10 +120,24 @@ class OnboardingSigninFragment : Fragment() {
                                 textlayout1.visibility = View.VISIBLE
                                 textlayout2.visibility = View.VISIBLE
                                 signinButton.visibility = View.VISIBLE
+
+                                // Log schools loaded
+                                if (Debugger.DEBUGGING_ENABLED)
+                                    DebugLog("SigninFrag",
+                                            "School list loading: Success",
+                                            bundleOf("listSize" to schoolIds.size)
+                                    ).log()
                             }
                         }
 
-                        override fun onError(anError: ANError?) {
+                        override fun onError(anError: ANError) {
+                            // Log network error
+                            if (Debugger.DEBUGGING_ENABLED)
+                                DebugLog("SigninFrag",
+                                        "NetError loading schools list",
+                                        anError
+                                ).log()
+
                             // Error occurred, very high chance of no network
                             // Show error
                             loadicon.visibility = View.GONE
@@ -110,6 +147,12 @@ class OnboardingSigninFragment : Fragment() {
                             description.setTextColor(requireContext().getColor(R.color.colorAccent))
                             description.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f)
                             description.setOnClickListener {
+                                // Log trying again
+                                if (Debugger.DEBUGGING_ENABLED)
+                                    DebugLog("SigninFrag",
+                                            "User Input: Trying again after net error"
+                                    ).log()
+                                // Recreate fragment
                                 val ft = parentFragmentManager.beginTransaction()
                                 ft.detach(this@OnboardingSigninFragment).attach(this@OnboardingSigninFragment).commit()
                             }
@@ -161,7 +204,7 @@ class OnboardingSigninFragment : Fragment() {
                 // Hide the password
                 passText.transformationMethod = PasswordTransformationMethod()
 
-
+                val school = schoolIds[schoolid.selectedItemPosition].second
                 prefs.edit()
                         .putString("user", userText.text.toString()
                                 .trim()
@@ -173,12 +216,22 @@ class OnboardingSigninFragment : Fragment() {
                         .putString("password", passText.text.toString())
                         // We'll assume schools have been loaded, as ui won't let the user get here otherwise
                         // We could mitigate this by checking for schoolIds.isNotEmpty()..
-                        .putString("schoolid", schoolIds[schoolid.selectedItemPosition].second)
+                        .putString("schoolid", school)
                         .apply()
+
+                // Log signing in
+                if (Debugger.DEBUGGING_ENABLED)
+                    DebugLog("SigninFrag", "Signing in with $school").log()
 
                 // Check if credentials are valid
                 // We'll only get a token if login was successfull
                 TokenManager().authenticate(true) { success: Int, token: String? ->
+
+                    // Log signing in
+                    if (Debugger.DEBUGGING_ENABLED)
+                        DebugLog("SigninFrag", "Signin cb: $success",
+                                type = Debugger.LOG_TYPE_VAR).log()
+
                     if (success == NetworkManager.SUCCESS && token != null && token != "") {
                         // User signed in successfully - NOW DO SOMETHING WITH IT :)
                         prefs.edit().putBoolean("credsVerified", true).apply()

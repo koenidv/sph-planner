@@ -2,6 +2,7 @@ package de.koenidv.sph.networking
 
 import android.content.Context
 import android.content.Intent
+import androidx.core.os.bundleOf
 import androidx.fragment.app.FragmentActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.androidnetworking.AndroidNetworking
@@ -12,6 +13,8 @@ import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.database.CoursesDb
 import de.koenidv.sph.database.TasksDb
+import de.koenidv.sph.debugging.DebugLog
+import de.koenidv.sph.debugging.Debugger
 import de.koenidv.sph.objects.Task
 import de.koenidv.sph.ui.InfoSheet
 
@@ -29,6 +32,15 @@ class Tasks {
             (task: Task, isDone: Boolean) -> Unit = { task, isDone ->
         // Get the course's number id
         val numberId = courseNumberId ?: CoursesDb.getInstance().getNumberId(task.id_course)
+
+        // Log checking task
+        if (Debugger.DEBUGGING_ENABLED)
+            DebugLog("Tasks", "Updating task checked status",
+                    bundleOf("taskId" to task.taskId,
+                            "courseId" to task.id_course,
+                            "numberId" to numberId,
+                            "isDone" to isDone)).log()
+
 
         // Mark the task as done
         complete(numberId, task, isDone) {
@@ -80,6 +92,13 @@ class Tasks {
         // Only post to sph if we know the number id
         // May be null if it's a custom task, or for some weird reason that we don't know yet
         if (numberId != null) {
+            // Log checking task
+            if (Debugger.DEBUGGING_ENABLED)
+                DebugLog("Tasks", "Posting task update to sph",
+                        bundleOf("taskId" to task.taskId,
+                                "numberId" to numberId,
+                                "isDone" to isDone)).log()
+
             // We need an access token first
             TokenManager().authenticate { success: Int, token: String? ->
                 if (success == NetworkManager.SUCCESS) {
@@ -99,9 +118,18 @@ class Tasks {
                                         callback(NetworkManager.SUCCESS)
                                     else
                                         callback(NetworkManager.FAILED_UNKNOWN)
+                                    // Log response
+                                    if (Debugger.DEBUGGING_ENABLED)
+                                        DebugLog("Tasks", "Posted task update to sph",
+                                                bundleOf("response" to response)).log()
                                 }
 
                                 override fun onError(error: ANError) {
+                                    // Log error
+                                    if (Debugger.DEBUGGING_ENABLED)
+                                        DebugLog("Tasks", "Error updating tasks",
+                                                error).log()
+
                                     when (error.errorDetail) {
                                         "connectionError" -> callback(NetworkManager.FAILED_NO_NETWORK)
                                         "requestCancelledError" -> callback(NetworkManager.FAILED_CANCELLED)

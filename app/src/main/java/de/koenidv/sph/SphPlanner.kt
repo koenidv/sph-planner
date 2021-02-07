@@ -58,7 +58,7 @@ class SphPlanner : Application() {
         val prefs = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
         // Upgrade to 120 if user is signed in
         if (prefs.getBoolean("introComplete", false) &&
-                prefs.getInt("appVersion", 0) < 121) {
+                prefs.getInt("appVersion", 0) < 120) {
 
             // Set new analytics properties
             val analytics = FirebaseAnalytics.getInstance(this)
