@@ -6,6 +6,7 @@
     </string-array>
     <string-array name="tiles_name_type">
         <item>Mein Unterricht|mycourses</item>
+        <item>Meine Kurse|mycourses</item>
         <item>Nachrichten|messages</item>
         <item>Stundenplan|timetable</item>
         <item>Stundenpläne|timetable</item>
