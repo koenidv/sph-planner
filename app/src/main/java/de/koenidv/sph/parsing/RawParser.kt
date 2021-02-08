@@ -496,12 +496,15 @@ class RawParser {
                             .getInt("themeColor", 0)
                 }
 
-                // Check the tile's type using its name
-                type = nametypeMap[name] ?: "other"
-                // Create a feature tile with these values and add it to the return list
-                functions.add(FunctionTile(name, locationTemp, type, icon, color))
-                // Remember tile id
-                ids.add(id)
+                // Don't save the tile if it's for logging out
+                if (!locationTemp.contains("index.php?logout")) {
+                    // Check the tile's type using its name
+                    type = nametypeMap[name] ?: "other"
+                    // Create a feature tile with these values and add it to the return list
+                    functions.add(FunctionTile(name, locationTemp, type, icon, color))
+                    // Remember tile id
+                    ids.add(id)
+                }
             }
 
         }
@@ -578,7 +581,7 @@ class RawParser {
                 posts.add(currentPosts[currentPostIds.indexOf(postId)])
             } else {
                 // Get information from html
-                postTitle = cells[1].select("b")[0].wholeText().trim()
+                postTitle = cells[1].selectFirst("b").wholeText().trim()
                 // Correct weird stuff that sph does
                 postTitle = postTitle.replace("""&amp;amp;quot;""", "\"")
                 if (postTitle == "kein Thema") postTitle = null

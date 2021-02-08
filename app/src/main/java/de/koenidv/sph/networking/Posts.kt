@@ -143,7 +143,8 @@ class Posts(private val networkManager: NetworkManager = NetworkManager()) {
             DebugLog("Posts", "Loading posts and post data",
                     bundleOf("courses" to coursesToLoad,
                             "markAsRead" to markAsRead,
-                            "semester" to semester)).log()
+                            "semester" to semester,
+                            "courses" to courses)).log()
 
         val prefs = SphPlanner.applicationContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
         val time = Date().time
@@ -152,7 +153,7 @@ class Posts(private val networkManager: NetworkManager = NetworkManager()) {
         // Call the callback if this was the last request
         fun callbackIfLast() {
             counter++
-            if (counter == coursesSize) {
+            if (counter >= coursesSize) {
                 // Return success or the highest error code
                 if (errors.isEmpty()) {
                     callback(NetworkManager.SUCCESS)
@@ -164,6 +165,16 @@ class Posts(private val networkManager: NetworkManager = NetworkManager()) {
                             bundleOf("errors" to errors),
                             Debugger.LOG_TYPE_VAR).log()
             }
+        }
+
+        if (courses.isEmpty()) {
+            // If not courses are specified, simply return - just a fallback
+            callbackIfLast()
+            // Log this
+            if (Debugger.DEBUGGING_ENABLED)
+                DebugLog("Posts", "No courses to load!",
+                        type = Debugger.LOG_TYPE_WARNING).log()
+            return
         }
 
         // Load every course
