@@ -44,10 +44,6 @@ class ExploreLinksAdapter(private val dataset: List<FunctionTile>, private val o
             nameText.text = functionTile.name
             var icon = functionTile.icon.replace("fa-", "")
             if (icon.startsWith("glyphicon-")) icon = icon.substring(icon.lastIndexOf("-") + 1)
-            // replace some icons that we know don't work
-            icon = icon.replace("mail-bulk", "comment-alt") // This does not even work on desktop
-                    .replace("video-camera", "play") // This does work but looks horrible (Edupool)
-                    .replace("project-diagram", "sitemap")
 
             iconText.text = icon
 

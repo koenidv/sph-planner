@@ -98,7 +98,7 @@ class OnboardingSupportlistFragment : Fragment() {
 
             val featureList = RawParser().parseFeatureList(response!!)
             // Get string list of supported features
-            val features = featureList.map { it.name }
+            val features = featureList.map { it.type }
 
             // Log supported features
             if (Debugger.DEBUGGING_ENABLED)
@@ -121,7 +121,7 @@ class OnboardingSupportlistFragment : Fragment() {
             val warnmarkText = getString(R.string.emoji_warning)
 
             // todo Better check for compatibility
-            if (!features.contains("Mein Unterricht")) {
+            if (!features.contains("mycourses")) {
                 allFeatures = false
                 usableFeatures = false
                 featurelistText = featurelistText.replace("%mycourses", warnmarkText)
@@ -129,28 +129,28 @@ class OnboardingSupportlistFragment : Fragment() {
                 someFeatures = true
                 featurelistText = featurelistText.replace("%mycourses", checkmarkText)
             }
-            if (!features.contains("Nachrichten")) {
+            if (!features.contains("messages")) {
                 //allFeatures = false
                 featurelistText = featurelistText.replace("%messages", crossmarkText)
             } else {
                 //someFeatures = true
                 featurelistText = featurelistText.replace("%messages", checkmarkText)
             }
-            if (!features.contains("Lerngruppen")) {
+            if (!features.contains("studygroups")) {
                 allFeatures = false
                 manualFeatures = true // todo manual course adding
                 featurelistText = featurelistText.replace("%studygroups", crossmarkText)
             } else {
                 featurelistText = featurelistText.replace("%studygroups", checkmarkText)
             }
-            if (!features.contains("Stundenplan")) {
+            if (!features.contains("timetable")) {
                 allFeatures = false
                 featurelistText = featurelistText.replace("%timetable", crossmarkText)
             } else {
                 someFeatures = true
                 featurelistText = featurelistText.replace("%timetable", checkmarkText)
             }
-            if (!features.contains("Vertretungsplan") && !features.contains("Testphase Vertretungsplan")) {
+            if (!features.contains("changes")) {
                 allFeatures = false
                 featurelistText = featurelistText.replace("%changes", crossmarkText)
             } else {
@@ -159,8 +159,7 @@ class OnboardingSupportlistFragment : Fragment() {
             }
 
             // Get title text from supported tags
-            val featureTitleText: String
-            featureTitleText = when {
+            val featureTitleText: String = when {
                 usableFeatures && schoolTested -> getString(R.string.onboard_supported_schooltested)
                 allFeatures -> getString(R.string.onboard_supported_features_full)
                 usableFeatures && manualFeatures -> getString(R.string.onboard_supported_features_partly_manual)

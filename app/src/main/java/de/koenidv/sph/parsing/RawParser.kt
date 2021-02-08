@@ -255,7 +255,9 @@ class RawParser {
             for (entry in rawContents) {
                 namedId = entry.substring(Utility.ordinalIndexOf(entry, "<td>", 1) + 4, entry.indexOf("<small>") - 1).trim()
                 uniformNamedId = CourseInfo.parseNamedId(namedId)
+                // Get the sph id from <small> and remove "lk" (ignore case)
                 sphId = entry.substring(entry.indexOf("<small>") + 8, entry.indexOf("</small>") - 1)
+                        .replace("(?i)lk".toRegex(), "")
                 teacherId = entry.substring(Utility.ordinalIndexOf(entry, "<td>", 2))
                 teacherId = teacherId.substring(teacherId.indexOf("(") + 1, teacherId.indexOf(")")).toLowerCase(Locale.ROOT)
                 internalId = IdParser().getCourseIdWithSph(sphId, teacherId, entry.contains("(LK|PF)".toRegex()))
@@ -468,7 +470,7 @@ class RawParser {
                 // Get the feature's name
                 name = element.select("div.textheight h3").last().ownText()
                 // Get the url this tile is directing to
-                // This (now changed: might) be something lik /meinunterricht.php?a=X&e=XXX,
+                // This (now changed: might) be something like /meinunterricht.php?a=X&e=XXX,
                 // we'll resolve those redirects later
                 locationTemp = element.select("div.textheight a").last()
                         .attr("href")
@@ -481,6 +483,12 @@ class RawParser {
                 icon = Regex(""".*((fa|glyphicon)-\S*)\s+logo""").find(
                         element.selectFirst("div.logoview span.logo").className()
                 )!!.groupValues[1]
+                // replace some icons that we know don't work
+                icon = icon.replace("mail-bulk", "comment-alt") // This does not even work on desktop
+                        .replace("video-camera", "play") // This does work but looks horrible (Edupool)
+                        .replace("project-diagram", "sitemap")
+                        .replace("file-contract", "file-alt")
+                        .replace("equals", "calculator")
                 // Try to get the tile's color
                 // sph sometimes uses rgb, sometimes hex and sometimes provides invalid hex values
                 color = try {
@@ -497,7 +505,9 @@ class RawParser {
                 }
 
                 // Don't save the tile if it's for logging out
-                if (!locationTemp.contains("index.php?logout")) {
+                if (!locationTemp.contains("index.php?logout")
+                        && !name.contains("Logout")
+                        && !name.contains("Abmelden")) {
                     // Check the tile's type using its name
                     type = nametypeMap[name] ?: "other"
                     // Create a feature tile with these values and add it to the return list
