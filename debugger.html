@@ -9,16 +9,13 @@
 
 <body>
 
-    <span>
-        <h1>SPHplanner debugging tool</h1>
+    <h1><a href="https://github.com/koenidv/sph-planner">SPHplanner debugging tool</a></h1>
 
-        <input id="data" type="text" placeholder="Paste debug log">
-        <button id="runBtn" onclick="analyze()">Analyze</button>
-    </span>
+    <input id="data" type="text" placeholder="Paste debug log">
+    <button id="runBtn" onclick="analyze()">Analyze</button>
+    <h4 id="brutalist">Brutalist aesthetic go brrr</h4>
 
-    <div id="results">
-
-    </div>
+    <div id="results"></div>
 
     <template id="template">
         <div id="result">
@@ -31,65 +28,65 @@
 
     <script>
 
-        const input = document.querySelector("#data")
-        input.focus()
+        const input = document.querySelector("#data");
+        input.focus();
 
         function analyze() {
 
             try {
-                input.classList.remove("error")
+                input.classList.remove("error");
+                document.querySelector("#brutalist").style.display = "none";
 
-                const data = JSON.parse(input.value)
-                const results = document.querySelector("#results")
-                const template = document.querySelector("#template").content
-                const container = template.querySelector("#result")
-                const title = template.querySelector("#title")
-                const source = template.querySelector("#source")
-                const datatext = template.querySelector("#data")
+                const data = JSON.parse(input.value);
+                const results = document.querySelector("#results");
+                const template = document.querySelector("#template").content;
+                const container = template.querySelector("#result");
+                const title = template.querySelector("#title");
+                const source = template.querySelector("#source");
+                const datatext = template.querySelector("#data");
 
                 for (const entry of data) {
-                    title.textContent = entry.description
-                    source.textContent = entry.source + " @ " + getTime(entry.timestamp)
+                    title.textContent = entry.description;
+                    source.textContent = entry.source + " @ " + getTime(entry.timestamp);
 
                     switch (entry.type) {
                         case -1:
-                            container.classList.add("success")
-                            break
+                            container.classList.add("success");
+                            break;
                         case 0:
-                            container.classList.add("info")
-                            break
+                            container.classList.add("info");
+                            break;
                         case 1:
-                            container.classList.add("var")
-                            break
+                            container.classList.add("var");
+                            break;
                         case 2:
-                            container.classList.add("warning")
-                            break
+                            container.classList.add("warning");
+                            break;
                         case 3:
-                            container.classList.add("error")
-                            break
+                            container.classList.add("error");
+                            break;
                     }
 
                     for (key in entry.data.mMap) {
-                        datatext.textContent += key + ": " + JSON.stringify(entry.data.mMap[key], null, 4) + "\n"
+                        datatext.textContent += key + ": " + JSON.stringify(entry.data.mMap[key], null, 4) + "\n";
                     }
 
                     // Append clone to document
-                    results.appendChild(document.importNode(template, true))
+                    results.appendChild(document.importNode(template, true));
                     // Reset
-                    container.className = ""
-                    datatext.textContent = ""
+                    container.className = "";
+                    datatext.textContent = "";
                 }
 
             } catch {
-                input.classList.add("error")
+                input.classList.add("error");
             }
 
-            input.value = ""
-
-        }
+            input.value = "";
+        };
 
         function getTime(unix) {
-            const date = new Date(unix)
+            const date = new Date(unix);
             const hours = "0" + date.getHours();
             const minutes = "0" + date.getMinutes();
             const seconds = "0" + date.getSeconds();
@@ -101,7 +98,15 @@
 
         input.addEventListener("keyup", function (event) {
             if (event.key === "Enter") {
-                analyze()
+                analyze();
+            }
+        });
+
+        // Paste from clipboard on page load
+        navigator.clipboard.readText().then(text => {
+            if (text.startsWith("[")) {
+                input.value = text;
+                analyze();
             }
         });
 
@@ -114,16 +119,51 @@
             color: white;
         }
 
-        h1 {
+        h1,
+        h1 a,
+        h4,
+        h4 a {
             -webkit-text-stroke: 1px white;
             font-family: monospace;
             color: black;
             display: inline;
             margin-inline-end: 1rem;
+            text-decoration: none;
+        }
+
+        h1:hover,
+        h1 a:hover,
+        h4:hover,
+        h4 a:hover {
+            -webkit-text-stroke-color: purple;
+        }
+
+        #brutalist {
+            float: right;
+        }
+
+        input,
+        button {
+            background-color: black;
+            color: white;
+            border: none;
+            border-bottom: 1px solid white;
+            font-family: monospace;
+            padding: 0.25rem;
+        }
+
+        input:hover,
+        button:hover {
+            border-bottom-color: purple;
+        }
+
+        button:hover {
+            cursor: pointer;
+            color: purple;
         }
 
         input.error {
-            background-color: lightcoral;
+            border-bottom-color: crimson;
         }
 
         h3,
@@ -133,29 +173,31 @@
 
         #data {
             white-space: pre-wrap;
+            overflow-wrap: break-word;
         }
 
         #result {
             margin: 0.25rem;
             padding: 0.5rem;
-            background-color: darkslategray;
+            background-color: rgba(20, 20, 20, 0.5);
             border-radius: 2px;
+            z-index: 1;
         }
 
         #result.success {
-            background-color: seagreen;
+            background-color: rgba(46, 139, 86, 0.5);
         }
 
         #result.var {
-            background-color: rgb(0, 165, 168);
+            background-color: rgba(0, 165, 168, 0.5);
         }
 
         #result.warning {
-            background-color: orange;
+            background-color: rgba(255, 166, 0, 0.5);
         }
 
         #result.error {
-            background-color: crimson;
+            background-color: rgba(220, 20, 60, 0.5);
         }
     </style>
 
