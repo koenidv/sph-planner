@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPHplanner debugging tool</title>
+</head>
+
+<body>
+
+    <span>
+        <h1>SPHplanner debugging tool</h1>
+
+        <input id="data" type="text" placeholder="Paste debug log">
+        <button id="runBtn" onclick="analyze()">Analyze</button>
+    </span>
+
+    <div id="results">
+
+    </div>
+
+    <template id="template">
+        <div id="result">
+            <h3 id="title"></h3>
+            <p id="source"></p>
+            <p id="data"></p>
+        </div>
+    </template>
+
+
+    <script>
+
+        const input = document.querySelector("#data")
+        input.focus()
+
+        function analyze() {
+
+            try {
+                input.classList.remove("error")
+
+                const data = JSON.parse(input.value)
+                const results = document.querySelector("#results")
+                const template = document.querySelector("#template").content
+                const container = template.querySelector("#result")
+                const title = template.querySelector("#title")
+                const source = template.querySelector("#source")
+                const datatext = template.querySelector("#data")
+
+                for (const entry of data) {
+                    title.textContent = entry.description
+                    source.textContent = entry.source + " @ " + getTime(entry.timestamp)
+
+                    switch (entry.type) {
+                        case -1:
+                            container.classList.add("success")
+                            break
+                        case 0:
+                            container.classList.add("info")
+                            break
+                        case 1:
+                            container.classList.add("var")
+                            break
+                        case 2:
+                            container.classList.add("warning")
+                            break
+                        case 3:
+                            container.classList.add("error")
+                            break
+                    }
+
+                    for (key in entry.data.mMap) {
+                        datatext.textContent += key + ": " + JSON.stringify(entry.data.mMap[key], null, 4) + "\n"
+                    }
+
+                    // Append clone to document
+                    results.appendChild(document.importNode(template, true))
+                    // Reset
+                    container.className = ""
+                    datatext.textContent = ""
+                }
+
+            } catch {
+                input.classList.add("error")
+            }
+
+            input.value = ""
+
+        }
+
+        function getTime(unix) {
+            const date = new Date(unix)
+            const hours = "0" + date.getHours();
+            const minutes = "0" + date.getMinutes();
+            const seconds = "0" + date.getSeconds();
+            const millis = "00" + date.getMilliseconds();
+
+            // Return as hh:mm:ss:SSS format
+            return formattedTime = hours.substr("-2") + ":" + minutes.substr(-2) + ":" + seconds.substr(-2) + ":" + millis.substr(-3);
+        }
+
+        input.addEventListener("keyup", function (event) {
+            if (event.key === "Enter") {
+                analyze()
+            }
+        });
+
+    </script>
+
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: black;
+            color: white;
+        }
+
+        h1 {
+            -webkit-text-stroke: 1px white;
+            font-family: monospace;
+            color: black;
+            display: inline;
+            margin-inline-end: 1rem;
+        }
+
+        input.error {
+            background-color: lightcoral;
+        }
+
+        h3,
+        p {
+            margin: 0;
+        }
+
+        #data {
+            white-space: pre-wrap;
+        }
+
+        #result {
+            margin: 0.25rem;
+            padding: 0.5rem;
+            background-color: darkslategray;
+            border-radius: 2px;
+        }
+
+        #result.success {
+            background-color: seagreen;
+        }
+
+        #result.var {
+            background-color: rgb(0, 165, 168);
+        }
+
+        #result.warning {
+            background-color: orange;
+        }
+
+        #result.error {
+            background-color: crimson;
+        }
+    </style>
+
+
+</body>
+
+</html>
