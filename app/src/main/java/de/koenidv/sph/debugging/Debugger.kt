@@ -1,23 +1,23 @@
 package de.koenidv.sph.debugging
 
-import android.content.ClipData
-import android.content.ClipboardManager
-import android.content.Context
-import android.content.Intent
+import android.content.*
 import android.net.Uri
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.os.bundleOf
 import com.androidnetworking.AndroidNetworking
 import com.androidnetworking.error.ANError
 import com.androidnetworking.interfaces.JSONObjectRequestListener
 import com.google.gson.GsonBuilder
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
+import de.koenidv.sph.database.CoursesDb
 import org.json.JSONObject
 
 
 //  Created by koenidv on 05.02.2021.
 object Debugger {
-    const val DEBUGGING_ENABLED = true
+    var DEBUGGING_ENABLED = false
 
     const val LOG_TYPE_SUCCESS = -1
     const val LOG_TYPE_INFO = 0
@@ -26,6 +26,14 @@ object Debugger {
     const val LOG_TYPE_ERROR = 3
 
     private val logs = mutableListOf<DebugLog>()
+
+    val prefs: SharedPreferences = SphPlanner.applicationContext()
+            .getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
+
+    init {
+        DEBUGGING_ENABLED = prefs.getBoolean("debugging_enabled", false)
+        if (DEBUGGING_ENABLED) addStartLog()
+    }
 
     /**
      * Adds the DebugLog to the list of logs
@@ -117,6 +125,25 @@ object Debugger {
      * Check if the log contains any entries
      */
     fun isEmpty() = logs.isEmpty()
+
+    /**
+     * Enable or Disable logging
+     */
+    fun setEnabled(enabled: Boolean) {
+        DEBUGGING_ENABLED = enabled
+        prefs.edit().putBoolean("debugging_enabled", enabled).apply()
+        if (enabled) addStartLog()
+    }
+
+    /**
+     * Add a log with school id and an gmbId example on startup
+     */
+    private fun addStartLog() {
+        logs.add(DebugLog("Debugger",
+                "Started logging",
+                bundleOf("school" to prefs.getString("schoolid", "0"),
+                        "gmbIdExample" to CoursesDb.getInstance().gmbIdExample)))
+    }
 
 
 }
