@@ -29,6 +29,7 @@ import com.google.android.play.core.install.model.InstallStatus
 import com.google.android.play.core.install.model.UpdateAvailability
 import com.google.android.play.core.tasks.Task
 import de.koenidv.sph.database.ChangesDb
+import de.koenidv.sph.debugging.Debugger
 import de.koenidv.sph.networking.NetworkManager
 import de.koenidv.sph.ui.OnboardingActivity
 import de.koenidv.sph.ui.OptionsSheet
@@ -97,6 +98,8 @@ class MainActivity : AppCompatActivity() {
         // Navigate to OnboardingActivity if user hasn't completed setup yet
         if (!prefs.getBoolean("credsVerified", false)
                 || !prefs.getBoolean("introComplete", false)) {
+            // Enable debugging
+            Debugger.setEnabled(true)
             startActivity(Intent(this, OnboardingActivity().javaClass).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP))
             finish()
         }

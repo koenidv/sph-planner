@@ -35,7 +35,11 @@ class DebuggingSheet internal constructor() : BottomSheetDialogFragment() {
             debuggerShare.isEnabled = false
         }
 
-        // todo debugger switch
+        // Enable or disable debugging
+        debuggerSwitch.setOnCheckedChangeListener { _, enabled ->
+            Debugger.setEnabled(enabled)
+            if (enabled) dismiss()
+        }
 
         // Copy the log and open the online debugger view
         debuggerView.setOnClickListener {

@@ -106,7 +106,7 @@ class OnboardingSupportlistFragment : Fragment() {
                         bundleOf("features" to featureList),
                         Debugger.LOG_TYPE_VAR).log()
 
-             // Don't crash if context is null for some reason
+            // Don't crash if context is null for some reason
             if (context == null) return@getSiteAuthed
 
             // Supported tags
@@ -180,26 +180,6 @@ class OnboardingSupportlistFragment : Fragment() {
                 warningText.visibility = View.VISIBLE
                 // todo start indexing
                 indexLoading.visibility = View.VISIBLE
-
-
-                /*
-                 * After being ready for indexing, wait 30s and display share debug log button
-                 */
-
-                CoroutineScope(Dispatchers.Unconfined).launch {
-                    delay(30000)
-                    withContext(Dispatchers.Main) {
-                        // Set up share debug log button
-                        view.findViewById<MaterialButton>(R.id.shareDebugButton).apply {
-                            visibility = View.VISIBLE
-                            setOnClickListener {
-                                this.setText(R.string.debugger_uploading)
-                                Debugger.share()
-                            }
-                        }
-
-                    }
-                }
 
 
                 /*
@@ -329,11 +309,30 @@ class OnboardingSupportlistFragment : Fragment() {
                         type = Debugger.LOG_TYPE_SUCCESS).log()
             // Mark onboarding completed for Crashlytics
             FirebaseCrashlytics.getInstance().setCustomKey("onboarding_completed", true)
+            // Disable debugger after indexing is complete
+            Debugger.setEnabled(false)
 
             startActivity(Intent(context, MainActivity().javaClass)); requireActivity().finish()
         }
 
         contactButton.setOnClickListener { ContactSheet().show(parentFragmentManager, "contact") }
+
+        /*
+        * After 30s, display debugging options
+        */
+        CoroutineScope(Dispatchers.Unconfined).launch {
+            delay(30000)
+            withContext(Dispatchers.Main) {
+                // Set up share debug log button
+                view.findViewById<MaterialButton>(R.id.debugButton).apply {
+                    visibility = View.VISIBLE
+                    setOnClickListener {
+                        DebuggingSheet().show(parentFragmentManager, "debugging-indexing")
+                    }
+                }
+
+            }
+        }
 
         return view
     }
