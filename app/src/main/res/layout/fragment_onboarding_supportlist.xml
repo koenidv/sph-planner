@@ -86,7 +86,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="16dp"
-        android:text="@string/debugger_share"
+        android:text="@string/debugger_share_long"
         android:visibility="gone"
         app:layout_constraintStart_toEndOf="@id/contactButton"
         app:layout_constraintTop_toBottomOf="@+id/warningTextView"

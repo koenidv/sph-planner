@@ -106,6 +106,14 @@ class OptionsSheet internal constructor() : BottomSheetDialogFragment() {
         }
 
         /**
+         * Debugging
+         */
+        view.findViewById<View>(R.id.debuggingButton).setOnClickListener {
+            dismiss()
+            DebuggingSheet().show(parentFragmentManager, "debugging")
+        }
+
+        /**
          * Contact
          */
         view.findViewById<View>(R.id.contactButton).setOnClickListener {

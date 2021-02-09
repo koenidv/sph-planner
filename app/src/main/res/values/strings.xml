@@ -263,6 +263,7 @@
     <string name="menu_open_sph_warning_yes">Continue automatically</string>
     <string name="info_last_refresh">My Courses: %courses Changes: %changes Newest changes: %changeTimestamp Indexed: %indexed</string>
     <string name="menu_contact">Contact</string>
+    <string name="menu_debugging">Debugging</string>
     <string name="menu_rate">Rate</string>
     <string name="dateformat_hours">HH:mm</string>
     <string name="dateformat_coursesrefreshed">d. MMM</string>
@@ -301,8 +302,18 @@
     <string name="update_action">Install</string>
 
     <!-- Debugging -->
-    <string name="debugger_share">Share debugging log</string>
+    <string name="debugger_switch">Record debug log</string>
+    <string name="debugger_view">View log</string>
+    <string name="debugger_share">Share log</string>
+    <string name="debugger_share_long">Share debugging log</string>
     <string name="debugger_uploading">Uploading…</string>
+    <string name="debugger_description">The debug log logs what the app is doing and can help understand issues. It does not contain very personal data.</string>
+    <string name="debug_database_export">Export database</string>
+    <string name="debug_database_description">The database contains all data the app crawled from SPH. It does not contain your credentials or session token.</string>
+    <string name="debug_token_share">Share session token</string>
+    <string name="debug_token_generating">Generating a new token…</string>
+    <string name="debug_token_description">By sharing your session token, you can grant temporary access to SPH without sharing your credentials. It must be used within 15 minutes.</string>
+    <string name="dev_options">Developer options</string>
 
     <!-- Translatable Arrays -->
     <!-- Only translate values (after "|"), not the keys! -->
