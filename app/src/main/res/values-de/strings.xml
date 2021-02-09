@@ -274,7 +274,18 @@
     <string name="email_template_error">Ungültige Adressvorlage</string>
     <string name="changes_holidays_description">Nur noch %d Tage!</string>
     <string name="users_email_title">Sende eine E-Mail an %firstname %lastname</string>
-    <string name="debugger_share">Debug-Protokoll teilen</string>
+    <string name="debugger_share_long">Debug-Protokoll teilen</string>
     <string name="debugger_uploading">Hochladen…</string>
+    <string name="menu_debugging">Fehlerbehebung</string>
+    <string name="debugger_switch">Debug-Log aktivieren</string>
+    <string name="debugger_view">Log ansehen</string>
+    <string name="debugger_share">Log teilen</string>
+    <string name="debugger_description">Das Fehlerbehebungsprotokoll hält fest, was die App macht. Das kann dabei helfen, Probleme zu verstehen. Es enthält keine sehr persönlichen Daten.</string>
+    <string name="debug_database_export">Datenbank exportieren</string>
+    <string name="debug_database_description">Die Datenbank enthält alle vom Schulportal gecrawlten Daten. Sie enthält keine Zugangsdaten oder Sitzungstoken.</string>
+    <string name="debug_token_share">Sitzungstoken teilen</string>
+    <string name="debug_token_generating">Neuer Token wird generiert…</string>
+    <string name="debug_token_description">Durch das Teilen eines Sitzungstokens kannst du temporären Zugang zum Schulportal gewähren, ohne deine Zugangsdaten zu teilen.</string>
+    <string name="dev_options">Entwicklereinstellungen</string>
 
 </resources>

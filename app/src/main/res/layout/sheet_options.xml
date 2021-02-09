@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -10,33 +11,33 @@
         android:padding="8dp"
         android:paddingTop="16dp">
 
-            <LinearLayout
-                android:layout_width="match_parent"
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingTop="8dp">
+
+            <TextView
+                android:id="@+id/titleTextView"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingTop="8dp">
+                android:fontFamily="@font/roboto_slab"
+                android:paddingEnd="8dp"
+                android:paddingStart="8dp"
+                android:text="@string/app_name"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
-                <TextView
-                    android:id="@+id/titleTextView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/roboto_slab"
-                    android:paddingStart="8dp"
-                    android:paddingEnd="8dp"
-                    android:text="@string/app_name"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+            <TextView
+                android:id="@+id/authorTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/roboto_slab"
+                android:paddingEnd="8dp"
+                android:paddingStart="8dp"
+                android:text="@string/info_author"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
-                <TextView
-                    android:id="@+id/authorTextView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/roboto_slab"
-                    android:paddingStart="8dp"
-                    android:paddingEnd="8dp"
-                    android:text="@string/info_author"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
-
-            </LinearLayout>
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -45,91 +46,75 @@
             android:orientation="horizontal">
 
             <com.google.android.material.button.MaterialButton
-                android:visibility="gone"
                 android:id="@+id/coursesButton"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginEnd="4dp"
                 android:layout_weight="1"
                 android:text="@string/menu_option_courses"
-                android:textColor="@color/titleText" />
+                android:textColor="@color/titleText"
+                android:visibility="gone" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/logoutButton"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginStart="4dp"
                 android:layout_weight="1"
                 android:text="@string/menu_option_logout"
                 android:textColor="@color/titleText" />
 
         </LinearLayout>
 
-        <!-- Background sync toggles
-        <com.google.android.material.button.MaterialButtonToggleGroup
-            android:id="@+id/backgroundToggleGroup"
+        <androidx.gridlayout.widget.GridLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:selectionRequired="true"
-            app:singleSelection="true">
+            app:columnCount="2">
 
-            <Button
-                android:id="@+id/backgroundOnButton"
-                style="?attr/materialButtonOutlinedStyle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/chooseThemeButton"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="4dp"
+                android:text="@string/menu_option_choosetheme"
+                android:textColor="@color/titleText"
+                app:layout_columnWeight="1" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/debuggingButton"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="4dp"
                 android:layout_weight="1"
-                android:maxWidth="288dp"
-                android:text="@string/option_background_on" />
-
-            <Button
-                android:id="@+id/backgroundOffButton"
-                style="?attr/materialButtonOutlinedStyle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/option_background_off" />
-
-        </com.google.android.material.button.MaterialButtonToggleGroup>
-        -->
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/chooseThemeButton"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="@string/menu_option_choosetheme"
-            android:textColor="@color/titleText" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+                android:text="@string/menu_debugging"
+                android:textColor="@color/titleText"
+                app:layout_columnWeight="1" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/contactButton"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_marginEnd="4dp"
                 android:layout_weight="1"
                 android:text="@string/menu_contact"
-                android:textColor="@color/titleText" />
+                android:textColor="@color/titleText"
+                app:layout_columnWeight="1" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/rateButton"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
                 android:layout_marginStart="4dp"
                 android:layout_weight="1"
                 android:text="@string/menu_rate"
-                android:textColor="@color/titleText" />
+                android:textColor="@color/titleText"
+                app:layout_columnWeight="1" />
 
-        </LinearLayout>
+        </androidx.gridlayout.widget.GridLayout>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/doneButton"
