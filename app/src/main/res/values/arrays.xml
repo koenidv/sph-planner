@@ -4,17 +4,13 @@
     <string-array name="tested_schools">
         <item>5146</item>
     </string-array>
-    <string-array name="tiles_name_type">
-        <item>Mein Unterricht|mycourses</item>
-        <item>Meine Kurse|mycourses</item>
-        <item>Nachrichten|messages</item>
-        <item>Stundenplan|timetable</item>
-        <item>Stundenpläne|timetable</item>
-        <item>Schülerstundenplan|timetable</item>
-        <item>Testphase Vertretungsplan|changes</item>
-        <item>Vertretungsplan|changes</item>
-        <item>Vertretungspläne|changes</item>
-        <item>Lerngruppen|studygroups</item>
+    <!-- Assign type if tile href contains the key, checked from top down -->
+    <string-array name="tiles_href_type">
+        <item>/meinunterricht.php|mycourses</item>
+        <item>/nachrichten.php|messages</item>
+        <item>/stundenplan.php|timetable</item>
+        <item>/vertretungsplan.php|changes</item>
+        <item>/lerngruppen.php|studygroups</item>
     </string-array>
     <string-array name="course_colors">
         <item>default|#5e2037</item>
