@@ -280,8 +280,8 @@ class NetworkManager {
      * Authenticates with sph, posts the specified body and returns json response
      */
     fun postJsonAuthed(url: String, body: Map<String, String> = mapOf(),
-                       callback: (success: Int, result: JSONObject?) -> Unit,
-                       headers: Map<String, String> = mapOf()) {
+                       headers: Map<String, String> = mapOf(),
+                       callback: (success: Int, result: JSONObject?) -> Unit) {
         // Authenticate
         TokenManager().authenticate { success, _ ->
             // Cancel if authentication was not successful
@@ -361,11 +361,11 @@ class NetworkManager {
                     // Run the respective funtion for each update order
                     for (entry in entries) {
                         when (entry) {
-                            "posts" -> Posts(this).fetch(checkDone)
-                            "changes" -> Changes(this).fetch(checkDone)
-                            "timetable" -> Timetable().fetch(checkDone)
-                            "messages" -> Messages().fetch(checkDone)
-                            "holidays" -> Holidays().fetch(checkDone)
+                            "posts" -> Posts(this).fetch(callback = checkDone)
+                            "changes" -> Changes(this).fetch(callback = checkDone)
+                            "timetable" -> Timetable().fetch(callback = checkDone)
+                            "messages" -> Messages().fetch(callback = checkDone)
+                            "holidays" -> Holidays().fetch(callback = checkDone)
                         }
                     }
                 } else callback(success)
@@ -440,7 +440,7 @@ class NetworkManager {
                 }
                 "messages" -> {
                     status(applicationContext().getString(R.string.index_status_messages))
-                    Messages().fetch(onDone, true)
+                    Messages().fetch(callback = onDone, markAsRead = true)
                 }
                 "users" -> {
                     status(applicationContext().getString(R.string.index_status_users))

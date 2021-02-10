@@ -4,7 +4,7 @@ import java.util.*
 
 //  Created by koenidv on 10.02.2021.
 data class Message(
-        val messId: String, // Message's unique id ("Uniqid")
+        val messId: String, // Message's unique id ("Uniquid" / )
         val idConv: String, // Conversation the message belongs to
         val idSender: String, // Sender's user id
         val senderType: String, // "Betreuer" / "Teilnehmer" user type

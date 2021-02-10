@@ -1,19 +1,17 @@
 package de.koenidv.sph.networking
 
-import android.content.Intent
 import android.util.Log
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.androidnetworking.AndroidNetworking
-import com.androidnetworking.error.ANError
-import com.androidnetworking.interfaces.StringRequestListener
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
+import com.google.gson.JsonObject
+import com.google.gson.JsonParser
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
+import de.koenidv.sph.database.ConversationsDb
 import de.koenidv.sph.debugging.DebugLog
 import de.koenidv.sph.debugging.Debugger
+import de.koenidv.sph.objects.Conversation
 import java.util.*
 
 //  Created by koenidv on 31.01.2021.
@@ -22,7 +20,7 @@ class Messages {
     /**
      * Check if the number of visible messages has increased
      */
-    fun fetch(callback: (success: Int) -> Unit, markAsRead: Boolean = false) {
+    fun fetch(markAsRead: Boolean = false, onlyHeaders: Boolean = false, callback: (success: Int) -> Unit) {
 
         /*
          * We currently cannot get messages, decryption isn't implemented yet.
@@ -38,124 +36,129 @@ class Messages {
         if (Debugger.DEBUGGING_ENABLED)
             DebugLog("Messages", "Fetching messages").log()
 
-        // Firstly, get an access token
-        TokenManager().authenticate { success, token ->
-            // If getting a token failed, call onComplete
-            // with the error and return
-            if (success != NetworkManager.SUCCESS) {
-                callback(success)
-                return@authenticate
-            }
+        // Now post messages.php with a few parameters
+        // a=headers - Titles only (read for entire message)
+        // getType=visibleOnly - Only get visible messages (could also be unvisibleOnly)
+        // last=0 - Not yet sure what that does, but it is needed to not get an error
+        NetworkManager().postJsonAuthed(SphPlanner.applicationContext().getString(R.string.url_messages),
+                body = mapOf("a" to "headers", "getType" to "visibleOnly", "last" to "0")) { netSuccess, json ->
+            if (netSuccess == NetworkManager.SUCCESS && json != null) {
+                // The response should be a json object with two values:
+                // total - The number of messages matching our request
+                // rows - The encrypted headers for each message
 
-            // Now post messages.php with a few parameters
-            // a=headers - Titles only (read for entire message)
-            // getType=visibleOnly - Only get visible messages (could also be unvisibleOnly)
-            // last=0 - Not yet sure what that does, but it is needed to not get an error
-            AndroidNetworking.post(SphPlanner.applicationContext().getString(R.string.url_messages))
-                    .addBodyParameter("a", "headers")
-                    .addBodyParameter("getType", "visibleOnly")
-                    .addBodyParameter("last", "0")
-                    .addHeaders(mapOf(
-                            "X-Requested-With" to "XMLHttpRequest",
-                            "Comment" to "Contact us at sph@koenidv.de"
-                    ))
-                    .setUserAgent("koenidv/sph-planner")
-                    .build()
-                    .getAsString(object : StringRequestListener {
-                        override fun onResponse(response: String) {
-                            // The response should be a json object with two values:
-                            // total - The number of messages matching our request
-                            // rows - The encrypted headers for each message
-                            // We only need total's value and therefore don't have
-                            // to parse the object
-                            val messagesCount: Int
-                            try {
-                                messagesCount = response.substring(
-                                        response.indexOf("\"total\":") + 8,
-                                        response.indexOf(",")
-                                ).toInt()
-                            } catch (e: Exception) {
-                                // If getting the message count failed,
-                                // log and return
-                                Log.e(SphPlanner.TAG, "Getting messages count failed")
-                                Log.e(SphPlanner.TAG, e.stackTraceToString())
-                                FirebaseCrashlytics.getInstance().recordException(e)
-                                // Log error
-                                if (Debugger.DEBUGGING_ENABLED)
-                                    DebugLog("Messages", "Error fetching messages",
-                                            bundleOf("exception" to e.stackTraceToString()),
-                                            Debugger.LOG_TYPE_ERROR).log()
-                                // Still continue with a success,
-                                // sph's messages page is just too unreliable
-                                // and this data not critical
-                                if (FirebaseRemoteConfig.getInstance()
-                                                .getBoolean("messages_mandatory")) {
-                                    callback(NetworkManager.SUCCESS)
-                                } else {
-                                    callback(NetworkManager.FAILED_UNKNOWN)
-                                }
-                                return
-                            }
+                try {
+                    // Get a decryptor
+                    Cryption.start { success, cryption ->
 
-                            // Get SharedPreferences to load and save messages count
-                            val prefs = SphPlanner.applicationContext().getSharedPreferences(
-                                    "sharedPrefs", AppCompatActivity.MODE_PRIVATE)
-
-                            // Compare current messages count with the old one
-                            // If current is higher and messages should not be marked as read,
-                            // notify ui to update
-                            if (prefs.getInt("messages_count", 0) < messagesCount
-                                    && !markAsRead) {
-                                // Update preferences to reflect that new messages might be available
-                                prefs.edit().putBoolean("messages_unread", true).apply()
-
-                                // Send a local broadcast to let the current fragment know
-                                // it might want to show that new messages may be available
-                                val uiBroadcast = Intent("uichange")
-                                uiBroadcast.putExtra("content", "messages_maybe")
-                                LocalBroadcastManager.getInstance(SphPlanner.applicationContext()).sendBroadcast(uiBroadcast)
-                            }
-
-                            // Update prefs even if current count is lower for use next time
-                            prefs.edit()
-                                    .putInt("messages_count", messagesCount)
-                                    .putLong("updated_messages", Date().time)
-                                    .apply()
-
-                            // Log success
-                            // Log fetching messages
-                            if (Debugger.DEBUGGING_ENABLED)
-                                DebugLog("Messages", "Messages fetched: Success",
-                                        bundleOf("messagesCount" to messagesCount),
-                                        Debugger.LOG_TYPE_SUCCESS).log()
-
-                            // Finally, call back with a success
-                            callback(NetworkManager.SUCCESS)
-                        }
-
-                        override fun onError(error: ANError) {
+                        if (success != NetworkManager.SUCCESS || cryption == null) {
+                            // Return if network manager could not be started
                             // Log error
                             if (Debugger.DEBUGGING_ENABLED)
-                                DebugLog("Messages", "Error loading messages",
-                                        error).log()
+                                DebugLog("Messages", "Could not start Cryption",
+                                        bundleOf("success" to success),
+                                        Debugger.LOG_TYPE_ERROR).log()
+                            callback(success)
+                            return@start
+                        }
 
-                            // Basic error handling should be enough,
-                            // as this method failing will not cause
-                            // any big issues
-                            when (error.errorDetail) {
-                                "connectionError" -> {
-                                    callback(NetworkManager.FAILED_NO_NETWORK)
+                        cryption.decrypt(json.get("rows").toString()) { headers ->
+                            if (headers != null) {
+                                val conversations = ConversationsDb()
+
+                                var data: JsonObject
+                                var conversationId: String
+                                var dbLastMessageId: String?
+                                var lastMessageId: String
+                                var answerType: String
+
+                                // Process each message header
+                                for (header in JsonParser.parseString(headers).asJsonArray) {
+                                    data = header.asJsonObject
+
+                                    conversationId = data.get("Id").asString
+                                    lastMessageId = data.get("Uniquid").asString
+                                    dbLastMessageId = conversations.lastMessage(conversationId)
+
+                                    // If the conversation does not yet exist, create it,
+                                    // and load all messages from them
+                                    if (dbLastMessageId == null) {
+                                        // Check if we could answer to this coonversation
+                                        answerType = when {
+                                            data.get("noanswer").asBoolean ||
+                                                    data.get("noAnswerAllowed").asBoolean ||
+                                                    data.get("Papierkorb").asString == "ja" ->
+                                                Conversation.ANSWER_TYPE_NONE
+                                            data.get("privateAnswerOnly").asString == "ja" ->
+                                                Conversation.ANSWER_TYPE_PRIVATE
+                                            data.get("groupOnly").asString == "ja" ->
+                                                Conversation.ANSWER_TYPE_ALL
+                                            else -> Conversation.ANSWER_TYPE_ALL
+                                        }
+
+                                        // Save this conversation
+                                        conversations.save(Conversation(
+                                                conversationId,
+                                                lastMessageId,
+                                                data.get("Betreff").asString,
+                                                data.get("private").asInt,
+                                                answerType
+                                        ))
+
+                                        // Load this conversation
+                                        if (!onlyHeaders) {
+                                            fetchConversation(conversationId, cryption)
+                                        }
+
+                                        // TODO HEADERS DO NOT CONTAIN A CONVERSATION'S LAST MESSAGE; BUT IT'S FIRST
+                                    }
+
                                 }
-                                "requestCancelledError" -> {
-                                    callback(NetworkManager.FAILED_CANCELLED)
-                                }
-                                else -> {
-                                    callback(NetworkManager.FAILED_UNKNOWN)
-                                }
+                            } else {
+                                // For some reason the decrypted data is null
+                                callback(NetworkManager.FAILED_UNKNOWN)
                             }
                         }
 
-                    })
+                    }
+
+                } catch (e: Exception) {
+                    // If messages fetching failed, log and return
+                    Log.e(SphPlanner.TAG, "Fetching messages failed")
+                    Log.e(SphPlanner.TAG, e.stackTraceToString())
+                    FirebaseCrashlytics.getInstance().recordException(e)
+                    // Log error
+                    if (Debugger.DEBUGGING_ENABLED)
+                        DebugLog("Messages", "Error fetching messages",
+                                bundleOf("exception" to e.stackTraceToString()),
+                                Debugger.LOG_TYPE_ERROR).log()
+                    // Still continue with a success,
+                    // sph's messages page is just too unreliable
+                    // and this data not critical
+                    if (FirebaseRemoteConfig.getInstance()
+                                    .getBoolean("messages_mandatory")) {
+                        callback(NetworkManager.SUCCESS)
+                    } else {
+                        callback(NetworkManager.FAILED_UNKNOWN)
+                    }
+                    return@postJsonAuthed
+                }
+            }
         }
     }
+
+    /**
+     * Fetch and save all messages for a conversation
+     * SPH identifies the conversation by it's first message id
+     */
+    fun fetchConversation(conversationId: String, cryption: Cryption) {
+        // Post to sph to get messages data
+        NetworkManager().postJsonAuthed(SphPlanner.applicationContext().getString(R.string.url_messages),
+                body = mapOf("a" to "read", "uniqid" to "visibleOnly", "last" to "0")) { netSuccess, json ->
+            if (netSuccess == NetworkManager.SUCCESS && json != null) {
+            }
+        }
+    }
+
+
 }

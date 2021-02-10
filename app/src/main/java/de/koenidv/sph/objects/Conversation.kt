@@ -8,4 +8,10 @@ data class Conversation(
         val recipientCount: Int, // Number of recipients according to sph's "private" property
         val answerType: String // none/private/all, merged from different values from sph:
         // Papierkorb, noAnswerAllowed, privateOnly, groupOnly
-)
+) {
+    companion object {
+        const val ANSWER_TYPE_NONE = "none"
+        const val ANSWER_TYPE_PRIVATE = "private"
+        const val ANSWER_TYPE_ALL = "all"
+    }
+}
