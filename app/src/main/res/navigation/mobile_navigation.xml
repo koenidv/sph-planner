@@ -240,6 +240,7 @@
     <fragment
         android:id="@+id/frag_holidays"
         android:name="de.koenidv.sph.ui.HolidaysFragment"
-        android:label="@string/holidays_title" />
+        android:label="@string/holidays_title"
+        tools:layout="@layout/fragment_holidays" />
 
 </navigation>
