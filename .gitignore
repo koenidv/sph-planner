@@ -16,3 +16,4 @@ apikeys.properties
 local.properties
 /node_modules
 /app/release
+/.idea/discord.xml

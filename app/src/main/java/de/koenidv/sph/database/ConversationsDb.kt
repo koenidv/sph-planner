@@ -28,6 +28,33 @@ class ConversationsDb {
     }
 
     /**
+     * Get a conversation by its id or null if it does not exist
+     */
+    fun get(convId: String): Conversation? {
+        val cursor: Cursor = writable.rawQuery(
+                "SELECT * FROM conversations WHERE conversation_id=\"$convId\"",
+                null)
+        // If result is empty, return null
+        if (!cursor.moveToFirst()) {
+            cursor.close()
+            return null
+        }
+        // Else return the queried conversation
+        val conversation = Conversation(
+                cursor.getString(0),
+                cursor.getString(1),
+                cursor.getString(2),
+                cursor.getInt(3),
+                cursor.getString(4),
+                cursor.getString(5),
+                cursor.getInt(6) == 1,
+                cursor.getInt(7) == 1
+        )
+        cursor.close()
+        return conversation
+    }
+
+    /**
      * Returns unread value for a conversation, or null if there is no such conversation
      */
     fun isUnread(convId: String): Boolean? {
@@ -51,6 +78,13 @@ class ConversationsDb {
     fun setUnread(convId: String, unread: Boolean) {
         writable.execSQL("UPDATE conversations SET unread = " +
                 (if (unread) 1 else 0) + " WHERE conversation_id=\"$convId\"")
+    }
+
+    /**
+     * Sets a conversation's answertype
+     */
+    fun setAnswertype(convId: String, answerType: String) {
+        writable.execSQL("UPDATE conversations SET answertype=\"$answerType\" WHERE conversation_id=\"$convId\"")
     }
 
 
