@@ -75,8 +75,5 @@ public class HolidaysDb {
         }
         cursor.close();
         return returnList;
-
     }
-
-
 }
