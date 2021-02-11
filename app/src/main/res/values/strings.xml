@@ -240,6 +240,11 @@
 
     <!-- Holidays -->
     <string name="holidays_title">Holidays</string>
+    <string name="holidays_spring">Spring Holidays</string>
+    <string name="holidays_summer">Summer Holidays</string>
+    <string name="holidays_autumn">Autumn Holidays</string>
+    <string name="holidays_winter">Winter Holidays</string>
+
 
     <!-- Options sheet -->
     <string name="info_menuaction">Options</string>
@@ -353,6 +358,4 @@
     <!-- Usabilty -->
     <string name="imagedescr_expand">Expand</string>
     <string name="imagedescr_info">Illustration</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
