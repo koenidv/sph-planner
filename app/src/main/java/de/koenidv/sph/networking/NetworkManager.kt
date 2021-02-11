@@ -440,7 +440,7 @@ class NetworkManager {
                 }
                 "messages" -> {
                     status(applicationContext().getString(R.string.index_status_messages))
-                    Messages().fetch(callback = onDone, markAsRead = true)
+                    Messages().fetch(archived = true, callback = onDone)
                 }
                 "users" -> {
                     status(applicationContext().getString(R.string.index_status_users))

@@ -104,10 +104,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private void createMessagesTables(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE conversations (" +
                 "conversation_id TEXT PRIMARY KEY," +
-                "last_id_message TEXT," +
+                "first_id_message TEXT," +
                 "subject TEXT," +
                 "recipient_count INTEGER," +
-                "answertype TEXT);");
+                "answertype TEXT," +
+                "original_id_sender TEXT," +
+                "unread INTEGER," +
+                "archived INTEGER DEFAULT 0);");
         db.execSQL("CREATE TABLE messages (" +
                 "message_id TEXT PRIMARY KEY," +
                 "id_conversation TEXT," +
