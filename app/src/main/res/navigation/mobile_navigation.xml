@@ -126,6 +126,11 @@
             app:destination="@id/frag_users"
             app:enterAnim="@anim/popup_enter"
             app:exitAnim="@anim/popup_exit" />
+        <action
+            android:id="@+id/holidaysFromExploreAction"
+            app:destination="@id/frag_holidays"
+            app:enterAnim="@anim/popup_enter"
+            app:exitAnim="@anim/popup_exit" />
     </fragment>
 
     <fragment
@@ -232,5 +237,9 @@
         android:name="de.koenidv.sph.ui.UsersFragment"
         android:label="@string/users_title"
         tools:layout="@layout/fragment_users" />
+    <fragment
+        android:id="@+id/frag_holidays"
+        android:name="de.koenidv.sph.ui.HolidaysFragment"
+        android:label="@string/holidays_title" />
 
 </navigation>

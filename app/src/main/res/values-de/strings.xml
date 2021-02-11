@@ -287,5 +287,7 @@
     <string name="debug_token_generating">Neuer Token wird generiert…</string>
     <string name="debug_token_description">Durch das Teilen eines Sitzungstokens kannst du temporären Zugang zum Schulportal gewähren, ohne deine Zugangsdaten zu teilen.</string>
     <string name="dev_options">Entwicklereinstellungen</string>
+    <string name="explore_collection_holidays">🚆 Ferien</string>
+    <string name="holidays_title">Ferien</string>
 
 </resources>

@@ -238,6 +238,9 @@
     <string name="email_template_chip_abbr">Abbreviation</string>
     <string name="email_template_chip_id">Identifier</string>
 
+    <!-- Holidays -->
+    <string name="holidays_title">Holidays</string>
+
     <!-- Options sheet -->
     <string name="info_menuaction">Options</string>
     <string name="info_greeting">Hey %name</string>
@@ -280,6 +283,7 @@
     <string name="explore_collection_tasks">🖋️ Tasks</string>
     <string name="explore_collection_changes">🗞️️ Changes</string>
     <string name="explore_collection_users">👥 Teachers</string>
+    <string name="explore_collection_holidays">🚆 Holidays</string>
 
     <!-- Contact -->
     <string name="contact_telegram_icon" translatable="false">paper-plane</string>
@@ -349,4 +353,6 @@
     <!-- Usabilty -->
     <string name="imagedescr_expand">Expand</string>
     <string name="imagedescr_info">Illustration</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
