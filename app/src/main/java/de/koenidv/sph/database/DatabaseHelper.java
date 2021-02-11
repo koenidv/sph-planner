@@ -123,7 +123,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "unread INTEGER," +
                 "recipients TEXT," +
                 "recipientsCount INTEGER," +
-                "isOwn INTEGER," +
                 "isTrashed INTEGER);");
     }
 }

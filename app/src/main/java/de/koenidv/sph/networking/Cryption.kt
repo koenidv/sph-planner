@@ -52,6 +52,14 @@ class Cryption {
             decrypt(data, privateKey, callback)
 
     /**
+     * Encrypts data with the stored secret
+     * @param data Data to be encrypted
+     * @param callback Callback when encryption is complete
+     */
+    fun encrypt(data: String, callback: (encrypted: String?) -> Unit) =
+            encrypt(data, privateKey, callback)
+
+    /**
      * Stops the Rhino VM
      * The VM will not stop by itself ;)
      */
@@ -281,6 +289,17 @@ class Cryption {
     private fun decrypt(data: String, secret: String, callback: (decrypted: String?) -> Unit) {
         val dataJs = data.replace("\\", "")
         execute("decrypt", arrayOf(dataJs, secret), callback)
+    }
+
+    /**
+     * Encrypts data with the secret
+     * @param data Data to be encrypted
+     * @param secret Authenticated private key to decrypt
+     * @param callback Callback when encryption is complete
+     */
+    private fun encrypt(data: String, secret: String, callback: (encrypted: String?) -> Unit) {
+        val dataJs = data.replace("\\", "")
+        execute("encrypt", arrayOf(dataJs, secret), callback)
     }
 
     /**
