@@ -289,5 +289,9 @@
     <string name="dev_options">Entwicklereinstellungen</string>
     <string name="explore_collection_holidays">🚆 Ferien</string>
     <string name="holidays_title">Ferien</string>
+    <string name="holidays_summer">Sommerferien</string>
+    <string name="holidays_autumn">Herbstferien</string>
+    <string name="holidays_winter">Winterferien</string>
+    <string name="holidays_spring">Frühjahrsferien</string>
 
 </resources>
