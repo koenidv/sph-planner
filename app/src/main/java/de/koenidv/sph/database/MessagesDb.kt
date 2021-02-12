@@ -25,7 +25,6 @@ class MessagesDb {
         cv.put("unread", if (message.unread) 1 else 0)
         cv.put("recipients", message.recipients.toString())
         cv.put("recipientsCount", message.recipientCount)
-        cv.put("isTrashed", message.isTrashed)
 
         writable.replace("messages", null, cv)
     }

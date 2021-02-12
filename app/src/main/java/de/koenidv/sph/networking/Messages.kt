@@ -3,7 +3,7 @@ package de.koenidv.sph.networking
 import android.util.Log
 import androidx.core.os.bundleOf
 import com.google.firebase.crashlytics.FirebaseCrashlytics
-import com.google.firebase.remoteconfig.FirebaseRemoteConfig
+import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import de.koenidv.sph.R
@@ -15,6 +15,7 @@ import de.koenidv.sph.debugging.DebugLog
 import de.koenidv.sph.debugging.Debugger
 import de.koenidv.sph.objects.Conversation
 import de.koenidv.sph.objects.Message
+import java.text.SimpleDateFormat
 import java.util.*
 
 //  Created by koenidv on 31.01.2021.
@@ -91,23 +92,25 @@ class Messages {
                                     isArchived = if (archived)
                                         data.get("Papierkorb").asString == "ja" else false
 
+                                    // Check if we could answer to this coonversation
+                                    answerType = when {
+                                        data.get("noanswer").asBoolean ||
+                                                data.get("noAnswerAllowed").asBoolean ||
+                                                data.get("Papierkorb").asString == "ja" ->
+                                            Conversation.ANSWER_TYPE_NONE
+                                        data.get("privateAnswerOnly").asString == "ja" ->
+                                            Conversation.ANSWER_TYPE_PRIVATE
+                                        data.get("groupOnly").asString == "ja" ->
+                                            Conversation.ANSWER_TYPE_ALL
+                                        else -> Conversation.ANSWER_TYPE_ALL
+                                    }
+
                                     var conversation = conversations.get(conversationId)
                                     // todo add user if new and not self
 
                                     // If the conversation does not yet exist, create it,
-                                    // and load all messages from them
+                                    // and load all messages from it
                                     if (conversation == null) {
-                                        // Check if we could answer to this coonversation
-                                        answerType = when {
-                                            data.get("noanswer").asBoolean ||
-                                                    data.get("noAnswerAllowed").asBoolean ->
-                                                Conversation.ANSWER_TYPE_NONE
-                                            data.get("privateAnswerOnly").asString == "ja" ->
-                                                Conversation.ANSWER_TYPE_PRIVATE
-                                            data.get("groupOnly").asString == "ja" ->
-                                                Conversation.ANSWER_TYPE_ALL
-                                            else -> Conversation.ANSWER_TYPE_ALL
-                                        }
 
                                         // Save this conversation
                                         conversation = Conversation(
@@ -125,12 +128,15 @@ class Messages {
                                         // Load this conversation, if not only headers
                                         if (!onlyHeaders) loadMessagesList.add(conversation)
 
-                                    } else if (conversation.unread != sphUnread || forceRefresh) {
+                                    } else if (conversation.unread != sphUnread ||
+                                            conversation.answerType != answerType ||
+                                            forceRefresh) {
                                         // If the read status of this conversation has changed,
                                         // or if force refresh is enabled, update this conversation
-                                        // Values other than unread should not have changed,
-                                        // so we'll just have to update that
+                                        // Values other than unread and answertype
+                                        // should not have changed, so we'll just have to update that
                                         conversations.setUnread(conversationId, sphUnread)
+                                        conversations.setAnswertype(conversationId, answerType)
 
                                         // Load this conversation, if not only headers
                                         if (!onlyHeaders) loadMessagesList.add(conversation)
@@ -141,6 +147,7 @@ class Messages {
                                 // If no messages should be loaded, callback, else load them
                                 if (loadMessagesList.isEmpty()) {
                                     callback(NetworkManager.SUCCESS)
+                                    cryption.stop()
                                 } else {
                                     var index = 0
                                     val callbackIfLast: (Int) -> Unit = {
@@ -150,6 +157,8 @@ class Messages {
                                             // If this was the last conversation, callback
                                             // If an error occurred, callback regardless
                                             callback(it)
+                                            // Stop the js vm
+                                            cryption.stop()
                                         }
                                     }
                                     // Load each conversation
@@ -175,16 +184,9 @@ class Messages {
                 DebugLog("Messages", "Error fetching messages",
                         bundleOf("exception" to e.stackTraceToString()),
                         Debugger.LOG_TYPE_ERROR).log()
-            // Still continue with a success,
-            // sph's messages page is just too unreliable
-            // and this data not critical
-            if (FirebaseRemoteConfig.getInstance()
-                            .getBoolean("messages_mandatory")) {
-                callback(NetworkManager.SUCCESS)
-            } else {
-                callback(NetworkManager.FAILED_UNKNOWN)
-            }
-            return
+
+            // Call back with unknown error
+            callback(NetworkManager.FAILED_UNKNOWN)
         }
     }
 
@@ -233,6 +235,24 @@ class Messages {
      * Saves a message and all its replies
      */
     fun saveMessage(msg: JsonObject, conv: Conversation, messages: MessagesDb = MessagesDb()) {
+        val dateformat = SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.ROOT)
+
+        // Add each recipient from "empf"
+        val recipients = mutableListOf<String>()
+        var recipText: String
+        if (msg.get("empf") is JsonArray) {
+            try {
+                for (recipient in msg.getAsJsonArray("empf")) {
+                    recipText = recipient.asString
+                    recipText = recipText.substring(recipText.indexOf("/i> ") + 4)
+                    recipText = recipText.substringBefore("<")
+                    recipients.add(recipText)
+                }
+            } catch (e: java.lang.Exception) {
+                Log.e(TAG, e.stackTraceToString())
+                FirebaseCrashlytics.getInstance().recordException(e)
+            }
+        }
 
         val message = Message(
                 messId = msg.get("Uniquid").asString,
@@ -240,16 +260,13 @@ class Messages {
                 idSender = msg.get("Sender").asString,
                 senderType = msg.get("SenderArt").asString,
                 senderName = msg.get("username").asString,
-                date = Date(), // todo
+                date = dateformat.parse(msg.get("Datum").asString)!!,
                 subject = msg.get("Betreff").asString,
                 content = msg.get("Inhalt").asString,
-                recipients = null, // todo
+                recipients = recipients,
                 recipientCount = msg.get("private").asInt,
-                unread = msg.get("ungelesen").asBoolean,
-                isTrashed = msg.get("Papierkorb").asString == "ja"
+                unread = msg.get("ungelesen").asBoolean
         )
-
-        // fixme something is wrong here when saving a reply
 
         messages.save(message)
 

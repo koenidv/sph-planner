@@ -14,6 +14,5 @@ data class Message(
         val content: String, // Message's content
         val recipients: List<String>?, // Recipients, only for own messages
         val recipientCount: Int, // Number of recipients according to sph's "private" property
-        val unread: Boolean, // true if unread, false if read
-        val isTrashed: Boolean // Whether message is trashed on sph, might disable replying
+        val unread: Boolean // true if unread, false if read
 )
