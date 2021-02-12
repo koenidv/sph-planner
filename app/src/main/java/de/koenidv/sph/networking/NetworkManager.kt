@@ -30,6 +30,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import okhttp3.Response
 import org.json.JSONObject
+import org.jsoup.Jsoup
 import java.util.*
 
 //  Created by koenidv on 11.12.2020.
@@ -150,7 +151,7 @@ class NetworkManager {
                         bundleOf("url" to url,
                                 "forceNewToken" to forceNewToken,
                                 "tokenCb" to success)).log()
-                                                    
+
             if (success == SUCCESS) {
 
                 // Getting webpage
@@ -382,7 +383,7 @@ class NetworkManager {
 
         // Get all supported features as String list
         val features = FunctionTilesDb.getInstance().supportedFeatures.map { it.type }
-        val loadList = mutableListOf("courses")
+        val loadList = mutableListOf("userid", "courses")
 
         // Mark each supported feature for loading
         if (features.contains(FEATURE_TIMETABLE)) loadList.add("timetable")
@@ -422,6 +423,10 @@ class NetworkManager {
             if (Debugger.DEBUGGING_ENABLED)
                 DebugLog("NetMgr", "Fetching ${loadList[index]}").log()
             when (loadList[index]) {
+                "userid" -> {
+                    status(applicationContext().getString(R.string.index_status_userid))
+                    getOwnUserId(onDone)
+                }
                 "courses" -> {
                     status(applicationContext().getString(R.string.index_status_courses))
                     Courses(this).createIndex(onDone, features)
@@ -527,6 +532,29 @@ class NetworkManager {
 
                         })
             } else callback(success, url)
+        }
+    }
+
+    /**
+     * Loads the user's profile picture site and gets their user id from there
+     */
+    fun getOwnUserId(callback: (success: Int) -> Unit) {
+        // Load the site where one can upload a profile picture
+        getSiteAuthed("https://start.schulportal.hessen.de/benutzerverwaltung.php?a=userFoto")
+        { success, result ->
+            if (success == SUCCESS) {
+                // Extract the user id
+                val document = Jsoup.parse(result)
+                val profilePicture = document.selectFirst("div#content img")
+                        .attr("src")
+                val userid = profilePicture.substringAfter("&p=")
+                        .substringBefore("&")
+
+                applicationContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
+                        .edit().putString("userid", userid).apply()
+
+                callback(SUCCESS)
+            } else callback(success)
         }
     }
 

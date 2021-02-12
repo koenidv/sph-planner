@@ -4,25 +4,36 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
-import androidx.navigation.Navigation
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import de.koenidv.sph.R
+import de.koenidv.sph.adapters.ConversationsAdapter
+import de.koenidv.sph.database.ConversationsDb
 
 // Created by koenidv on 18.12.2020.
 class MessagesFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?, savedInstanceState: Bundle?): View? {
-
         val view = inflater.inflate(R.layout.fragment_messages, container, false)
 
-        // Just for convenience while developing, open sph's front page using the WebViewFragment
-        // But first, use a very bad but simple workaround to set explore tab as active tab
+        val conversationsRecycler = view.findViewById<RecyclerView>(R.id.conversationsRecycler)
+        val fab = view.findViewById<ExtendedFloatingActionButton>(R.id.newConversationFab)
 
-        Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
-                .navigate(R.id.nav_explore)
-        Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
-                .navigate(R.id.frag_webview, bundleOf("url" to "https://start.schulportal.hessen.de"))
+        // Display conversations
+        conversationsRecycler.adapter = ConversationsAdapter(ConversationsDb().getAll())
+
+        // Extend / Shrink fab on scroll
+        conversationsRecycler.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                if (dy > 0 && fab.isExtended) {
+                    fab.shrink()
+                } else if (dy < 0 && !fab.isExtended) {
+                    fab.extend()
+                }
+            }
+        })
 
         return view
     }

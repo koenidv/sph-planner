@@ -3,6 +3,8 @@ package de.koenidv.sph.database
 import android.content.ContentValues
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
+import de.koenidv.sph.R
+import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.objects.User
 
 //  Created by koenidv on 09.01.2021.
@@ -18,6 +20,31 @@ class UsersDb {
             writable.rawQuery(
                     "SELECT * FROM users ORDER BY pinned DESC, lastname", null
             ))
+
+    /**
+     * Get a users name
+     */
+    fun getName(userid: String, lastnamefirst: Boolean = false): String {
+        val nameCursor = writable.rawQuery(
+                "SELECT firstname, lastname FROM users WHERE user_id=\"$userid\" OR user_id=\"l-$userid\"",
+                null
+        )
+        // If result is empty, return user id
+        if (!nameCursor.moveToFirst()) {
+            nameCursor.close()
+            return userid
+        }
+        // Get template
+        var name = SphPlanner.applicationContext().getString(
+                if (lastnamefirst) R.string.users_name_template_last
+                else R.string.users_name_template_first)
+        // Replace placeholders
+        name = name.replace("%firstname", nameCursor.getString(0))
+                .replace("%lastname", nameCursor.getString(1))
+
+        nameCursor.close()
+        return name
+    }
 
     /**
      * Save a list of users to the db
@@ -55,6 +82,9 @@ class UsersDb {
         cursor.close()
     }
 
+    /**
+     * Get a list of users from a cursor pointing at such a table
+     */
     private fun getWithCursor(cursor: Cursor): List<User> {
         val returnList = mutableListOf<User>()
         if (cursor.moveToFirst()) {
