@@ -244,9 +244,11 @@
     <string name="holidays_summer">Summer Holidays</string>
     <string name="holidays_autumn">Autumn Holidays</string>
     <string name="holidays_winter">Winter Holidays</string>
-    <string name="holidays_remaining_days">In %d days</string>
-    <string name="holidays_remaining_weeks">In %w weeks \nand %d days</string>
-    <string name="holidays_date">From %s \nto %e</string>
+    <string name="holidays_remaining_days">%d days</string>
+    <string name="holidays_remaining_weeks">%w weeks\n%d days</string>
+    <string name="holidays_date">From %s to %e</string>
+    <string name="holidays_date_template">d MMM</string>
+    <string name="holidays_date_template2">d MMM yy</string>
 
     <!-- Options sheet -->
     <string name="info_menuaction">Options</string>
