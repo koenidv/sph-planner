@@ -213,7 +213,9 @@ class OnboardingSupportlistFragment : Fragment() {
                             NetworkManager().indexAll({
                                 // Update status text on status update
                                 status ->
-                                statusText.text = status
+                                activity?.runOnUiThread {
+                                    statusText.text = status
+                                }
                             }) { indexsuccess ->
                                 // Log index status
                                 if (Debugger.DEBUGGING_ENABLED)
