@@ -109,6 +109,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "recipient_count INTEGER," +
                 "answertype TEXT," +
                 "original_id_sender TEXT," +
+                "date INTEGER," +
                 "unread INTEGER," +
                 "archived INTEGER DEFAULT 0);");
         db.execSQL("CREATE TABLE messages (" +

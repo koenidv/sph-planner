@@ -4,6 +4,7 @@ import android.content.ContentValues
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import de.koenidv.sph.objects.Conversation
+import java.util.*
 
 //  Created by koenidv on 09.01.2021.
 class ConversationsDb {
@@ -21,6 +22,7 @@ class ConversationsDb {
         cv.put("recipient_count", conversation.recipientCount)
         cv.put("answertype", conversation.answerType)
         cv.put("original_id_sender", conversation.originalSenderId)
+        cv.put("date", conversation.date.time / 1000)
         cv.put("unread", if (conversation.unread) 1 else 0)
         cv.put("archived", if (conversation.archived) 1 else 0)
 
@@ -51,7 +53,7 @@ class ConversationsDb {
     fun getAll(archived: Boolean = false) =
             toConversationList(writable.rawQuery(
                     "SELECT * FROM conversations WHERE archived=${if (archived) 1 else 0}",
-                    null))
+                    null), true)
 
     /**
      * Returns unread value for a conversation, or null if there is no such conversation
@@ -69,6 +71,15 @@ class ConversationsDb {
         val unread = cursor.getInt(0) == 1
         cursor.close()
         return unread
+    }
+
+    /**
+     * Sets the last date
+     * Should be replaced with just a left join, but sph's data makes that quite hard
+     */
+    fun setDate(convId: String, date: Date) {
+        writable.execSQL("UPDATE conversations SET date = " +
+                date.time / 1000 + " WHERE conversation_id=\"$convId\"")
     }
 
     /**
@@ -97,6 +108,7 @@ class ConversationsDb {
                 cursor.getInt(3),
                 cursor.getString(4),
                 cursor.getString(5),
+                Date(cursor.getInt(6) * 1000L),
                 cursor.getInt(6) == 1,
                 cursor.getInt(7) == 1
         )
@@ -105,13 +117,18 @@ class ConversationsDb {
     /**
      * Get a list of conversations from the cursor and close it
      */
-    private fun toConversationList(cursor: Cursor): List<Conversation> {
+    private fun toConversationList(cursor: Cursor, withFirstMessage: Boolean = false): List<Conversation> {
         val returnList = mutableListOf<Conversation>()
 
         if (!cursor.moveToFirst()) return returnList
 
+        val messages = MessagesDb()
+
         do {
-            returnList.add(toConversation(cursor))
+            returnList.add(toConversation(cursor).apply {
+                if (withFirstMessage)
+                    this.fistMessage = messages.getMessage(this.firstIdMess)
+            })
         } while (cursor.moveToNext())
 
         cursor.close()

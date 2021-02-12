@@ -76,6 +76,9 @@ class Messages {
                                 var answerType: String
                                 var origSenderId: String
                                 var isArchived: Boolean
+                                var date: Date
+
+                                val dateformat = SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.ROOT)
 
                                 // List of conversations to load all messages for
                                 val loadMessagesList = mutableListOf<Conversation>()
@@ -91,6 +94,8 @@ class Messages {
                                     origSenderId = data.get("Sender").asString
                                     isArchived = if (archived)
                                         data.get("Papierkorb").asString == "ja" else false
+
+                                    date = dateformat.parse(data.get("Datum").asString)!!
 
                                     // Check if we could answer to this coonversation
                                     answerType = when {
@@ -120,6 +125,7 @@ class Messages {
                                                 data.get("private").asInt,
                                                 answerType,
                                                 origSenderId,
+                                                date,
                                                 sphUnread,
                                                 isArchived
                                         )
@@ -128,13 +134,14 @@ class Messages {
                                         // Load this conversation, if not only headers
                                         if (!onlyHeaders) loadMessagesList.add(conversation)
 
-                                    } else if (conversation.unread != sphUnread ||
+                                    } else if (conversation.date != date ||
                                             conversation.answerType != answerType ||
                                             forceRefresh) {
                                         // If the read status of this conversation has changed,
                                         // or if force refresh is enabled, update this conversation
-                                        // Values other than unread and answertype
+                                        // Values other than unread, date and answertype
                                         // should not have changed, so we'll just have to update that
+                                        conversations.setDate(conversationId, date)
                                         conversations.setUnread(conversationId, sphUnread)
                                         conversations.setAnswertype(conversationId, answerType)
 

@@ -70,6 +70,8 @@ class ConversationsAdapter(private val conversations: List<Conversation>) :
             text = text.replace("%sender", UsersDb().getName(conversation.originalSenderId))
                     .replace("%countall", conversation.recipientCount.toString())
                     .replace("%count", (conversation.recipientCount - 1).toString())
+                    .replace("%recipient",
+                            conversation.fistMessage?.recipients?.getOrNull(0).toString())
 
             return text
         }

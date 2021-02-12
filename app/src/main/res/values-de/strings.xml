@@ -260,7 +260,7 @@
     <string name="index_status_timetable">Deinen Stundenplan einprägen…</string>
     <string name="index_status_posts">Alle Beiträge lesen…</string>
     <string name="index_status_changes">Ausschau nach Vertretungen halten…</string>
-    <string name="index_status_messages">Deine Nachrichten zählen…</string>
+    <string name="index_status_messages">Deine Nachrichten laden…</string>
     <string name="index_status_users">Deine Lehrkräfte finden…</string>
     <string name="index_status_holidays">Nach Ferien suchen…</string>
     <string name="email_template_info">Einmal eingerichtet kannst du hier E-Mails an alle Lehrkräfte senden.\nBitte lege das Muster fest, nach welchem deine Schule E-Mail-Adressen vergibt.</string>
