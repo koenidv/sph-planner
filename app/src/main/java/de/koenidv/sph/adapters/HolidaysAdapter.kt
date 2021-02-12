@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.RecyclerView
 import de.koenidv.sph.objects.Holiday
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner.Companion.applicationContext
-import de.koenidv.sph.debugging.Debugger.prefs
 import de.koenidv.sph.parsing.Utility
 import java.text.SimpleDateFormat
 import java.util.*
@@ -20,8 +19,6 @@ import java.util.*
 //  Created by LbTobi on 10.02.2021
 class HolidaysAdapter(private val holidays: List<Holiday>) :
     RecyclerView.Adapter<HolidaysAdapter.ViewHolder>() {
-
-    private val themeColor = prefs.getInt("themeColor", 0)
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     private val layout = view.findViewById<ConstraintLayout>(R.id.holidayLayout)
@@ -41,7 +38,7 @@ class HolidaysAdapter(private val holidays: List<Holiday>) :
         val year = currentHoliday.year
 
         name.text = when (currentName) {
-            "osterferien" -> applicationContext().getString(R.string.holidays_spring) + " " + year
+            "osterferien" -> applicationContext().getString(R.string.holidays_spring) + " $year"
             "sommerferien" -> applicationContext().getString(R.string.holidays_summer) + " $year"
             "herbstferien" -> applicationContext().getString(R.string.holidays_autumn) + " $year"
             "weihnachtsferien" -> applicationContext().getString(R.string.holidays_winter) + " $year"
@@ -49,9 +46,10 @@ class HolidaysAdapter(private val holidays: List<Holiday>) :
         }
 
         //date stuff
-        val formatter = SimpleDateFormat.getDateInstance()
+        val formatter = SimpleDateFormat(applicationContext().getString(R.string.holidays_date_template), Locale.getDefault())
+        val formatter2 = SimpleDateFormat(applicationContext().getString(R.string.holidays_date_template2), Locale.getDefault())
         val startDate = formatter.format(currentHoliday.start)
-        val endDate = formatter.format(currentHoliday.end)
+        val endDate = formatter2.format(currentHoliday.end)
         val currentDate = Date().time
         val remainingTime = currentHoliday.start.time - currentDate
         val remainingDays = remainingTime / 86400000
@@ -59,16 +57,16 @@ class HolidaysAdapter(private val holidays: List<Holiday>) :
         date.text = applicationContext().getString(R.string.holidays_date)
                 .replace("%s", startDate)
                 .replace("%e", endDate)
-        // TODO: 12/02/2021 don't display year in date Textfield
 
         //remaining
-        if (remainingDays >= 7) {
+        if (remainingDays >= 14) {
             remaining.text = applicationContext().getString(R.string.holidays_remaining_weeks)
                     .replace("%w", (remainingDays / 7).toString())
                     .replace("%d", (remainingDays - (remainingDays / 7) * 7).toString())
         } else {
             remaining.text = applicationContext().getString(R.string.holidays_remaining_days, remainingDays)
         }
+        // TODO: 13/02/2021 make use of plurals/singulars
 
         // Tint background with holiday color at 15% for next 4 Holidays
         if (position < 4) {
@@ -79,7 +77,7 @@ class HolidaysAdapter(private val holidays: List<Holiday>) :
                 "weihnachtsferien" -> applicationContext().getColor(R.color.holiday_color_winter)
                 else -> Color.TRANSPARENT
             }
-            Utility.tintBackground(layout, color, 0x50000000)
+            Utility.tintBackground(layout, color, 0x32000000)
         } else
             layout.background.clearColorFilter()
     }
