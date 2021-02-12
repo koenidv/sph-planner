@@ -293,5 +293,7 @@
     <string name="holidays_autumn">Herbstferien</string>
     <string name="holidays_winter">Winterferien</string>
     <string name="holidays_spring">Frühjahrsferien</string>
-
+    <string name="holidays_remaining_days">In %d Tagen</string>
+    <string name="holidays_remaining_weeks">In %w Wochen \nund %d Tagen</string>
+    <string name="holidays_date">Vom %s \nbis %e</string>
 </resources>
