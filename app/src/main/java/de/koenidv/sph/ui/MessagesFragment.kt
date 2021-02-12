@@ -20,20 +20,56 @@ class MessagesFragment : Fragment() {
         val conversationsRecycler = view.findViewById<RecyclerView>(R.id.conversationsRecycler)
         val fab = view.findViewById<ExtendedFloatingActionButton>(R.id.newConversationFab)
 
+        var recyclerEditMode = false
+        val conversations = ConversationsDb().getAll().toMutableList()
+
         // Display conversations
-        conversationsRecycler.adapter = ConversationsAdapter(ConversationsDb().getAll())
+        val adapter = ConversationsAdapter(conversations) { selectMode ->
+            recyclerEditMode = selectMode
+            fab.setText(
+                    if (selectMode) R.string.messages_archive_conversations
+                    else R.string.messages_new_conversation)
+            fab.setIconResource(
+                    if (selectMode) R.drawable.ic_archive
+                    else R.drawable.ic_edit
+            )
+            fab.extend()
+        }
+        conversationsRecycler.adapter = adapter
 
         // Extend / Shrink fab on scroll
         conversationsRecycler.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
-                if (dy > 0 && fab.isExtended) {
-                    fab.shrink()
-                } else if (dy < 0 && !fab.isExtended) {
-                    fab.extend()
+                // Don't shrink if in edit mode
+                if (!recyclerEditMode) {
+                    if (dy > 0 && fab.isExtended) {
+                        fab.shrink()
+                    } else if (dy < 0 && !fab.isExtended) {
+                        fab.extend()
+                    }
                 }
             }
         })
+
+        fab.setOnClickListener {
+            if (recyclerEditMode) {
+                // todo archive in db
+                var index: Int
+                val selected = adapter.getSelected()
+                adapter.clearSelected()
+                for (conversation in selected) {
+                    // Remove this item from the recycler view
+                    index = conversations.indexOf(conversation)
+                    if (index != -1) {
+                        conversations.removeAt(index)
+                        adapter.notifyItemRemoved(index)
+                    }
+                }
+            } else {
+                // todo send new message
+            }
+        }
 
         return view
     }

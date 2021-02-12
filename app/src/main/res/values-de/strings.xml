@@ -294,5 +294,6 @@
     <string name="messages_partic_toself_more">%sender an dich und %count weitere</string>
     <string name="imagedescr_newconversation">Starte eine neue Unterhaltung</string>
     <string name="index_status_userid">Sammle einige Informationen…</string>
+    <string name="messages_archive_conversations">Archivieren</string>
 
 </resources>

@@ -226,6 +226,7 @@
     <!-- Messages -->
     <string name="messages_unread_possible">✉️ You might have unread messages</string>
     <string name="messages_new_conversation">New conversation</string>
+    <string name="messages_archive_conversations">Archive</string>
     <string name="messages_partic_fromself">You to %recipient</string>
     <string name="messages_partic_fromself_more">You to %countall recipients</string>
     <string name="messages_partic_toself">%sender to you</string>
