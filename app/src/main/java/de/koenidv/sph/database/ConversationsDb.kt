@@ -40,19 +40,18 @@ class ConversationsDb {
             return null
         }
         // Else return the queried conversation
-        val conversation = Conversation(
-                cursor.getString(0),
-                cursor.getString(1),
-                cursor.getString(2),
-                cursor.getInt(3),
-                cursor.getString(4),
-                cursor.getString(5),
-                cursor.getInt(6) == 1,
-                cursor.getInt(7) == 1
-        )
+        val conversation = toConversation(cursor)
         cursor.close()
         return conversation
     }
+
+    /**
+     * Get all conversations that are (not) archived
+     */
+    fun getAll(archived: Boolean = false) =
+            toConversationList(writable.rawQuery(
+                    "SELECT * FROM conversations WHERE archived=${if (archived) 1 else 0}",
+                    null))
 
     /**
      * Returns unread value for a conversation, or null if there is no such conversation
@@ -87,5 +86,37 @@ class ConversationsDb {
         writable.execSQL("UPDATE conversations SET answertype=\"$answerType\" WHERE conversation_id=\"$convId\"")
     }
 
+    /**
+     * Get a conversation from a cursor pointing at such
+     */
+    private fun toConversation(cursor: Cursor): Conversation {
+        return Conversation(
+                cursor.getString(0),
+                cursor.getString(1),
+                cursor.getString(2),
+                cursor.getInt(3),
+                cursor.getString(4),
+                cursor.getString(5),
+                cursor.getInt(6) == 1,
+                cursor.getInt(7) == 1
+        )
+    }
+
+    /**
+     * Get a list of conversations from the cursor and close it
+     */
+    private fun toConversationList(cursor: Cursor): List<Conversation> {
+        val returnList = mutableListOf<Conversation>()
+
+        if (!cursor.moveToFirst()) return returnList
+
+        do {
+            returnList.add(toConversation(cursor))
+        } while (cursor.moveToNext())
+
+        cursor.close()
+        return returnList
+
+    }
 
 }

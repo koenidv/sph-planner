@@ -244,8 +244,8 @@ class Messages {
             try {
                 for (recipient in msg.getAsJsonArray("empf")) {
                     recipText = recipient.asString
-                    recipText = recipText.substring(recipText.indexOf("/i> ") + 4)
-                    recipText = recipText.substringBefore("<")
+                            .substringAfter("/i> ")
+                            .substringBefore("<")
                     recipients.add(recipText)
                 }
             } catch (e: java.lang.Exception) {

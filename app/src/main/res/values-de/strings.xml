@@ -287,5 +287,12 @@
     <string name="debug_token_generating">Neuer Token wird generiert…</string>
     <string name="debug_token_description">Durch das Teilen eines Sitzungstokens kannst du temporären Zugang zum Schulportal gewähren, ohne deine Zugangsdaten zu teilen.</string>
     <string name="dev_options">Entwicklereinstellungen</string>
+    <string name="messages_new_conversation">Neue Unterhaltung</string>
+    <string name="messages_partic_fromself">Du an %recipient</string>
+    <string name="messages_partic_fromself_more">Du an %countall Empfänger</string>
+    <string name="messages_partic_toself">%sender an dich</string>
+    <string name="messages_partic_toself_more">%sender an dich und %count weitere</string>
+    <string name="imagedescr_newconversation">Starte eine neue Unterhaltung</string>
+    <string name="index_status_userid">Sammle einige Informationen…</string>
 
 </resources>

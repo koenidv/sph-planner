@@ -59,7 +59,7 @@ class UsersAdapter(private val users: List<User>,
             currentUser = user
 
             // Set user name
-            name.text = SphPlanner.applicationContext().getString(R.string.users_name_template)
+            name.text = SphPlanner.applicationContext().getString(R.string.users_name_template_last)
                     .replace("%firstname", user.firstname.toString())
                     .replace("%lastname", user.lastname.toString())
 
