@@ -8,7 +8,7 @@
     <!-- Colors for different themes -->
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_450">#7123f0</color>
-        <color name="purple_500">#FF6200EE</color>
+    <color name="purple_500">#FF6200EE</color>
     <color name="purple_700">#FF3700B3</color>
     <color name="teal_200">#FF03DAC5</color>
     <color name="teal_700">#FF018786</color>
@@ -57,5 +57,11 @@
     <color name="change_type_exam">#e45da9</color>
     <color name="change_type_other">#47e6ab</color>
     <color name="change_type_holidays">#aeaeae</color>
+
+    <!-- Holiday colors -->
+    <color name="holiday_color_spring">#76ff03</color>
+    <color name="holiday_color_summer">#ffff00</color>
+    <color name="holiday_color_autumn">#ff9100</color>
+    <color name="holiday_color_winter">#4fc3f7</color>
 
 </resources>
