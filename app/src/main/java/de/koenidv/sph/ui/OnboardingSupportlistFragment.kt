@@ -320,10 +320,10 @@ class OnboardingSupportlistFragment : Fragment() {
         contactButton.setOnClickListener { ContactSheet().show(parentFragmentManager, "contact") }
 
         /*
-        * After 30s, display debugging options
+        * After 45s, display debugging options
         */
         CoroutineScope(Dispatchers.Unconfined).launch {
-            delay(30000)
+            delay(45000)
             withContext(Dispatchers.Main) {
                 // Set up share debug log button
                 view.findViewById<MaterialButton>(R.id.debugButton).apply {

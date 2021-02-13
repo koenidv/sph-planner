@@ -26,6 +26,11 @@ class MessagesDb {
         return conversation
     }
 
+    fun getConversation(conversationId: String): List<Message> =
+            toMessagesList(writable.rawQuery(
+                    "SELECT * FROM messages WHERE id_conversation=\"$conversationId\"",
+                    null))
+
     /**
      * Saves/replaces a message
      */
@@ -63,6 +68,23 @@ class MessagesDb {
                 recipients = cursor.getString(9).split(";"),
                 recipientCount = cursor.getInt(10),
         )
+    }
+
+    /**
+     * Get a list of messages from the cursor and close it
+     */
+    private fun toMessagesList(cursor: Cursor): List<Message> {
+        val returnList = mutableListOf<Message>()
+
+        if (!cursor.moveToFirst()) return returnList
+
+        do {
+            returnList.add(toMessage(cursor))
+        } while (cursor.moveToNext())
+
+        cursor.close()
+        return returnList
+
     }
 
 }

@@ -70,9 +70,13 @@
 
     <fragment
         android:id="@+id/nav_messages"
-        android:name="de.koenidv.sph.ui.MessagesFragment"
+        android:name="de.koenidv.sph.ui.ConversationsFragment"
         android:label="@string/title_messages"
-        tools:layout="@layout/fragment_messages" />
+        tools:layout="@layout/fragment_conversations">
+        <action
+            android:id="@+id/chatFromConversationsAction"
+            app:destination="@id/chatFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/nav_explore"
@@ -232,5 +236,14 @@
         android:name="de.koenidv.sph.ui.UsersFragment"
         android:label="@string/users_title"
         tools:layout="@layout/fragment_users" />
+    <fragment
+        android:id="@+id/chatFragment"
+        android:name="de.koenidv.sph.ui.ChatFragment"
+        android:label="ChatFragment"
+        tools:layout="@layout/fragment_chat">
+        <argument
+            android:name="conversationId"
+            app:argType="string" />
+    </fragment>
 
 </navigation>

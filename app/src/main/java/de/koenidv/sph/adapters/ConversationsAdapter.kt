@@ -7,6 +7,9 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.os.bundleOf
+import androidx.fragment.app.FragmentActivity
+import androidx.navigation.Navigation
 import androidx.recyclerview.widget.RecyclerView
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner.Companion.applicationContext
@@ -19,6 +22,7 @@ import java.util.*
 
 //  Created by koenidv on 20.12.2020.
 class ConversationsAdapter(private val conversations: List<Conversation>,
+                           private val activity: FragmentActivity,
                            private val onSelectModeChange: (Boolean) -> Unit) :
         RecyclerView.Adapter<ConversationsAdapter.ViewHolder>() {
 
@@ -46,7 +50,9 @@ class ConversationsAdapter(private val conversations: List<Conversation>,
         if (selectMode) {
             selectItem(position)
         } else {
-            // todo open conversation
+            Navigation.findNavController(activity, R.id.nav_host_fragment)
+                    .navigate(R.id.chatFromConversationsAction,
+                            bundleOf("conversationId" to conversation.convId))
         }
     }
     private val onLongClick: (Int) -> Unit = {
