@@ -51,6 +51,7 @@
     <string name="index_status_messages">Getting your messages…</string>
     <string name="index_status_users">Finding your teachers…</string>
     <string name="index_status_holidays">Searching for holidays…</string>
+    <string name="upgrading_messages">Loading messages. This might take a while.</string>
 
     <!-- Sign in process -->
     <string name="onboard_legal_title">Before we start</string>
