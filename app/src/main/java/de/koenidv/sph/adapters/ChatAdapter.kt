@@ -4,25 +4,28 @@ import android.text.util.Linkify
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import de.koenidv.sph.R
-import de.koenidv.sph.SphPlanner
+import de.koenidv.sph.SphPlanner.Companion.applicationContext
 import de.koenidv.sph.database.UsersDb
+import de.koenidv.sph.objects.Conversation
 import de.koenidv.sph.objects.Message
 import me.saket.bettermovementmethod.BetterLinkMovementMethod
 
 
 //  Created by koenidv on 20.12.2020.
-class ChatAdapter(private val messages: List<Message>) :
-        RecyclerView.Adapter<ChatAdapter.ViewHolder>() {
+class ChatAdapter(private val messages: List<Message>, private val conversation: Conversation) :
+        RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     // Get own user id
-    private val prefs = SphPlanner.applicationContext()
+    private val prefs = applicationContext()
             .getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
     private val userid = prefs.getString("userid", "")!!
 
@@ -102,24 +105,64 @@ class ChatAdapter(private val messages: List<Message>) :
             else media.adapter = null
 
         }
+    }
+
+    class HeaderViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        private val identicon = view.findViewById<ImageView>(R.id.headerImageView)
+        private val header = view.findViewById<TextView>(R.id.headerTextView)
+
+        fun bind(conversation: Conversation) {
+
+            val info = Conversation.getConversationPartner(conversation.convId)
+
+            header.text = applicationContext().getString(
+                    if (info.second == 0)
+                        R.string.messages_header_private
+                    else R.string.messages_header_group)
+                    .replace("%name", info.first)
+                    .replace("%count", info.second.toString())
+
+
+            // Get an identicon using Kwelo's API
+            Glide.with(identicon.context)
+                    .load("https://api.kwelo.com/v1/media/identicon/${info.first}?format=webm")
+                    .circleCrop()
+                    .into(identicon)
+
+        }
 
     }
 
     // Creates new views (invoked by the layout manager)
-    override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): ViewHolder {
+    override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         // Create a new view, which defines the UI of the list item
         val view = LayoutInflater.from(viewGroup.context)
-                .inflate(R.layout.item_message, viewGroup, false)
-        return ViewHolder(view)
+                .inflate(viewType, viewGroup, false)
+        return if (viewType == R.layout.item_chat_header) HeaderViewHolder(view)
+        else ViewHolder(view)
     }
 
     // Replaces the contents of a view (invoked by the layout manager)
-    override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
-        // Bind data to ViewHolder
-        viewHolder.bind(messages[position], userid)
+    override fun onBindViewHolder(viewHolder: RecyclerView.ViewHolder, position: Int) {
+        if (position == 0) {
+            // Head item ("Conversation with xy")
+            (viewHolder as HeaderViewHolder).bind(conversation)
+        } else {
+            // Bind data to ViewHolder
+            (viewHolder as ViewHolder).bind(messages[position - 1], userid)
+        }
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        // Head item type on position 0, message otherwise
+        return if (position == 0) {
+            R.layout.item_chat_header
+        } else {
+            R.layout.item_message
+        }
     }
 
     // Return the size of your dataset (invoked by the layout manager)
-    override fun getItemCount() = messages.size
+    override fun getItemCount() = messages.size + 1
 
 }

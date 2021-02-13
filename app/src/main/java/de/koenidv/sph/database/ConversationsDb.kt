@@ -32,7 +32,7 @@ class ConversationsDb {
     /**
      * Get a conversation by its id or null if it does not exist
      */
-    fun get(convId: String): Conversation? {
+    fun get(convId: String, withFirstMessage: Boolean): Conversation? {
         val cursor: Cursor = writable.rawQuery(
                 "SELECT * FROM conversations WHERE conversation_id=\"$convId\"",
                 null)
@@ -42,7 +42,7 @@ class ConversationsDb {
             return null
         }
         // Else return the queried conversation
-        val conversation = toConversation(cursor)
+        val conversation = toConversation(cursor, withFirstMessage)
         cursor.close()
         return conversation
     }
@@ -100,7 +100,7 @@ class ConversationsDb {
     /**
      * Get a conversation from a cursor pointing at such
      */
-    private fun toConversation(cursor: Cursor): Conversation {
+    private fun toConversation(cursor: Cursor, withFirstMessage: Boolean): Conversation {
         return Conversation(
                 cursor.getString(0),
                 cursor.getString(1),
@@ -111,7 +111,10 @@ class ConversationsDb {
                 Date(cursor.getInt(6) * 1000L),
                 cursor.getInt(6) == 1,
                 cursor.getInt(7) == 1
-        )
+        ).apply {
+            if (withFirstMessage)
+                firstMessage = MessagesDb().getMessage(this.firstIdMess)
+        }
     }
 
     /**
@@ -122,13 +125,8 @@ class ConversationsDb {
 
         if (!cursor.moveToFirst()) return returnList
 
-        val messages = MessagesDb()
-
         do {
-            returnList.add(toConversation(cursor).apply {
-                if (withFirstMessage)
-                    this.fistMessage = messages.getMessage(this.firstIdMess)
-            })
+            returnList.add(toConversation(cursor, withFirstMessage))
         } while (cursor.moveToNext())
 
         cursor.close()

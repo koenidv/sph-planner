@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import de.koenidv.sph.R
+import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.adapters.ConversationsAdapter
 import de.koenidv.sph.database.ConversationsDb
 
@@ -16,6 +17,8 @@ class ConversationsFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_conversations, container, false)
+
+        SphPlanner.openInBrowserUrl = getString(R.string.url_messages)
 
         val conversationsRecycler = view.findViewById<RecyclerView>(R.id.conversationsRecycler)
         val fab = view.findViewById<ExtendedFloatingActionButton>(R.id.newConversationFab)

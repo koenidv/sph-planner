@@ -232,7 +232,13 @@
     <string name="messages_partic_fromself_more">You to %countall recipients</string>
     <string name="messages_partic_toself">%sender to you</string>
     <string name="messages_partic_toself_more">%sender to you and %count others</string>
-
+    <string name="messages_dateformat_today">HH:mm</string>
+    <string name="messages_dateformat_yesterday">"Yesterday" HH:mm</string>
+    <string name="messages_dateformat_other">d. MMM HH:mm</string>
+    <string name="reply_all">Reply everyone</string>
+    <string name="reply_private">Reply %name</string>
+    <string name="messages_header_private">Conversation with %name</string>
+    <string name="messages_header_group">Conversation with %name and %count others</string>
 
     <!-- Users-->
     <string name="users_title">Teachers</string>
@@ -363,4 +369,5 @@
     <string name="imagedescr_info">Illustration</string>
     <string name="imagedescr_newconversation">Start a new conversation</string>
     <string name="imagedescr_external">External Image</string>
+    <string name="imagedescr_identicon">Identicon</string>
 </resources>

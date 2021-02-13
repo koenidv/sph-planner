@@ -114,12 +114,20 @@ class ConversationsAdapter(private val conversations: List<Conversation>,
             val now = Date()
 
             return if (now.date == date.date &&
-                    now.time - date.time < 24 * 60000) {
+                    now.time - date.time < 24 * 360000) {
                 // If now is the same day in month and maximum of 24hours ago
-                SimpleDateFormat("HH:mm", Locale.getDefault()).format(date)
+                SimpleDateFormat(applicationContext().getString(R.string.messages_dateformat_today),
+                        Locale.getDefault())
+                        .format(date)
+            } else if (now.time - date.time < 48 * 360000) {
+                SimpleDateFormat(applicationContext().getString(R.string.messages_dateformat_yesterday),
+                        Locale.getDefault())
+                        .format(date)
             } else {
                 // todo proper relative dates
-                SimpleDateFormat("d.M. HH:mm", Locale.getDefault()).format(date)
+                SimpleDateFormat(applicationContext().getString(R.string.messages_dateformat_other),
+                        Locale.getDefault())
+                        .format(date)
             }
 
         }
@@ -148,7 +156,7 @@ class ConversationsAdapter(private val conversations: List<Conversation>,
                     .replace("%countall", conversation.recipientCount.toString())
                     .replace("%count", (conversation.recipientCount - 1).toString())
                     .replace("%recipient",
-                            conversation.fistMessage?.recipients?.getOrNull(0).toString())
+                            conversation.firstMessage?.recipients?.getOrNull(0).toString())
 
             return text
         }
