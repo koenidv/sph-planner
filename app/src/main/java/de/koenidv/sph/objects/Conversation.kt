@@ -35,11 +35,12 @@ data class Conversation(
                     .getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
                     .getString("userid", "")
 
-            val partner = if (conversation?.originalSenderId == ownId) {
-                conversation?.firstMessage?.recipients?.getOrNull(0).toString()
-            } else {
-                UsersDb.getName(conversation?.originalSenderId.toString())
-            }
+            val partner = UsersDb.getName(
+                    if (conversation?.originalSenderId == ownId) {
+                        conversation?.firstMessage?.recipients?.getOrNull(0).toString()
+                    } else {
+                        conversation?.originalSenderId.toString()
+                    })
             val recipientsCount: Int = (conversation?.recipientCount ?: 1) - 1
 
             return Pair(partner, recipientsCount)

@@ -162,6 +162,38 @@ class Users {
     }
 
     /**
+     * Add a teacher using their id and username (lastname, firstname (abbr))
+     */
+    fun addTeacherFromMessage(id: String, username: String) {
+        val matches = Regex("""(.*),\s(.*)\s\((.*)\)""").find(username)?.groupValues
+
+        if (matches != null && matches.size > 1) {
+            UsersDb.save(listOf(User(
+                    "l-$id",
+                    matches[3],
+                    matches[2],
+                    matches[1],
+                    "lul",
+                    false // todo check if teacher should be pinned
+            )))
+        }
+    }
+
+    /**
+     * Find a user's id by their username (lastname, firstname (abbr))
+     */
+    fun getTeacherUserId(username: String): String? {
+        val matches = Regex("""(.*),\s(.*)\s\((.*)\)""").find(username)?.groupValues
+
+        return if (matches != null && matches.size > 1) {
+            UsersDb.getTeacherUserId(matches[2], matches[1], matches[3])
+        } else {
+            null
+        }
+    }
+
+
+    /**
      * Send en email to an adress based upon the template in SharedPrefs
      */
     fun sendEmail(user: User) {

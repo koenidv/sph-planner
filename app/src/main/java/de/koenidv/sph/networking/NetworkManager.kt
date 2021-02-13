@@ -390,8 +390,8 @@ class NetworkManager {
         if (features.contains(FEATURE_COURSES)) loadList.add("posts")
         if (features.contains(FEATURE_CHANGES)) loadList.add("changes")
         if (features.contains(FEATURE_MESSAGES)) {
-            loadList.add("messages")
             loadList.add("users")
+            loadList.add("messages")
         }
         loadList.add("holidays")
 

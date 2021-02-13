@@ -11,6 +11,7 @@ import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.SphPlanner.Companion.TAG
 import de.koenidv.sph.database.ConversationsDb
 import de.koenidv.sph.database.MessagesDb
+import de.koenidv.sph.database.UsersDb
 import de.koenidv.sph.debugging.DebugLog
 import de.koenidv.sph.debugging.Debugger
 import de.koenidv.sph.objects.Conversation
@@ -111,8 +112,16 @@ class Messages {
                                         else -> Conversation.ANSWER_TYPE_ALL
                                     }
 
+                                    // Add user if not known yet
+                                    if (!UsersDb.exists(data.get("Sender").asString)
+                                            && data.get("SenderArt").asString == "Betreuer") {
+                                        Users().addTeacherFromMessage(
+                                                data.get("Sender").asString,
+                                                data.get("username").asString
+                                        )
+                                    }
+
                                     var conversation = conversations.get(conversationId, false)
-                                    // todo add user if new and not self
 
                                     // If the conversation does not yet exist, create it,
                                     // and load all messages from it
@@ -250,11 +259,17 @@ class Messages {
         var recipText: String
         if (msg.get("empf") is JsonArray) {
             try {
+                var userid: String?
+                val users = Users()
                 for (recipient in msg.getAsJsonArray("empf")) {
+                    // Try to get a users id, else add their name
                     recipText = recipient.asString
                             .substringAfter("/i> ")
                             .substringBefore("<")
-                    recipients.add(recipText)
+
+                    userid = users.getTeacherUserId(recipText)
+                    if (userid != null) recipients.add(userid)
+                    else recipients.add(recipText)
                 }
             } catch (e: java.lang.Exception) {
                 Log.e(TAG, e.stackTraceToString())
