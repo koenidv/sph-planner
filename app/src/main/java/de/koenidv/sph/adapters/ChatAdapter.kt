@@ -41,8 +41,13 @@ class ChatAdapter(private val messages: List<Message>) :
         fun bind(message: Message, ownUID: String) {
             val isOwn = message.idSender == ownUID
 
-            // Text content
-            content.text = message.content.trim()
+            /*
+             * Data
+             */
+
+            // Text content, with newlines, spaces and image links removed from the end
+            content.text = message.content
+                    .replace("""(Bild:|https://i.imgur.com\S*|\s|\\n)*$""".toRegex(), "")
             BetterLinkMovementMethod.linkify(Linkify.ALL, content)
 
             // Sender name
@@ -54,6 +59,9 @@ class ChatAdapter(private val messages: List<Message>) :
                 name.text = if (sendername != message.idSender) sendername else message.senderName
             }
 
+            /*
+             * Message bubble
+             */
             // Set background drawable depending on if the message is outgoing or incoming
             // Also set horizontal bias so messages show up on the correct side
             if (isOwn) {
@@ -75,12 +83,23 @@ class ChatAdapter(private val messages: List<Message>) :
                 }.applyTo(outerLayout)
             }
 
-            val img = if (Math.random() > 0.5) "https://i.imgur.com/VkRzqYh.jpg?maxwidth=800"
-            else "https://i.imgur.com/b4QZOaD.jpeg?maxwidth=800"
+            /*
+             * Media stuff
+             */
+            val mediaValues = mutableListOf<ChatMediaAdapter.ChatMedia>()
 
-            if (Math.random() > 0.5)
-                media.adapter = ChatMediaAdapter(listOf(ChatMediaAdapter.ChatMedia(
-                        ChatMediaAdapter.TYPE_IMGUR, img)), isOwn)
+            // Find imgur links in message
+            for (match in Regex("""https://i\.imgur\.com/\w{6,8}\.\w{2,5}""")
+                    .findAll(message.content)) {
+                mediaValues.add(ChatMediaAdapter.ChatMedia(
+                        ChatMediaAdapter.TYPE_IMGUR,
+                        "${match.value}?maxwidth=800"))
+            }
+
+            // Display media
+            if (mediaValues.isNotEmpty())
+                media.adapter = ChatMediaAdapter(mediaValues, isOwn)
+            else media.adapter = null
 
         }
 
