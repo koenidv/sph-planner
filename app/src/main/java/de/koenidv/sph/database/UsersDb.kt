@@ -8,7 +8,7 @@ import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.objects.User
 
 //  Created by koenidv on 09.01.2021.
-class UsersDb {
+object UsersDb {
 
     var writable: SQLiteDatabase = DatabaseHelper.getInstance().writableDatabase
 

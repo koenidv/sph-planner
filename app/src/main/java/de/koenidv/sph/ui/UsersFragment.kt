@@ -31,7 +31,7 @@ class UsersFragment : Fragment() {
         // Set up adapter to show all users
 
         val usersRecycler = view.findViewById<RecyclerView>(R.id.usersRecycler)
-        val users = UsersDb().all()
+        val users = UsersDb.all()
         usersRecycler.adapter = UsersAdapter(users, requireActivity())
 
         // Set up fast scroll

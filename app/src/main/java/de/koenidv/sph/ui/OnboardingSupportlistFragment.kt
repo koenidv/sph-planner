@@ -314,6 +314,9 @@ class OnboardingSupportlistFragment : Fragment() {
             // Disable debugger after indexing is complete
             Debugger.setEnabled(false)
 
+            // Remember this version code
+            prefs.edit().putInt("appVersion", 130).apply()
+
             startActivity(Intent(context, MainActivity().javaClass)); requireActivity().finish()
         }
 

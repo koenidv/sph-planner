@@ -144,7 +144,7 @@ class ConversationsAdapter(private val conversations: List<Conversation>,
             })
 
             // Replace placeholders
-            text = text.replace("%sender", UsersDb().getName(conversation.originalSenderId))
+            text = text.replace("%sender", UsersDb.getName(conversation.originalSenderId))
                     .replace("%countall", conversation.recipientCount.toString())
                     .replace("%count", (conversation.recipientCount - 1).toString())
                     .replace("%recipient",
