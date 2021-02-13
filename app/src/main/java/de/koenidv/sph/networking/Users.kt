@@ -119,7 +119,7 @@ class Users {
                                 if (completed == 26) {
                                     // If this was the last request, save the user list
                                     // and call back success
-                                    UsersDb().save(users)
+                                    UsersDb.save(users)
                                     callback(NetworkManager.SUCCESS)
 
                                     // Log success

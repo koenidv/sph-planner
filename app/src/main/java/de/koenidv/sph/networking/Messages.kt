@@ -15,6 +15,7 @@ import de.koenidv.sph.debugging.DebugLog
 import de.koenidv.sph.debugging.Debugger
 import de.koenidv.sph.objects.Conversation
 import de.koenidv.sph.objects.Message
+import org.jsoup.nodes.Entities
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -268,8 +269,10 @@ class Messages {
                 senderType = msg.get("SenderArt").asString,
                 senderName = msg.get("username").asString,
                 date = dateformat.parse(msg.get("Datum").asString)!!,
-                subject = msg.get("Betreff").asString,
-                content = msg.get("Inhalt").asString.replace("<br />", ""),
+                subject = Entities.unescape(msg.get("Betreff").asString.trim()),
+                content = Entities.unescape(
+                        msg.get("Inhalt").asString.replace("<br />", "").trim()
+                ),
                 recipients = recipients,
                 recipientCount = msg.get("private").asInt,
                 unread = msg.get("ungelesen").asBoolean

@@ -1,5 +1,6 @@
 package de.koenidv.sph.adapters
 
+import android.text.util.Linkify
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,7 +12,9 @@ import androidx.constraintlayout.widget.ConstraintSet
 import androidx.recyclerview.widget.RecyclerView
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
+import de.koenidv.sph.database.UsersDb
 import de.koenidv.sph.objects.Message
+import me.saket.bettermovementmethod.BetterLinkMovementMethod
 
 
 //  Created by koenidv on 20.12.2020.
@@ -31,11 +34,23 @@ class ChatAdapter(private val messages: List<Message>) :
         private val outerLayout = view.findViewById<ConstraintLayout>(R.id.messageOuter)
         private val layout = view.findViewById<LinearLayout>(R.id.messageLayout)
         private val content = view.findViewById<TextView>(R.id.messageTextView)
+        private val name = view.findViewById<TextView>(R.id.nameTextView)
 
 
         fun bind(message: Message, ownUID: String) {
 
-            content.text = message.content
+            // Text content
+            content.text = message.content.trim()
+            BetterLinkMovementMethod.linkify(Linkify.ALL, content)
+
+            // Sender name
+            if (message.idSender == ownUID) {
+                name.visibility = View.GONE
+            } else {
+                name.visibility = View.VISIBLE
+                val sendername = UsersDb.getName(message.idSender)
+                name.text = if (sendername != message.idSender) sendername else message.senderName
+            }
 
             // Set background drawable depending on if the message is outgoing or incoming
             // Also set horizontal bias so messages show up on the correct side
@@ -44,12 +59,17 @@ class ChatAdapter(private val messages: List<Message>) :
                 ConstraintSet().apply {
                     clone(outerLayout)
                     setHorizontalBias(layout.id, 1f)
+                    setHorizontalBias(name.id, 1f)
                 }.applyTo(outerLayout)
             } else {
-                layout.setBackgroundResource(R.drawable.message_background_incoming)
+                layout.setBackgroundResource(
+                        if (message.senderType == "Teilnehmer")
+                            R.drawable.message_background_incoming_student
+                        else R.drawable.message_background_incoming)
                 ConstraintSet().apply {
                     clone(outerLayout)
                     setHorizontalBias(layout.id, 0f)
+                    setHorizontalBias(name.id, 0f)
                 }.applyTo(outerLayout)
             }
 
