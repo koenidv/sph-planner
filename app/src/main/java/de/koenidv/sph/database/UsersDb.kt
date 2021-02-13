@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteDatabase
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.objects.User
+import java.util.*
 
 //  Created by koenidv on 09.01.2021.
 object UsersDb {
@@ -26,7 +27,8 @@ object UsersDb {
      */
     fun getName(userid: String, lastnamefirst: Boolean = false): String {
         val nameCursor = writable.rawQuery(
-                "SELECT firstname, lastname FROM users WHERE user_id=\"$userid\" OR user_id=\"l-$userid\"",
+                "SELECT firstname, lastname FROM users WHERE user_id=\"$userid\"" +
+                        "OR user_id=\"l-$userid\" LIMIT 1",
                 null
         )
         // If result is empty, return user id
@@ -44,6 +46,36 @@ object UsersDb {
 
         nameCursor.close()
         return name
+    }
+
+    /**
+     * Checks if a user exists
+     */
+    fun exists(userid: String): Boolean {
+        val cursor = writable.rawQuery(
+                "SELECT * FROM users WHERE user_id=\"$userid\" OR user_id=\"l-$userid\" LIMIT 1",
+                null)
+        val exists = cursor.moveToFirst()
+        cursor.close()
+        return exists
+    }
+
+    /**
+     * Gets a teacher's user id by their firstname, lastname and abbreviation
+     */
+    fun getTeacherUserId(firstname: String, lastname: String, abbreviation: String): String? {
+        val cursor = writable.rawQuery(
+                "SELECT user_id FROM users WHERE firstname=\"$firstname\"" +
+                        "AND lastname=\"$lastname\"" +
+                        "AND teacher_id=\"${abbreviation.toLowerCase(Locale.ROOT)}\" LIMIT 1",
+                null)
+        if (!cursor.moveToFirst()) {
+            cursor.close()
+            return null
+        }
+        val id = cursor.getString(0)
+        cursor.close()
+        return id
     }
 
     /**
