@@ -26,15 +26,15 @@ class ChatFragment : Fragment() {
 
         val messagesRecycler = view.findViewById<RecyclerView>(R.id.messagesRecycler)
 
-        val conversation = ConversationsDb().get(conversationId)
+        val conversation = ConversationsDb().get(conversationId, false)
         val messages = MessagesDb().getConversation(conversationId)
 
         // Display messages
-        val adapter = ChatAdapter(messages)
+        val adapter = ChatAdapter(messages, conversation!!)
         messagesRecycler.adapter = adapter
 
         // Set action bar title
-        (activity as AppCompatActivity).supportActionBar?.title = conversation?.subject
+        (activity as AppCompatActivity).supportActionBar?.title = conversation.subject
 
         return view
     }

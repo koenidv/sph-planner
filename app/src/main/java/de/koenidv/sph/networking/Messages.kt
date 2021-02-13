@@ -111,7 +111,7 @@ class Messages {
                                         else -> Conversation.ANSWER_TYPE_ALL
                                     }
 
-                                    var conversation = conversations.get(conversationId)
+                                    var conversation = conversations.get(conversationId, false)
                                     // todo add user if new and not self
 
                                     // If the conversation does not yet exist, create it,

@@ -297,5 +297,13 @@
     <string name="messages_archive_conversations">Archivieren</string>
     <string name="upgrading_messages">Nachrichten werden geladen. Das könnte eine Weile dauern.</string>
     <string name="imagedescr_external">Externes Bild</string>
+    <string name="imagedescr_identicon">Identicon</string>
+    <string name="reply_private">%name antworten</string>
+    <string name="reply_all">Allen antworten</string>
+    <string name="messages_dateformat_other">d.M. HH:mm</string>
+    <string name="messages_dateformat_yesterday">Gestern HH:mm</string>
+    <string name="messages_dateformat_today">HH:mm</string>
+    <string name="messages_header_private">Unterhaltung mit %name</string>
+    <string name="messages_header_group">Unterhaltung mit %name und %count weiteren</string>
 
 </resources>
