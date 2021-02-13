@@ -35,16 +35,18 @@ class ChatAdapter(private val messages: List<Message>) :
         private val layout = view.findViewById<LinearLayout>(R.id.messageLayout)
         private val content = view.findViewById<TextView>(R.id.messageTextView)
         private val name = view.findViewById<TextView>(R.id.nameTextView)
+        private val media = view.findViewById<RecyclerView>(R.id.messageMediaRecycler)
 
 
         fun bind(message: Message, ownUID: String) {
+            val isOwn = message.idSender == ownUID
 
             // Text content
             content.text = message.content.trim()
             BetterLinkMovementMethod.linkify(Linkify.ALL, content)
 
             // Sender name
-            if (message.idSender == ownUID) {
+            if (isOwn) {
                 name.visibility = View.GONE
             } else {
                 name.visibility = View.VISIBLE
@@ -54,7 +56,7 @@ class ChatAdapter(private val messages: List<Message>) :
 
             // Set background drawable depending on if the message is outgoing or incoming
             // Also set horizontal bias so messages show up on the correct side
-            if (message.idSender == ownUID) {
+            if (isOwn) {
                 layout.setBackgroundResource(R.drawable.message_background_outgoing)
                 ConstraintSet().apply {
                     clone(outerLayout)
@@ -72,6 +74,13 @@ class ChatAdapter(private val messages: List<Message>) :
                     setHorizontalBias(name.id, 0f)
                 }.applyTo(outerLayout)
             }
+
+            val img = if (Math.random() > 0.5) "https://i.imgur.com/VkRzqYh.jpg?maxwidth=800"
+            else "https://i.imgur.com/b4QZOaD.jpeg?maxwidth=800"
+
+            if (Math.random() > 0.5)
+                media.adapter = ChatMediaAdapter(listOf(ChatMediaAdapter.ChatMedia(
+                        ChatMediaAdapter.TYPE_IMGUR, img)), isOwn)
 
         }
 

@@ -362,4 +362,5 @@
     <string name="imagedescr_expand">Expand</string>
     <string name="imagedescr_info">Illustration</string>
     <string name="imagedescr_newconversation">Start a new conversation</string>
+    <string name="imagedescr_external">External Image</string>
 </resources>
