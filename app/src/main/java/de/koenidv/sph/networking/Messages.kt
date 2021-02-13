@@ -269,7 +269,7 @@ class Messages {
                 senderName = msg.get("username").asString,
                 date = dateformat.parse(msg.get("Datum").asString)!!,
                 subject = msg.get("Betreff").asString,
-                content = msg.get("Inhalt").asString,
+                content = msg.get("Inhalt").asString.replace("<br />", ""),
                 recipients = recipients,
                 recipientCount = msg.get("private").asInt,
                 unread = msg.get("ungelesen").asBoolean

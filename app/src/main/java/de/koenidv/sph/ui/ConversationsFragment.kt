@@ -12,10 +12,10 @@ import de.koenidv.sph.adapters.ConversationsAdapter
 import de.koenidv.sph.database.ConversationsDb
 
 // Created by koenidv on 18.12.2020.
-class MessagesFragment : Fragment() {
+class ConversationsFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.fragment_messages, container, false)
+        val view = inflater.inflate(R.layout.fragment_conversations, container, false)
 
         val conversationsRecycler = view.findViewById<RecyclerView>(R.id.conversationsRecycler)
         val fab = view.findViewById<ExtendedFloatingActionButton>(R.id.newConversationFab)
@@ -24,7 +24,7 @@ class MessagesFragment : Fragment() {
         val conversations = ConversationsDb().getAll().toMutableList()
 
         // Display conversations
-        val adapter = ConversationsAdapter(conversations) { selectMode ->
+        val adapter = ConversationsAdapter(conversations, requireActivity()) { selectMode ->
             recyclerEditMode = selectMode
             fab.setText(
                     if (selectMode) R.string.messages_archive_conversations

@@ -110,8 +110,12 @@ class SphPlanner : Application() {
                             }
                         }
                     }
-                } else Messages().fetch {
-                    prefs.edit().putInt("appVersion", 130).apply()
+                } else {
+                    NetworkManager().getOwnUserId {
+                        Messages().fetch {
+                            prefs.edit().putInt("appVersion", 130).apply()
+                        }
+                    }
                 }
             }
 
