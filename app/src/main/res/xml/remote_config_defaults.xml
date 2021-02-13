@@ -16,4 +16,8 @@
         <key>messages_mandatory</key>
         <value>true</value>
     </entry>
+    <entry>
+        <key>messages_enabled</key>
+        <value>true</value>
+    </entry>
 </defaultsMap>
