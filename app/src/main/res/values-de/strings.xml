@@ -296,5 +296,6 @@
     <string name="index_status_userid">Sammle einige Informationen…</string>
     <string name="messages_archive_conversations">Archivieren</string>
     <string name="upgrading_messages">Nachrichten werden geladen. Das könnte eine Weile dauern.</string>
+    <string name="imagedescr_external">Externes Bild</string>
 
 </resources>
