@@ -42,7 +42,7 @@ class ChatFragment : Fragment() {
          */
 
         val messagesRecycler = view.findViewById<RecyclerView>(R.id.messagesRecycler)
-        val messages = MessagesDb().getConversation(conversationId)
+        val messages = MessagesDb.getConversation(conversationId)
 
         // Display messages
         val info = conversation!!.getInfo()

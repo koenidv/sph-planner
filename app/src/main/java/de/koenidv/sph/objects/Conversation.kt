@@ -30,7 +30,7 @@ data class Conversation(
      * Get the main conversation partner name and the amount of other recipients
      */
     fun getInfo(): Pair<String, Int> {
-        if (firstMessage == null) firstMessage = MessagesDb().getMessage(firstIdMess)
+        if (firstMessage == null) firstMessage = MessagesDb.getMessage(firstIdMess)
 
         val ownId = applicationContext()
                 .getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)

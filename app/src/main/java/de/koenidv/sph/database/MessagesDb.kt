@@ -7,7 +7,7 @@ import de.koenidv.sph.objects.Message
 import java.util.*
 
 //  Created by koenidv on 09.01.2021.
-class MessagesDb {
+object MessagesDb {
 
     var writable: SQLiteDatabase = DatabaseHelper.getInstance().writableDatabase
 

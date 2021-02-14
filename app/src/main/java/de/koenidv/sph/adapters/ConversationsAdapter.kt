@@ -75,6 +75,7 @@ class ConversationsAdapter(private val conversations: List<Conversation>,
         private val subject = view.findViewById<TextView>(R.id.subjectTextView)
         private val participants = view.findViewById<TextView>(R.id.participantsTextView)
         private val date = view.findViewById<TextView>(R.id.dateTextView)
+        private val unread = view.findViewById<TextView>(R.id.unreadTextView)
 
         private var currentConversation: Conversation? = null
 
@@ -108,6 +109,12 @@ class ConversationsAdapter(private val conversations: List<Conversation>,
                 // Item now unselected
                 layout.background.clearColorFilter()
             }
+
+            // If item is unread, show unread marker
+            unread.visibility =
+                    if (conversation.unread) View.VISIBLE
+                    else View.GONE
+
         }
 
         private fun getRelativeDate(date: Date): String {
