@@ -12,7 +12,6 @@
         android:title="@string/title_courses" />
 
     <item
-        android:visible="false"
         android:id="@+id/nav_messages"
         android:icon="@drawable/ic_chat"
         android:title="@string/title_messages" />
