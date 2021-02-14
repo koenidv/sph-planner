@@ -251,7 +251,7 @@ class Messages {
     /**
      * Saves a message and all its replies
      */
-    fun saveMessage(msg: JsonObject, conv: Conversation, messages: MessagesDb = MessagesDb()) {
+    fun saveMessage(msg: JsonObject, conv: Conversation, messages: MessagesDb = MessagesDb) {
         val dateformat = SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.ROOT)
 
         // Add each recipient from "empf"

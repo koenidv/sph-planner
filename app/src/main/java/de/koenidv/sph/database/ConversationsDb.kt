@@ -109,11 +109,11 @@ class ConversationsDb {
                 cursor.getString(4),
                 cursor.getString(5),
                 Date(cursor.getInt(6) * 1000L),
-                cursor.getInt(6) == 1,
-                cursor.getInt(7) == 1
+                cursor.getInt(7) == 1,
+                cursor.getInt(8) == 1
         ).apply {
             if (withFirstMessage)
-                firstMessage = MessagesDb().getMessage(this.firstIdMess)
+                firstMessage = MessagesDb.getMessage(this.firstIdMess)
         }
     }
 
