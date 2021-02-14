@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.EditText
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputLayout
 import de.koenidv.sph.R
 import de.koenidv.sph.adapters.UserSelectionAdapter
@@ -17,7 +18,7 @@ import de.koenidv.sph.database.UsersDb
 
 //  Created by koenidv on 29.12.2020.
 // Bottom sheet displaying an image and text
-class NewConversationSheet internal constructor() : BottomSheetDialogFragment() {
+class NewConversationSheet(private val callback: (String, List<String>) -> Unit) : BottomSheetDialogFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val view: View = inflater.inflate(R.layout.sheet_newconversation, container, false)
@@ -26,6 +27,7 @@ class NewConversationSheet internal constructor() : BottomSheetDialogFragment() 
         val subject = view.findViewById<EditText>(R.id.subjectEditText)
         val recipients = view.findViewById<EditText>(R.id.recipientsEditText)
         val recipientsRecycler = view.findViewById<RecyclerView>(R.id.recipientsRecycler)
+        val createButton = view.findViewById<MaterialButton>(R.id.createButton)
 
         // Display users list
         val users = UsersDb.all()
@@ -41,6 +43,19 @@ class NewConversationSheet internal constructor() : BottomSheetDialogFragment() 
                 recipAdapter.filter(s.toString().trim())
             }
         })
+
+        createButton.setOnClickListener {
+            val subjectText = subject.text.toString()
+            val recipList = recipAdapter.getSelected()
+
+            dismiss()
+
+            callback(subjectText, recipList.map {
+                if (it.userId.startsWith("l-")) it.userId
+                else "l-${it.userId}"
+            })
+
+        }
 
         subject.requestFocus()
 

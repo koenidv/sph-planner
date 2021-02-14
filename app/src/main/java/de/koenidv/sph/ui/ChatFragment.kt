@@ -1,11 +1,13 @@
 package de.koenidv.sph.ui
 
+import android.app.Activity
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
@@ -43,7 +45,8 @@ class ChatFragment : Fragment() {
         val messages = MessagesDb().getConversation(conversationId)
 
         // Display messages
-        val adapter = ChatAdapter(messages, conversation!!)
+        val info = conversation!!.getInfo()
+        val adapter = ChatAdapter(messages, info)
         messagesRecycler.adapter = adapter
 
         /*
@@ -54,7 +57,6 @@ class ChatFragment : Fragment() {
         val input = view.findViewById<EditText>(R.id.messageEditText)
         inputContainer.isEndIconVisible = false
 
-        val conversationInfo = Conversation.getConversationPartner(conversationId)
         // Disable replying if answertype is none
         if (conversation.answerType == Conversation.ANSWER_TYPE_NONE) {
             inputContainer.visibility = View.GONE
@@ -62,9 +64,9 @@ class ChatFragment : Fragment() {
         } else {
 
             // If this is a private conversation, reflect it in the hint
-            inputContainer.hint = if (conversationInfo.second == 0 ||
+            inputContainer.hint = if (info.second == 0 ||
                     conversation.answerType == Conversation.ANSWER_TYPE_PRIVATE)
-                getString(R.string.messages_reply_private).replace("%name", conversationInfo.first)
+                getString(R.string.messages_reply_private).replace("%name", info.first)
             else getString(R.string.messages_reply_all)
 
             // Show / Hide send button if there is any input
@@ -89,5 +91,13 @@ class ChatFragment : Fragment() {
         return view
     }
 
+    /*
+    * Close soft keyboard on stop
+    */
+    override fun onStop() {
+        val imm = requireContext().getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(requireView().windowToken, 0)
+        super.onStop()
+    }
 
 }

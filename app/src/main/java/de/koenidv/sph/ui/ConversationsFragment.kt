@@ -4,7 +4,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.navigation.Navigation
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import de.koenidv.sph.R
@@ -72,7 +74,13 @@ class ConversationsFragment : Fragment() {
                 }
             } else {
                 // Show a bottom sheet to start a new conversation
-                NewConversationSheet().show(parentFragmentManager, "newconversation")
+                NewConversationSheet { subject, recipients ->
+                    Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
+                            .navigate(R.id.newChatFromConversationsAction, bundleOf(
+                                    "subject" to subject,
+                                    "recipients" to recipients
+                            ))
+                }.show(parentFragmentManager, "newconversation")
             }
         }
 

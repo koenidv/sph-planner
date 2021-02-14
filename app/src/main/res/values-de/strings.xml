@@ -310,5 +310,6 @@
     <string name="mesages_new_action">Los gehts</string>
     <string name="messages_new_subject">Füge einen Betreff hinzu</string>
     <string name="messages_new_recipients">Suche nach Empfängern</string>
+    <string name="messages_new_message">Sende eine Nachricht</string>
 
 </resources>

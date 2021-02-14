@@ -244,6 +244,7 @@
     <string name="mesages_new_action">Let\'s go</string>
     <string name="messages_new_subject">Add a subject</string>
     <string name="messages_new_recipients">Search for recipients</string>
+    <string name="messages_new_message">Send a message</string>
 
     <!-- Users-->
     <string name="users_title">Teachers</string>

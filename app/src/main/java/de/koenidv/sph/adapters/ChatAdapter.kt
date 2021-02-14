@@ -15,13 +15,12 @@ import com.bumptech.glide.Glide
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner.Companion.applicationContext
 import de.koenidv.sph.database.UsersDb
-import de.koenidv.sph.objects.Conversation
 import de.koenidv.sph.objects.Message
 import me.saket.bettermovementmethod.BetterLinkMovementMethod
 
 
 //  Created by koenidv on 12.02.2021.
-class ChatAdapter(private val messages: List<Message>, private val conversation: Conversation) :
+class ChatAdapter(private val messages: List<Message>, private val conversationInfo: Pair<String, Int>) :
         RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     // Get own user id
@@ -111,9 +110,7 @@ class ChatAdapter(private val messages: List<Message>, private val conversation:
         private val identicon = view.findViewById<ImageView>(R.id.headerImageView)
         private val header = view.findViewById<TextView>(R.id.headerTextView)
 
-        fun bind(conversation: Conversation) {
-
-            val info = Conversation.getConversationPartner(conversation.convId)
+        fun bind(info: Pair<String, Int>) {
 
             header.text = applicationContext().getString(
                     if (info.second == 0)
@@ -146,7 +143,7 @@ class ChatAdapter(private val messages: List<Message>, private val conversation:
     override fun onBindViewHolder(viewHolder: RecyclerView.ViewHolder, position: Int) {
         if (position == 0) {
             // Head item ("Conversation with xy")
-            (viewHolder as HeaderViewHolder).bind(conversation)
+            (viewHolder as HeaderViewHolder).bind(conversationInfo)
         } else {
             // Bind data to ViewHolder
             (viewHolder as ViewHolder).bind(messages[position - 1], userid)
