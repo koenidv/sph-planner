@@ -69,7 +69,7 @@ class AttachmentsAdapter(private var attachments: List<Attachment>,
             if (attachment.pinned()) icon += "thumbtack "
             // Add checkmark if file is saved locally
             if (attachment.type() == "file")
-                if (File(SphPlanner.applicationContext().filesDir.toString() + "/" + attachment.file().localPath()).exists())
+                if (File(attachment.file().localPath()).exists())
                     icon += "check-circle "
             // Set file icon according to file type
             icon += AttachmentManager().getIconForFiletype(type)

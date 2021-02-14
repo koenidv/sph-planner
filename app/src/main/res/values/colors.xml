@@ -58,4 +58,10 @@
     <color name="change_type_other">#47e6ab</color>
     <color name="change_type_holidays">#aeaeae</color>
 
+    <!-- Holiday colors -->
+    <color name="holiday_color_spring">#76ff03</color>
+    <color name="holiday_color_summer">#ffff00</color>
+    <color name="holiday_color_autumn">#ff9100</color>
+    <color name="holiday_color_winter">#4fc3f7</color>
+
 </resources>

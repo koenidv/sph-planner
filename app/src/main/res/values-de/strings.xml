@@ -287,6 +287,17 @@
     <string name="debug_token_generating">Neuer Token wird generiert…</string>
     <string name="debug_token_description">Durch das Teilen eines Sitzungstokens kannst du temporären Zugang zum Schulportal gewähren, ohne deine Zugangsdaten zu teilen.</string>
     <string name="dev_options">Entwicklereinstellungen</string>
+    <string name="explore_collection_holidays">🚆 Ferien</string>
+    <string name="holidays_title">Ferien</string>
+    <string name="holidays_summer">Sommerferien</string>
+    <string name="holidays_autumn">Herbstferien</string>
+    <string name="holidays_winter">Winterferien</string>
+    <string name="holidays_spring">Frühjahrsferien</string>
+    <string name="holidays_remaining_days">%d Tage</string>
+    <string name="holidays_remaining_weeks">%w Wochen\n%d Tage</string>
+    <string name="holidays_date">Vom %s bis %e</string>
+    <string name="holidays_date_template">dd.MM</string>
+    <string name="holidays_date_template2">dd.MM.yy</string>
     <string name="messages_new_button">Neue Unterhaltung</string>
     <string name="messages_partic_fromself">Du an %recipient</string>
     <string name="messages_partic_fromself_more">Du an %countall Empfänger</string>
