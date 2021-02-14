@@ -80,6 +80,13 @@
             app:exitAnim="@anim/fade_out"
             app:popEnterAnim="@anim/fade_in"
             app:popExitAnim="@anim/exit_to_right" />
+        <action
+            android:id="@+id/newChatFromConversationsAction"
+            app:destination="@id/newChatFragment"
+            app:enterAnim="@anim/enter_from_right"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/exit_to_right" />
     </fragment>
 
     <fragment
@@ -243,7 +250,14 @@
     <fragment
         android:id="@+id/chatFragment"
         android:name="de.koenidv.sph.ui.ChatFragment"
-        android:label="ChatFragment"
+        tools:layout="@layout/fragment_chat">
+        <argument
+            android:name="conversationId"
+            app:argType="string" />
+    </fragment>
+    <fragment
+        android:id="@+id/newChatFragment"
+        android:name="de.koenidv.sph.ui.NewChatFragment"
         tools:layout="@layout/fragment_chat">
         <argument
             android:name="conversationId"

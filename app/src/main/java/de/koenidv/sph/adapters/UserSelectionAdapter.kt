@@ -113,4 +113,9 @@ class UserSelectionAdapter(users: List<User>, private val onSelection: () -> Uni
         }
         previousfilter = filter
     }
+
+    /**
+     * Get all selected users
+     */
+    fun getSelected() = userData.filter { it.selected }.map { it.user }
 }

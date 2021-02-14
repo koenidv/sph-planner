@@ -23,14 +23,14 @@
             android:text="@string/messages_new_title"
             android:textAppearance="@style/TextAppearance.AppCompat.Body2"
             android:textSize="18sp"
-            app:layout_constraintBottom_toBottomOf="@+id/doneButton"
-            app:layout_constraintEnd_toStartOf="@+id/doneButton"
+            app:layout_constraintBottom_toBottomOf="@+id/createButton"
+            app:layout_constraintEnd_toStartOf="@+id/createButton"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/doneButton" />
+            app:layout_constraintTop_toTopOf="@+id/createButton" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/doneButton"
+            android:id="@+id/createButton"
             style="@style/Widget.MaterialComponents.FloatingActionButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

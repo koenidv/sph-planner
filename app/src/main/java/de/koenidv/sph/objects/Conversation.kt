@@ -2,7 +2,7 @@ package de.koenidv.sph.objects
 
 import android.content.Context
 import de.koenidv.sph.SphPlanner.Companion.applicationContext
-import de.koenidv.sph.database.ConversationsDb
+import de.koenidv.sph.database.MessagesDb
 import de.koenidv.sph.database.UsersDb
 import java.util.*
 
@@ -24,27 +24,27 @@ data class Conversation(
         const val ANSWER_TYPE_NONE = "none"
         const val ANSWER_TYPE_PRIVATE = "private"
         const val ANSWER_TYPE_ALL = "all"
+    }
 
-        /**
-         * Get the main conversation partner name and the amount of other recipients
-         */
-        fun getConversationPartner(conversationId: String): Pair<String, Int> {
-            val conversation = ConversationsDb().get(conversationId, true)
+    /**
+     * Get the main conversation partner name and the amount of other recipients
+     */
+    fun getInfo(): Pair<String, Int> {
+        if (firstMessage == null) firstMessage = MessagesDb().getMessage(firstIdMess)
 
-            val ownId = applicationContext()
-                    .getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
-                    .getString("userid", "")
+        val ownId = applicationContext()
+                .getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
+                .getString("userid", "")
 
-            val partner = UsersDb.getName(
-                    if (conversation?.originalSenderId == ownId) {
-                        conversation?.firstMessage?.recipients?.getOrNull(0).toString()
-                    } else {
-                        conversation?.originalSenderId.toString()
-                    })
-            val recipientsCount: Int = (conversation?.recipientCount ?: 1) - 1
+        val partner = UsersDb.getName(
+                if (originalSenderId == ownId) {
+                    firstMessage?.recipients?.getOrNull(0).toString()
+                } else {
+                    originalSenderId
+                })
+        val recipientsCount: Int = recipientCount - 1
 
-            return Pair(partner, recipientsCount)
+        return Pair(partner, recipientsCount)
 
-        }
     }
 }
