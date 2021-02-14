@@ -16,7 +16,7 @@ import de.koenidv.sph.R
 import de.koenidv.sph.parsing.Utility
 
 
-//  Created by koenidv on 20.12.2020.
+//  Created by koenidv on 13.02.2021.
 class ChatMediaAdapter(private val media: List<ChatMedia>, private val isOwn: Boolean) :
         RecyclerView.Adapter<ChatMediaAdapter.ViewHolder>() {
 

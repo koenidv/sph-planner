@@ -20,7 +20,7 @@ import de.koenidv.sph.objects.Message
 import me.saket.bettermovementmethod.BetterLinkMovementMethod
 
 
-//  Created by koenidv on 20.12.2020.
+//  Created by koenidv on 12.02.2021.
 class ChatAdapter(private val messages: List<Message>, private val conversation: Conversation) :
         RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 

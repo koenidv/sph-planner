@@ -11,9 +11,9 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:clipToPadding="false"
-        android:paddingTop="8dp"
         android:paddingEnd="8dp"
         android:paddingStart="8dp"
+        android:paddingTop="8dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toTopOf="@+id/textInputLayout"
         app:layout_constraintEnd_toEndOf="parent"
@@ -34,7 +34,8 @@
         app:boxBackgroundColor="?attr/backgroundColor"
         app:endIconDrawable="@drawable/ic_send"
         app:endIconMode="custom"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:endIconTint="?attr/colorPrimary"
+        app:layout_constraintBottom_toTopOf="@id/repliesDisabledTextView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
@@ -42,11 +43,22 @@
             android:id="@+id/messageEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/reply_all"
-            android:inputType="textMultiLine|textImeMultiLine|textLongMessage"
+            android:hint="@string/messages_reply_all"
+            android:inputType="textLongMessage|textMultiLine|textImeMultiLine|textAutoComplete|textAutoCorrect|textCapSentences"
             android:maxLines="10"
             android:singleLine="false" />
 
     </com.google.android.material.textfield.TextInputLayout>
+
+    <TextView
+        android:id="@+id/repliesDisabledTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="2dp"
+        android:text="@string/messages_reply_disabled"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        tools:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

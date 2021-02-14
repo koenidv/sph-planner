@@ -24,7 +24,7 @@
         android:clickable="true"
         android:contentDescription="@string/imagedescr_newconversation"
         android:focusable="true"
-        android:text="@string/messages_new_conversation"
+        android:text="@string/messages_new_button"
         app:icon="@drawable/ic_edit"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />

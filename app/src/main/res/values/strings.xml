@@ -226,7 +226,7 @@
 
     <!-- Messages -->
     <string name="messages_unread_possible">✉️ You might have unread messages</string>
-    <string name="messages_new_conversation">New conversation</string>
+    <string name="messages_new_button">New conversation</string>
     <string name="messages_archive_conversations">Archive</string>
     <string name="messages_partic_fromself">You to %recipient</string>
     <string name="messages_partic_fromself_more">You to %countall recipients</string>
@@ -235,10 +235,15 @@
     <string name="messages_dateformat_today">HH:mm</string>
     <string name="messages_dateformat_yesterday">"Yesterday" HH:mm</string>
     <string name="messages_dateformat_other">d. MMM HH:mm</string>
-    <string name="reply_all">Reply everyone</string>
-    <string name="reply_private">Reply %name</string>
+    <string name="messages_reply_all">Reply everyone</string>
+    <string name="messages_reply_private">Reply %name</string>
+    <string name="messages_reply_disabled">Replies are disabled</string>
     <string name="messages_header_private">Conversation with %name</string>
     <string name="messages_header_group">Conversation with %name and %count others</string>
+    <string name="messages_new_title">New conversation</string>
+    <string name="mesages_new_action">Let\'s go</string>
+    <string name="messages_new_subject">Add a subject</string>
+    <string name="messages_new_recipients">Search for recipients</string>
 
     <!-- Users-->
     <string name="users_title">Teachers</string>
