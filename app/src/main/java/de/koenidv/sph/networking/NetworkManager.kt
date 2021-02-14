@@ -30,6 +30,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import okhttp3.Response
 import org.json.JSONObject
+import org.jsoup.Jsoup
 import java.util.*
 
 //  Created by koenidv on 11.12.2020.
@@ -150,7 +151,7 @@ class NetworkManager {
                         bundleOf("url" to url,
                                 "forceNewToken" to forceNewToken,
                                 "tokenCb" to success)).log()
-                                                    
+
             if (success == SUCCESS) {
 
                 // Getting webpage
@@ -280,8 +281,8 @@ class NetworkManager {
      * Authenticates with sph, posts the specified body and returns json response
      */
     fun postJsonAuthed(url: String, body: Map<String, String> = mapOf(),
-                       callback: (success: Int, result: JSONObject?) -> Unit,
-                       headers: Map<String, String> = mapOf()) {
+                       headers: Map<String, String> = mapOf(),
+                       callback: (success: Int, result: JSONObject?) -> Unit) {
         // Authenticate
         TokenManager().authenticate { success, _ ->
             // Cancel if authentication was not successful
@@ -361,11 +362,11 @@ class NetworkManager {
                     // Run the respective funtion for each update order
                     for (entry in entries) {
                         when (entry) {
-                            "posts" -> Posts(this).fetch(checkDone)
-                            "changes" -> Changes(this).fetch(checkDone)
-                            "timetable" -> Timetable().fetch(checkDone)
-                            "messages" -> Messages().fetch(checkDone)
-                            "holidays" -> Holidays().fetch(checkDone)
+                            "posts" -> Posts(this).fetch(callback = checkDone)
+                            "changes" -> Changes(this).fetch(callback = checkDone)
+                            "timetable" -> Timetable().fetch(callback = checkDone)
+                            "messages" -> Messages().fetch(callback = checkDone)
+                            "holidays" -> Holidays().fetch(callback = checkDone)
                         }
                     }
                 } else callback(success)
@@ -382,15 +383,15 @@ class NetworkManager {
 
         // Get all supported features as String list
         val features = FunctionTilesDb.getInstance().supportedFeatures.map { it.type }
-        val loadList = mutableListOf("courses")
+        val loadList = mutableListOf("userid", "courses")
 
         // Mark each supported feature for loading
         if (features.contains(FEATURE_TIMETABLE)) loadList.add("timetable")
         if (features.contains(FEATURE_COURSES)) loadList.add("posts")
         if (features.contains(FEATURE_CHANGES)) loadList.add("changes")
         if (features.contains(FEATURE_MESSAGES)) {
-            loadList.add("messages")
             loadList.add("users")
+            loadList.add("messages")
         }
         loadList.add("holidays")
 
@@ -422,6 +423,10 @@ class NetworkManager {
             if (Debugger.DEBUGGING_ENABLED)
                 DebugLog("NetMgr", "Fetching ${loadList[index]}").log()
             when (loadList[index]) {
+                "userid" -> {
+                    status(applicationContext().getString(R.string.index_status_userid))
+                    getOwnUserId(onDone)
+                }
                 "courses" -> {
                     status(applicationContext().getString(R.string.index_status_courses))
                     Courses(this).createIndex(onDone, features)
@@ -440,7 +445,7 @@ class NetworkManager {
                 }
                 "messages" -> {
                     status(applicationContext().getString(R.string.index_status_messages))
-                    Messages().fetch(onDone, true)
+                    Messages().fetch(archived = true, callback = onDone)
                 }
                 "users" -> {
                     status(applicationContext().getString(R.string.index_status_users))
@@ -527,6 +532,29 @@ class NetworkManager {
 
                         })
             } else callback(success, url)
+        }
+    }
+
+    /**
+     * Loads the user's profile picture site and gets their user id from there
+     */
+    fun getOwnUserId(callback: (success: Int) -> Unit) {
+        // Load the site where one can upload a profile picture
+        getSiteAuthed("https://start.schulportal.hessen.de/benutzerverwaltung.php?a=userFoto")
+        { success, result ->
+            if (success == SUCCESS) {
+                // Extract the user id
+                val document = Jsoup.parse(result)
+                val profilePicture = document.selectFirst("div#content img")
+                        .attr("src")
+                val userid = profilePicture.substringAfter("&p=")
+                        .substringBefore("&")
+
+                applicationContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
+                        .edit().putString("userid", userid).apply()
+
+                callback(SUCCESS)
+            } else callback(success)
         }
     }
 

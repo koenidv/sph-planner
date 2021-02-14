@@ -28,9 +28,12 @@ import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.InstallStatus
 import com.google.android.play.core.install.model.UpdateAvailability
 import com.google.android.play.core.tasks.Task
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import de.koenidv.sph.database.ChangesDb
+import de.koenidv.sph.database.FunctionTilesDb
 import de.koenidv.sph.debugging.Debugger
 import de.koenidv.sph.networking.NetworkManager
+import de.koenidv.sph.objects.FunctionTile
 import de.koenidv.sph.ui.OnboardingActivity
 import de.koenidv.sph.ui.OptionsSheet
 
@@ -160,6 +163,14 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             }
+        }
+
+        /*
+         * Hide messages tab if messages are not supported
+         */
+        if (!FirebaseRemoteConfig.getInstance().getBoolean("messages_enabled") ||
+                !FunctionTilesDb.getInstance().supports(FunctionTile.FEATURE_MESSAGES)) {
+            navView.menu.findItem(R.id.nav_messages).isVisible = false
         }
 
         // Save theme color to use somewhere without application context

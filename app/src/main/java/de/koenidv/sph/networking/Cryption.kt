@@ -22,6 +22,7 @@ import org.mozilla.javascript.Scriptable
 import java.util.*
 import kotlin.math.floor
 import kotlin.math.roundToInt
+import kotlin.system.measureTimeMillis
 
 //  Created by koenidv on 04.02.2021.
 // If it ain't broken, don't fix it. Unless you really know what you're doing.
@@ -49,6 +50,14 @@ class Cryption {
      */
     fun decrypt(data: String, callback: (decrypted: String?) -> Unit) =
             decrypt(data, privateKey, callback)
+
+    /**
+     * Encrypts data with the stored secret
+     * @param data Data to be encrypted
+     * @param callback Callback when encryption is complete
+     */
+    fun encrypt(data: String, callback: (encrypted: String?) -> Unit) =
+            encrypt(data, privateKey, callback)
 
     /**
      * Stops the Rhino VM
@@ -199,11 +208,7 @@ class Cryption {
             }
         }
         // Encrypt the uuid with itself
-        execute("encrypt", arrayOf(uuid, uuid)) { encrypted ->
-            Log.d("$TAG js", "uuid: $uuid")
-            Log.d("$TAG js", "key: $encrypted")
-            callback(encrypted)
-        }
+        execute("encrypt", arrayOf(uuid, uuid), callback)
     }
 
     /**
@@ -287,6 +292,17 @@ class Cryption {
     }
 
     /**
+     * Encrypts data with the secret
+     * @param data Data to be encrypted
+     * @param secret Authenticated private key to decrypt
+     * @param callback Callback when encryption is complete
+     */
+    private fun encrypt(data: String, secret: String, callback: (encrypted: String?) -> Unit) {
+        val dataJs = data.replace("\\", "")
+        execute("encrypt", arrayOf(dataJs, secret), callback)
+    }
+
+    /**
      * Executes the specified js function within cryption.js
      * THIS WILL NOT START OR STOP THE VM
      * Call #startVm or #stop respectively
@@ -335,13 +351,16 @@ class Cryption {
             // Check if the specified object is actually a function and execute it
             val obj: Any? = scope.get(jsFunction, scope)
             if (obj is Function) {
-                // Call the function with the params
-                val result: Any = obj.call(rhino,
-                        scope,
-                        scope,
-                        params)
-                // Return the output
-                callback(org.mozilla.javascript.Context.toString(result))
+                val execTime = measureTimeMillis {
+                    // Call the function with the params
+                    val result: Any = obj.call(rhino,
+                            scope,
+                            scope,
+                            params)
+                    // Return the output
+                    callback(org.mozilla.javascript.Context.toString(result))
+                }
+                Log.d("$TAG js", "Execution for $jsFunction took $execTime ms")
             } else {
                 throw Exception("$jsFunction is not a valid Function at Cryption#execute")
             }

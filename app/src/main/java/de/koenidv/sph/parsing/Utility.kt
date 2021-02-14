@@ -95,15 +95,15 @@ object Utility {
                 SphPlanner.applicationContext().getString(R.string.greeting_random_general_2)
             random < 0.15 ->
                 SphPlanner.applicationContext().getString(R.string.greeting_random_general_3)
-            dayOfWeek == Calendar.FRIDAY ->
+            dayOfWeek == Calendar.FRIDAY && random < 0.4 ->
                 SphPlanner.applicationContext().getString(R.string.greeting_friday_weekend)
-            hourOfDay > 21 ->
+            hourOfDay > 21 && random < 0.8 ->
                 SphPlanner.applicationContext().getString(R.string.greeting_night)
             hourOfDay > 17 && random < 0.1 ->
                 SphPlanner.applicationContext().getString(R.string.greeting_random_evening_1)
             hourOfDay > 17 && random < 0.2 ->
                 SphPlanner.applicationContext().getString(R.string.greeting_random_evening_2)
-            hourOfDay > 17 ->
+            hourOfDay > 17 && random < 0.9 ->
                 SphPlanner.applicationContext().getString(R.string.greeting_evening)
             hourOfDay < 8 && random < 0.1 ->
                 SphPlanner.applicationContext().getString(R.string.greeting_random_morning_1)
