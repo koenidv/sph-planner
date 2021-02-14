@@ -20,7 +20,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 
-//  Created by koenidv on 20.12.2020.
+//  Created by koenidv on 12.02.2021.
 class ConversationsAdapter(private val conversations: List<Conversation>,
                            private val activity: FragmentActivity,
                            private val onSelectModeChange: (Boolean) -> Unit) :
@@ -180,8 +180,15 @@ class ConversationsAdapter(private val conversations: List<Conversation>,
     // Return the size of your dataset (invoked by the layout manager)
     override fun getItemCount() = conversations.size
 
+    /**
+     * Get currently selected items
+     */
     fun getSelected() = selectedItems.map { conversations[it] }
 
+    /**
+     * Clear list of selected items, will not update ui
+     * (Called when items are removed anyway)
+     */
     fun clearSelected() {
         selectedItems.clear()
         selectMode = false

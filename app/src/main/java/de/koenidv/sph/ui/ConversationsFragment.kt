@@ -31,7 +31,7 @@ class ConversationsFragment : Fragment() {
             recyclerEditMode = selectMode
             fab.setText(
                     if (selectMode) R.string.messages_archive_conversations
-                    else R.string.messages_new_conversation)
+                    else R.string.messages_new_button)
             fab.setIconResource(
                     if (selectMode) R.drawable.ic_archive
                     else R.drawable.ic_edit
@@ -57,6 +57,7 @@ class ConversationsFragment : Fragment() {
 
         fab.setOnClickListener {
             if (recyclerEditMode) {
+                // Archive selected conversations
                 // todo archive in db
                 var index: Int
                 val selected = adapter.getSelected()
@@ -70,7 +71,8 @@ class ConversationsFragment : Fragment() {
                     }
                 }
             } else {
-                // todo send new message
+                // Show a bottom sheet to start a new conversation
+                NewConversationSheet().show(parentFragmentManager, "newconversation")
             }
         }
 

@@ -102,7 +102,7 @@ class Messages {
                                     // Check if we could answer to this coonversation
                                     answerType = when {
                                         data.get("noanswer").asBoolean ||
-                                                data.get("noAnswerAllowed").asBoolean ||
+                                                data.get("noAnswerAllowed").asString == "ja" ||
                                                 data.get("Papierkorb").asString == "ja" ->
                                             Conversation.ANSWER_TYPE_NONE
                                         data.get("privateAnswerOnly").asString == "ja" ->
