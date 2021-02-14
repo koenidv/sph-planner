@@ -262,6 +262,18 @@
     <string name="email_template_chip_abbr">Abbreviation</string>
     <string name="email_template_chip_id">Identifier</string>
 
+    <!-- Holidays -->
+    <string name="holidays_title">Holidays</string>
+    <string name="holidays_spring">Spring Holidays</string>
+    <string name="holidays_summer">Summer Holidays</string>
+    <string name="holidays_autumn">Autumn Holidays</string>
+    <string name="holidays_winter">Winter Holidays</string>
+    <string name="holidays_remaining_days">%d days</string>
+    <string name="holidays_remaining_weeks">%w weeks\n%d days</string>
+    <string name="holidays_date">From %s to %e</string>
+    <string name="holidays_date_template">d MMM</string>
+    <string name="holidays_date_template2">d MMM yy</string>
+
     <!-- Options sheet -->
     <string name="info_menuaction">Options</string>
     <string name="info_greeting">Hey %name</string>
@@ -304,6 +316,7 @@
     <string name="explore_collection_tasks">🖋️ Tasks</string>
     <string name="explore_collection_changes">🗞️️ Changes</string>
     <string name="explore_collection_users">👥 Teachers</string>
+    <string name="explore_collection_holidays">🚆 Holidays</string>
 
     <!-- Contact -->
     <string name="contact_telegram_icon" translatable="false">paper-plane</string>

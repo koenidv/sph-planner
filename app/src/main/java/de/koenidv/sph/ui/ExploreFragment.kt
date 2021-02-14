@@ -39,6 +39,7 @@ class ExploreFragment : Fragment() {
         val tasksText = view.findViewById<TextView>(R.id.tasksTextView)
         val changesText = view.findViewById<TextView>(R.id.changesTextView)
         val usersText = view.findViewById<TextView>(R.id.usersTextView)
+        val holidaysText = view.findViewById<TextView>(R.id.holidaysTextView)
 
         // Set on click listeners, open respective fragment
 
@@ -88,6 +89,11 @@ class ExploreFragment : Fragment() {
                 nav.navigate(R.id.usersFromExploreAction)
             }
         } else gridLayout.removeView(usersText)
+
+        // Holidays
+        holidaysText.setOnClickListener {
+            nav.navigate(R.id.holidaysFromExploreAction)
+        }
 
 
         /*

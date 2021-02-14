@@ -192,6 +192,8 @@ class TimetableViewFragment : Fragment() {
                 timetable = TimetableDb.instance!!.get(!viewAll)
                 // Get maximum amount of concurrent lessons if they are shown
                 val maxConcurrent = if (viewAll) timetable.maxOf { days -> days.maxOf { it.size } } else 1
+                // Cancel if timetable does not for some reason contain entries for 5 days
+                if (timetable.size < 5) return
                 // Notify recyclerviews
                 (requireView().findViewById<RecyclerView>(R.id.mondayRecycler).adapter as LessonsAdapter).setDataAndMultiple(timetable[0], viewAll, maxConcurrent)
                 (requireView().findViewById<RecyclerView>(R.id.tuesdayRecycler).adapter as LessonsAdapter).setDataAndMultiple(timetable[1], viewAll, maxConcurrent)

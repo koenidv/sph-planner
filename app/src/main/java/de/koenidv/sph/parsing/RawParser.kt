@@ -450,12 +450,12 @@ class RawParser {
         val accordion = Jsoup.parse(rawResponse).selectFirst("div#accordion")
 
         // Name-type map
-        val nametypeMap = Utility.parseStringArray(R.array.tiles_name_type)
+        val hrefTypeMap = Utility.parseStringArray(R.array.tiles_href_type)
 
         var id: String
         var name: String
         var locationTemp: String
-        var type: String
+        var type: String?
         var icon: String
         var color: Int
         var styles: String
@@ -508,8 +508,18 @@ class RawParser {
                 if (!locationTemp.contains("index.php?logout")
                         && !name.contains("Logout")
                         && !name.contains("Abmelden")) {
-                    // Check the tile's type using its name
-                    type = nametypeMap[name] ?: "other"
+
+                    // Check the tile's type using its href
+                    type = null
+                    type@ for (href in hrefTypeMap) {
+                        if (locationTemp.contains(href.key)) {
+                            type = href.value
+                            break@type
+                        }
+                    }
+                    // If no matching href to type mapentry was found, use "other"
+                    if (type == null) type = "other"
+
                     // Create a feature tile with these values and add it to the return list
                     functions.add(FunctionTile(name, locationTemp, type, icon, color))
                     // Remember tile id
