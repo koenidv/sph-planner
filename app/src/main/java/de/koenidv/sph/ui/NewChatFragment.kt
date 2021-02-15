@@ -1,7 +1,6 @@
 package de.koenidv.sph.ui
 
 import android.app.Activity
-import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.InputFilter
@@ -25,6 +24,7 @@ import de.koenidv.sph.database.MessagesDb
 import de.koenidv.sph.database.UsersDb
 import de.koenidv.sph.networking.Messages
 import de.koenidv.sph.networking.NetworkManager
+import de.koenidv.sph.networking.TokenManager
 import de.koenidv.sph.objects.Message
 import de.koenidv.sph.parsing.EmojiExcludeFilter
 import java.util.*
@@ -92,13 +92,13 @@ class NewChatFragment : Fragment() {
             input.setText("")
             input.isEnabled = false
             sending.visibility = View.VISIBLE
+            inputContainer.hint = getString(R.string.messages_new_sending)
 
             // Display message with empty values
-            val prefs = requireContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
             messages.add(Message(
                     "", "",
-                    prefs.getString("userid", "0")!!, "Teilnehmer",
-                    "", Date(), subject, text, recipients, recipients.size, false
+                    TokenManager.userid, Message.SENDER_TYPE_STUDENT, "",
+                    Date(), subject, text, recipients, recipients.size, false
             ))
             adapter.notifyItemInserted(messages.size)
 
@@ -122,6 +122,7 @@ class NewChatFragment : Fragment() {
                         input.setText(text)
                         input.isEnabled = true
                         sending.visibility = View.GONE
+                        inputContainer.hint = getString(R.string.messages_new_message)
 
                         // Show a snackbar
                         Snackbar.make(input, when (success) {

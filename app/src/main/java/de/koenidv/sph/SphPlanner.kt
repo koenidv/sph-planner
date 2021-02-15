@@ -2,6 +2,7 @@ package de.koenidv.sph
 
 import android.app.Application
 import android.content.Context
+import android.content.SharedPreferences
 import android.widget.Toast
 import com.androidnetworking.AndroidNetworking
 import com.facebook.stetho.Stetho
@@ -39,10 +40,14 @@ class SphPlanner : Application() {
 
         // Set application tag for Log
         const val TAG = "SPH-Planner"
+
+        lateinit var prefs: SharedPreferences
     }
 
     override fun onCreate() {
         super.onCreate()
+
+        prefs = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
 
         // Apply default remote configs
         Firebase.remoteConfig.setDefaultsAsync(R.xml.remote_config_defaults)

@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.recyclerview.widget.RecyclerView
@@ -23,11 +22,6 @@ import me.saket.bettermovementmethod.BetterLinkMovementMethod
 class ChatAdapter(private val messages: List<Message>, private val conversationInfo: Pair<String, Int>) :
         RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    // Get own user id
-    private val prefs = applicationContext()
-            .getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
-    private val userid = prefs.getString("userid", "")!!
-
     /**
      * Provides a reference to the type of view
      * (custom ViewHolder).
@@ -40,8 +34,7 @@ class ChatAdapter(private val messages: List<Message>, private val conversationI
         private val media = view.findViewById<RecyclerView>(R.id.messageMediaRecycler)
 
 
-        fun bind(message: Message, ownUID: String) {
-            val isOwn = message.idSender == ownUID
+        fun bind(message: Message) {
 
             /*
              * Data
@@ -53,7 +46,7 @@ class ChatAdapter(private val messages: List<Message>, private val conversationI
             BetterLinkMovementMethod.linkify(Linkify.ALL, content)
 
             // Sender name
-            if (isOwn) {
+            if (message.isOwn()) {
                 name.visibility = View.GONE
             } else {
                 name.visibility = View.VISIBLE
@@ -66,7 +59,7 @@ class ChatAdapter(private val messages: List<Message>, private val conversationI
              */
             // Set background drawable depending on if the message is outgoing or incoming
             // Also set horizontal bias so messages show up on the correct side
-            if (isOwn) {
+            if (message.isOwn()) {
                 layout.setBackgroundResource(R.drawable.message_background_outgoing)
                 ConstraintSet().apply {
                     clone(outerLayout)
@@ -100,7 +93,7 @@ class ChatAdapter(private val messages: List<Message>, private val conversationI
 
             // Display media
             if (mediaValues.isNotEmpty())
-                media.adapter = ChatMediaAdapter(mediaValues, isOwn)
+                media.adapter = ChatMediaAdapter(mediaValues, message.isOwn())
             else media.adapter = null
 
         }
@@ -146,7 +139,7 @@ class ChatAdapter(private val messages: List<Message>, private val conversationI
             (viewHolder as HeaderViewHolder).bind(conversationInfo)
         } else {
             // Bind data to ViewHolder
-            (viewHolder as ViewHolder).bind(messages[position - 1], userid)
+            (viewHolder as ViewHolder).bind(messages[position - 1])
         }
     }
 

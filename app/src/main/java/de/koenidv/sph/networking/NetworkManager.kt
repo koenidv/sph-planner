@@ -553,6 +553,7 @@ class NetworkManager {
                 val userid = profilePicture.substringAfter("&p=")
                         .substringBefore("&")
 
+                TokenManager.userid = userid
                 applicationContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
                         .edit().putString("userid", userid).apply()
 

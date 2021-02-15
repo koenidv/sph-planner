@@ -7,6 +7,7 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import de.koenidv.sph.R
+import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.SphPlanner.Companion.TAG
 import de.koenidv.sph.SphPlanner.Companion.applicationContext
 import de.koenidv.sph.database.ConversationsDb
@@ -121,7 +122,7 @@ class Messages {
                                         data.get("privateAnswerOnly").asString == "ja" ->
                                             Conversation.ANSWER_TYPE_PRIVATE
                                         data.get("groupOnly").asString == "ja" ->
-                                            Conversation.ANSWER_TYPE_ALL
+                                            Conversation.ANSWER_TYPE_GROUP
                                         else -> Conversation.ANSWER_TYPE_ALL
                                     }
 
@@ -375,6 +376,86 @@ class Messages {
                 }
             }
         }
+
+    }
+
+    /*
+     * Send a reply to a conversation
+     */
+    fun sendReply(firstMessageId: String,
+                  answerType: String,
+                  message: String,
+                  recipient: String = "all",
+                  conversation: Conversation? = null,
+                  callback: (success: Int) -> Unit) {
+
+        if ((answerType == Conversation.ANSWER_TYPE_GROUP && recipient != "all") ||
+                firstMessageId == "" || message == "") {
+            callback(NetworkManager.FAILED_UNKNOWN)
+            return
+        }
+
+        // Assemble the needed JSONObject
+        // For groupOnly and privateAnswerOnly, sph will only check existance and ignore the values
+        val json = JSONObject(mapOf(
+                "to" to recipient,
+                "groupOnly" to if (answerType == Conversation.ANSWER_TYPE_GROUP) "ja" else "nein",
+                "privateAnswerOnly" to if (answerType == Conversation.ANSWER_TYPE_PRIVATE) "ja" else "nein",
+                "message" to message,
+                "replyToMsg" to firstMessageId
+        ))
+
+        // Encrypt the message
+        Cryption.start { cryptsuccess, cryption ->
+            if (cryptsuccess != NetworkManager.SUCCESS || cryption == null) {
+                callback(cryptsuccess)
+                return@start
+            }
+
+            cryption.encrypt(json.toString()) { encrypted ->
+                if (encrypted == null) {
+                    callback(NetworkManager.FAILED_UNKNOWN)
+                    return@encrypt
+                }
+
+                // Post the encrypted message to sph
+                NetworkManager().postJsonAuthed(
+                        applicationContext().getString(R.string.url_messages),
+                        mapOf("a" to "reply", "c" to encrypted)) { success, data ->
+
+                    if (success != NetworkManager.SUCCESS
+                            || data == null || !data.getBoolean("back")) {
+                        // Some network error
+                        callback(
+                                if (success == NetworkManager.SUCCESS) NetworkManager.FAILED_UNKNOWN
+                                else success)
+                        cryption.stop()
+                        return@postJsonAuthed
+                    }
+
+                    // Post successful, now save the message locally
+                    if (conversation != null) {
+                        MessagesDb.save(Message(
+                                data.getString("id"),
+                                conversation.convId,
+                                TokenManager.userid,
+                                Message.SENDER_TYPE_STUDENT,
+                                SphPlanner.prefs.getString("real_name", "")!!,
+                                Date(), // A few seconds later than actual, shouldn't be an issue
+                                conversation.subject,
+                                message,
+                                listOf(recipient), // Accurate recipients are only really required for the first msg
+                                conversation.recipientCount,
+                                false
+                        ))
+                    }
+
+                    callback(NetworkManager.SUCCESS)
+
+                }
+            }
+        }
+
 
     }
 

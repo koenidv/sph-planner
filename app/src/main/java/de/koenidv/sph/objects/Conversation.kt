@@ -1,7 +1,5 @@
 package de.koenidv.sph.objects
 
-import android.content.Context
-import de.koenidv.sph.SphPlanner.Companion.applicationContext
 import de.koenidv.sph.database.MessagesDb
 import de.koenidv.sph.database.UsersDb
 import java.util.*
@@ -23,6 +21,7 @@ data class Conversation(
     companion object {
         const val ANSWER_TYPE_NONE = "none"
         const val ANSWER_TYPE_PRIVATE = "private"
+        const val ANSWER_TYPE_GROUP = "group"
         const val ANSWER_TYPE_ALL = "all"
     }
 
@@ -32,12 +31,8 @@ data class Conversation(
     fun getInfo(): Pair<String, Int> {
         if (firstMessage == null) firstMessage = MessagesDb.getMessage(firstIdMess)
 
-        val ownId = applicationContext()
-                .getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
-                .getString("userid", "")
-
         val partner = UsersDb.getName(
-                if (originalSenderId == ownId) {
+                if (firstMessage?.isOwn() == true) {
                     firstMessage?.recipients?.getOrNull(0).toString()
                 } else {
                     originalSenderId
