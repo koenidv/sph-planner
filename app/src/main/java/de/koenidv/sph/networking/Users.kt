@@ -34,7 +34,7 @@ class Users {
             DebugLog("Users", "Fetching users").log()
 
         // We need to make sure that we have an access token
-        TokenManager().authenticate { success, token ->
+        TokenManager.authenticate { success, _ ->
             // If getting a token failed, call onComplete
             // with the error and return
             if (success != NetworkManager.SUCCESS) {
@@ -43,121 +43,158 @@ class Users {
             }
 
             val users = mutableListOf<User>()
-            val userIds = mutableListOf<String>()
             val favoriteTeachers = CoursesDb.getInstance().favoriteTeacherIds
 
             // Iterate through every single char
             var char = 'a'
             var completed = 0
+
+            val onDone: (Int, List<User>) -> Unit = { mSuccess, mUsers ->
+                if (mSuccess == NetworkManager.SUCCESS) {
+
+                    // Add found users to the list
+                    for (user in mUsers) {
+                        // If this user is not yet in the list, add it
+                        if (users.indexOfFirst { it.userId == user.userId } == -1) {
+                            users.add(user)
+                        }
+                    }
+
+                    // We could check for char = z here, but that'd break if one
+                    // request takes longer than the previous
+                    completed++
+                    if (completed == 26) {
+                        // If this was the last request, save the user list
+                        // and call back success
+                        UsersDb.save(users)
+                        callback(NetworkManager.SUCCESS)
+
+                        // Log success
+                        if (Debugger.DEBUGGING_ENABLED)
+                            DebugLog("Users", "Loaded users",
+                                    bundleOf("usersCount" to users.size),
+                                    type = Debugger.LOG_TYPE_SUCCESS).log()
+                    }
+                } else {
+                    callback(mSuccess)
+                }
+            }
+
             while (char <= 'z') {
-                // Log fetching users
-                if (Debugger.DEBUGGING_ENABLED)
-                    DebugLog("Users", "Loading users for $char").log()
-                // Not get the all recipients for the current character
-                AndroidNetworking.post(SphPlanner.applicationContext().getString(R.string.url_messages))
-                        .addBodyParameter("a", "searchRecipt")
-                        .addBodyParameter("q", char.toString())
-                        .build()
-                        .getAsJSONObject(object : JSONObjectRequestListener {
-                            override fun onResponse(response: JSONObject) {
-                                var index = 0
-                                val items = response.getJSONArray("items")
-                                var currentItem: JSONObject
-                                var text: String
-                                var firstname: String?
-                                var lastname: String?
-                                var teacherId: String?
-
-                                // Get every item from the array
-                                while (index < response.getInt("total_count")) {
-                                    currentItem = items.getJSONObject(index)
-
-                                    // If list doesn't contain this user yet
-                                    // Also, only get teachers at this time (type=lul)
-                                    if (!userIds.contains(currentItem.getString("id"))
-                                            && currentItem.getString("type") == "lul") {
-                                        // We'll only use names with "," and "(..)"
-                                        // This way we'll ignore admin entries
-                                        // However, this will not add anything if a school does not
-                                        // show a teacher's first name or shorthand
-                                        text = currentItem.getString("text")
-
-                                        if (text.contains(",") &&
-                                                text.contains("""\(.*\)""".toRegex())) {
-
-                                            // Get the name and shorthand
-                                            lastname = text.substring(0, text.indexOf(","))
-                                            firstname = text.substring(
-                                                    text.indexOf(", ") + 2,
-                                                    text.indexOf(" (")
-                                            )
-                                            teacherId = text.substring(
-                                                    text.indexOf(" (") + 2,
-                                                    text.indexOf(")")
-                                            ).toLowerCase(Locale.ROOT)
-
-                                            // Add it to the list
-                                            users.add(User(
-                                                    userId = currentItem.getString("id"),
-                                                    teacherId = teacherId,
-                                                    firstname = firstname,
-                                                    lastname = lastname,
-                                                    type = currentItem.getString("type"),
-                                                    favoriteTeachers.contains(teacherId)
-                                            ))
-                                            // Add id to the list for faster checks of existing users
-                                            userIds.add(currentItem.getString("id"))
-                                        }
-                                    }
-
-                                    index++ // Next user for this result
-                                }
-
-                                // We could check for char = z here, but that'd break if one
-                                // request takes longer than the previous
-                                completed++
-                                if (completed == 26) {
-                                    // If this was the last request, save the user list
-                                    // and call back success
-                                    UsersDb.save(users)
-                                    callback(NetworkManager.SUCCESS)
-
-                                    // Log success
-                                    if (Debugger.DEBUGGING_ENABLED)
-                                        DebugLog("Users", "Loaded users",
-                                                bundleOf("usersCount" to users.size),
-                                                type = Debugger.LOG_TYPE_SUCCESS).log()
-                                }
-
-                            }
-
-                            override fun onError(error: ANError) {
-                                // Handle request errors
-
-                                // Log error
-                                if (Debugger.DEBUGGING_ENABLED)
-                                    DebugLog("Users", "Error loading users",
-                                            error).log()
-                                Log.d(SphPlanner.TAG, error.errorDetail)
-
-                                when (error.errorDetail) {
-                                    "connectionError" -> {
-                                        callback(NetworkManager.FAILED_NO_NETWORK)
-                                    }
-                                    "requestCancelledError" -> {
-                                        callback(NetworkManager.FAILED_CANCELLED)
-                                    }
-                                    else -> {
-                                        callback(NetworkManager.FAILED_UNKNOWN)
-                                    }
-                                }
-                            }
-
-                        })
+                // Use empty list, we want all found users, known or not
+                loadUsersForQuery(char.toString(), listOf(), favoriteTeachers, onDone)
                 // Use the next char
                 char++
             }
 
+        }
+    }
+
+    /**
+     * Load all new users for a given query
+     */
+    fun loadUsersForQuery(query: String,
+                          currentUsers: List<User> = UsersDb.all(),
+                          favoriteTeachers: List<String> = CoursesDb.getInstance().favoriteTeacherIds,
+                          callback: (Int, List<User>) -> Unit) {
+        // Log fetching users
+        if (Debugger.DEBUGGING_ENABLED)
+            DebugLog("Users", "Loading users for $query").log()
+
+        TokenManager.authenticate { success, _ ->
+            if (success != NetworkManager.SUCCESS) {
+                callback(success, listOf())
+                return@authenticate
+            }
+            // Not get the all recipients for the current character
+            AndroidNetworking.post(SphPlanner.applicationContext().getString(R.string.url_messages))
+                    .addBodyParameter("a", "searchRecipt")
+                    .addBodyParameter("q", query)
+                    .build()
+                    .getAsJSONObject(object : JSONObjectRequestListener {
+                        override fun onResponse(response: JSONObject) {
+                            var index = 0
+                            val items = response.getJSONArray("items")
+                            var currentItem: JSONObject
+                            var text: String
+                            var firstname: String?
+                            var lastname: String?
+                            var teacherId: String?
+                            val returnUsers = mutableListOf<User>()
+
+                            // Get every item from the array
+                            while (index < response.getInt("total_count")) {
+                                currentItem = items.getJSONObject(index)
+
+                                // If list doesn't contain this user yet
+                                // Also, only get teachers at this time (type=lul)
+                                if (currentUsers.indexOfFirst {
+                                            it.userId == currentItem.getString("id")
+                                        } == -1
+                                        && currentItem.getString("type") == "lul") {
+                                    // We'll only use names with "," and "(..)"
+                                    // This way we'll ignore admin entries
+                                    // However, this will not add anything if a school does not
+                                    // show a teacher's first name or shorthand
+                                    text = currentItem.getString("text")
+
+                                    if (text.contains(",") &&
+                                            text.contains("""\(.*\)""".toRegex())) {
+
+                                        // Get the name and shorthand
+                                        lastname = text.substring(0, text.indexOf(","))
+                                        firstname = text.substring(
+                                                text.indexOf(", ") + 2,
+                                                text.indexOf(" (")
+                                        )
+                                        teacherId = text.substring(
+                                                text.indexOf(" (") + 2,
+                                                text.indexOf(")")
+                                        ).toLowerCase(Locale.ROOT)
+
+                                        // Add it to the list
+                                        returnUsers.add(User(
+                                                userId = currentItem.getString("id"),
+                                                teacherId = teacherId,
+                                                firstname = firstname,
+                                                lastname = lastname,
+                                                type = currentItem.getString("type"),
+                                                favoriteTeachers.contains(teacherId)
+                                        ))
+                                    }
+                                }
+
+                                index++ // Next user for this result
+                            }
+
+                            // Call back with the found users
+                            callback(NetworkManager.SUCCESS, returnUsers)
+
+
+                        }
+
+                        override fun onError(error: ANError) {
+                            // Handle request errors
+
+                            // Log error
+                            if (Debugger.DEBUGGING_ENABLED)
+                                DebugLog("Users", "Error loading users",
+                                        error).log()
+                            Log.d(SphPlanner.TAG, error.errorDetail)
+
+                            when (error.errorDetail) {
+                                "connectionError" -> {
+                                    callback(NetworkManager.FAILED_NO_NETWORK, listOf())
+                                }
+                                "requestCancelledError" -> {
+                                    callback(NetworkManager.FAILED_CANCELLED, listOf())
+                                }
+                                else -> {
+                                    callback(NetworkManager.FAILED_UNKNOWN, listOf())
+                                }
+                            }
+                        }
+                    })
         }
     }
 

@@ -262,7 +262,7 @@ class OnboardingSupportlistFragment : Fragment() {
                                                     "Recreating on user input").log()
 
                                         // Clear session id
-                                        TokenManager().reset()
+                                        TokenManager.reset()
                                         // Recreate to try again
                                         requireActivity().recreate()
                                     }

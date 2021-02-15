@@ -137,7 +137,7 @@ class WebViewFragment : Fragment() {
         // If target is a sph page, generate access token, save as cookie and load once done
         // else just load the page
         if (domain.contains("schulportal.hessen.de")) {
-            TokenManager().authenticate { success: Int, token: String? ->
+            TokenManager.authenticate { success: Int, token: String? ->
                 if (success == NetworkManager.SUCCESS) {
                     Log.d(SphPlanner.TAG, token!!)
                     cookieManager.setCookie(domain, "sid=$token")
