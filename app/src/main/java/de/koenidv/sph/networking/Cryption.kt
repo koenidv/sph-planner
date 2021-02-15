@@ -292,7 +292,6 @@ class Cryption {
     private fun decrypt(data: String, secret: String, callback: (decrypted: String?) -> Unit) {
         val dataJs = data.replace("\\", "")
         execute("decrypt", arrayOf(dataJs, secret), callback)
-        Log.d("SPH-PLANNER", "DECR KEY IS $secret")
     }
 
     /**
@@ -304,7 +303,6 @@ class Cryption {
     private fun encrypt(data: String, secret: String, callback: (encrypted: String?) -> Unit) {
         val dataJs = data.replace("\\", "")
         execute("encrypt", arrayOf(dataJs, secret), callback)
-        Log.d("SPH-PLANNER", "ENCR KEY IS $secret")
     }
 
     /**

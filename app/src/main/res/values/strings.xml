@@ -244,7 +244,8 @@
     <string name="messages_new_title">New conversation</string>
     <string name="mesages_new_action">Let\'s go</string>
     <string name="messages_new_subject">Add a subject</string>
-    <string name="messages_new_recipients">Search for recipients</string>
+    <string name="messages_new_recipients">Add recipients</string>
+    <string name="messages_new_recipients_search">Search for all users</string>
     <string name="messages_new_message">Send a message</string>
     <string name="messages_new_sending">Message is being sent…</string>
 

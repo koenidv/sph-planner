@@ -19,7 +19,7 @@ import java.util.*
 
 
 //  Created by koenidv on 12.02.2021.
-class ConversationsAdapter(private val conversations: List<ConversationInfo>,
+class ConversationsAdapter(val conversations: MutableList<ConversationInfo>,
                            private val activity: FragmentActivity,
                            private val onSelectModeChange: (Boolean) -> Unit) :
         RecyclerView.Adapter<ConversationsAdapter.ViewHolder>() {
@@ -129,12 +129,12 @@ class ConversationsAdapter(private val conversations: List<ConversationInfo>,
             val now = Date()
 
             return if (now.date == date.date &&
-                    now.time - date.time < 24 * 360000) {
+                    now.time - date.time < 24 * 3600000) {
                 // If now is the same day in month and maximum of 24hours ago
                 SimpleDateFormat(applicationContext().getString(R.string.messages_dateformat_today),
                         Locale.getDefault())
                         .format(date)
-            } else if (now.time - date.time < 48 * 360000) {
+            } else if (now.time - date.time < 48 * 3600000) {
                 SimpleDateFormat(applicationContext().getString(R.string.messages_dateformat_yesterday),
                         Locale.getDefault())
                         .format(date)

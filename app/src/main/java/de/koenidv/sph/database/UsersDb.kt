@@ -12,6 +12,7 @@ import java.util.*
 object UsersDb {
 
     var writable: SQLiteDatabase = DatabaseHelper.getInstance().writableDatabase
+    var cache = mutableMapOf<String, MutableMap<String, String>>()
 
     /**
      * Get all users from the db,
@@ -26,26 +27,42 @@ object UsersDb {
      * Get a users name
      */
     fun getName(userid: String, lastnamefirst: Boolean = false): String {
-        val nameCursor = writable.rawQuery(
-                "SELECT firstname, lastname FROM users WHERE user_id=\"$userid\"" +
-                        "OR user_id=\"l-$userid\" LIMIT 1",
-                null
-        )
-        // If result is empty, return user id
-        if (!nameCursor.moveToFirst()) {
-            nameCursor.close()
-            return userid
-        }
-        // Get template
-        var name = SphPlanner.applicationContext().getString(
-                if (lastnamefirst) R.string.users_name_template_last
-                else R.string.users_name_template_first)
-        // Replace placeholders
-        name = name.replace("%firstname", nameCursor.getString(0))
-                .replace("%lastname", nameCursor.getString(1))
+        // Try to get the full name from a map of saved fullnames
+        // This is done because this function is very oftenly used and database access slow
 
-        nameCursor.close()
-        return name
+        val cachedvalue: String? = cache[userid.replace("l-", "")]?.get(
+                if (lastnamefirst) "fullnameLast" else "fullnameFirst")
+
+        if (cachedvalue != null) return cachedvalue
+        else {
+
+            val nameCursor = writable.rawQuery(
+                    "SELECT firstname, lastname FROM users WHERE user_id=\"$userid\"" +
+                            "OR user_id=\"l-$userid\" LIMIT 1",
+                    null
+            )
+            // If result is empty, return user id
+            if (!nameCursor.moveToFirst()) {
+                nameCursor.close()
+                return userid
+            }
+            // Get template
+            var name = SphPlanner.applicationContext().getString(
+                    if (lastnamefirst) R.string.users_name_template_last
+                    else R.string.users_name_template_first)
+            // Replace placeholders
+            name = name.replace("%firstname", nameCursor.getString(0))
+                    .replace("%lastname", nameCursor.getString(1))
+
+            nameCursor.close()
+
+            // Save this to "cache"
+            cache.getOrPut(userid.replace("l-", ""), { mutableMapOf() })[
+                    if (lastnamefirst) "fullnameLast" else "fullnameFirst"] = name
+
+            return name
+
+        }
     }
 
     /**
