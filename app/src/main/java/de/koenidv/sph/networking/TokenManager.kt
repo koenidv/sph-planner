@@ -37,6 +37,8 @@ object TokenManager {
 
     val prefs: SharedPreferences = applicationContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
 
+    var userid = prefs.getString("userid", "0")!!
+
     /**
      * Creates an signed-in access token and saves it to CookieStore
      * @param onComplete Called when a token is ready

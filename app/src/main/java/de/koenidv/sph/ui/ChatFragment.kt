@@ -10,18 +10,24 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import android.widget.ProgressBar
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputLayout
 import de.koenidv.sph.R
 import de.koenidv.sph.adapters.ChatAdapter
 import de.koenidv.sph.database.ConversationsDb
 import de.koenidv.sph.database.MessagesDb
+import de.koenidv.sph.networking.Messages
+import de.koenidv.sph.networking.NetworkManager
+import de.koenidv.sph.networking.TokenManager
 import de.koenidv.sph.objects.Conversation
+import de.koenidv.sph.objects.Message
 import de.koenidv.sph.parsing.EmojiExcludeFilter
+import java.util.*
 
 // Created by koenidv on 18.12.2020.
 class ChatFragment : Fragment() {
@@ -44,7 +50,7 @@ class ChatFragment : Fragment() {
          */
 
         val messagesRecycler = view.findViewById<RecyclerView>(R.id.messagesRecycler)
-        val messages = MessagesDb.getConversation(conversationId)
+        val messages = MessagesDb.getConversation(conversationId).toMutableList()
 
         // Display messages
         val info = conversation!!.getInfo()
@@ -57,6 +63,7 @@ class ChatFragment : Fragment() {
 
         val inputContainer = view.findViewById<TextInputLayout>(R.id.textInputLayout)
         val input = view.findViewById<EditText>(R.id.messageEditText)
+        val sending = view.findViewById<ProgressBar>(R.id.messageSendingProgress)
         inputContainer.isEndIconVisible = false
 
         // Disable replying if answertype is none
@@ -83,9 +90,68 @@ class ChatFragment : Fragment() {
 
             })
 
-            inputContainer.setEndIconOnClickListener {
-                Toast.makeText(this.context, input.text, Toast.LENGTH_LONG).show()
+            var endiconClick: (View) -> Unit = {}
+            endiconClick = {
+                val text = input.text.toString()
+
+                // Clear input and disable it until the message was successfully sent
+                input.setText("")
+                input.isEnabled = false
+                sending.visibility = View.VISIBLE
+                inputContainer.hint = getString(R.string.messages_new_sending)
+
+                // Display virtual message
+                messages.add(Message(
+                        "", "",
+                        TokenManager.userid, Message.SENDER_TYPE_STUDENT, "",
+                        Date(), conversation.subject, text, listOf(), conversation.recipientCount,
+                        false
+                ))
+                adapter.notifyItemInserted(messages.size)
+
+                // Send the message
+                Messages().sendReply(conversation.firstIdMess,
+                        conversation.answerType,
+                        text, "all",
+                        conversation) { success ->
+
+                    if (success == NetworkManager.SUCCESS) {
+                        // Sending the reply was successful, enable input
+                        input.isEnabled = true
+                        sending.visibility = View.GONE
+
+                        // Re-set input hint
+                        inputContainer.hint = if (info.second == 0 ||
+                                conversation.answerType == Conversation.ANSWER_TYPE_PRIVATE)
+                            getString(R.string.messages_reply_private).replace("%name", info.first)
+                        else getString(R.string.messages_reply_all)
+
+                    } else {
+                        // An error occurred
+
+                        // Remove the message
+                        messages.clear()
+                        adapter.notifyItemRemoved(0)
+
+                        // Re-set text
+                        input.setText(text)
+                        input.isEnabled = true
+                        sending.visibility = View.GONE
+
+                        // Show a snackbar
+                        Snackbar.make(input, when (success) {
+                            NetworkManager.FAILED_NO_NETWORK -> getString(R.string.error_offline)
+                            NetworkManager.FAILED_SERVER_ERROR -> getString(R.string.error_server)
+                            NetworkManager.FAILED_MAINTENANCE -> getString(R.string.error_maintenance)
+                            else -> getString(R.string.error) + ": $success"
+                        }, Snackbar.LENGTH_LONG)
+                                .setAnchorView(R.id.nav_view)
+                                .setAction(R.string.retry) { endiconClick(it) }
+                                .show()
+                    }
+                }
             }
+            inputContainer.setEndIconOnClickListener(endiconClick)
 
         }
 

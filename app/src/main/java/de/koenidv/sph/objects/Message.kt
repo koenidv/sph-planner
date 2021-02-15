@@ -1,5 +1,6 @@
 package de.koenidv.sph.objects
 
+import de.koenidv.sph.networking.TokenManager
 import java.util.*
 
 //  Created by koenidv on 10.02.2021.
@@ -15,4 +16,12 @@ data class Message(
         val recipients: List<String>?, // Recipients, only for own messages
         val recipientCount: Int, // Number of recipients according to sph's "private" property
         val unread: Boolean // true if unread, false if read
-)
+) {
+
+    companion object {
+        const val SENDER_TYPE_TEACHER = "Betreuer"
+        const val SENDER_TYPE_STUDENT = "Teilnehmer"
+    }
+
+    fun isOwn() = idSender == TokenManager.userid
+}
