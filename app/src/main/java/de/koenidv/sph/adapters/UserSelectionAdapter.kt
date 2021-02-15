@@ -7,6 +7,9 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
+import de.koenidv.sph.database.UsersDb
+import de.koenidv.sph.networking.NetworkManager
+import de.koenidv.sph.networking.Users
 import de.koenidv.sph.objects.User
 import de.koenidv.sph.parsing.Utility
 
@@ -18,15 +21,15 @@ class UserSelectionAdapter(users: List<User>, private val onSelection: () -> Uni
             val user: User,
             var selected: Boolean = false)
 
-    private val userData = users.map { UserData(it) }
+    private val userData = users.map { UserData(it) }.toMutableList()
     private val displayedUsers = userData.toMutableList()
     private var previousfilter = ""
 
     private val onSelect: (UserData) -> Unit = {
-        onSelection()
         it.selected = !it.selected
         val displayindex = displayedUsers.indexOf(it)
         notifyItemChanged(displayindex)
+        onSelection()
     }
 
     /**
@@ -104,14 +107,38 @@ class UserSelectionAdapter(users: List<User>, private val onSelection: () -> Uni
             // If filter got shorter, just replace items
             // This way, alphabetical order will be preserved without fancy re-sorting
             displayedUsers.clear()
-            displayedUsers.addAll(userData.filter {
-                ("${it.user.lastname}, ${it.user.firstname} " +
-                        "(${it.user.teacherId}) ${it.user.userId}")
-                        .contains(filter)
-            })
+            displayedUsers.addAll(userData
+                    .sortedByDescending { it.selected }
+                    .filter {
+                        ("${it.user.lastname}, ${it.user.firstname} " +
+                                "(${it.user.teacherId}) ${it.user.userId}")
+                                .contains(filter)
+                    })
             notifyDataSetChanged()
         }
         previousfilter = filter
+
+        // If there are less than 3 entries for the filter, check online
+        // if there are teachers that match it
+        // This might happen as sph returns only 30 users per request, and some might not
+        // be captured by queries with one char a-z
+        if (displayedUsers.size < 3) {
+            Users().loadUsersForQuery(filter) { success, users ->
+                if (success == NetworkManager.SUCCESS) {
+                    // This will only return users that were not in the database before,
+                    // but we still need to check if a user is in the list in case
+                    // another request was made in the meantime
+                    for (user in users) {
+                        if (userData.indexOfFirst { it.user.userId == user.userId } == -1) {
+                            // Add it to this list and save it
+                            // Will be displayed the next time the filter is changed
+                            userData.add(UserData((user)))
+                            UsersDb.save(listOf(user))
+                        }
+                    }
+                }
+            }
+        }
     }
 
     /**

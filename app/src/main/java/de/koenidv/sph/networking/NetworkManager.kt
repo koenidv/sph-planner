@@ -143,7 +143,7 @@ class NetworkManager {
                       callback: (success: Int, result: String?) -> Unit) {
 
         // Getting an access token
-        TokenManager().authenticate(forceNewToken) { success: Int, _ ->
+        TokenManager.authenticate(forceNewToken) { success: Int, _ ->
 
             // Log loading the page
             if (Debugger.DEBUGGING_ENABLED)
@@ -284,7 +284,7 @@ class NetworkManager {
                        headers: Map<String, String> = mapOf(),
                        callback: (success: Int, result: JSONObject?) -> Unit) {
         // Authenticate
-        TokenManager().authenticate { success, _ ->
+        TokenManager.authenticate { success, _ ->
             // Cancel if authentication was not successful
             if (success != SUCCESS) {
                 callback(success, null)
@@ -337,7 +337,7 @@ class NetworkManager {
 
         if (entries.isNotEmpty()) {
             // Prepare token
-            TokenManager().authenticate { success, _ ->
+            TokenManager.authenticate { success, _ ->
                 if (success == SUCCESS) {
                     var number = 0 // Completed calls
                     var lastError: Int? = null // Last error occurred
@@ -481,7 +481,7 @@ class NetworkManager {
             )).log()
 
         // Getting an access token
-        TokenManager().authenticate { success: Int, _ ->
+        TokenManager.authenticate { success: Int, _ ->
             if (success == SUCCESS) {
 
                 // Getting webpage as OkHttp

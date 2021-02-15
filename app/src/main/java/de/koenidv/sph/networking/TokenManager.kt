@@ -31,11 +31,9 @@ import java.util.*
 
 
 //  Created by koenidv on 05.12.2020.
-class TokenManager {
+object TokenManager {
 
-    companion object {
-        var lastTokenCheck = 0L
-    }
+    var lastTokenCheck = 0L
 
     val prefs: SharedPreferences = applicationContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
 
@@ -131,7 +129,7 @@ class TokenManager {
                         type = Debugger.LOG_TYPE_SUCCESS).log()
 
             onComplete(NetworkManager.SUCCESS, CookieStore.getCookie("schulportal.hessen.de", "sid")!!)
-          
+
         } else if (response.contains("Login - Schulportal Hessen")
                 || response.contains("Schulauswahl - Schulportal Hessen")) {
             // Login not successful

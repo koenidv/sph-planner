@@ -84,7 +84,7 @@ class Cryption {
         val prefs = applicationContext().getSharedPreferences(
                 "sharedPrefs", Context.MODE_PRIVATE)
         // Get the current session id token to check if it has changed
-        TokenManager().authenticate { tokensuccess, token ->
+        TokenManager.authenticate { tokensuccess, token ->
             // Cancel if token authentication was not successful
             if (tokensuccess != SUCCESS) {
                 callback(tokensuccess, null)
@@ -218,7 +218,7 @@ class Cryption {
      */
     private fun handshake(encryptedKey: String, callback: (success: Int, challenge: String?) -> Unit) {
         // The handshake needs to be sent with a session id
-        TokenManager().authenticate { tokensuccess, _ ->
+        TokenManager.authenticate { tokensuccess, _ ->
             // Cancel if token authentication was not successful
             if (tokensuccess != SUCCESS) {
                 callback(tokensuccess, null)
