@@ -3,6 +3,7 @@ package de.koenidv.sph.ui
 import android.app.Activity
 import android.os.Bundle
 import android.text.Editable
+import android.text.InputFilter
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
@@ -17,7 +18,9 @@ import com.google.android.material.textfield.TextInputLayout
 import de.koenidv.sph.R
 import de.koenidv.sph.adapters.ChatAdapter
 import de.koenidv.sph.database.UsersDb
+import de.koenidv.sph.networking.Messages
 import de.koenidv.sph.objects.Message
+import de.koenidv.sph.parsing.EmojiExcludeFilter
 
 
 // Created by koenidv on 18.12.2020.
@@ -74,8 +77,15 @@ class NewChatFragment : Fragment() {
         })
 
         inputContainer.setEndIconOnClickListener {
-            Toast.makeText(this.context, input.text, Toast.LENGTH_LONG).show()
+            Messages().sendFirstMessage(recipients, subject, input.text.toString()) {
+                requireActivity().runOnUiThread {
+                    Toast.makeText(requireActivity(), "CALLBACK IS $it", Toast.LENGTH_LONG).show()
+                }
+            }
         }
+
+        // Exclude emoji, sph doesn't support them
+        input.filters = arrayOf<InputFilter>(EmojiExcludeFilter())
 
         input.requestFocus()
 

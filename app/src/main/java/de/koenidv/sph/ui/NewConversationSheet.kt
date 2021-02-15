@@ -10,7 +10,6 @@ import android.widget.EditText
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.button.MaterialButton
-import com.google.android.material.textfield.TextInputLayout
 import de.koenidv.sph.R
 import de.koenidv.sph.adapters.UserSelectionAdapter
 import de.koenidv.sph.database.UsersDb
@@ -23,7 +22,6 @@ class NewConversationSheet(private val callback: (String, List<String>) -> Unit)
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val view: View = inflater.inflate(R.layout.sheet_newconversation, container, false)
 
-        val subjectContainer = view.findViewById<TextInputLayout>(R.id.subjectInputLayout)
         val subject = view.findViewById<EditText>(R.id.subjectEditText)
         val recipients = view.findViewById<EditText>(R.id.recipientsEditText)
         val recipientsRecycler = view.findViewById<RecyclerView>(R.id.recipientsRecycler)
@@ -48,12 +46,24 @@ class NewConversationSheet(private val callback: (String, List<String>) -> Unit)
             val subjectText = subject.text.toString()
             val recipList = recipAdapter.getSelected()
 
-            dismiss()
+            // Require a subject
+            if (subjectText.isEmpty()) {
+                subject.error = getString(R.string.messages_new_subject)
+                return@setOnClickListener
+            }
 
+            // Require recipients
+            if (recipList.isEmpty()) {
+                recipients.error = getString(R.string.messages_new_recipients)
+                return@setOnClickListener
+            }
+
+            // Call back to start new conversation
             callback(subjectText, recipList.map {
                 if (it.userId.startsWith("l-")) it.userId
                 else "l-${it.userId}"
             })
+            dismiss()
 
         }
 

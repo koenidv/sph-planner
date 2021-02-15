@@ -34,12 +34,12 @@ class Users {
             DebugLog("Users", "Fetching users").log()
 
         // We need to make sure that we have an access token
-        TokenManager.authenticate { success, _ ->
+        TokenManager.getToken { success, _ ->
             // If getting a token failed, call onComplete
             // with the error and return
             if (success != NetworkManager.SUCCESS) {
                 callback(success)
-                return@authenticate
+                return@getToken
             }
 
             val users = mutableListOf<User>()
@@ -101,10 +101,10 @@ class Users {
         if (Debugger.DEBUGGING_ENABLED)
             DebugLog("Users", "Loading users for $query").log()
 
-        TokenManager.authenticate { success, _ ->
+        TokenManager.getToken { success, _ ->
             if (success != NetworkManager.SUCCESS) {
                 callback(success, listOf())
-                return@authenticate
+                return@getToken
             }
             // Not get the all recipients for the current character
             AndroidNetworking.post(SphPlanner.applicationContext().getString(R.string.url_messages))

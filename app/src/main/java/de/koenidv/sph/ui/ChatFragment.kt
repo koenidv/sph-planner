@@ -3,6 +3,7 @@ package de.koenidv.sph.ui
 import android.app.Activity
 import android.os.Bundle
 import android.text.Editable
+import android.text.InputFilter
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
@@ -20,6 +21,7 @@ import de.koenidv.sph.adapters.ChatAdapter
 import de.koenidv.sph.database.ConversationsDb
 import de.koenidv.sph.database.MessagesDb
 import de.koenidv.sph.objects.Conversation
+import de.koenidv.sph.parsing.EmojiExcludeFilter
 
 // Created by koenidv on 18.12.2020.
 class ChatFragment : Fragment() {
@@ -87,6 +89,8 @@ class ChatFragment : Fragment() {
 
         }
 
+        // Exclude emoji, sph doesn't support them
+        input.filters = arrayOf<InputFilter>(EmojiExcludeFilter())
 
         return view
     }
