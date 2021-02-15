@@ -229,10 +229,10 @@
     <string name="messages_unread_possible">✉️ You might have unread messages</string>
     <string name="messages_new_button">New conversation</string>
     <string name="messages_archive_conversations">Archive</string>
-    <string name="messages_partic_fromself">You to %recipient</string>
-    <string name="messages_partic_fromself_more">You to %countall recipients</string>
-    <string name="messages_partic_toself">%sender to you</string>
-    <string name="messages_partic_toself_more">%sender to you and %count others</string>
+    <string name="messages_partic_fromself">You to %partner</string>
+    <string name="messages_partic_fromself_more">You to %count recipients</string>
+    <string name="messages_partic_toself">%partner to you</string>
+    <string name="messages_partic_toself_more">%partner to you and %count others</string>
     <string name="messages_dateformat_today">HH:mm</string>
     <string name="messages_dateformat_yesterday">"'Yesterday' HH:mm"</string>
     <string name="messages_dateformat_other">d. MMM HH:mm</string>

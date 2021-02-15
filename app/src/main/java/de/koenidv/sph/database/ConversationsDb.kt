@@ -3,6 +3,8 @@ package de.koenidv.sph.database
 import android.content.ContentValues
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
+import de.koenidv.sph.adapters.ConversationsAdapter
+import de.koenidv.sph.networking.TokenManager
 import de.koenidv.sph.objects.Conversation
 import java.util.*
 
@@ -22,7 +24,7 @@ class ConversationsDb {
         cv.put("recipient_count", conversation.recipientCount)
         cv.put("answertype", conversation.answerType)
         cv.put("original_id_sender", conversation.originalSenderId)
-        cv.put("date", conversation.date.time / 1000)
+        cv.put("lastdate", conversation.date.time / 1000)
         cv.put("unread", if (conversation.unread) 1 else 0)
         cv.put("archived", if (conversation.archived) 1 else 0)
 
@@ -56,6 +58,55 @@ class ConversationsDb {
                     null), true)
 
     /**
+     * Gets a list of conversations as ConversationInfo for the conversations list
+     */
+    fun getConversationInfo(archived: Boolean = false): List<ConversationsAdapter.ConversationInfo> {
+        val cursor = writable.rawQuery("SELECT conversation_id, " +
+                "conversations.subject, conversations.recipient_count, " +
+                "original_id_sender, messages.recipients, conversations.lastdate, " +
+                "conversations.unread FROM conversations LEFT JOIN messages ON " +
+                "conversations.first_id_message = messages.message_id WHERE " +
+                "archived=${if (archived) 1 else 0} ORDER BY date DESC", null)
+
+        if (!cursor.moveToFirst()) {
+            cursor.close()
+            return listOf()
+        }
+
+        var isOwn: Boolean
+        var partner: String
+        var partnerCount: Int
+        val returnList = mutableListOf<ConversationsAdapter.ConversationInfo>()
+
+        do {
+            isOwn = cursor.getString(3) == TokenManager.userid
+            // If sender is self, use first recipient as partner, else original sender
+            if (isOwn) {
+                partner = cursor.getString(4).substringBefore(";")
+                partnerCount = cursor.getInt(2)
+            } else {
+                partner = cursor.getString(3)
+                partnerCount = cursor.getInt(2) - 1
+            }
+
+            returnList.add(ConversationsAdapter.ConversationInfo(
+                    id = cursor.getString(0),
+                    subject = cursor.getString(1),
+                    partner = partner,
+                    partnerCount = partnerCount,
+                    date = Date(cursor.getInt(5) * 1000L),
+                    isOwn = isOwn,
+                    isUnread = cursor.getInt(6) == 1
+            ))
+
+        } while (cursor.moveToNext())
+
+        cursor.close()
+        return returnList
+
+    }
+
+    /**
      * Returns unread value for a conversation, or null if there is no such conversation
      */
     fun isUnread(convId: String): Boolean? {
@@ -78,7 +129,7 @@ class ConversationsDb {
      * Should be replaced with just a left join, but sph's data makes that quite hard
      */
     fun setDate(convId: String, date: Date) {
-        writable.execSQL("UPDATE conversations SET date = " +
+        writable.execSQL("UPDATE conversations SET lastdate = " +
                 date.time / 1000 + " WHERE conversation_id=\"$convId\"")
     }
 

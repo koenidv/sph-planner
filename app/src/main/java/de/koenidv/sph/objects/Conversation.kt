@@ -28,7 +28,7 @@ data class Conversation(
     /**
      * Get the main conversation partner name and the amount of other recipients
      */
-    fun getInfo(): Pair<String, Int> {
+    fun getPartner(): Pair<String, Int> {
         if (firstMessage == null) firstMessage = MessagesDb.getMessage(firstIdMess)
 
         val partner = UsersDb.getName(
