@@ -7,8 +7,8 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import de.koenidv.sph.R
-import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.SphPlanner.Companion.TAG
+import de.koenidv.sph.SphPlanner.Companion.applicationContext
 import de.koenidv.sph.database.ConversationsDb
 import de.koenidv.sph.database.MessagesDb
 import de.koenidv.sph.database.UsersDb
@@ -16,6 +16,8 @@ import de.koenidv.sph.debugging.DebugLog
 import de.koenidv.sph.debugging.Debugger
 import de.koenidv.sph.objects.Conversation
 import de.koenidv.sph.objects.Message
+import org.json.JSONArray
+import org.json.JSONObject
 import org.jsoup.nodes.Entities
 import java.text.SimpleDateFormat
 import java.util.*
@@ -32,6 +34,7 @@ class Messages {
     fun fetch(onlyHeaders: Boolean = false,
               archived: Boolean = false,
               forceRefresh: Boolean = false,
+              currentCrypt: Cryption? = null,
               callback: (success: Int) -> Unit) {
 
         // Log fetching messages
@@ -43,7 +46,7 @@ class Messages {
         try {
             // Get a decryptor
             // We need to complete the rsa handshake before requesting messages
-            Cryption.start { success, cryption ->
+            Cryption.start(currentCrypt) { success, cryption ->
 
                 if (success != NetworkManager.SUCCESS || cryption == null) {
                     // Return if network manager could not be started
@@ -60,7 +63,7 @@ class Messages {
                 // a=headers - Titles only (read for entire message)
                 // getType=visibleOnly - Only get visible messages (could also be unvisibleOnly)
                 // last=0 - Not yet sure what that does, but it is needed to not get an error
-                NetworkManager().postJsonAuthed(SphPlanner.applicationContext().getString(R.string.url_messages),
+                NetworkManager().postJsonAuthed(applicationContext().getString(R.string.url_messages),
                         body = mapOf("a" to "headers", "getType" to typeBody, "last" to "0")) { netSuccess, json ->
                     if (netSuccess == NetworkManager.SUCCESS && json != null) {
                         // The response should be a json object with two values:
@@ -78,9 +81,11 @@ class Messages {
                                 var answerType: String
                                 var origSenderId: String
                                 var isArchived: Boolean
+                                var dateString: String
                                 var date: Date
 
                                 val dateformat = SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.ROOT)
+                                val replaceformat = SimpleDateFormat("dd.MM.yyyy", Locale.ROOT)
 
                                 // List of conversations to load all messages for
                                 val loadMessagesList = mutableListOf<Conversation>()
@@ -97,7 +102,15 @@ class Messages {
                                     isArchived = if (archived)
                                         data.get("Papierkorb").asString == "ja" else false
 
-                                    date = dateformat.parse(data.get("Datum").asString)!!
+                                    // Make relative dates absolute
+                                    dateString = data.get("Datum").asString
+                                            .replace("heute",
+                                                    replaceformat.format(Date()))
+                                            .replace("gestern",
+                                                    replaceformat.format(
+                                                            Date().time - 24 * 60 * 60000))
+                                    // Parse date
+                                    date = dateformat.parse(dateString)!!
 
                                     // Check if we could answer to this coonversation
                                     answerType = when {
@@ -218,7 +231,7 @@ class Messages {
         cryption.encrypt(conversation.firstIdMess) { firstMessageId ->
             if (firstMessageId != null) {
                 // Post to sph to get messages data
-                NetworkManager().postJsonAuthed(SphPlanner.applicationContext().getString(R.string.url_messages),
+                NetworkManager().postJsonAuthed(applicationContext().getString(R.string.url_messages),
                         body = mapOf("a" to "read", "uniqid" to firstMessageId)) { netSuccess, json ->
                     if (netSuccess == NetworkManager.SUCCESS && json != null) {
                         // If net request was successfull, decrypt the message
@@ -277,13 +290,22 @@ class Messages {
             }
         }
 
+        // Make relative dates absolute
+        val replaceformat = SimpleDateFormat("dd.MM.yyyy", Locale.ROOT)
+        val dateString = msg.get("Datum").asString
+                .replace("heute",
+                        replaceformat.format(Date()))
+                .replace("gestern",
+                        replaceformat.format(
+                                Date().time - 24 * 60 * 60000))
+
         val message = Message(
                 messId = msg.get("Uniquid").asString,
                 idConv = conv.convId,
                 idSender = msg.get("Sender").asString,
                 senderType = msg.get("SenderArt").asString,
                 senderName = msg.get("username").asString,
-                date = dateformat.parse(msg.get("Datum").asString)!!,
+                date = dateformat.parse(dateString)!!,
                 subject = Entities.unescape(msg.get("Betreff").asString.trim()),
                 content = Entities.unescape(
                         msg.get("Inhalt").asString.replace("<br />", "").trim()
@@ -298,6 +320,60 @@ class Messages {
         // Save each reply
         for (reply in msg.getAsJsonArray("reply")) {
             saveMessage(reply.asJsonObject, conv, messages)
+        }
+
+    }
+
+    /**
+     * Create a conversation by sending the first message
+     */
+    fun sendFirstMessage(recipientIds: List<String>, subject: String, message: String, callback: (Int) -> Unit) {
+        // Parse all recipients to a json object each
+        val values = mutableListOf<JSONObject>()
+        for (recip in recipientIds) {
+            values.add(JSONObject(mapOf("name" to "to[]", "value" to recip)))
+        }
+        // Also add subject and message
+        values.add(JSONObject(mapOf("name" to "subject", "value" to subject)))
+        values.add(JSONObject(mapOf("name" to "text", "value" to message)))
+
+        // Message content needs to be encrypted
+        Cryption.start { cryptsuccess, cryption ->
+            if (cryptsuccess != NetworkManager.SUCCESS) {
+                callback(cryptsuccess)
+                return@start
+            }
+
+            cryption!!.encrypt(JSONArray(values).toString()) { encrypted ->
+
+                // Post this to sph
+                TokenManager.authenticate {
+                    NetworkManager().postJsonAuthed(
+                            applicationContext().getString(R.string.url_messages),
+                            mapOf("a" to "newmessage", "c" to encrypted!!)) { success, result ->
+
+                        if (success != NetworkManager.SUCCESS) {
+                            // Some network error
+                            callback(success)
+                            cryption.stop()
+                            return@postJsonAuthed
+                        }
+
+                        if (result == null || !result.getBoolean("back")) {
+                            // Possibly server error
+                            callback(NetworkManager.FAILED_UNKNOWN)
+                            cryption.stop()
+                            return@postJsonAuthed
+                        }
+
+                        // Now refresh messages list
+                        fetch(currentCrypt = cryption) {
+                            callback(it)
+                        }
+
+                    }
+                }
+            }
         }
 
     }

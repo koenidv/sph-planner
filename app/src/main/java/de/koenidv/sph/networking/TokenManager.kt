@@ -39,10 +39,20 @@ object TokenManager {
 
     /**
      * Creates an signed-in access token and saves it to CookieStore
+     * @param onComplete Called when a token is ready
+     */
+    fun authenticate(onComplete: (success: Int) -> Unit) {
+        getToken { success, _ ->
+            onComplete(success)
+        }
+    }
+
+    /**
+     * Creates an signed-in access token and saves it to CookieStore
      * @param forceNewToken if a new token should be generated, even if an old one should still be valid
      * @param onComplete Called when a token is ready
      */
-    fun authenticate(forceNewToken: Boolean = false, onComplete: (success: Int, token: String?) -> Unit) {
+    fun getToken(forceNewToken: Boolean = false, onComplete: (success: Int, token: String?) -> Unit) {
 
         // Use existing, signed-in token if it was used within 15 Minutes
         // Else get a new token

@@ -52,7 +52,7 @@ class ConversationsDb {
      */
     fun getAll(archived: Boolean = false) =
             toConversationList(writable.rawQuery(
-                    "SELECT * FROM conversations WHERE archived=${if (archived) 1 else 0}",
+                    "SELECT * FROM conversations WHERE archived=${if (archived) 1 else 0} ORDER BY date DESC",
                     null), true)
 
     /**

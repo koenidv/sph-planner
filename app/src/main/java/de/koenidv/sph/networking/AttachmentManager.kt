@@ -409,7 +409,7 @@ class AttachmentManager {
      */
     private fun downloadFile(file: FileAttachment, onComplete: (success: Int) -> Unit) {
         // Get an access token
-        TokenManager.authenticate { success: Int, token: String? ->
+        TokenManager.getToken { success: Int, token: String? ->
             if (success == NetworkManager.SUCCESS) {
                 // Set sid cookie
                 CookieStore.saveFromResponse(

@@ -81,6 +81,9 @@ class NetworkManager {
                 if (time - prefs.getLong("updated_posts", 0) > 2 * 60 * 100)
                     updateList.add("posts")
             }
+            R.id.nav_messages -> {
+                updateList.add("messages")
+            }
             R.id.frag_timetable -> {
                 updateList.add("timetable")
             }
@@ -143,7 +146,7 @@ class NetworkManager {
                       callback: (success: Int, result: String?) -> Unit) {
 
         // Getting an access token
-        TokenManager.authenticate(forceNewToken) { success: Int, _ ->
+        TokenManager.getToken(forceNewToken) { success: Int, _ ->
 
             // Log loading the page
             if (Debugger.DEBUGGING_ENABLED)
@@ -284,11 +287,11 @@ class NetworkManager {
                        headers: Map<String, String> = mapOf(),
                        callback: (success: Int, result: JSONObject?) -> Unit) {
         // Authenticate
-        TokenManager.authenticate { success, _ ->
+        TokenManager.getToken { success, _ ->
             // Cancel if authentication was not successful
             if (success != SUCCESS) {
                 callback(success, null)
-                return@authenticate
+                return@getToken
             }
 
             // Add default headers
@@ -337,7 +340,7 @@ class NetworkManager {
 
         if (entries.isNotEmpty()) {
             // Prepare token
-            TokenManager.authenticate { success, _ ->
+            TokenManager.getToken { success, _ ->
                 if (success == SUCCESS) {
                     var number = 0 // Completed calls
                     var lastError: Int? = null // Last error occurred
@@ -481,7 +484,7 @@ class NetworkManager {
             )).log()
 
         // Getting an access token
-        TokenManager.authenticate { success: Int, _ ->
+        TokenManager.getToken { success: Int, _ ->
             if (success == SUCCESS) {
 
                 // Getting webpage as OkHttp
