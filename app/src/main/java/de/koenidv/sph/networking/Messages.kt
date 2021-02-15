@@ -327,7 +327,7 @@ class Messages {
     /**
      * Create a conversation by sending the first message
      */
-    fun sendFirstMessage(recipientIds: List<String>, subject: String, message: String, callback: (Int) -> Unit) {
+    fun sendFirstMessage(recipientIds: List<String>, subject: String, message: String, callback: (Int, String?) -> Unit) {
         // Parse all recipients to a json object each
         val values = mutableListOf<JSONObject>()
         for (recip in recipientIds) {
@@ -340,7 +340,7 @@ class Messages {
         // Message content needs to be encrypted
         Cryption.start { cryptsuccess, cryption ->
             if (cryptsuccess != NetworkManager.SUCCESS) {
-                callback(cryptsuccess)
+                callback(cryptsuccess, null)
                 return@start
             }
 
@@ -350,25 +350,25 @@ class Messages {
                 TokenManager.authenticate {
                     NetworkManager().postJsonAuthed(
                             applicationContext().getString(R.string.url_messages),
-                            mapOf("a" to "newmessage", "c" to encrypted!!)) { success, result ->
+                            mapOf("a" to "newmessage", "c" to encrypted!!)) { success, data ->
 
                         if (success != NetworkManager.SUCCESS) {
                             // Some network error
-                            callback(success)
+                            callback(success, null)
                             cryption.stop()
                             return@postJsonAuthed
                         }
 
-                        if (result == null || !result.getBoolean("back")) {
+                        if (data == null || !data.getBoolean("back")) {
                             // Possibly server error
-                            callback(NetworkManager.FAILED_UNKNOWN)
+                            callback(NetworkManager.FAILED_UNKNOWN, null)
                             cryption.stop()
                             return@postJsonAuthed
                         }
 
                         // Now refresh messages list
                         fetch(currentCrypt = cryption) {
-                            callback(it)
+                            callback(it, data.getString("id"))
                         }
 
                     }

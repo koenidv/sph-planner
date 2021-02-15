@@ -1,6 +1,7 @@
 package de.koenidv.sph.ui
 
 import android.app.Activity
+import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.InputFilter
@@ -10,17 +11,23 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
-import android.widget.Toast
+import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.navigation.Navigation
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputLayout
 import de.koenidv.sph.R
 import de.koenidv.sph.adapters.ChatAdapter
+import de.koenidv.sph.database.MessagesDb
 import de.koenidv.sph.database.UsersDb
 import de.koenidv.sph.networking.Messages
+import de.koenidv.sph.networking.NetworkManager
 import de.koenidv.sph.objects.Message
 import de.koenidv.sph.parsing.EmojiExcludeFilter
+import java.util.*
 
 
 // Created by koenidv on 18.12.2020.
@@ -59,6 +66,7 @@ class NewChatFragment : Fragment() {
 
         val inputContainer = view.findViewById<TextInputLayout>(R.id.textInputLayout)
         val input = view.findViewById<EditText>(R.id.messageEditText)
+        val sending = view.findViewById<ProgressBar>(R.id.messageSendingProgress)
         inputContainer.isEndIconVisible = false
 
         // Set correct hint
@@ -76,13 +84,61 @@ class NewChatFragment : Fragment() {
 
         })
 
-        inputContainer.setEndIconOnClickListener {
-            Messages().sendFirstMessage(recipients, subject, input.text.toString()) {
+        var endiconClick: (View) -> Unit = {}
+        endiconClick = {
+            val text = input.text.toString()
+
+            // Clear input and disable it; sending another message would start a new conversation
+            input.setText("")
+            input.isEnabled = false
+            sending.visibility = View.VISIBLE
+
+            // Display message with empty values
+            val prefs = requireContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
+            messages.add(Message(
+                    "", "",
+                    prefs.getString("userid", "0")!!, "Teilnehmer",
+                    "", Date(), subject, text, recipients, recipients.size, false
+            ))
+            adapter.notifyItemInserted(messages.size)
+
+            // Send the message
+            Messages().sendFirstMessage(recipients, subject, text) { success, id ->
                 requireActivity().runOnUiThread {
-                    Toast.makeText(requireActivity(), "CALLBACK IS $it", Toast.LENGTH_LONG).show()
+                    if (success == NetworkManager.SUCCESS && id != null) {
+                        // If it was successful, switch to the regular chat fragment
+                        Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
+                                .navigate(R.id.switchToChatAction, bundleOf(
+                                        "conversationId" to MessagesDb.getConversationId(id)
+                                ))
+                    } else {
+                        // An error occurred
+
+                        // Remove the message
+                        messages.clear()
+                        adapter.notifyItemRemoved(0)
+
+                        // Re-set text
+                        input.setText(text)
+                        input.isEnabled = true
+                        sending.visibility = View.GONE
+
+                        // Show a snackbar
+                        Snackbar.make(input, when (success) {
+                            NetworkManager.FAILED_NO_NETWORK -> getString(R.string.error_offline)
+                            NetworkManager.FAILED_SERVER_ERROR -> getString(R.string.error_server)
+                            NetworkManager.FAILED_MAINTENANCE -> getString(R.string.error_maintenance)
+                            else -> getString(R.string.error) + ": $success"
+                        }, Snackbar.LENGTH_LONG)
+                                .setAnchorView(R.id.nav_view)
+                                .setAction(R.string.retry) { endiconClick(it) }
+                                .show()
+                    }
                 }
             }
         }
+        inputContainer.setEndIconOnClickListener(endiconClick)
+
 
         // Exclude emoji, sph doesn't support them
         input.filters = arrayOf<InputFilter>(EmojiExcludeFilter())

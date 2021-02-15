@@ -33,6 +33,7 @@
     <string name="no">No</string>
     <string name="understood">Alright</string>
     <string name="load_more">Show more</string>
+    <string name="retry">Retry</string>
     <string name="open_in_browser">Open in browser</string>
     <string name="emoji_check" translatable="false">✔</string>
     <string name="emoji_cross" translatable="false">❌</string>
@@ -233,7 +234,7 @@
     <string name="messages_partic_toself">%sender to you</string>
     <string name="messages_partic_toself_more">%sender to you and %count others</string>
     <string name="messages_dateformat_today">HH:mm</string>
-    <string name="messages_dateformat_yesterday">"Yesterday" HH:mm</string>
+    <string name="messages_dateformat_yesterday">"'Yesterday' HH:mm"</string>
     <string name="messages_dateformat_other">d. MMM HH:mm</string>
     <string name="messages_reply_all">Reply everyone</string>
     <string name="messages_reply_private">Reply %name</string>
@@ -245,6 +246,7 @@
     <string name="messages_new_subject">Add a subject</string>
     <string name="messages_new_recipients">Search for recipients</string>
     <string name="messages_new_message">Send a message</string>
+    <string name="messages_new_sending">Message is being sent…</string>
 
     <!-- Users-->
     <string name="users_title">Teachers</string>
