@@ -31,6 +31,21 @@ object MessagesDb {
                     "SELECT * FROM messages WHERE id_conversation=\"$conversationId\"",
                     null))
 
+    fun getConversationId(messageId: String): String? {
+        val cursor: Cursor = writable.rawQuery(
+                "SELECT id_conversation FROM messages WHERE message_id=\"$messageId\"",
+                null)
+        // If result is empty, return null
+        if (!cursor.moveToFirst()) {
+            cursor.close()
+            return null
+        }
+        // Else return the queried conversation
+        val id = cursor.getString(0)
+        cursor.close()
+        return id
+    }
+
     /**
      * Saves/replaces a message
      */
