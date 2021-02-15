@@ -299,10 +299,10 @@
     <string name="holidays_date_template">dd.MM</string>
     <string name="holidays_date_template2">dd.MM.yy</string>
     <string name="messages_new_button">Neue Unterhaltung</string>
-    <string name="messages_partic_fromself">Du an %recipient</string>
-    <string name="messages_partic_fromself_more">Du an %countall Empfänger</string>
-    <string name="messages_partic_toself">%sender an dich</string>
-    <string name="messages_partic_toself_more">%sender an dich und %count weitere</string>
+    <string name="messages_partic_fromself">Du an %partner</string>
+    <string name="messages_partic_fromself_more">Du an %count Empfänger</string>
+    <string name="messages_partic_toself">%partner an dich</string>
+    <string name="messages_partic_toself_more">%partner an dich und %count weitere</string>
     <string name="imagedescr_newconversation">Starte eine neue Unterhaltung</string>
     <string name="index_status_userid">Sammle einige Informationen…</string>
     <string name="messages_archive_conversations">Archivieren</string>

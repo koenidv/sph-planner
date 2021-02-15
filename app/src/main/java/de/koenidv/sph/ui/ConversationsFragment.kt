@@ -26,7 +26,7 @@ class ConversationsFragment : Fragment() {
         val fab = view.findViewById<ExtendedFloatingActionButton>(R.id.newConversationFab)
 
         var recyclerEditMode = false
-        val conversations = ConversationsDb().getAll().toMutableList()
+        val conversations = ConversationsDb().getConversationInfo().toMutableList()
 
         // Display conversations
         val adapter = ConversationsAdapter(conversations, requireActivity()) { selectMode ->

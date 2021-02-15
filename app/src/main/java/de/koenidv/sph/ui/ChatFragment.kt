@@ -53,7 +53,7 @@ class ChatFragment : Fragment() {
         val messages = MessagesDb.getConversation(conversationId).toMutableList()
 
         // Display messages
-        val info = conversation!!.getInfo()
+        val info = conversation!!.getPartner()
         val adapter = ChatAdapter(messages, info)
         messagesRecycler.adapter = adapter
 

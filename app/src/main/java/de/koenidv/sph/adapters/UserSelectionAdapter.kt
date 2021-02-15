@@ -22,7 +22,7 @@ class UserSelectionAdapter(users: List<User>, private val onSelection: () -> Uni
             var selected: Boolean = false)
 
     private val userData = users.map { UserData(it) }.toMutableList()
-    private val displayedUsers = userData.toMutableList()
+    private val displayedUsers = userData.filter { it.user.isPinned }.toMutableList()
     private var previousfilter = ""
 
     private val onSelect: (UserData) -> Unit = {
