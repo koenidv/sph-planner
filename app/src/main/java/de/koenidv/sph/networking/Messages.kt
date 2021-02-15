@@ -1,7 +1,9 @@
 package de.koenidv.sph.networking
 
+import android.content.Intent
 import android.util.Log
 import androidx.core.os.bundleOf
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
@@ -158,6 +160,9 @@ class Messages {
                                         // Load this conversation, if not only headers
                                         if (!onlyHeaders) loadMessagesList.add(conversation)
 
+                                        // Notify ui about the new conversation
+                                        notifyFragments(conversationId, "new")
+
                                     } else if (conversation.date != date ||
                                             conversation.answerType != answerType ||
                                             forceRefresh) {
@@ -171,6 +176,9 @@ class Messages {
 
                                         // Load this conversation, if not only headers
                                         if (!onlyHeaders) loadMessagesList.add(conversation)
+
+                                        // Notify ui about the changed conversation
+                                        notifyFragments(conversationId, "metachanged")
                                     }
 
                                 }
@@ -455,8 +463,21 @@ class Messages {
                 }
             }
         }
+    }
 
-
+    /**
+     * Send a local broadcast with the specified conversation id to update the ui
+     * @param conversationId Id of the updated conversation
+     * @param type should be "new", "metachanged" or "contentchanged", ui will be updated accordingly
+     */
+    private fun notifyFragments(conversationId: String, type: String) {
+        val uiBroadcast = Intent("uichange")
+                .putExtras(bundleOf(
+                        "content" to "messages",
+                        "id" to conversationId,
+                        "type" to type
+                ))
+        LocalBroadcastManager.getInstance(applicationContext()).sendBroadcast(uiBroadcast)
     }
 
 

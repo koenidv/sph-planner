@@ -13,10 +13,10 @@
         <action
             android:id="@+id/timetableFromHomeAction"
             app:destination="@id/frag_timetable"
-            app:enterAnim="@anim/nav_default_enter_anim"
-            app:exitAnim="@anim/nav_default_exit_anim"
-            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
-            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/fade_out" />
         <action
             android:id="@+id/overviewFromHomeAction"
             app:destination="@id/frag_course_overview"
@@ -34,7 +34,6 @@
         <action
             android:id="@+id/changesFromHomeAction"
             app:destination="@id/frag_changes"
-
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
@@ -42,7 +41,6 @@
         <action
             android:id="@+id/tasksFromHomeAction"
             app:destination="@id/frag_tasks"
-
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
@@ -57,7 +55,6 @@
         <action
             android:id="@+id/overviewFromCoursesAction"
             app:destination="@id/frag_course_overview"
-
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
@@ -65,7 +62,6 @@
         <action
             android:id="@+id/allPostsFromCoursesAction"
             app:destination="@id/frag_allposts"
-
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
@@ -101,15 +97,13 @@
         <action
             android:id="@+id/webviewFromExploreAction"
             app:destination="@id/frag_webview"
-
-            app:enterAnim="@anim/nav_default_enter_anim"
-            app:exitAnim="@anim/nav_default_exit_anim"
-            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
-            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+            app:enterAnim="@anim/enter_from_right"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/exit_to_right" />
         <action
             android:id="@+id/timetableFromExploreAction"
             app:destination="@id/frag_timetable"
-
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
@@ -117,7 +111,6 @@
         <action
             android:id="@+id/attachmentsFromExploreAction"
             app:destination="@id/frag_attachments"
-
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
@@ -125,7 +118,6 @@
         <action
             android:id="@+id/allPostsFromExploreAction"
             app:destination="@id/frag_allposts"
-
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
@@ -133,7 +125,6 @@
         <action
             android:id="@+id/tasksFromExploreAction"
             app:destination="@id/frag_tasks"
-
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
@@ -141,7 +132,6 @@
         <action
             android:id="@+id/changesFromExploreAction"
             app:destination="@id/frag_changes"
-
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
@@ -149,13 +139,17 @@
         <action
             android:id="@+id/usersFromExploreAction"
             app:destination="@id/frag_users"
-            app:enterAnim="@anim/popup_enter"
-            app:exitAnim="@anim/popup_exit" />
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
         <action
             android:id="@+id/holidaysFromExploreAction"
             app:destination="@id/frag_holidays"
-            app:enterAnim="@anim/popup_enter"
-            app:exitAnim="@anim/popup_exit" />
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
     </fragment>
 
     <fragment
@@ -179,7 +173,6 @@
         <action
             android:id="@+id/webviewFromPostsAction"
             app:destination="@id/frag_webview"
-
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
@@ -224,7 +217,6 @@
         <action
             android:id="@+id/overviewFromChangesAction"
             app:destination="@id/frag_course_overview"
-
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
@@ -241,7 +233,6 @@
         <action
             android:id="@+id/overviewFromTasksAction"
             app:destination="@id/frag_course_overview"
-
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"

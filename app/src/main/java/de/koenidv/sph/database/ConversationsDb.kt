@@ -17,6 +17,7 @@ class ConversationsDb {
      * Saves/replaces a conversation
      */
     fun save(conversation: Conversation) {
+        writable.beginTransaction()
         val cv = ContentValues()
         cv.put("conversation_id", conversation.convId)
         cv.put("first_id_message", conversation.firstIdMess)
@@ -29,6 +30,8 @@ class ConversationsDb {
         cv.put("archived", if (conversation.archived) 1 else 0)
 
         writable.replace("conversations", null, cv)
+        writable.setTransactionSuccessful()
+        writable.endTransaction()
     }
 
     /**
@@ -60,13 +63,15 @@ class ConversationsDb {
     /**
      * Gets a list of conversations as ConversationInfo for the conversations list
      */
-    fun getConversationInfo(archived: Boolean = false): List<ConversationsAdapter.ConversationInfo> {
-        val cursor = writable.rawQuery("SELECT conversation_id, " +
-                "conversations.subject, conversations.recipient_count, " +
-                "original_id_sender, messages.recipients, conversations.lastdate, " +
-                "conversations.unread FROM conversations LEFT JOIN messages ON " +
-                "conversations.first_id_message = messages.message_id WHERE " +
-                "archived=${if (archived) 1 else 0} ORDER BY date DESC", null)
+    fun getConversationInfo(whereClause: String = "archived=0"):
+            List<ConversationsAdapter.ConversationInfo> {
+        val cursor = writable.rawQuery(
+                "SELECT conversation_id, " +
+                        "conversations.subject, conversations.recipient_count, " +
+                        "original_id_sender, messages.recipients, conversations.lastdate, " +
+                        "conversations.unread FROM conversations LEFT JOIN messages ON " +
+                        "conversations.first_id_message = messages.message_id " +
+                        "WHERE $whereClause ORDER BY date DESC", null)
 
         if (!cursor.moveToFirst()) {
             cursor.close()

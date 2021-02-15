@@ -324,5 +324,6 @@
     <string name="messages_new_message">Sende eine Nachricht</string>
     <string name="messages_new_sending">Nachricht wird gesendet…</string>
     <string name="retry">Erneut versuchen</string>
+    <string name="messages_new_recipients_search">Nach allen Nutzern suchen</string>
 
 </resources>
