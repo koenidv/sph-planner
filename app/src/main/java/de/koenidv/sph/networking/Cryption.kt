@@ -28,8 +28,11 @@ import kotlin.math.roundToInt
 class Cryption {
 
     companion object {
-        fun start(callback: (success: Int, cryption: Cryption?) -> Unit) =
-                Cryption().getCryptor(callback)
+        fun start(current: Cryption? = null, callback: (success: Int, cryption: Cryption?) -> Unit) =
+                if (current != null && current.vmrunnning)
+                    callback(SUCCESS, current)
+                else
+                    Cryption().getCryptor(callback)
     }
 
 
@@ -49,6 +52,14 @@ class Cryption {
      */
     fun decrypt(data: String, callback: (decrypted: String?) -> Unit) =
             decrypt(data, privateKey, callback)
+
+    /**
+     * Encrypts data with the stored secret
+     * @param data Data to be encrypted
+     * @param callback Callback when encryption is complete
+     */
+    fun encrypt(data: String, callback: (encrypted: String?) -> Unit) =
+            encrypt(data, privateKey, callback)
 
     /**
      * Stops the Rhino VM
@@ -75,13 +86,13 @@ class Cryption {
         val prefs = applicationContext().getSharedPreferences(
                 "sharedPrefs", Context.MODE_PRIVATE)
         // Get the current session id token to check if it has changed
-        TokenManager().authenticate { tokensuccess, token ->
+        TokenManager.getToken { tokensuccess, token ->
             // Cancel if token authentication was not successful
             if (tokensuccess != SUCCESS) {
                 callback(tokensuccess, null)
                 // Stop the vm, is probly still starting
                 stop()
-                return@authenticate
+                return@getToken
             }
 
             // Keep the same secret only for up to 15 minutes and only if the token hasn't changed
@@ -199,11 +210,7 @@ class Cryption {
             }
         }
         // Encrypt the uuid with itself
-        execute("encrypt", arrayOf(uuid, uuid)) { encrypted ->
-            Log.d("$TAG js", "uuid: $uuid")
-            Log.d("$TAG js", "key: $encrypted")
-            callback(encrypted)
-        }
+        execute("encrypt", arrayOf(uuid, uuid), callback)
     }
 
     /**
@@ -213,11 +220,11 @@ class Cryption {
      */
     private fun handshake(encryptedKey: String, callback: (success: Int, challenge: String?) -> Unit) {
         // The handshake needs to be sent with a session id
-        TokenManager().authenticate { tokensuccess, _ ->
+        TokenManager.getToken { tokensuccess, _ ->
             // Cancel if token authentication was not successful
             if (tokensuccess != SUCCESS) {
                 callback(tokensuccess, null)
-                return@authenticate
+                return@getToken
             }
 
             // Get the handshake url with a random value for s between 0 and 2000
@@ -284,6 +291,17 @@ class Cryption {
     private fun decrypt(data: String, secret: String, callback: (decrypted: String?) -> Unit) {
         val dataJs = data.replace("\\", "")
         execute("decrypt", arrayOf(dataJs, secret), callback)
+    }
+
+    /**
+     * Encrypts data with the secret
+     * @param data Data to be encrypted
+     * @param secret Authenticated private key to decrypt
+     * @param callback Callback when encryption is complete
+     */
+    private fun encrypt(data: String, secret: String, callback: (encrypted: String?) -> Unit) {
+        val dataJs = data.replace("\\", "")
+        execute("encrypt", arrayOf(dataJs, secret), callback)
     }
 
     /**

@@ -260,7 +260,7 @@
     <string name="index_status_timetable">Deinen Stundenplan einprägen…</string>
     <string name="index_status_posts">Alle Beiträge lesen…</string>
     <string name="index_status_changes">Ausschau nach Vertretungen halten…</string>
-    <string name="index_status_messages">Deine Nachrichten zählen…</string>
+    <string name="index_status_messages">Deine Nachrichten laden…</string>
     <string name="index_status_users">Deine Lehrkräfte finden…</string>
     <string name="index_status_holidays">Nach Ferien suchen…</string>
     <string name="email_template_info">Einmal eingerichtet kannst du hier E-Mails an alle Lehrkräfte senden.\nBitte lege das Muster fest, nach welchem deine Schule E-Mail-Adressen vergibt.</string>
@@ -298,4 +298,37 @@
     <string name="holidays_date">Vom %s bis %e</string>
     <string name="holidays_date_template">dd.MM</string>
     <string name="holidays_date_template2">dd.MM.yy</string>
+    <string name="messages_new_button">Neue Unterhaltung</string>
+    <string name="messages_partic_fromself">Du an %partner</string>
+    <string name="messages_partic_fromself_more">Du an %count Empfänger</string>
+    <string name="messages_partic_toself">%partner an dich</string>
+    <string name="messages_partic_toself_more">%partner an dich und %count weitere</string>
+    <string name="imagedescr_newconversation">Starte eine neue Unterhaltung</string>
+    <string name="index_status_userid">Sammle einige Informationen…</string>
+    <string name="messages_archive_conversations">Archivieren</string>
+    <string name="upgrading_messages">Nachrichten werden geladen. Das könnte eine Weile dauern.</string>
+    <string name="imagedescr_external">Externes Bild</string>
+    <string name="imagedescr_identicon">Identicon</string>
+    <string name="messages_reply_private">%name antworten</string>
+    <string name="messages_reply_all">Allen antworten</string>
+    <string name="messages_dateformat_other">d.M. HH:mm</string>
+    <string name="messages_dateformat_yesterday">"'Gestern' HH:mm"</string>
+    <string name="messages_dateformat_today">HH:mm</string>
+    <string name="messages_header_private">Unterhaltung mit %name</string>
+    <string name="messages_header_group">Unterhaltung mit %name und %count weiteren</string>
+    <string name="messages_reply_disabled">Antworten sind deaktiviert</string>
+    <string name="messages_new_title">Neue Unterhaltung</string>
+    <string name="mesages_new_action">Los gehts</string>
+    <string name="messages_new_subject">Füge einen Betreff hinzu</string>
+    <string name="messages_new_recipients">Suche nach Empfängern</string>
+    <string name="messages_new_message">Sende eine Nachricht</string>
+    <string name="messages_new_sending">Nachricht wird gesendet…</string>
+    <string name="retry">Erneut versuchen</string>
+    <string name="messages_new_recipients_search">Nach allen Nutzern suchen</string>
+    <string name="messages_empty_new">Starte eine neue Unterhaltung</string>
+    <string name="messages_empty_refresh">Auf neue Nachrichten prüfen</string>
+    <string name="messages_empty_title">Du führst zur Zeit keine Unterhaltungen</string>
+    <string name="messages_title_unread">Ungelesene Nachrichten</string>
+    <string name="users_email_action">Stattdessen eine E-Mail senden</string>
+
 </resources>

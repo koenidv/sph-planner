@@ -33,6 +33,7 @@
     <string name="no">No</string>
     <string name="understood">Alright</string>
     <string name="load_more">Show more</string>
+    <string name="retry">Retry</string>
     <string name="open_in_browser">Open in browser</string>
     <string name="emoji_check" translatable="false">✔</string>
     <string name="emoji_cross" translatable="false">❌</string>
@@ -43,13 +44,15 @@
     <string name="error_maintenance">Maintenance, try again later</string>
     <string name="error_server">Try again in a few minutes</string>
     <string name="sph_status">Status</string>
+    <string name="index_status_userid">Collecting some information…</string>
     <string name="index_status_courses">Looking for course information…</string>
     <string name="index_status_timetable">Memorizing your timetable…</string>
     <string name="index_status_posts">Reading all posts…</string>
     <string name="index_status_changes">Checking for changes…</string>
-    <string name="index_status_messages">Counting your messages…</string>
+    <string name="index_status_messages">Getting your messages…</string>
     <string name="index_status_users">Finding your teachers…</string>
     <string name="index_status_holidays">Searching for holidays…</string>
+    <string name="upgrading_messages">Loading messages. This might take a while.</string>
 
     <!-- Sign in process -->
     <string name="onboard_legal_title">Before we start</string>
@@ -222,10 +225,39 @@
     <string name="changes_type_short_other">change</string>
     <string name="changes_holidays_description">Only %d days left!</string>
 
-    <!-- Messages and Users-->
+    <!-- Messages -->
     <string name="messages_unread_possible">✉️ You might have unread messages</string>
+    <string name="messages_title_unread">Unread messages</string>
+    <string name="messages_new_button">New conversation</string>
+    <string name="messages_archive_conversations">Archive</string>
+    <string name="messages_partic_fromself">You to %partner</string>
+    <string name="messages_partic_fromself_more">You to %count recipients</string>
+    <string name="messages_partic_toself">%partner to you</string>
+    <string name="messages_partic_toself_more">%partner to you and %count others</string>
+    <string name="messages_dateformat_today">HH:mm</string>
+    <string name="messages_dateformat_yesterday">"'Yesterday' HH:mm"</string>
+    <string name="messages_dateformat_other">d. MMM HH:mm</string>
+    <string name="messages_reply_all">Reply everyone</string>
+    <string name="messages_reply_private">Reply %name</string>
+    <string name="messages_reply_disabled">Replies are disabled</string>
+    <string name="messages_header_private">Conversation with %name</string>
+    <string name="messages_header_group">Conversation with %name and %count others</string>
+    <string name="messages_new_title">New conversation</string>
+    <string name="mesages_new_action">Let\'s go</string>
+    <string name="messages_new_subject">Add a subject</string>
+    <string name="messages_new_recipients">Add recipients</string>
+    <string name="messages_new_recipients_search">Search for all users</string>
+    <string name="messages_new_message">Send a message</string>
+    <string name="messages_new_sending">Message is being sent…</string>
+    <string name="messages_empty_title">You currently have no conversations</string>
+    <string name="messages_empty_new">Start a new conversation</string>
+    <string name="messages_empty_refresh">Check for new conversations</string>
+
+    <!-- Users-->
     <string name="users_title">Teachers</string>
-    <string name="users_name_template" translatable="false">%lastname, %firstname</string>
+    <string name="users_name_template_last" translatable="false">%lastname, %firstname</string>
+    <string name="users_name_template_first" translatable="false">%firstname %lastname</string>
+    <string name="users_email_action">Send an email instead</string>
     <string name="users_email_title">Send an email to %firstname %lastname</string>
     <string name="email_template_info">Once set up, you can send an email to any teacher from here.\n\nPlease enter the template your school uses for email addresses.</string>
     <string name="email_template_error">Invalid address template</string>
@@ -362,4 +394,7 @@
     <!-- Usabilty -->
     <string name="imagedescr_expand">Expand</string>
     <string name="imagedescr_info">Illustration</string>
+    <string name="imagedescr_newconversation">Start a new conversation</string>
+    <string name="imagedescr_external">External Image</string>
+    <string name="imagedescr_identicon">Identicon</string>
 </resources>

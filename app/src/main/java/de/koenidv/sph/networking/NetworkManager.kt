@@ -30,6 +30,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import okhttp3.Response
 import org.json.JSONObject
+import org.jsoup.Jsoup
 import java.util.*
 
 //  Created by koenidv on 11.12.2020.
@@ -52,6 +53,7 @@ class NetworkManager {
         val prefs = applicationContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
         val time = Date().time
         val updateList = mutableListOf<String>()
+        val updateData = mutableMapOf<String, String>()
         var disableList = false
 
         // Log pull to refresh
@@ -79,6 +81,23 @@ class NetworkManager {
                 // 2 minutes cooldown, update all posts
                 if (time - prefs.getLong("updated_posts", 0) > 2 * 60 * 100)
                     updateList.add("posts")
+            }
+            R.id.nav_messages -> {
+                // Update all messages after 30sec
+                if (time - prefs.getLong("updated_messages", 0) > 30 * 1000) {
+                    updateList.add("messages")
+                }
+            }
+            R.id.chatFragment -> {
+                // Messages for this conversation after 30sec
+                val conversationId = arguments?.getString("conversationId")
+                if (conversationId != null) {
+                    if (time - prefs.getLong("updated_messages_$conversationId", 0)
+                            > 30 * 1000) {
+                        updateList.add("chat")
+                        updateData["chatid"] = conversationId
+                    }
+                }
             }
             R.id.frag_timetable -> {
                 updateList.add("timetable")
@@ -129,7 +148,7 @@ class NetworkManager {
             }
         }
         if (!disableList)
-            update(updateList) { callback(it) }
+            update(updateList, updateData) { callback(it) }
 
     }
 
@@ -142,7 +161,7 @@ class NetworkManager {
                       callback: (success: Int, result: String?) -> Unit) {
 
         // Getting an access token
-        TokenManager().authenticate(forceNewToken) { success: Int, _ ->
+        TokenManager.getToken(forceNewToken) { success: Int, _ ->
 
             // Log loading the page
             if (Debugger.DEBUGGING_ENABLED)
@@ -150,7 +169,7 @@ class NetworkManager {
                         bundleOf("url" to url,
                                 "forceNewToken" to forceNewToken,
                                 "tokenCb" to success)).log()
-                                                    
+
             if (success == SUCCESS) {
 
                 // Getting webpage
@@ -280,14 +299,14 @@ class NetworkManager {
      * Authenticates with sph, posts the specified body and returns json response
      */
     fun postJsonAuthed(url: String, body: Map<String, String> = mapOf(),
-                       callback: (success: Int, result: JSONObject?) -> Unit,
-                       headers: Map<String, String> = mapOf()) {
+                       headers: Map<String, String> = mapOf(),
+                       callback: (success: Int, result: JSONObject?) -> Unit) {
         // Authenticate
-        TokenManager().authenticate { success, _ ->
+        TokenManager.getToken { success, _ ->
             // Cancel if authentication was not successful
             if (success != SUCCESS) {
                 callback(success, null)
-                return@authenticate
+                return@getToken
             }
 
             // Add default headers
@@ -328,7 +347,7 @@ class NetworkManager {
      * @param entries List of strings with scopes to update
      * (See in when below for what's supported)
      */
-    fun update(entries: List<String>, callback: (success: Int) -> Unit) {
+    fun update(entries: List<String>, data: Map<String, String>, callback: (success: Int) -> Unit) {
         // Log updating
         if (Debugger.DEBUGGING_ENABLED)
             DebugLog("NetMgr", "Updating invoked",
@@ -336,7 +355,7 @@ class NetworkManager {
 
         if (entries.isNotEmpty()) {
             // Prepare token
-            TokenManager().authenticate { success, _ ->
+            TokenManager.getToken { success, _ ->
                 if (success == SUCCESS) {
                     var number = 0 // Completed calls
                     var lastError: Int? = null // Last error occurred
@@ -361,11 +380,12 @@ class NetworkManager {
                     // Run the respective funtion for each update order
                     for (entry in entries) {
                         when (entry) {
-                            "posts" -> Posts(this).fetch(checkDone)
-                            "changes" -> Changes(this).fetch(checkDone)
-                            "timetable" -> Timetable().fetch(checkDone)
-                            "messages" -> Messages().fetch(checkDone)
-                            "holidays" -> Holidays().fetch(checkDone)
+                            "posts" -> Posts(this).fetch(callback = checkDone)
+                            "changes" -> Changes(this).fetch(callback = checkDone)
+                            "timetable" -> Timetable().fetch(callback = checkDone)
+                            "messages" -> Messages().fetch(callback = checkDone)
+                            "holidays" -> Holidays().fetch(callback = checkDone)
+                            "chat" -> Messages().updateConversation(data["chatid"], checkDone)
                         }
                     }
                 } else callback(success)
@@ -382,15 +402,15 @@ class NetworkManager {
 
         // Get all supported features as String list
         val features = FunctionTilesDb.getInstance().supportedFeatures.map { it.type }
-        val loadList = mutableListOf("courses")
+        val loadList = mutableListOf("userid", "courses")
 
         // Mark each supported feature for loading
         if (features.contains(FEATURE_TIMETABLE)) loadList.add("timetable")
         if (features.contains(FEATURE_COURSES)) loadList.add("posts")
         if (features.contains(FEATURE_CHANGES)) loadList.add("changes")
         if (features.contains(FEATURE_MESSAGES)) {
-            loadList.add("messages")
             loadList.add("users")
+            loadList.add("messages")
         }
         loadList.add("holidays")
 
@@ -422,6 +442,10 @@ class NetworkManager {
             if (Debugger.DEBUGGING_ENABLED)
                 DebugLog("NetMgr", "Fetching ${loadList[index]}").log()
             when (loadList[index]) {
+                "userid" -> {
+                    status(applicationContext().getString(R.string.index_status_userid))
+                    getOwnUserId(onDone)
+                }
                 "courses" -> {
                     status(applicationContext().getString(R.string.index_status_courses))
                     Courses(this).createIndex(onDone, features)
@@ -440,7 +464,7 @@ class NetworkManager {
                 }
                 "messages" -> {
                     status(applicationContext().getString(R.string.index_status_messages))
-                    Messages().fetch(onDone, true)
+                    Messages().fetch(archived = true, callback = onDone)
                 }
                 "users" -> {
                     status(applicationContext().getString(R.string.index_status_users))
@@ -476,7 +500,7 @@ class NetworkManager {
             )).log()
 
         // Getting an access token
-        TokenManager().authenticate { success: Int, _ ->
+        TokenManager.getToken { success: Int, _ ->
             if (success == SUCCESS) {
 
                 // Getting webpage as OkHttp
@@ -527,6 +551,30 @@ class NetworkManager {
 
                         })
             } else callback(success, url)
+        }
+    }
+
+    /**
+     * Loads the user's profile picture site and gets their user id from there
+     */
+    fun getOwnUserId(callback: (success: Int) -> Unit) {
+        // Load the site where one can upload a profile picture
+        getSiteAuthed("https://start.schulportal.hessen.de/benutzerverwaltung.php?a=userFoto")
+        { success, result ->
+            if (success == SUCCESS) {
+                // Extract the user id
+                val document = Jsoup.parse(result)
+                val profilePicture = document.selectFirst("div#content img")
+                        .attr("src")
+                val userid = profilePicture.substringAfter("&p=")
+                        .substringBefore("&")
+
+                TokenManager.userid = userid
+                applicationContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
+                        .edit().putString("userid", userid).apply()
+
+                callback(SUCCESS)
+            } else callback(success)
         }
     }
 
