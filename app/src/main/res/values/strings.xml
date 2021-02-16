@@ -227,6 +227,7 @@
 
     <!-- Messages -->
     <string name="messages_unread_possible">✉️ You might have unread messages</string>
+    <string name="messages_title_unread">Unread messages</string>
     <string name="messages_new_button">New conversation</string>
     <string name="messages_archive_conversations">Archive</string>
     <string name="messages_partic_fromself">You to %partner</string>

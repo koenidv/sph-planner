@@ -328,5 +328,6 @@
     <string name="messages_empty_new">Starte eine neue Unterhaltung</string>
     <string name="messages_empty_refresh">Auf neue Nachrichten prüfen</string>
     <string name="messages_empty_title">Du führst zur Zeit keine Unterhaltungen</string>
+    <string name="messages_title_unread">Ungelesene Nachrichten</string>
 
 </resources>
