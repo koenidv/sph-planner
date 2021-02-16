@@ -1,6 +1,10 @@
 package de.koenidv.sph.ui
 
 import android.app.Activity
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import android.text.Editable
 import android.text.InputFilter
@@ -14,6 +18,8 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputLayout
@@ -33,6 +39,8 @@ import java.util.*
 class ChatFragment : Fragment() {
 
     private lateinit var conversationId: String
+    private lateinit var adapter: ChatAdapter
+    private lateinit var layoutManager: LinearLayoutManager
 
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -54,8 +62,9 @@ class ChatFragment : Fragment() {
 
         // Display messages
         val info = conversation!!.getPartner()
-        val adapter = ChatAdapter(messages, info)
+        adapter = ChatAdapter(messages, info)
         messagesRecycler.adapter = adapter
+        layoutManager = messagesRecycler.layoutManager as LinearLayoutManager
 
         /*
          * Input
@@ -168,6 +177,37 @@ class ChatFragment : Fragment() {
         val imm = requireContext().getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(requireView().windowToken, 0)
         super.onStop()
+    }
+
+    // Update conversations on uichange broadcast
+    private val uichangeReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            // If messages content was updated for this conversation
+            if (intent.getStringExtra("content") == "messages" &&
+                    intent.getStringExtra("type") == "contentchanged" &&
+                    intent.getStringExtra("id") == conversationId &&
+                    ::adapter.isInitialized) {
+
+                // Replace existing messages with the new ones
+                adapter.messages.clear()
+                adapter.messages.addAll(MessagesDb.getConversation(conversationId))
+                adapter.notifyDataSetChanged()
+
+            }
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        // Register to receive messages.
+        LocalBroadcastManager.getInstance(requireContext()).registerReceiver(uichangeReceiver,
+                IntentFilter("uichange"))
+    }
+
+    override fun onDestroy() {
+        // Unregister broadcast receiver
+        LocalBroadcastManager.getInstance(requireActivity()).unregisterReceiver(uichangeReceiver)
+        super.onDestroy()
     }
 
 }

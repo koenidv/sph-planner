@@ -23,8 +23,8 @@ import de.koenidv.sph.database.ConversationsDb
 // Created by koenidv on 18.12.2020.
 class ConversationsFragment : Fragment() {
 
-    lateinit var adapter: ConversationsAdapter
-    lateinit var layoutManager: LinearLayoutManager
+    private lateinit var adapter: ConversationsAdapter
+    private lateinit var layoutManager: LinearLayoutManager
 
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?, savedInstanceState: Bundle?): View? {

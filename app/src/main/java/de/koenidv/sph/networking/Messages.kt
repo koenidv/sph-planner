@@ -187,6 +187,11 @@ class Messages {
                                 if (loadMessagesList.isEmpty()) {
                                     callback(NetworkManager.SUCCESS)
                                     cryption.stop()
+                                    // Remember the time we updated this
+                                    // Not updating this the first time,
+                                    // but that shouldn't be an issue
+                                    SphPlanner.prefs.edit().putLong("updated_messages",
+                                            Date().time).apply()
                                 } else {
                                     var index = 0
                                     val callbackIfLast: (Int) -> Unit = {
@@ -229,13 +234,14 @@ class Messages {
         }
     }
 
+
     /**
      * Fetch and save all messages for a conversation
      * SPH identifies the conversation by it's first message id
      */
-    fun fetchConversation(conversation: Conversation,
-                          cryption: Cryption,
-                          callback: (success: Int) -> Unit) {
+    private fun fetchConversation(conversation: Conversation,
+                                  cryption: Cryption,
+                                  callback: (success: Int) -> Unit) {
         // We need to encrypt the conversation's first message id for sph
         cryption.encrypt(conversation.firstIdMess) { firstMessageId ->
             if (firstMessageId != null) {
@@ -270,10 +276,11 @@ class Messages {
         }
     }
 
+
     /**
      * Saves a message and all its replies
      */
-    fun saveMessage(msg: JsonObject, conv: Conversation, messages: MessagesDb = MessagesDb) {
+    private fun saveMessage(msg: JsonObject, conv: Conversation, messages: MessagesDb = MessagesDb) {
         val dateformat = SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.ROOT)
 
         // Add each recipient from "empf"
@@ -333,6 +340,44 @@ class Messages {
 
     }
 
+
+    /**
+     * Update an existing conversation using its conversationId
+     */
+    fun updateConversation(conversationId: String?, callback: (Int) -> Unit) {
+        if (conversationId != null) {
+            // Get the corresponding conversation object
+            val conversation = ConversationsDb().get(conversationId, false)
+            if (conversation == null) {
+                callback(NetworkManager.FAILED_UNKNOWN)
+                return
+            }
+            // Start encryption vm
+            Cryption.start { success, cryption ->
+                if (success != NetworkManager.SUCCESS) {
+                    callback(NetworkManager.FAILED_UNKNOWN)
+                    cryption?.stop()
+                    return@start
+                }
+
+                // Fetch the remote conversation
+                fetchConversation(conversation, cryption!!) {
+                    // Stop the vm and call back
+                    cryption.stop()
+                    callback(it)
+
+                    // Notify ui about the changed conversation
+                    notifyFragments(conversationId, "contentchanged")
+
+                    // Remember the time we updated this
+                    SphPlanner.prefs.edit().putLong(
+                            "updated_messages_$conversationId", Date().time).apply()
+                }
+            }
+        }
+    }
+
+
     /**
      * Create a conversation by sending the first message
      */
@@ -387,7 +432,8 @@ class Messages {
 
     }
 
-    /*
+
+    /**
      * Send a reply to a conversation
      */
     fun sendReply(firstMessageId: String,
@@ -464,6 +510,7 @@ class Messages {
             }
         }
     }
+
 
     /**
      * Send a local broadcast with the specified conversation id to update the ui
