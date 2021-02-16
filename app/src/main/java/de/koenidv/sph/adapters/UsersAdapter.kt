@@ -6,15 +6,15 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.os.bundleOf
 import androidx.fragment.app.FragmentActivity
+import androidx.navigation.Navigation
 import androidx.recyclerview.widget.RecyclerView
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
-import de.koenidv.sph.networking.Users
 import de.koenidv.sph.objects.User
 import de.koenidv.sph.parsing.Utility
-import de.koenidv.sph.ui.EmailTemplateSheet
-import de.koenidv.sph.ui.InfoSheet
+import de.koenidv.sph.ui.NewConversationSheet
 
 //  Created by koenidv on 09.01.2021.
 class UsersAdapter(private val users: List<User>,
@@ -29,15 +29,14 @@ class UsersAdapter(private val users: List<User>,
      * Send an email to this user on click
      */
     val onclick: (User) -> Unit = {
-        // If email address template has been set
-        if (prefs.getString("users_mail_template", null) != null) {
-            Users().sendEmail(it)
-        } else {
-            // Else show two sheets prompting the user to add a template
-            InfoSheet(R.drawable.img_email, R.string.email_template_info) {
-                EmailTemplateSheet().show(activity.supportFragmentManager, "email-preset-sheet")
-            }.show(activity.supportFragmentManager, "info-email")
-        }
+        // Show a bottom sheet to start a new conversation, but also show an option to send an email
+        NewConversationSheet(it) { subject, recipients ->
+            Navigation.findNavController(activity, R.id.nav_host_fragment)
+                    .navigate(R.id.newChatAction, bundleOf(
+                            "subject" to subject,
+                            "recipients" to recipients
+                    ))
+        }.show(activity.supportFragmentManager, "newconversation")
     }
 
     /**
@@ -59,7 +58,7 @@ class UsersAdapter(private val users: List<User>,
             currentUser = user
 
             // Set user name
-            name.text = SphPlanner.applicationContext().getString(R.string.users_name_template)
+            name.text = SphPlanner.applicationContext().getString(R.string.users_name_template_last)
                     .replace("%firstname", user.firstname.toString())
                     .replace("%lastname", user.lastname.toString())
 

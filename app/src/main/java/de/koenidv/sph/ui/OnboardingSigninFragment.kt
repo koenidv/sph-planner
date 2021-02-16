@@ -225,7 +225,7 @@ class OnboardingSigninFragment : Fragment() {
 
                 // Check if credentials are valid
                 // We'll only get a token if login was successfull
-                TokenManager().authenticate(true) { success: Int, token: String? ->
+                TokenManager.getToken(true) { success: Int, token: String? ->
 
                     // Log signing in
                     if (Debugger.DEBUGGING_ENABLED)

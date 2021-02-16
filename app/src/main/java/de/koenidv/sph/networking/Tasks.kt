@@ -100,7 +100,7 @@ class Tasks {
                                 "isDone" to isDone)).log()
 
             // We need an access token first
-            TokenManager().authenticate { success: Int, token: String? ->
+            TokenManager.getToken { success: Int, token: String? ->
                 if (success == NetworkManager.SUCCESS) {
 
                     // Send a post request to let sph know the task is done

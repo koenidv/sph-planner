@@ -213,7 +213,9 @@ class OnboardingSupportlistFragment : Fragment() {
                             NetworkManager().indexAll({
                                 // Update status text on status update
                                 status ->
-                                statusText.text = status
+                                activity?.runOnUiThread {
+                                    statusText.text = status
+                                }
                             }) { indexsuccess ->
                                 // Log index status
                                 if (Debugger.DEBUGGING_ENABLED)
@@ -260,7 +262,7 @@ class OnboardingSupportlistFragment : Fragment() {
                                                     "Recreating on user input").log()
 
                                         // Clear session id
-                                        TokenManager().reset()
+                                        TokenManager.reset()
                                         // Recreate to try again
                                         requireActivity().recreate()
                                     }
@@ -312,16 +314,19 @@ class OnboardingSupportlistFragment : Fragment() {
             // Disable debugger after indexing is complete
             Debugger.setEnabled(false)
 
+            // Remember this version code
+            prefs.edit().putInt("appVersion", 130).apply()
+
             startActivity(Intent(context, MainActivity().javaClass)); requireActivity().finish()
         }
 
         contactButton.setOnClickListener { ContactSheet().show(parentFragmentManager, "contact") }
 
         /*
-        * After 30s, display debugging options
+        * After 45s, display debugging options
         */
         CoroutineScope(Dispatchers.Unconfined).launch {
-            delay(30000)
+            delay(45000)
             withContext(Dispatchers.Main) {
                 // Set up share debug log button
                 view.findViewById<MaterialButton>(R.id.debugButton).apply {

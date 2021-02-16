@@ -76,7 +76,7 @@ class DebuggingSheet internal constructor() : BottomSheetDialogFragment() {
             Toast.makeText(requireContext(),
                     R.string.debug_token_generating, Toast.LENGTH_LONG).show()
             // Get a fresh token
-            TokenManager().authenticate(true) { _, token ->
+            TokenManager.getToken(true) { _, token ->
                 dismiss()
                 // Share it
                 val sendIntent: Intent = Intent().apply {

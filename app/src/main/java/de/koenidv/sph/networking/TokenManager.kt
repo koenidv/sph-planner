@@ -31,20 +31,30 @@ import java.util.*
 
 
 //  Created by koenidv on 05.12.2020.
-class TokenManager {
+object TokenManager {
 
-    companion object {
-        var lastTokenCheck = 0L
-    }
+    var lastTokenCheck = 0L
 
     val prefs: SharedPreferences = applicationContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
+
+    var userid = prefs.getString("userid", "0")!!
+
+    /**
+     * Creates an signed-in access token and saves it to CookieStore
+     * @param onComplete Called when a token is ready
+     */
+    fun authenticate(onComplete: (success: Int) -> Unit) {
+        getToken { success, _ ->
+            onComplete(success)
+        }
+    }
 
     /**
      * Creates an signed-in access token and saves it to CookieStore
      * @param forceNewToken if a new token should be generated, even if an old one should still be valid
      * @param onComplete Called when a token is ready
      */
-    fun authenticate(forceNewToken: Boolean = false, onComplete: (success: Int, token: String?) -> Unit) {
+    fun getToken(forceNewToken: Boolean = false, onComplete: (success: Int, token: String?) -> Unit) {
 
         // Use existing, signed-in token if it was used within 15 Minutes
         // Else get a new token
@@ -131,7 +141,7 @@ class TokenManager {
                         type = Debugger.LOG_TYPE_SUCCESS).log()
 
             onComplete(NetworkManager.SUCCESS, CookieStore.getCookie("schulportal.hessen.de", "sid")!!)
-          
+
         } else if (response.contains("Login - Schulportal Hessen")
                 || response.contains("Schulauswahl - Schulportal Hessen")) {
             // Login not successful

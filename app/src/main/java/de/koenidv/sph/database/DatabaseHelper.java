@@ -16,7 +16,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static DatabaseHelper instance;
 
     private DatabaseHelper(@Nullable Context context) {
-        super(context, "database", null, 4);
+        super(context, "database", null, 5);
     }
 
     public static DatabaseHelper getInstance() {
@@ -77,7 +77,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // Create holidays table
         db.execSQL("CREATE TABLE holidays(id TEXT PRIMARY KEY, start INTEGER," +
                 "endtime INTEGER, name TEXT, year TEXT)");
-    }//
+        // Create messages tables
+        createMessagesTables(db);
+    }
 
     //upgrade Database
     @Override
@@ -95,5 +97,32 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.execSQL("CREATE TABLE holidays(id TEXT PRIMARY KEY, start INTEGER," +
                     "endtime INTEGER, name TEXT, year TEXT)");
         }
+        if (oldversion < 5) createMessagesTables(db);
+    }
+
+    // Create conversations and messages tables
+    private void createMessagesTables(SQLiteDatabase db) {
+        db.execSQL("CREATE TABLE conversations (" +
+                "conversation_id TEXT PRIMARY KEY," +
+                "first_id_message TEXT," +
+                "subject TEXT," +
+                "recipient_count INTEGER," +
+                "answertype TEXT," +
+                "original_id_sender TEXT," +
+                "lastdate INTEGER," +
+                "unread INTEGER," +
+                "archived INTEGER DEFAULT 0);");
+        db.execSQL("CREATE TABLE messages (" +
+                "message_id TEXT PRIMARY KEY," +
+                "id_conversation TEXT," +
+                "id_sender TEXT," +
+                "sendername TEXT," +
+                "sendertype TEXT," +
+                "date INTEGER," +
+                "subject TEXT," +
+                "content TEXT," +
+                "unread INTEGER," +
+                "recipients TEXT," +
+                "recipientsCount INTEGER);");
     }
 }

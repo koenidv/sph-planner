@@ -22,13 +22,9 @@ import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.remoteconfig.ktx.remoteConfig
-import de.koenidv.sph.MainActivity
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
-import de.koenidv.sph.adapters.AttachmentsAdapter
-import de.koenidv.sph.adapters.CompactChangesAdapter
-import de.koenidv.sph.adapters.CompactPostsAdapter
-import de.koenidv.sph.adapters.CompactTasksAdapter
+import de.koenidv.sph.adapters.*
 import de.koenidv.sph.database.*
 import de.koenidv.sph.networking.AttachmentManager
 import de.koenidv.sph.networking.Tasks
@@ -49,6 +45,7 @@ class HomeFragment : Fragment() {
     private lateinit var posts: MutableList<Post>
     private lateinit var unreadPostsRecycler: RecyclerView
     private lateinit var messagesLayout: LinearLayout
+    private lateinit var messagesAdapter: ConversationsAdapter
 
     /**
      * Update tasks title to reflect the current number of undone tasks
@@ -146,11 +143,39 @@ class HomeFragment : Fragment() {
                     val postIndex = posts.indexOfFirst { it.postId == postId }
                     if (postIndex != -1) unreadPostsRecycler.adapter?.notifyItemChanged(postIndex)
                 }
-            } else if (intent.getStringExtra("content") == "messages_maybe") {
-                // If there might be unread messages and remote config enables that,
-                // show a text redirecting the user to sph's messages page
-                if (Firebase.remoteConfig.getBoolean("messages_display_possible")) {
-                    // Gone by default
+            } else if (intent.getStringExtra("content") == "messages" &&
+                    ::messagesAdapter.isInitialized &&
+                    Firebase.remoteConfig.getBoolean("messages_enabled")) {
+
+                // Update messages
+
+                // Get the updated conversation
+                val updateId = intent.getStringExtra("id")
+                val updatedInfo = ConversationsDb()
+                        .getConversationInfo(
+                                "archived=0 AND conversation_id=\"$updateId\"")
+                        .firstOrNull()
+
+                if (updatedInfo != null) {
+                    if (intent.getStringExtra("type") == "new") {
+                        // New conversation, just add it to the top of the list
+                        messagesAdapter.conversations.add(0, updatedInfo)
+                        messagesAdapter.notifyItemInserted(0)
+                    } else if (intent.getStringExtra("type") == "metachanged") {
+                        // Updated conversation, find and update it in the list
+                        // Move it to the top while we're at it
+                        val index = messagesAdapter.conversations.indexOfFirst { it.id == updateId }
+                        if (index != -1) {
+                            // Remove current position and push to list
+                            messagesAdapter.conversations.removeAt(index)
+                            messagesAdapter.conversations.add(0, updatedInfo)
+                            // Notify item moved to top and changed
+                            messagesAdapter.notifyItemMoved(index, 0)
+                            messagesAdapter.notifyItemChanged(0)
+                        }
+                    }
+
+                    // Make sure the layout is visible
                     messagesLayout.visibility = View.VISIBLE
                 }
             }
@@ -169,7 +194,6 @@ class HomeFragment : Fragment() {
                               savedInstanceState: Bundle?): View? {
 
         val view = inflater.inflate(R.layout.fragment_home, container, false)
-        val prefs = requireContext().getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
 
         // Set random greeting as action bar title, once per app start, or after 30 minutes
         if (SphPlanner.randomGreeting == null || Date().time - SphPlanner.randomGreetingTime > 30 * 60 * 1000) {
@@ -193,26 +217,28 @@ class HomeFragment : Fragment() {
             }
         } else timetableLayout.visibility = View.GONE
 
+
         /*
-         * Possibly new messages
+         * Messages
          */
 
         messagesLayout = view.findViewById(R.id.messagesLayout)
+        val messagesRecycler = view.findViewById<RecyclerView>(R.id.messagesRecycler)
 
-        // If there might be unread messages and remote config enables that,
-        // show a text redirecting the user to sph's messages page
-        if (prefs.getBoolean("messages_unread", false)
-                && Firebase.remoteConfig.getBoolean("messages_display_possible")) {
-            // Gone by default
-            messagesLayout.visibility = View.VISIBLE
+        // Get info for unread conversations
+        val unreadMessages = ConversationsDb().getConversationInfo("conversations.unread=1").toMutableList()
+        messagesAdapter = ConversationsAdapter(unreadMessages, requireActivity(), true)
+        messagesRecycler.adapter = messagesAdapter
+
+        // If no unread messages are to be displayed, hide the layout
+        if (unreadMessages.isEmpty()) {
+            messagesLayout.visibility = View.GONE
         }
 
-        // Open sph with a prompt to use AutoSPH,
-        // reset unread preference and hide this text
+        // Navigate to fragments tab
         messagesLayout.setOnClickListener {
-            MainActivity.openSph(requireContext())
-            prefs.edit().putBoolean("messages_unread", false).apply()
-            messagesLayout.visibility = View.GONE
+            Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
+                    .navigate(R.id.messagesFromHomeAction)
         }
 
 
