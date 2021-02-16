@@ -167,6 +167,9 @@ class ChatFragment : Fragment() {
         // Exclude emoji, sph doesn't support them
         input.filters = arrayOf<InputFilter>(EmojiExcludeFilter())
 
+        // Mark this conversation as read
+        ConversationsDb().setUnread(conversationId, false)
+
         return view
     }
 

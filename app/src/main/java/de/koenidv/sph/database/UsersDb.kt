@@ -33,8 +33,11 @@ object UsersDb {
         val cachedvalue: String? = cache[userid.replace("l-", "")]?.get(
                 if (lastnamefirst) "fullnameLast" else "fullnameFirst")
 
-        if (cachedvalue != null) return cachedvalue
-        else {
+        if (cachedvalue != null) {
+
+            return cachedvalue
+
+        } else {
 
             val nameCursor = writable.rawQuery(
                     "SELECT firstname, lastname FROM users WHERE user_id=\"$userid\"" +
