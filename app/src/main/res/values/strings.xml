@@ -248,6 +248,9 @@
     <string name="messages_new_recipients_search">Search for all users</string>
     <string name="messages_new_message">Send a message</string>
     <string name="messages_new_sending">Message is being sent…</string>
+    <string name="messages_empty_title">You currently have no conversations</string>
+    <string name="messages_empty_new">Start a new conversation</string>
+    <string name="messages_empty_refresh">Check for new conversations</string>
 
     <!-- Users-->
     <string name="users_title">Teachers</string>

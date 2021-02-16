@@ -17,7 +17,6 @@ class ConversationsDb {
      * Saves/replaces a conversation
      */
     fun save(conversation: Conversation) {
-        writable.beginTransaction()
         val cv = ContentValues()
         cv.put("conversation_id", conversation.convId)
         cv.put("first_id_message", conversation.firstIdMess)
@@ -30,8 +29,6 @@ class ConversationsDb {
         cv.put("archived", if (conversation.archived) 1 else 0)
 
         writable.replace("conversations", null, cv)
-        writable.setTransactionSuccessful()
-        writable.endTransaction()
     }
 
     /**
@@ -86,12 +83,18 @@ class ConversationsDb {
         do {
             isOwn = cursor.getString(3) == TokenManager.userid
             // If sender is self, use first recipient as partner, else original sender
-            if (isOwn) {
-                partner = cursor.getString(4).substringBefore(";")
-                partnerCount = cursor.getInt(2)
-            } else {
-                partner = cursor.getString(3)
-                partnerCount = cursor.getInt(2) - 1
+            try {
+                if (isOwn) {
+                    partner = cursor.getString(4).substringBefore(";")
+                    partnerCount = cursor.getInt(2)
+                } else {
+                    partner = cursor.getString(3)
+                    partnerCount = cursor.getInt(2) - 1
+                }
+            } catch (npe: NullPointerException) {
+                npe.printStackTrace()
+                partner = "null"
+                partnerCount = 0
             }
 
             returnList.add(ConversationsAdapter.ConversationInfo(
@@ -130,6 +133,24 @@ class ConversationsDb {
     }
 
     /**
+     * Returns the first message id for a given conversation id
+     */
+    fun getFirstMessageId(convId: String): String? {
+        // Query message id
+        val queryString = "SELECT first_id_message FROM conversations WHERE conversation_id=\"$convId\""
+        val cursor: Cursor = writable.rawQuery(queryString, null)
+        // If result is empty, return null
+        if (!cursor.moveToFirst()) {
+            cursor.close()
+            return null
+        }
+        // Else return the queried message id
+        val id = cursor.getString(0)
+        cursor.close()
+        return id
+    }
+
+    /**
      * Sets the last date
      * Should be replaced with just a left join, but sph's data makes that quite hard
      */
@@ -151,6 +172,13 @@ class ConversationsDb {
      */
     fun setAnswertype(convId: String, answerType: String) {
         writable.execSQL("UPDATE conversations SET answertype=\"$answerType\" WHERE conversation_id=\"$convId\"")
+    }
+
+    /**
+     * Sets a conversation's archived status
+     */
+    fun setArchived(convId: String, archived: Boolean) {
+        writable.execSQL("UPDATE conversations SET archived=${if (archived) 1 else 0} WHERE conversation_id=\"$convId\"")
     }
 
     /**

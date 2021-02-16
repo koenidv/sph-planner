@@ -325,5 +325,8 @@
     <string name="messages_new_sending">Nachricht wird gesendet…</string>
     <string name="retry">Erneut versuchen</string>
     <string name="messages_new_recipients_search">Nach allen Nutzern suchen</string>
+    <string name="messages_empty_new">Starte eine neue Unterhaltung</string>
+    <string name="messages_empty_refresh">Auf neue Nachrichten prüfen</string>
+    <string name="messages_empty_title">Du führst zur Zeit keine Unterhaltungen</string>
 
 </resources>

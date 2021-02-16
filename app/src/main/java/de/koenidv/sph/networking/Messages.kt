@@ -102,7 +102,7 @@ class Messages {
                                     sphUnread = data.get("unread").asBoolean
                                             || data.get("ungelesen").asBoolean
                                     origSenderId = data.get("Sender").asString
-                                    isArchived = if (archived)
+                                    isArchived = if (archived) // Can only be archived if we requested that
                                         data.get("Papierkorb").asString == "ja" else false
 
                                     // Make relative dates absolute
@@ -141,7 +141,7 @@ class Messages {
 
                                     // If the conversation does not yet exist, create it,
                                     // and load all messages from it
-                                    if (conversation == null) {
+                                    if (conversation == null || forceRefresh) {
 
                                         // Save this conversation
                                         conversation = Conversation(
@@ -165,7 +165,7 @@ class Messages {
 
                                     } else if (conversation.date != date ||
                                             conversation.answerType != answerType ||
-                                            forceRefresh) {
+                                            conversation.archived != isArchived) {
                                         // If the read status of this conversation has changed,
                                         // or if force refresh is enabled, update this conversation
                                         // Values other than unread, date and answertype
@@ -173,6 +173,7 @@ class Messages {
                                         conversations.setDate(conversationId, date)
                                         conversations.setUnread(conversationId, sphUnread)
                                         conversations.setAnswertype(conversationId, answerType)
+                                        conversations.setArchived(conversationId, archived)
 
                                         // Load this conversation, if not only headers
                                         if (!onlyHeaders) loadMessagesList.add(conversation)
@@ -509,6 +510,23 @@ class Messages {
                 }
             }
         }
+    }
+
+    /**
+     * Archive an conversation in the db and post deletion request to sph
+     * External request is not guaranteed to succeed, though
+     */
+    fun setArchived(conversationId: String, firstMessageId: String, archived: Boolean) {
+        // Mark the conversation as archived in the db
+        ConversationsDb().setArchived(conversationId, archived)
+        // Post to sph
+        // We don't actually care about the response, leaving the lambda empty
+        NetworkManager().postJsonAuthed(
+                applicationContext().getString(R.string.url_messages),
+                mapOf(
+                        "a" to if (archived) "deleteAll" else "recycleMsg",
+                        "uniqid" to firstMessageId,
+                )) { _, _ -> }
     }
 
 
