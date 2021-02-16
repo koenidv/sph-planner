@@ -53,6 +53,7 @@ class NetworkManager {
         val prefs = applicationContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
         val time = Date().time
         val updateList = mutableListOf<String>()
+        val updateData = mutableMapOf<String, String>()
         var disableList = false
 
         // Log pull to refresh
@@ -82,7 +83,21 @@ class NetworkManager {
                     updateList.add("posts")
             }
             R.id.nav_messages -> {
-                updateList.add("messages")
+                // Update all messages after 30sec
+                if (time - prefs.getLong("updated_messages", 0) > 30 * 1000) {
+                    updateList.add("messages")
+                }
+            }
+            R.id.chatFragment -> {
+                // Messages for this conversation after 30sec
+                val conversationId = arguments?.getString("conversationId")
+                if (conversationId != null) {
+                    if (time - prefs.getLong("updated_messages_$conversationId", 0)
+                            > 30 * 1000) {
+                        updateList.add("chat")
+                        updateData["chatid"] = conversationId
+                    }
+                }
             }
             R.id.frag_timetable -> {
                 updateList.add("timetable")
@@ -133,7 +148,7 @@ class NetworkManager {
             }
         }
         if (!disableList)
-            update(updateList) { callback(it) }
+            update(updateList, updateData) { callback(it) }
 
     }
 
@@ -332,7 +347,7 @@ class NetworkManager {
      * @param entries List of strings with scopes to update
      * (See in when below for what's supported)
      */
-    fun update(entries: List<String>, callback: (success: Int) -> Unit) {
+    fun update(entries: List<String>, data: Map<String, String>, callback: (success: Int) -> Unit) {
         // Log updating
         if (Debugger.DEBUGGING_ENABLED)
             DebugLog("NetMgr", "Updating invoked",
@@ -370,6 +385,7 @@ class NetworkManager {
                             "timetable" -> Timetable().fetch(callback = checkDone)
                             "messages" -> Messages().fetch(callback = checkDone)
                             "holidays" -> Holidays().fetch(callback = checkDone)
+                            "chat" -> Messages().updateConversation(data["chatid"], checkDone)
                         }
                     }
                 } else callback(success)

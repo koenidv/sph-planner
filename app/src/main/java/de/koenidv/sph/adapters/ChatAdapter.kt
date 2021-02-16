@@ -19,7 +19,7 @@ import me.saket.bettermovementmethod.BetterLinkMovementMethod
 
 
 //  Created by koenidv on 12.02.2021.
-class ChatAdapter(private val messages: List<Message>, private val conversationInfo: Pair<String, Int>) :
+class ChatAdapter(val messages: MutableList<Message>, private val conversationInfo: Pair<String, Int>) :
         RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     /**
