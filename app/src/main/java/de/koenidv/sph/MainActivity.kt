@@ -217,6 +217,11 @@ class MainActivity : AppCompatActivity() {
         return navController.navigateUp() || super.onSupportNavigateUp()
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        SphPlanner.saveCache()
+        super.onSaveInstanceState(outState)
+    }
+
     companion object {
         /**
          * Prompt user to use AutoSPH if he hasn't accepted this before
