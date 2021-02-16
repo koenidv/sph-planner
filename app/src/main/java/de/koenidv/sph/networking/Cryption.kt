@@ -22,7 +22,6 @@ import org.mozilla.javascript.Scriptable
 import java.util.*
 import kotlin.math.floor
 import kotlin.math.roundToInt
-import kotlin.system.measureTimeMillis
 
 //  Created by koenidv on 04.02.2021.
 // If it ain't broken, don't fix it. Unless you really know what you're doing.
@@ -354,16 +353,13 @@ class Cryption {
             // Check if the specified object is actually a function and execute it
             val obj: Any? = scope.get(jsFunction, scope)
             if (obj is Function) {
-                val execTime = measureTimeMillis {
-                    // Call the function with the params
-                    val result: Any = obj.call(rhino,
-                            scope,
-                            scope,
-                            params)
-                    // Return the output
-                    callback(org.mozilla.javascript.Context.toString(result))
-                }
-                Log.d("$TAG js", "Execution for $jsFunction took $execTime ms")
+                // Call the function with the params
+                val result: Any = obj.call(rhino,
+                        scope,
+                        scope,
+                        params)
+                // Return the output
+                callback(org.mozilla.javascript.Context.toString(result))
             } else {
                 throw Exception("$jsFunction is not a valid Function at Cryption#execute")
             }

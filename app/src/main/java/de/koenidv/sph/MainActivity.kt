@@ -41,6 +41,8 @@ import de.koenidv.sph.ui.OptionsSheet
 
 class MainActivity : AppCompatActivity() {
 
+    lateinit var swipeRefresh: SwipeRefreshLayout
+
     override fun onResume() {
         ChangesDb.instance!!.removeOld()
         super.onResume()
@@ -130,7 +132,7 @@ class MainActivity : AppCompatActivity() {
         /*
          * Pull to refresh
          */
-        val swipeRefresh = findViewById<SwipeRefreshLayout>(R.id.swipeRefresh)
+        swipeRefresh = findViewById<SwipeRefreshLayout>(R.id.swipeRefresh)
         swipeRefresh.setOnRefreshListener {
             navController.currentDestination?.id?.let { destination ->
                 // If destination is known, let network manager handle the refreshing

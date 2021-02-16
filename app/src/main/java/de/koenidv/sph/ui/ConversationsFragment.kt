@@ -8,27 +8,33 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+import de.koenidv.sph.MainActivity
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.adapters.ConversationsAdapter
 import de.koenidv.sph.database.ConversationsDb
+import de.koenidv.sph.networking.Messages
 
 // Created by koenidv on 18.12.2020.
 class ConversationsFragment : Fragment() {
 
     private lateinit var adapter: ConversationsAdapter
     private lateinit var layoutManager: LinearLayoutManager
+    lateinit var emptyLayout: LinearLayout
 
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_conversations, container, false)
+        val conversationsDb = ConversationsDb()
 
         SphPlanner.openInBrowserUrl = getString(R.string.url_messages)
 
@@ -36,7 +42,7 @@ class ConversationsFragment : Fragment() {
         val fab = view.findViewById<ExtendedFloatingActionButton>(R.id.newConversationFab)
 
         var recyclerEditMode = false
-        val conversations = ConversationsDb().getConversationInfo().toMutableList()
+        val conversations = conversationsDb.getConversationInfo().toMutableList()
 
         // Display conversations
         adapter = ConversationsAdapter(conversations, requireActivity()) { selectMode ->
@@ -74,6 +80,7 @@ class ConversationsFragment : Fragment() {
                 // todo archive in db
                 var index: Int
                 val selected = adapter.getSelected()
+                val messages = Messages()
                 adapter.clearSelected()
                 for (conversation in selected) {
                     // Remove this item from the recycler view
@@ -82,20 +89,54 @@ class ConversationsFragment : Fragment() {
                         conversations.removeAt(index)
                         adapter.notifyItemRemoved(index)
                     }
+                    val firstMsgId = conversationsDb.getFirstMessageId(conversation.id)
+                    if (firstMsgId != null)
+                        messages.setArchived(conversation.id, firstMsgId, true)
+
+                    // If there are no conversations left, show emptyConversationsLayout
+                    if (adapter.conversations.isEmpty()) emptyLayout.visibility = View.VISIBLE
                 }
             } else {
-                // Show a bottom sheet to start a new conversation
-                NewConversationSheet { subject, recipients ->
-                    Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
-                            .navigate(R.id.newChatFromConversationsAction, bundleOf(
-                                    "subject" to subject,
-                                    "recipients" to recipients
-                            ))
-                }.show(parentFragmentManager, "newconversation")
+                newConversation()
             }
         }
 
+        // If there are no conversations to display, show a text explaining that
+        emptyLayout = view.findViewById(R.id.noConversationsLayout)
+        val newButton = view.findViewById<MaterialButton>(R.id.noConversationsNewButton)
+        val refreshButton = view.findViewById<MaterialButton>(R.id.noConversationsRefreshButton)
+
+        newButton.setOnClickListener { newConversation() }
+        refreshButton.setOnClickListener {
+            // Set ptr as refreshing
+            try {
+                (requireActivity() as MainActivity).swipeRefresh.isRefreshing = true
+                Messages().fetch(forceRefresh = true, archived = true) {
+                    (requireActivity() as MainActivity).swipeRefresh.isRefreshing = false
+                }
+            } catch (e: IllegalStateException) {
+                e.printStackTrace()
+            }
+        }
+
+        if (conversations.isEmpty()) {
+            emptyLayout.visibility = View.VISIBLE
+        }
+
+
+
         return view
+    }
+
+    private fun newConversation() {
+        // Show a bottom sheet to start a new conversation
+        NewConversationSheet { subject, recipients ->
+            Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
+                    .navigate(R.id.newChatFromConversationsAction, bundleOf(
+                            "subject" to subject,
+                            "recipients" to recipients
+                    ))
+        }.show(parentFragmentManager, "newconversation")
     }
 
     // Update conversations on uichange broadcast
@@ -110,7 +151,9 @@ class ConversationsFragment : Fragment() {
                 // Get the updated conversation
                 val updateId = intent.getStringExtra("id")
                 val updatedInfo = ConversationsDb()
-                        .getConversationInfo("conversation_id=\"$updateId\"").firstOrNull()
+                        .getConversationInfo(
+                                "archived=0 AND conversation_id=\"$updateId\"")
+                        .firstOrNull()
 
                 if (updatedInfo != null) {
                     if (intent.getStringExtra("type") == "new") {
@@ -133,6 +176,10 @@ class ConversationsFragment : Fragment() {
                             layoutManager.scrollToPosition(0)
                         }
                     }
+
+                    // Make sure emptyConversationsLayout is hidden as there are conversations now
+                    if (emptyLayout.visibility == View.VISIBLE)
+                        emptyLayout.visibility = View.GONE
                 }
 
             }
