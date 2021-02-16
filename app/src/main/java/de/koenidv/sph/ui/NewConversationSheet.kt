@@ -11,13 +11,18 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.button.MaterialButton
 import de.koenidv.sph.R
+import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.adapters.UserSelectionAdapter
 import de.koenidv.sph.database.UsersDb
+import de.koenidv.sph.networking.Users
+import de.koenidv.sph.objects.User
 
 
-//  Created by koenidv on 29.12.2020.
-// Bottom sheet displaying an image and text
-class NewConversationSheet(private val callback: (String, List<String>) -> Unit) : BottomSheetDialogFragment() {
+//  Created by koenidv on 14.02.2021.
+// Bottom sheet showing options to start a new conversation
+class NewConversationSheet(private val preselect: User? = null,
+                           private val callback: (String, List<String>) -> Unit) :
+        BottomSheetDialogFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val view: View = inflater.inflate(R.layout.sheet_newconversation, container, false)
@@ -29,7 +34,7 @@ class NewConversationSheet(private val callback: (String, List<String>) -> Unit)
 
         // Display users list
         val users = UsersDb.all()
-        val recipAdapter = UserSelectionAdapter(users) { recipients.setText("") }
+        val recipAdapter = UserSelectionAdapter(users, preselect?.userId) { recipients.setText("") }
         recipientsRecycler.adapter = recipAdapter
 
         // Filter the recyclerview on user input
@@ -69,6 +74,31 @@ class NewConversationSheet(private val callback: (String, List<String>) -> Unit)
 
         subject.requestFocus()
 
+        // If there is a preset user set, also display an email button
+        if (preselect != null) {
+            val fragmentManager = parentFragmentManager
+            val emailButton = view.findViewById<MaterialButton>(R.id.emailButton)
+            emailButton.visibility = View.VISIBLE
+            emailButton.setOnClickListener {
+                // If email address template has been set
+                if (SphPlanner.prefs.getString("users_mail_template", null) != null) {
+                    dismiss()
+                    Users().sendEmail(preselect)
+                } else {
+                    dismiss()
+                    // Else show two sheets prompting the user to add a template
+                    InfoSheet(R.drawable.img_email, R.string.email_template_info) {
+                        EmailTemplateSheet().show(fragmentManager, "email-preset-sheet")
+                    }.show(fragmentManager, "info-email")
+                }
+            }
+        }
+
         return view
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        setStyle(STYLE_NORMAL, R.style.Theme_SPH_Sheet_NoBackground)
+        super.onCreate(savedInstanceState)
     }
 }

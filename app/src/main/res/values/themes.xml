@@ -82,8 +82,16 @@
         <item name="colorOnPrimary">@color/white</item>
     </style>
 
+    <style name="Theme.SPH.Sheet.NoBackground" parent="Theme.SPH.Sheet">
+        <item name="bottomSheetStyle">@style/Theme.SPH.ModalStyle.NoBackground</item>
+    </style>
+
     <style name="Theme.SPH.ModalStyle" parent="Widget.Design.BottomSheet.Modal">
         <item name="android:background">@drawable/rounded_dialog</item>
+    </style>
+
+    <style name="Theme.SPH.ModalStyle.NoBackground" parent="Widget.Design.BottomSheet.Modal">
+        <item name="android:background">@drawable/md_transparent</item>
     </style>
 
     <style name="Theme.SPH.NoActionBar">

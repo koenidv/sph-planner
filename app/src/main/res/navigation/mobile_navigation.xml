@@ -300,4 +300,12 @@
             app:popUpTo="@id/nav_messages" />
     </fragment>
 
+    <action
+        android:id="@+id/newChatAction"
+        app:destination="@id/newChatFragment"
+        app:enterAnim="@anim/enter_from_right"
+        app:exitAnim="@anim/fade_out"
+        app:popEnterAnim="@anim/fade_in"
+        app:popExitAnim="@anim/exit_to_right" />
+
 </navigation>
