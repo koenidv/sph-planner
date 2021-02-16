@@ -329,5 +329,6 @@
     <string name="messages_empty_refresh">Auf neue Nachrichten prüfen</string>
     <string name="messages_empty_title">Du führst zur Zeit keine Unterhaltungen</string>
     <string name="messages_title_unread">Ungelesene Nachrichten</string>
+    <string name="users_email_action">Stattdessen eine E-Mail senden</string>
 
 </resources>

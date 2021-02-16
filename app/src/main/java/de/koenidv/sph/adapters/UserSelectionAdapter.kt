@@ -14,15 +14,19 @@ import de.koenidv.sph.objects.User
 import de.koenidv.sph.parsing.Utility
 
 //  Created by koenidv on 14.02.2021.
-class UserSelectionAdapter(users: List<User>, private val onSelection: () -> Unit) :
+class UserSelectionAdapter(users: List<User>, preselect: String? = null, private val onSelection: () -> Unit) :
         RecyclerView.Adapter<UserSelectionAdapter.ViewHolder>() {
 
     data class UserData(
             val user: User,
             var selected: Boolean = false)
 
-    private val userData = users.map { UserData(it) }.toMutableList()
-    private val displayedUsers = userData.filter { it.user.isPinned }.toMutableList()
+    private val userData = users.map { UserData(it, it.userId == preselect) }
+            .sortedByDescending { it.selected }
+            .toMutableList()
+    private val displayedUsers = userData.filter {
+        if (preselect == null) it.user.isPinned else true
+    }.toMutableList()
     private var previousfilter = ""
 
     private val onSelect: (UserData) -> Unit = {
