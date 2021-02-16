@@ -1,10 +1,10 @@
 package de.koenidv.sph.adapters
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.os.bundleOf
 import androidx.fragment.app.FragmentActivity
@@ -21,7 +21,8 @@ import java.util.*
 //  Created by koenidv on 12.02.2021.
 class ConversationsAdapter(val conversations: MutableList<ConversationInfo>,
                            private val activity: FragmentActivity,
-                           private val onSelectModeChange: (Boolean) -> Unit) :
+                           private val compactMode: Boolean = false,
+                           private val onSelectModeChange: ((Boolean) -> Unit)? = null) :
         RecyclerView.Adapter<ConversationsAdapter.ViewHolder>() {
 
     class ConversationInfo(
@@ -38,20 +39,22 @@ class ConversationsAdapter(val conversations: MutableList<ConversationInfo>,
     private var selectMode = false
 
     private fun selectItem(position: Int) {
-        if (selectedItems.contains(position)) {
-            // Items was already selected, remove selection
-            selectedItems.remove(position)
-            // Disable select mode if this was the last item
-            if (selectedItems.isEmpty()) {
-                selectMode = false
-                onSelectModeChange(false)
+        if (!compactMode && onSelectModeChange != null) {
+            if (selectedItems.contains(position)) {
+                // Items was already selected, remove selection
+                selectedItems.remove(position)
+                // Disable select mode if this was the last item
+                if (selectedItems.isEmpty()) {
+                    selectMode = false
+                    onSelectModeChange.invoke(false)
+                }
+            } else {
+                selectedItems.add(position)
+                selectMode = true
+                onSelectModeChange.invoke(true)
             }
-        } else {
-            selectedItems.add(position)
-            selectMode = true
-            onSelectModeChange(true)
+            notifyItemChanged(position)
         }
-        notifyItemChanged(position)
     }
 
     private val onClick: (ConversationInfo, Int) -> Unit = { conversation, position ->
@@ -59,7 +62,9 @@ class ConversationsAdapter(val conversations: MutableList<ConversationInfo>,
             selectItem(position)
         } else {
             Navigation.findNavController(activity, R.id.nav_host_fragment)
-                    .navigate(R.id.chatFromConversationsAction,
+                    .navigate(
+                            if (compactMode) R.id.chatFromHomeAction
+                            else R.id.chatFromConversationsAction,
                             bundleOf("conversationId" to conversation.id))
         }
     }
@@ -69,7 +74,7 @@ class ConversationsAdapter(val conversations: MutableList<ConversationInfo>,
 
     // Get theme color
     private val prefs = applicationContext()
-            .getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
+            .getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
     private val themeColor = prefs.getInt("themeColor", 0)
 
     /**
@@ -102,7 +107,7 @@ class ConversationsAdapter(val conversations: MutableList<ConversationInfo>,
         }
 
 
-        fun bind(conversation: ConversationInfo, isSelected: Boolean, themeColor: Int) {
+        fun bind(conversation: ConversationInfo, isSelected: Boolean, themeColor: Int, compactMode: Boolean) {
             currentConversation = conversation
 
             subject.text = conversation.subject
@@ -110,12 +115,14 @@ class ConversationsAdapter(val conversations: MutableList<ConversationInfo>,
             date.text = getRelativeDate(conversation.date)
 
             // If item is selected, adjust background color
-            if (isSelected) {
-                // Item now selected
-                Utility.tintBackground(layout, themeColor, 0x52000000)
-            } else {
-                // Item now unselected
-                layout.background.clearColorFilter()
+            if (!compactMode) {
+                if (isSelected) {
+                    // Item now selected
+                    Utility.tintBackground(layout, themeColor, 0x52000000)
+                } else {
+                    // Item now unselected
+                    layout.background.clearColorFilter()
+                }
             }
 
             // If item is unread, show unread marker
@@ -177,14 +184,17 @@ class ConversationsAdapter(val conversations: MutableList<ConversationInfo>,
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): ViewHolder {
         // Create a new view, which defines the UI of the list item
         val view = LayoutInflater.from(viewGroup.context)
-                .inflate(R.layout.item_conversation, viewGroup, false)
+                .inflate(
+                        if (compactMode) R.layout.item_conversation_compact
+                        else R.layout.item_conversation,
+                        viewGroup, false)
         return ViewHolder(view, onClick, onLongClick)
     }
 
     // Replaces the contents of a view (invoked by the layout manager)
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
         // Bind data to ViewHolder
-        viewHolder.bind(conversations[position], selectedItems.contains(position), themeColor)
+        viewHolder.bind(conversations[position], selectedItems.contains(position), themeColor, compactMode)
     }
 
     // Return the size of your dataset (invoked by the layout manager)
@@ -202,6 +212,6 @@ class ConversationsAdapter(val conversations: MutableList<ConversationInfo>,
     fun clearSelected() {
         selectedItems.clear()
         selectMode = false
-        onSelectModeChange(false)
+        onSelectModeChange?.invoke(false)
     }
 }
