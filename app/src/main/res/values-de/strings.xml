@@ -330,5 +330,8 @@
     <string name="messages_empty_title">Du führst zur Zeit keine Unterhaltungen</string>
     <string name="messages_title_unread">Ungelesene Nachrichten</string>
     <string name="users_email_action">Stattdessen eine E-Mail senden</string>
+    <string name="share_action">Sharing is caring</string>
+    <string name="share_prompt">Magst du die App? Dann teile sie doch mit deinen Freunden :)</string>
+    <string name="share_button">Teilen</string>
 
 </resources>

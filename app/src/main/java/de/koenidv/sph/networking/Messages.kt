@@ -9,9 +9,9 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import de.koenidv.sph.R
-import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.SphPlanner.Companion.TAG
 import de.koenidv.sph.SphPlanner.Companion.applicationContext
+import de.koenidv.sph.SphPlanner.Companion.prefs
 import de.koenidv.sph.database.ConversationsDb
 import de.koenidv.sph.database.MessagesDb
 import de.koenidv.sph.database.UsersDb
@@ -68,13 +68,14 @@ class Messages {
                 // last=0 - Not yet sure what that does, but it is needed to not get an error
                 NetworkManager().postJsonAuthed(applicationContext().getString(R.string.url_messages),
                         body = mapOf("a" to "headers", "getType" to typeBody, "last" to "0")) { netSuccess, json ->
-                    if (netSuccess == NetworkManager.SUCCESS && json != null) {
+                    if (netSuccess == NetworkManager.SUCCESS && json != null &&
+                            json.get("rows") != "false") {
                         // The response should be a json object with two values:
                         // total - The number of messages matching our request
                         // rows - The encrypted headers for each message
 
                         cryption.decrypt(json.get("rows").toString()) { headers ->
-                            if (headers != null) {
+                            if (headers != null && headers != "") {
                                 val conversations = ConversationsDb()
 
                                 var data: JsonObject
@@ -191,7 +192,7 @@ class Messages {
                                     // Remember the time we updated this
                                     // Not updating this the first time,
                                     // but that shouldn't be an issue
-                                    SphPlanner.prefs.edit().putLong("updated_messages",
+                                    prefs.edit().putLong("updated_messages",
                                             Date().time).apply()
                                 } else {
                                     var index = 0
@@ -214,8 +215,13 @@ class Messages {
                             } else {
                                 // For some reason the decrypted data is null
                                 callback(NetworkManager.FAILED_UNKNOWN)
+                                prefs.edit().putLong("cryption_time", 0).apply()
                             }
                         }
+                    } else {
+                        // The provided data is invalid
+                        callback(NetworkManager.FAILED_UNKNOWN)
+                        prefs.edit().putLong("cryption_time", 0).apply()
                     }
                 }
             }
@@ -371,7 +377,7 @@ class Messages {
                     notifyFragments(conversationId, "contentchanged")
 
                     // Remember the time we updated this
-                    SphPlanner.prefs.edit().putLong(
+                    prefs.edit().putLong(
                             "updated_messages_$conversationId", Date().time).apply()
                 }
             }
@@ -495,7 +501,7 @@ class Messages {
                                 conversation.convId,
                                 TokenManager.userid,
                                 Message.SENDER_TYPE_STUDENT,
-                                SphPlanner.prefs.getString("real_name", "")!!,
+                                prefs.getString("real_name", "")!!,
                                 Date(), // A few seconds later than actual, shouldn't be an issue
                                 conversation.subject,
                                 message,

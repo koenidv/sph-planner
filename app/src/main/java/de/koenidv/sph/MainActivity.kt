@@ -29,6 +29,7 @@ import com.google.android.play.core.install.model.InstallStatus
 import com.google.android.play.core.install.model.UpdateAvailability
 import com.google.android.play.core.tasks.Task
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
+import de.koenidv.sph.SphPlanner.Companion.prefs
 import de.koenidv.sph.database.ChangesDb
 import de.koenidv.sph.database.FunctionTilesDb
 import de.koenidv.sph.debugging.Debugger
@@ -36,6 +37,11 @@ import de.koenidv.sph.networking.NetworkManager
 import de.koenidv.sph.objects.FunctionTile
 import de.koenidv.sph.ui.OnboardingActivity
 import de.koenidv.sph.ui.OptionsSheet
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import java.util.*
 
 //  Created by koenidv on 05.12.2020.
 
@@ -83,6 +89,47 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+
+
+        // If app install is at least 3 days ago,
+        // the last share snackbar is at least 12 days ago,
+        // and the app has not been shared before,
+        // show a snackbar asking the user to share the app after 30 seconds
+        if (prefs.getLong("install_time", 0) == 0L) {
+            prefs.edit().putLong("install_time", Date().time).apply()
+        } else if (Date().time - prefs.getLong("install_time", 0) > 3 * 24 * 360 * 1000 &&
+                !prefs.getBoolean("share_done", false) &&
+                Date().time - prefs.getLong("share_snackbar_time", 0) >
+                12 * 24 * 360 * 1000) {
+
+            CoroutineScope(Dispatchers.Main).launch {
+                delay(30000)
+
+                // Create a snackbar with share action
+                val snackbar = Snackbar.make(
+                        findViewById<FragmentContainerView>(R.id.nav_host_fragment),
+                        R.string.share_prompt, Snackbar.LENGTH_INDEFINITE)
+                        .setAnchorView(R.id.nav_view)
+                        .setAction(R.string.share_action) {
+                            val sendIntent: Intent = Intent().apply {
+                                // Action: Share plain text and save action completion in prefs
+                                action = Intent.ACTION_SEND
+                                putExtra(Intent.EXTRA_TEXT, getString(R.string.share_text))
+                                this.type = "text/plain"
+                                prefs.edit().putBoolean("share_done", true).apply()
+                            }
+                            startActivity(Intent.createChooser(sendIntent, getString(R.string.share_action)))
+                        }
+                snackbar.show()
+                prefs.edit().putLong("share_snackbar_time", Date().time).apply()
+
+                // Dismiss the snackbar after 10 seconds
+                delay(10000)
+                snackbar.dismiss()
+
+            }
+        }
+
 
     }
 
@@ -132,36 +179,40 @@ class MainActivity : AppCompatActivity() {
         /*
          * Pull to refresh
          */
-        swipeRefresh = findViewById<SwipeRefreshLayout>(R.id.swipeRefresh)
+        swipeRefresh = findViewById(R.id.swipeRefresh)
         swipeRefresh.setOnRefreshListener {
             navController.currentDestination?.id?.let { destination ->
                 // If destination is known, let network manager handle the refreshing
                 NetworkManager().handlePullToRefresh(destination, lastNavArguments) { success ->
-                    val errorSnackbar = Snackbar.make(findViewById<FragmentContainerView>(R.id.nav_host_fragment), "", Snackbar.LENGTH_LONG)
-                    errorSnackbar.setAnchorView(R.id.nav_view)
-                    // Show error message if needed
-                    when (success) {
-                        NetworkManager.FAILED_NO_NETWORK -> errorSnackbar.setText(R.string.error_offline).show()
-                        NetworkManager.FAILED_MAINTENANCE -> errorSnackbar.setText(R.string.error_maintenance).show()
-                        NetworkManager.FAILED_SERVER_ERROR -> errorSnackbar.setText(R.string.error_server).show()
-                        NetworkManager.FAILED_UNKNOWN, NetworkManager.FAILED_CANCELLED ->
-                            errorSnackbar.setText(R.string.error).show()
-                        else -> if (success != NetworkManager.SUCCESS) errorSnackbar.setText(R.string.error).show()
-                    }
-                    // If this is due to a server error, display a link to sph's status page
-                    if (success == NetworkManager.FAILED_MAINTENANCE
-                            || success == NetworkManager.FAILED_SERVER_ERROR
-                            || success == NetworkManager.FAILED_UNKNOWN) {
-                        errorSnackbar.setAction(R.string.sph_status) {
-                            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.url_status))))
+                    // Just to make sure we're actually running on ui thread after networking
+                    // issue fc-21432b0dd857aa2a3e29e938109bf74c to be specific
+                    runOnUiThread {
+                        val errorSnackbar = Snackbar.make(findViewById<FragmentContainerView>(R.id.nav_host_fragment), "", Snackbar.LENGTH_LONG)
+                        errorSnackbar.setAnchorView(R.id.nav_view)
+                        // Show error message if needed
+                        when (success) {
+                            NetworkManager.FAILED_NO_NETWORK -> errorSnackbar.setText(R.string.error_offline).show()
+                            NetworkManager.FAILED_MAINTENANCE -> errorSnackbar.setText(R.string.error_maintenance).show()
+                            NetworkManager.FAILED_SERVER_ERROR -> errorSnackbar.setText(R.string.error_server).show()
+                            NetworkManager.FAILED_UNKNOWN, NetworkManager.FAILED_CANCELLED ->
+                                errorSnackbar.setText(R.string.error).show()
+                            else -> if (success != NetworkManager.SUCCESS) errorSnackbar.setText(R.string.error).show()
                         }
-                    }
-                    // Indicate no longer refreshing
-                    swipeRefresh.isRefreshing = false
-                    if (success == NetworkManager.FAILED_INVALID_CREDENTIALS) {
-                        // Credentials seem to be invalid
-                        // Show sign in screen
-                        prefs.edit().remove("credsVerified").apply()
+                        // If this is due to a server error, display a link to sph's status page
+                        if (success == NetworkManager.FAILED_MAINTENANCE
+                                || success == NetworkManager.FAILED_SERVER_ERROR
+                                || success == NetworkManager.FAILED_UNKNOWN) {
+                            errorSnackbar.setAction(R.string.sph_status) {
+                                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.url_status))))
+                            }
+                        }
+                        // Indicate no longer refreshing
+                        swipeRefresh.isRefreshing = false
+                        if (success == NetworkManager.FAILED_INVALID_CREDENTIALS) {
+                            // Credentials seem to be invalid
+                            // Show sign in screen
+                            prefs.edit().remove("credsVerified").apply()
+                        }
                     }
                 }
             }

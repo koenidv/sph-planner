@@ -2,6 +2,10 @@
 Android app to easily access Hesse's education portal - 
 *SPH: Schulportal Hessen / Education Portal Hesse*
 
+<details>
+
+<summary>Screenshots as of 1.2 (v120)</summary>
+
 <p float="left">
   <img src="https://play-lh.googleusercontent.com/W998xiTW5TvKZvtqZFm6hhVLo9ji97VgnDJ9Z86sMJEs53_kA0NU4ohTP9S2W1Pv7Q=w1920-h947-rw" width="200" />
   <img src="https://play-lh.googleusercontent.com/tYMyPkNZc6qIEbNMNbLksOuiLM9sPncAHFC74Nq-QB1pCetwCEls5baYFo2bhE--tTM=w1920-h947-rw" width="200" /> 
@@ -9,8 +13,10 @@ Android app to easily access Hesse's education portal -
   <img src="https://play-lh.googleusercontent.com/W8Buymrj0ShiNaHG3CcXcVh2RcztyA1Tgm4U7xMCqF1cBQzrJyhVLRb89jOZpjXuHA=w1920-h947-rw" width="200" />
 </p>
 
+</details>
+
 ### Advantages compared to SPH's website
-- [x] The App presents way more data at a glance
+- [x] Presenting way more data at a glance
 - [x] Easier and faster to use
 - [x] Skip signing in every time 
 - [x] Works even when SPH is under maintenance or offline
@@ -19,15 +25,16 @@ Android app to easily access Hesse's education portal -
 - [x] Personal timetable (that works better than sph's)
 - [x] Personal changes in the timetable
 - [x] Overview of undone tasks & unread posts
+- [x] Send and receive messages to teachers (starting in 1.3)
 - [x] Rename and pin attachments, keep them offline
 - [x] Display posts from SPH
 
 ### Future plans
-- [ ] Implementing the messages feature (wip, decryption works)
-- [ ] More reliably support more schools (always wip, developing better debugging features)
+- [ ] Notifications
+- [ ] Manually edit courses
+- [ ] More reliably support more schools (always wip)
 - [ ] Displaying grades and attendances 
 - [ ] Submit files to assignments
-- [ ] Manually edit courses
 - [ ] Add own tasks / grades / attendances
 
 ### Contributing

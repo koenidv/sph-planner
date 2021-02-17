@@ -91,6 +91,7 @@ class WebViewFragment : Fragment() {
         webView.settings.useWideViewPort = true
         webView.setInitialScale(1)
         // Remove previous sph cookies as they might lead to problems
+        // Well this doesn't work, future someone: Trying to delete only the sph sid cookie
         /*listOf("https://schulportal.hessen.de",
                 "schulportal.hessen.de",
                 "https://connect.schulportal.hessen.de",
@@ -106,9 +107,6 @@ class WebViewFragment : Fragment() {
                 ".schulportal.hessen.de").forEach {
             cookieManager.setCookie(it, "")
         }*/
-        // todo Removing only sph's cookies somehow doesn't work, so we'll remove all session cookies
-        // This will also remove any login to other sites..
-        cookieManager.removeSessionCookies {}
         cookieManager.setAcceptThirdPartyCookies(webView, true)
 
         // Enable force dark mode above Android 10 if dark theme is selected
@@ -139,7 +137,11 @@ class WebViewFragment : Fragment() {
         if (domain.contains("schulportal.hessen.de")) {
             TokenManager.getToken { success: Int, token: String? ->
                 if (success == NetworkManager.SUCCESS) {
-                    Log.d(SphPlanner.TAG, token!!)
+                    // Removing only sph's cookies somehow doesn't work, so we'll remove all session cookies
+                    // This will also remove any login to other sites..
+                    cookieManager.removeSessionCookies {}
+                    Log.d(SphPlanner.TAG, token.toString())
+                    // Set cookie and load url
                     cookieManager.setCookie(domain, "sid=$token")
                     webView.loadUrl(domain)
                 }
@@ -161,6 +163,8 @@ class WebViewFragment : Fragment() {
     override fun onDestroy() {
         // Unregister broadcast receiver
         LocalBroadcastManager.getInstance(requireActivity()).unregisterReceiver(uichangeReceiver)
+        // Reset cryption secret as the webview might have created a new one
+        SphPlanner.prefs.edit().putLong("cryption_time", 0).apply()
         super.onDestroy()
         // Recreate activity if this was the first time using webview during this application lifecycle
         // This is to work around a weird bug in WebView causing the night theme configuration to be changed
