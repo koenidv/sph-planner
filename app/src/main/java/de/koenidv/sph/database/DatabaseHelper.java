@@ -11,7 +11,6 @@ import de.koenidv.sph.SphPlanner;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     // todo close db on exit
-    // todo escape everything we put in the db
 
     private static DatabaseHelper instance;
 

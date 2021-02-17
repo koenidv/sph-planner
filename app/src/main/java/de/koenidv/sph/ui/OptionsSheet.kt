@@ -1,11 +1,9 @@
 package de.koenidv.sph.ui
 
 import android.app.AlertDialog
-import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -120,15 +118,16 @@ class OptionsSheet internal constructor() : BottomSheetDialogFragment() {
             dismiss()
             ContactSheet().show(parentFragmentManager, "contact")
         }
-        view.findViewById<View>(R.id.rateButton).setOnClickListener {
-            // Open Play Store to let the user rate the app
-            val appPackageName = SphPlanner.applicationContext().packageName
-            try {
-                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$appPackageName")))
-            } catch (anfe: ActivityNotFoundException) {
-                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=$appPackageName")))
-            }
+        view.findViewById<View>(R.id.shareButton).setOnClickListener {
             dismiss()
+            // Share a text inviting people to use the app
+            val sendIntent: Intent = Intent().apply {
+                action = Intent.ACTION_SEND
+                putExtra(Intent.EXTRA_TEXT, getString(R.string.share_text))
+                this.type = "text/plain"
+                SphPlanner.prefs.edit().putBoolean("share_done", true).apply()
+            }
+            startActivity(Intent.createChooser(sendIntent, getString(R.string.share_action)))
         }
         view.findViewById<View>(R.id.doneButton).setOnClickListener {
             // Dismiss the sheet

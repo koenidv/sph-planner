@@ -360,6 +360,13 @@
     <string name="debug_token_description">By sharing your session token, you can grant temporary access to SPH without sharing your credentials. It must be used within 15 minutes.</string>
     <string name="dev_options">Developer options</string>
 
+    <!-- Sharing -->
+    <string name="share_prompt">Like the app? Share it with your friends :)</string>
+    <string name="share_action">Sharing is caring</string>
+    <string name="share_button">Share</string>
+    <!-- Share text is always in German as the app is mainly for German users... -->
+    <string name="share_text" translatable="false">Hey, kennst du schon die Schulportal-App?\n→ https://kutt.it/sph</string>
+
     <!-- Translatable Arrays -->
     <!-- Only translate values (after "|"), not the keys! -->
     <!-- Spanish, Russian, Korean ? -->

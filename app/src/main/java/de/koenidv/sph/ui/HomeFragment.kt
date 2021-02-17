@@ -21,6 +21,7 @@ import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.ktx.remoteConfig
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
@@ -161,6 +162,9 @@ class HomeFragment : Fragment() {
                         // New conversation, just add it to the top of the list
                         messagesAdapter.conversations.add(0, updatedInfo)
                         messagesAdapter.notifyItemInserted(0)
+
+                        // Make sure the layout is visible
+                        messagesLayout.visibility = View.VISIBLE
                     } else if (intent.getStringExtra("type") == "metachanged") {
                         // Updated conversation, find and update it in the list
                         // Move it to the top while we're at it
@@ -175,8 +179,6 @@ class HomeFragment : Fragment() {
                         }
                     }
 
-                    // Make sure the layout is visible
-                    messagesLayout.visibility = View.VISIBLE
                 }
             }
         }
@@ -225,20 +227,26 @@ class HomeFragment : Fragment() {
         messagesLayout = view.findViewById(R.id.messagesLayout)
         val messagesRecycler = view.findViewById<RecyclerView>(R.id.messagesRecycler)
 
-        // Get info for unread conversations
-        val unreadMessages = ConversationsDb().getConversationInfo("conversations.unread=1").toMutableList()
-        messagesAdapter = ConversationsAdapter(unreadMessages, requireActivity(), true)
-        messagesRecycler.adapter = messagesAdapter
+        if (FunctionTilesDb.getInstance().supports(FunctionTile.FEATURE_MESSAGES)
+                && FirebaseRemoteConfig.getInstance().getBoolean("messages_enabled")) {
 
-        // If no unread messages are to be displayed, hide the layout
-        if (unreadMessages.isEmpty()) {
-            messagesLayout.visibility = View.GONE
-        }
+            // Get info for unread conversations
+            val unreadMessages = ConversationsDb().getConversationInfo(
+                    "conversations.unread=1").toMutableList()
+            messagesAdapter = ConversationsAdapter(unreadMessages, requireActivity(), true)
+            messagesRecycler.adapter = messagesAdapter
 
-        // Navigate to fragments tab
-        messagesLayout.setOnClickListener {
-            Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
-                    .navigate(R.id.messagesFromHomeAction)
+            // If no unread messages are to be displayed, hide the layout
+            if (unreadMessages.isEmpty()) {
+                messagesLayout.visibility = View.GONE
+            }
+
+            // Navigate to fragments tab
+            messagesLayout.setOnClickListener {
+                Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
+                        .navigate(R.id.messagesFromHomeAction)
+            }
+
         }
 
 

@@ -20,14 +20,11 @@ object CourseInfo {
      */
     fun getFullnameFromInternald(internalCourseId: String): String {
         // Get subject from course id
-        val subject = if (internalCourseId.contains("_"))
-            internalCourseId.substring(0, internalCourseId.indexOf("_"))
-        else internalCourseId
+        val subject = internalCourseId.substringBefore("_")
         // Get a map of full names
         val nameMap = Utility.parseStringArray(R.array.courseId_fullName)
         // Return map value if available, else subject
-        return if (nameMap.containsKey(subject)) nameMap.getValue(subject)
-        else subject.capitalize(Locale.getDefault())
+        return nameMap.getOrElse(subject, { subject.capitalize(Locale.getDefault()) })
     }
 
     /**
@@ -37,7 +34,7 @@ object CourseInfo {
         // Check if the provided id is in fact an internal one
         require(IdParser().getCourseIdType(courseId) == TYPE_INTERNAL)
         // Get subject from course id
-        val subject = courseId.substring(0, courseId.indexOf("_"))
+        val subject = courseId.substringBefore("_")
         // Get a map of short and full names
         val shortMap = Utility.parseStringArray(R.array.courseId_shortName_override)
         val nameMap = Utility.parseStringArray(R.array.courseId_fullName)

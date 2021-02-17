@@ -38,6 +38,7 @@ class RawParser {
             val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.GERMAN)
 
             // We'll need those below to construct our Change object
+            var dateString: String?
             var date: Date
             var internalId: String?
             var id_course_external: String? = null
@@ -54,10 +55,12 @@ class RawParser {
             // Extract every changes table, i.e. every available day
             for (panel in doc.select("div.panel:not(#menue_tag) div.panel-body")) {
                 // Parse date
-                // Substring: Only get "11.01.2021" from "Vertretungen am 11.01.2021" -> Chars 16-26
-                date = dateFormat.parse(
-                        panel.selectFirst("h3").text()
-                                .substring(16, 26))!!
+                // Only get "11.01.2021" from "Vertretungen am 11.01.2021" -> Chars 16-26
+                dateString = Regex("""\d{1,2}\.\d{1,2}\.\d{2,4}""")
+                        .find(panel.selectFirst("h3").text())?.value
+                date = if (dateString != null)
+                    dateFormat.parse(dateString)!!
+                else Date() // Use current date as fallback if no date was found
 
                 // We are left with a table, each row contains these columns:
                 // title (not needed), lessons (11 11 - 12), classname (Q34), old classname (Q34, mostly empty),

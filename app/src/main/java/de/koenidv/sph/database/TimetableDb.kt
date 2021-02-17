@@ -62,8 +62,21 @@ class TimetableDb private constructor() {
         // If there are no courses, return an empty list
         if (unorderedList.isNullOrEmpty()) return listOf()
         // Create a list for each day containing as many lesson lists as the timetable has maximum hours per day
-        val orderedList: List<List<MutableList<TimetableEntry>>> = List(5) { day: Int ->
-            List(unorderedList.filter { it.day == day }.maxOf { it.hour }) { mutableListOf() }
+        val orderedList: List<List<MutableList<TimetableEntry>>> = try {
+            List(5) { day: Int ->
+                List(try {
+                    // Get the maximum number of lessons for this day
+                    unorderedList.filter { it.day == day }.maxOf { it.hour }
+                } catch (nse: NoSuchElementException) {
+                    // If there are no lessons for this day
+                    0
+                }) {
+                    // Mutable list for each hour per day
+                    mutableListOf()
+                }
+            }
+        } catch (nse: NoSuchElementException) {
+            List(5) { listOf(mutableListOf()) }
         }
         // Map each lesson to the corresponding day / hour list
         unorderedList.map {
