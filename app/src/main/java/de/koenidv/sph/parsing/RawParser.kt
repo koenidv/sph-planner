@@ -263,7 +263,11 @@ class RawParser {
                         .replace("(?i)lk".toRegex(), "")
                 teacherId = entry.substring(Utility.ordinalIndexOf(entry, "<td>", 2))
                 teacherId = teacherId.substring(teacherId.indexOf("(") + 1, teacherId.indexOf(")")).toLowerCase(Locale.ROOT)
-                internalId = IdParser().getCourseIdWithSph(sphId, teacherId, entry.contains("(LK|PF)".toRegex()))
+                // Get an internal id from sph's sphid
+                internalId = IdParser().getCourseIdWithSph(
+                        sphId,
+                        teacherId,
+                        entry.toLowerCase(Locale.ROOT).contains("(lk|pf)".toRegex()))
 
                 courses.add(Course(
                         courseId = internalId,
@@ -272,7 +276,7 @@ class RawParser {
                         id_teacher = teacherId,
                         fullname = CourseInfo.getFullnameFromInternald(internalId),
                         isFavorite = true,
-                        isLK = entry.contains("(LK|PF)".toRegex()),
+                        isLK = entry.toLowerCase(Locale.ROOT).contains("(lk|pf)".toRegex()),
                         color = (nameColorMap[uniformNamedId.substring(0, uniformNamedId.indexOf(" "))]
                                 ?: nameColorMap["default"])!!.toColorInt()
                 ))
@@ -308,7 +312,7 @@ class RawParser {
             courseName = row.select("span.name").text()
             teacherId = row.select("span.teacher button")
                     .first().ownText().toLowerCase(Locale.ROOT)
-            isLK = courseName.contains("(LK|PF)".toRegex())
+            isLK = courseName.toLowerCase(Locale.ROOT).contains("(lk|pf|prfgk)".toRegex())
 
             // Add the course to the list
             courseToAdd = getCourseFromPostsoverviewData(courseName, teacherId, isLK, numberId, nameColorMap)
