@@ -93,7 +93,7 @@
     <!-- Spanish, Russian, Korean ? -->
     <string name="onboard_legal_privacy">Ich habe die  <a href="http://koenidv.de/sph/datenschutz">Datenschutzerklärung</a> gelesen, verstanden und stimme ihr zu.</string>
     <string name="timetable_personal_title">Dein Stundenplan</string>
-    <string name="timetable_personal_filter">Nur eigene Kurse zeigen</string>
+    <string name="timetable_personal_filter">Nur eigene Kurse</string>
     <string name="timetable_title">Stundenplan</string>
     <string name="attachments_title">Dateien &amp; Links</string>
     <string name="attachments_downloading_size">%s werden heruntergeladen</string>
@@ -198,7 +198,7 @@
     <string name="changes_date_past">Vergangen</string>
     <string name="placeholder_under_construction">🏗️\nIn Entwicklung</string>
     <string name="changes_none">👨‍🏫 Keine Vertretungen gefunden</string>
-    <string name="changes_filter">Nur eigene Vertretungen anzeigen</string>
+    <string name="changes_filter">Nur eigene Vertretungen</string>
     <string name="explore_collection_timetable">🗓️ Stundenplan</string>
     <string name="explore_collection_posts">📑️ Einträge</string>
     <string name="explore_collection_attachments">🖇️️ Dateien &amp; Links</string>
@@ -213,7 +213,7 @@
     <string name="tasks_date_info">Vom %s</string>
     <string name="tasks_filter_none_undone">Alle Aufgaben erledigt ✅</string>
     <string name="tasks_filter_none">Keine Aufgaben gefunden</string>
-    <string name="tasks_filter_undone">Nur offene Aufgaben zeigen</string>
+    <string name="tasks_filter_undone">Nur offene Aufgaben</string>
     <string name="tasks_personalized_title">Offene Aufgaben</string>
     <plurals name="tasks_personalized_more">
         <item quantity="one">Eine weitere offene Aufgabe</item>

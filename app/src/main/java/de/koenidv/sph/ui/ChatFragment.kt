@@ -65,6 +65,8 @@ class ChatFragment : Fragment() {
         adapter = ChatAdapter(messages, info)
         messagesRecycler.adapter = adapter
         layoutManager = messagesRecycler.layoutManager as LinearLayoutManager
+        // Make sure we are scrolled all the way down
+        layoutManager.scrollToPosition(messages.size)
 
         /*
          * Input

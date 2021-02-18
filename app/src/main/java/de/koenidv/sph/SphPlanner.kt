@@ -8,6 +8,7 @@ import com.androidnetworking.AndroidNetworking
 import com.facebook.stetho.Stetho
 import com.facebook.stetho.okhttp3.StethoInterceptor
 import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.remoteconfig.ktx.remoteConfig
 import com.google.gson.Gson
@@ -75,6 +76,9 @@ class SphPlanner : Application() {
 
         // Apply default remote configs
         Firebase.remoteConfig.setDefaultsAsync(R.xml.remote_config_defaults)
+
+        // Enable Crashlytics only in non-debug configuration
+        FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(!BuildConfig.DEBUG)
 
         // Initialize stetho for network debugging
         Stetho.initializeWithDefaults(this)
