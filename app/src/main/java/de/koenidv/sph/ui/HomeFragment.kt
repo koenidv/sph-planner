@@ -32,14 +32,13 @@ import de.koenidv.sph.networking.Tasks
 import de.koenidv.sph.objects.Attachment
 import de.koenidv.sph.objects.FunctionTile
 import de.koenidv.sph.objects.Post
-import de.koenidv.sph.objects.Task
 import de.koenidv.sph.parsing.Utility
 import java.util.*
 
 
 class HomeFragment : Fragment() {
 
-    private lateinit var tasks: MutableList<Task>
+    private lateinit var tasks: MutableList<Tasks.TaskData>
     private lateinit var tasksRecycler: RecyclerView
     private lateinit var tasksTitle: TextView
     private lateinit var tasksRecyclerLayout: LinearLayout
@@ -103,7 +102,7 @@ class HomeFragment : Fragment() {
                 }
 
                 // Add all new tasks to the top of the tasks list
-                val unreadTasks = TasksDb.getInstance().undone
+                val unreadTasks = TasksDb.getInstance().getUndoneData(false)
                 for (task in unreadTasks) {
                     if (!tasks.contains(task)) {
                         tasks.add(0, task)
@@ -122,13 +121,13 @@ class HomeFragment : Fragment() {
                 val postId = intent.getStringExtra("postId")
 
                 // If tasks list contains this, notify tasks aapter, else add it
-                val taskIndex = tasks.indexOfFirst { it.taskId == taskId }
+                val taskIndex = tasks.indexOfFirst { it.id == taskId }
                 if (taskIndex != -1) {
                     // Remove this task from the recycler
                     tasks.removeAt(taskIndex)
                     tasksRecycler.adapter?.notifyItemRemoved(taskIndex)
                 } else if (!intent.getBooleanExtra("isDone", true)) {
-                    val taskToAdd = TasksDb.getInstance().getByTaskId(taskId).firstOrNull()
+                    val taskToAdd = TasksDb.getInstance().getDataById(taskId, false)
                     if (taskToAdd != null) {
                         // Add task to the top of the list if it is not done and wasn't there before
                         tasks.add(0, taskToAdd)
@@ -209,15 +208,20 @@ class HomeFragment : Fragment() {
          * Timetable
          */
 
+
         val timetableLayout = view.findViewById<LinearLayout>(R.id.timetableLayout)
         val timetable = view.findViewById<FragmentContainerView>(R.id.timetableFragment)
         if (FunctionTilesDb.getInstance().supports(FunctionTile.FEATURE_TIMETABLE)) {
+            /*parentFragmentManager.beginTransaction()
+                    .add(R.id.timetableFragment, TimetableViewFragment())
+                    .commit()*/
             timetableLayout.setOnClickListener {
                 Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
                         .navigate(R.id.timetableFromHomeAction, null, null,
                                 FragmentNavigatorExtras(timetable to "timetable"))
             }
         } else timetableLayout.visibility = View.GONE
+
 
 
         /*
@@ -300,7 +304,7 @@ class HomeFragment : Fragment() {
 
         if (FunctionTilesDb.getInstance().supports(FunctionTile.FEATURE_COURSES)) {
 
-            tasks = TasksDb.getInstance().undone
+            tasks = TasksDb.getInstance().getUndoneData(false)
             var tasksOverflow = 0
             if (tasks.size > 6) {
                 tasksOverflow = tasks.size - 6
@@ -316,12 +320,12 @@ class HomeFragment : Fragment() {
                         6,
                         onClick = {
                             // Show single task bottom sheet
-                            TaskSheet(it).show(parentFragmentManager, "task")
+                            TaskSheet(it.id).show(parentFragmentManager, "task")
                         },
                         onTaskCheckedChanged = Tasks().onCheckedChanged(requireActivity()) { task, isDone ->
                             if (isDone) {
                                 // Update tasks dataset
-                                val index = tasks.indexOfFirst { it.taskId == task.taskId }
+                                val index = tasks.indexOfFirst { it.id == task.id }
                                 tasks.removeAt(index)
                                 tasksRecycler.adapter?.notifyItemRemoved(index)
                                 if (tasks.size < 6) (tasksRecycler.adapter as CompactTasksAdapter)

@@ -77,8 +77,9 @@ class SphPlanner : Application() {
         // Apply default remote configs
         Firebase.remoteConfig.setDefaultsAsync(R.xml.remote_config_defaults)
 
-        // Enable Crashlytics only in non-debug configuration
+        // Enable Crashlytics and Analytics only in non-debug configuration
         FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(!BuildConfig.DEBUG)
+        FirebaseAnalytics.getInstance(this).setAnalyticsCollectionEnabled(!BuildConfig.DEBUG)
 
         // Initialize stetho for network debugging
         Stetho.initializeWithDefaults(this)

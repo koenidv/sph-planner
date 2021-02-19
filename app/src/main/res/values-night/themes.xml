@@ -50,7 +50,7 @@
     </style>
 
     <style name="Theme.SPH.ModalStyle" parent="Widget.Design.BottomSheet.Modal">
-        <item name="android:background">@drawable/rounded_dialog</item>
+        <item name="android:background">@drawable/background_rounded_dialog</item>
     </style>
 
     <style name="Theme.SPH.ActionBar" parent="Widget.AppCompat.ActionBar">
