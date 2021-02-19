@@ -148,21 +148,21 @@ public class PostsDb {
         return count;
     }
 
+    protected Post cursorToPost(Cursor cursor) {
+        return new Post(
+                cursor.getString(0),
+                cursor.getString(1),
+                new Date(cursor.getInt(2) * 1000L),
+                cursor.getString(3),
+                cursor.getString(4),
+                cursor.getInt(5) == 1);
+    }
+
     private List<Post> getWithCursor(Cursor cursor) {
         List<Post> returnList = new ArrayList<>();
         if (cursor.moveToFirst()) {
             do {
-                String postId = cursor.getString(0);
-                String id_course = cursor.getString(1);
-                Date date = new Date(cursor.getInt(2) * 1000L);
-                String title = cursor.getString(3);
-                String description = cursor.getString(4);
-                boolean unread = cursor.getInt(5) == 1;
-
-                if (postId != null) {
-                    Post newPost = new Post(postId, id_course, date, title, description, unread);
-                    returnList.add(newPost);
-                }
+                returnList.add(cursorToPost(cursor));
             } while (cursor.moveToNext());
         }
         cursor.close();

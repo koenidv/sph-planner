@@ -19,6 +19,7 @@ import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.database.CoursesDb
 import de.koenidv.sph.database.TasksDb
+import de.koenidv.sph.networking.Tasks
 import de.koenidv.sph.objects.Task
 import de.koenidv.sph.parsing.Utility
 import java.text.SimpleDateFormat
@@ -30,7 +31,7 @@ class TasksAdapter(private val tasks: MutableList<Task>,
                    private val activity: Activity,
                    private val onDateClick: (postId: String) -> Unit,
                    private val onCourseClick: (courseId: String) -> Unit,
-                   private val onTaskCheckedChanged: (task: Task, isDone: Boolean) -> Unit) :
+                   private val onTaskCheckedChanged: (taskdata: Tasks.TaskData, isDone: Boolean) -> Unit) :
         RecyclerView.Adapter<TasksAdapter.ViewHolder>() {
 
     // Show a bottom sheet with options when long clicking a task
@@ -125,7 +126,7 @@ class TasksAdapter(private val tasks: MutableList<Task>,
     class ViewHolder(view: View,
                      onDateClick: (postId: String) -> Unit,
                      onCourseClick: (String) -> Unit,
-                     onTaskCheckedChanged: (task: Task, isDone: Boolean) -> Unit,
+                     onTaskCheckedChanged: (taskdata: Tasks.TaskData, isDone: Boolean) -> Unit,
                      onTaskLongClick: (Task, Int) -> Unit,
                      onDueClick: (Task, Int) -> Unit) : RecyclerView.ViewHolder(view) {
         private val layout = view.findViewById<ConstraintLayout>(R.id.taskLayout)
@@ -147,7 +148,9 @@ class TasksAdapter(private val tasks: MutableList<Task>,
             checkbox.setOnCheckedChangeListener { _, isChecked ->
                 if (checkboxset)
                     currentTask?.let {
-                        onTaskCheckedChanged(it, isChecked)
+                        onTaskCheckedChanged(
+                                Tasks.TaskData(it.taskId, it.description, it.isDone),
+                                isChecked)
                     }
             }
             layout.setOnLongClickListener {

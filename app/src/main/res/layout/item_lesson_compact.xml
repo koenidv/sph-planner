@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layout"
+    android:layout_width="64dp"
+    android:layout_height="64dp"
+    android:layout_marginEnd="8dp"
+    android:background="@drawable/background_circle"
+    android:foreground="?attr/selectableItemBackground"
+    android:gravity="center"
+    tools:backgroundTint="@color/purple_500">
+
+    <TextView
+        android:id="@+id/courseNameTextView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textColor="?attr/colorOnSurface"
+        app:autoSizeMaxTextSize="14sp"
+        app:autoSizeMinTextSize="8sp"
+        app:autoSizeTextType="uniform"
+        tools:text="Phy" />
+
+</LinearLayout>

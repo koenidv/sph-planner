@@ -38,7 +38,6 @@
 
             <androidx.fragment.app.FragmentContainerView
                 android:id="@+id/timetableFragment"
-                android:name="de.koenidv.sph.ui.TimetableViewFragment"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"

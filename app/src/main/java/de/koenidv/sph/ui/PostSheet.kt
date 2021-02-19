@@ -62,7 +62,7 @@ class PostSheet internal constructor(private val post: Post) : BottomSheetDialog
                         postsRecycler.adapter?.notifyItemChanged(0)
                     }
                 },
-                Tasks().onCheckedChanged(requireActivity(), CoursesDb.getInstance().getNumberId(post.id_course))
+                Tasks().onCheckedChanged(requireActivity())
         )
 
         titleLayout.setOnClickListener {

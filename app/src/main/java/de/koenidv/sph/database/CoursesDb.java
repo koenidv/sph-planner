@@ -416,7 +416,7 @@ public class CoursesDb {
     }
 
 
-    private Course cursorToCourse(Cursor cursor) {
+    protected Course cursorToCourse(Cursor cursor) {
         String CourseId = cursor.getString(0);
         String gmb_id = cursor.getString(1);
         String sph_id = cursor.getString(2);

@@ -11,15 +11,23 @@ import com.androidnetworking.interfaces.StringRequestListener
 import com.google.android.material.snackbar.Snackbar
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
-import de.koenidv.sph.database.CoursesDb
 import de.koenidv.sph.database.TasksDb
 import de.koenidv.sph.debugging.DebugLog
 import de.koenidv.sph.debugging.Debugger
-import de.koenidv.sph.objects.Task
 import de.koenidv.sph.ui.InfoSheet
 
 //  Created by koenidv on 31.01.2021.
 class Tasks {
+
+    class TaskData(
+            val id: String,
+            val description: String,
+            val isDone: Boolean,
+            val color: Int = 0,
+            val date: Long? = null,
+            val dueDate: Long? = null,
+            val isPinned: Boolean? = null,
+    )
 
     /**
      * Get a lambda to handle task checked changes in posts
@@ -27,23 +35,24 @@ class Tasks {
      */
     fun onCheckedChanged(
             activity: FragmentActivity,
-            courseNumberId: String? = null,
-            callback: ((Task, Boolean) -> Unit)? = null):
-            (task: Task, isDone: Boolean) -> Unit = { task, isDone ->
-        // Get the course's number id
-        val numberId = courseNumberId ?: CoursesDb.getInstance().getNumberId(task.id_course)
+            callback: ((TaskData, Boolean) -> Unit)? = null):
+            (TaskData, Boolean) -> Unit = { task, isDone ->
+
+        // Get the corresponding course and post
+        val course = TasksDb.getInstance().getCourseByTaskId(task.id)
+        val post = TasksDb.getInstance().getPostByTaskId(task.id)
 
         // Log checking task
         if (Debugger.DEBUGGING_ENABLED)
             DebugLog("Tasks", "Updating task checked status",
-                    bundleOf("taskId" to task.taskId,
-                            "courseId" to task.id_course,
-                            "numberId" to numberId,
+                    bundleOf("taskId" to task.id,
+                            "courseId" to course.courseId,
+                            "numberId" to course.number_id,
                             "isDone" to isDone)).log()
 
 
         // Mark the task as done
-        complete(numberId, task, isDone) {
+        complete(course.number_id, task.id, post.postId, isDone) {
             if (it == NetworkManager.SUCCESS) {
                 // Call back if function was specified
                 if (callback != null) callback(task, isDone)
@@ -60,8 +69,8 @@ class Tasks {
             // Send broadcast to update ui (remove from tasks list on home)
             val uiBroadcast = Intent("uichange")
             uiBroadcast.putExtra("content", "taskDone")
-            uiBroadcast.putExtra("taskId", task.taskId)
-            uiBroadcast.putExtra("postId", task.id_post)
+            uiBroadcast.putExtra("taskId", task.id)
+            uiBroadcast.putExtra("postId", post.postId)
             uiBroadcast.putExtra("isDone", isDone)
             LocalBroadcastManager.getInstance(SphPlanner.applicationContext()).sendBroadcast(uiBroadcast)
         }
@@ -79,23 +88,24 @@ class Tasks {
     /**
      * Mark a task as done in the db and send a post to sph to mark it as read there, too
      * @param numberId NumberId of the course the task belongs to
-     * @param task Task that should be marked as done
+     * @param taskId Task id that should be marked as done
+     * @param postId Id of the according post
      * @param isDone Whether the task is now done or not
      */
     // todo retry later on error
-    private fun complete(numberId: String?, task: Task, isDone: Boolean, callback: (success: Int) -> Unit) {
+    private fun complete(numberId: String?, taskId: String, postId: String, isDone: Boolean, callback: (success: Int) -> Unit) {
         // Mark as (un)done in the db
-        TasksDb.getInstance().setDone(task.taskId, isDone)
+        TasksDb.getInstance().setDone(taskId, isDone)
         // Mark as done on sph
         // Cancel potential pending requests for this same task, just to be sure
-        AndroidNetworking.cancel(task.taskId)
+        AndroidNetworking.cancel(taskId)
         // Only post to sph if we know the number id
         // May be null if it's a custom task, or for some weird reason that we don't know yet
         if (numberId != null) {
             // Log checking task
             if (Debugger.DEBUGGING_ENABLED)
                 DebugLog("Tasks", "Posting task update to sph",
-                        bundleOf("taskId" to task.taskId,
+                        bundleOf("taskId" to taskId,
                                 "numberId" to numberId,
                                 "isDone" to isDone)).log()
 
@@ -108,9 +118,9 @@ class Tasks {
                             SphPlanner.applicationContext().getString(R.string.url_mycourses))
                             .addBodyParameter("a", "sus_homeworkDone")
                             .addBodyParameter("id", numberId)
-                            .addBodyParameter("entry", task.id_post.substring(task.id_post.lastIndexOf("_") + 1))
+                            .addBodyParameter("entry", postId.substringAfterLast("_"))
                             .addBodyParameter("b", if (isDone) "done" else "undone")
-                            .setTag(task.taskId)
+                            .setTag(taskId)
                             .build()
                             .getAsString(object : StringRequestListener {
                                 override fun onResponse(response: String) {
