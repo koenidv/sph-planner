@@ -125,7 +125,7 @@ public class TasksDb {
         else optSelect = "";
         final SQLiteDatabase db = dbhelper.getReadableDatabase();
 
-        // Query posts
+        // Query tasks
         String queryString = "SELECT task_id, description, isdone, courses.color" + optSelect +
                 " FROM tasks LEFT JOIN courses ON id_course = course_id WHERE " + where +
                 " ORDER BY pinned DESC, dueDate IS NULL, dueDate ASC, date DESC";

@@ -8,31 +8,40 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner.Companion.applicationContext
-import de.koenidv.sph.database.AttachmentsDb
-import de.koenidv.sph.database.CoursesDb
-import de.koenidv.sph.database.TasksDb
-import de.koenidv.sph.objects.Post
 import de.koenidv.sph.parsing.Utility
+import java.util.*
 
 
 //  Created by koenidv on 20.12.2020.
-class CompactPostsAdapter(private val posts: List<Post>,
+class CompactPostsAdapter(private val postData: List<PostData>,
                           private var maxSize: Int? = null,
-                          private val onClick: (Post, View) -> Unit) :
+                          private val onClick: (PostData, View) -> Unit) :
         RecyclerView.Adapter<CompactPostsAdapter.ViewHolder>() {
+
+    class PostData(
+            val id: String,
+            val courseName: String,
+            val title: String?,
+            val description: String?,
+            val attachmentCount: Int,
+            var unread: Boolean,
+            val color: Int,
+            val taskDone: Boolean?,
+            val date: Date
+    )
 
     /**
      * Provides a reference to the type of view
      * (custom ViewHolder).
      */
-    class ViewHolder(view: View, onClick: (Post, View) -> Unit) : RecyclerView.ViewHolder(view) {
+    class ViewHolder(view: View, onClick: (PostData, View) -> Unit) : RecyclerView.ViewHolder(view) {
         private val layout = view.findViewById<ConstraintLayout>(R.id.postLayout)
         private val title = view.findViewById<TextView>(R.id.titleTextView)
         private val unread = view.findViewById<TextView>(R.id.unreadTextView)
         private val course = view.findViewById<TextView>(R.id.courseTextView)
         private val attachs = view.findViewById<TextView>(R.id.attachmentsTextView)
         private val task = view.findViewById<TextView>(R.id.taskTextView)
-        private var currentPost: Post? = null
+        private var currentPost: PostData? = null
 
         init {
             layout.setOnClickListener {
@@ -42,29 +51,28 @@ class CompactPostsAdapter(private val posts: List<Post>,
             }
         }
 
-        fun bind(post: Post) {
+        fun bind(post: PostData) {
             currentPost = post
-
-            val taskDone: Boolean? = TasksDb.getInstance().taskDoneByPost(post.postId)
-            val attachCount = AttachmentsDb.countForPost(post.postId)
 
             // Set data
             title.text = post.title ?: post.description
                     ?: applicationContext().getString(R.string.posts_no_text)
 
-            course.text = CoursesDb.getInstance().getFullname(post.id_course)
+            course.text = post.courseName
 
             if (post.unread) unread.visibility = View.VISIBLE
             else unread.visibility = View.GONE
 
-            if (attachCount > 0) {
+            if (post.attachmentCount > 0) {
                 attachs.visibility = View.VISIBLE
-                attachs.text = applicationContext().resources.getQuantityString(R.plurals.posts_info_attachments, attachCount, attachCount)
+                attachs.text = applicationContext().resources.getQuantityString(
+                        R.plurals.posts_info_attachments,
+                        post.attachmentCount, post.attachmentCount)
             } else attachs.visibility = View.GONE
-            if (taskDone != null) {
+            if (post.taskDone != null) {
                 task.visibility = View.VISIBLE
                 val color: Int
-                if (taskDone) {
+                if (post.taskDone) {
                     task.text = applicationContext().getString(R.string.posts_info_task_done)
                     // todo use theme color
                     //color = Utility().getThemedColor(R.attr.tagBackground)
@@ -79,7 +87,7 @@ class CompactPostsAdapter(private val posts: List<Post>,
 
             // Adjust course background color
             // Set background color, about 70% opacity
-            Utility.tintBackground(course, CoursesDb.getInstance().getColor(post.id_course), 0xb4000000.toInt())
+            Utility.tintBackground(course, post.color, 0xb4000000.toInt())
 
         }
     }
@@ -95,13 +103,13 @@ class CompactPostsAdapter(private val posts: List<Post>,
     // Replaces the contents of a view (invoked by the layout manager)
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
         // Bind data to ViewHolder
-        viewHolder.bind(posts[position])
+        viewHolder.bind(postData[position])
     }
 
     // Return the size of your dataset (invoked by the layout manager)
     override fun getItemCount() =
-            if (maxSize != null && maxSize!! <= posts.size)
-                maxSize!! else posts.size
+            if (maxSize != null && maxSize!! <= postData.size)
+                maxSize!! else postData.size
 
     override fun getItemId(position: Int): Long {
         // This will in almost all cases show distinct items,
@@ -114,7 +122,7 @@ class CompactPostsAdapter(private val posts: List<Post>,
     }
 
     fun setMaxSize(size: Int?) {
-        val postsSize = posts.size
+        val postsSize = postData.size
         val prevMaxSize = maxSize ?: postsSize
         maxSize = size
         if (size ?: postsSize > prevMaxSize)

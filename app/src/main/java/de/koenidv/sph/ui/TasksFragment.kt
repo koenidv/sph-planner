@@ -19,7 +19,6 @@ import com.google.android.material.switchmaterial.SwitchMaterial
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.adapters.TasksAdapter
-import de.koenidv.sph.database.PostsDb
 import de.koenidv.sph.database.TasksDb
 import de.koenidv.sph.networking.Tasks
 import de.koenidv.sph.objects.Task
@@ -121,9 +120,7 @@ class TasksFragment : Fragment() {
                 requireActivity(),
                 onDateClick = {
                     // Show single post bottom sheet
-                    PostSheet(
-                            PostsDb.getInstance().getByPostId(it)
-                    ).show(parentFragmentManager, "post")
+                    PostSheet(it).show(parentFragmentManager, "post")
                 },
                 onCourseClick = {
                     Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)

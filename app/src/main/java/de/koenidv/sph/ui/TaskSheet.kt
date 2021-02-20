@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import de.koenidv.sph.R
 import de.koenidv.sph.adapters.TasksAdapter
-import de.koenidv.sph.database.PostsDb
 import de.koenidv.sph.database.TasksDb
 import de.koenidv.sph.networking.Tasks
 
@@ -33,9 +32,7 @@ class TaskSheet internal constructor(private val taskId: String) : BottomSheetDi
                 onDateClick = {
                     // Show single post bottom sheet
                     dismiss()
-                    PostSheet(
-                            PostsDb.getInstance().getByPostId(it)
-                    ).show(parentFragmentManager, "post")
+                    PostSheet(it).show(parentFragmentManager, "post")
                 },
                 onCourseClick = {
                     dismiss()

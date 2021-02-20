@@ -13,7 +13,6 @@ import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.adapters.CompactPostsAdapter
 import de.koenidv.sph.database.PostsDb
 import de.koenidv.sph.database.TasksDb
-import de.koenidv.sph.objects.Post
 
 
 // Created by koenidv on 18.12.2020.
@@ -33,7 +32,8 @@ class AllPostsFragment(private var filters: MutableList<String> = mutableListOf(
         val filterText = view.findViewById<TextView>(R.id.filterPostsTextView)
         val postsRecycler = view.findViewById<RecyclerView>(R.id.postsRecycler)
         val noDataText = view.findViewById<TextView>(R.id.noDataTextView)
-        val postsUnfiltered = PostsDb.getInstance().allOrderedByUnread
+        val postsUnfiltered = PostsDb.getInstance().getData("1 = 1",
+                "ORDER BY posts.unread DESC, posts.date DESC")
         val posts = postsUnfiltered.toMutableList()
 
         // Filter posts function
@@ -47,7 +47,7 @@ class AllPostsFragment(private var filters: MutableList<String> = mutableListOf(
                 else if (filters.contains("read") && it.unread) remove = true
                 if (filterTask) {
                     // Filter for tasks
-                    val taskDone: Boolean? = TasksDb.getInstance().taskDoneByPost(it.postId)
+                    val taskDone: Boolean? = TasksDb.getInstance().taskDoneByPost(it.id)
                     when {
                         filters.contains("task_none") && taskDone != null -> remove = true
                         filters.contains("task_any") && taskDone == null -> remove = true
@@ -71,13 +71,13 @@ class AllPostsFragment(private var filters: MutableList<String> = mutableListOf(
         if (filters.isNotEmpty()) filter()
 
         // Set up posts recycler with all posts
-        val adapter = CompactPostsAdapter(posts) { post: Post, itemview: View ->
+        val adapter = CompactPostsAdapter(posts) { post: CompactPostsAdapter.PostData, itemview: View ->
             // Show single post bottom sheet
-            PostSheet(post).show(parentFragmentManager, "post")
+            PostSheet(post.id).show(parentFragmentManager, "post")
             // Remove unread indicator and mark as read
             if (post.unread) {
                 itemview.findViewById<TextView>(R.id.unreadTextView).visibility = View.GONE
-                PostsDb.getInstance().markAsRead(post.postId)
+                PostsDb.getInstance().markAsRead(post.id)
             }
         }
         adapter.setHasStableIds(true)
