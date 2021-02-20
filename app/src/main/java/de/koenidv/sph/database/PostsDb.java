@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import de.koenidv.sph.adapters.CompactPostsAdapter;
 import de.koenidv.sph.objects.Post;
 
 public class PostsDb {
@@ -81,6 +82,52 @@ public class PostsDb {
         Cursor cursor = db.rawQuery(queryString, null);
         // Get posts with the cursor
         return getWithCursor(cursor);
+    }
+
+    /**
+     * Get posts data as CompactPostsAdapter.PostData
+     */
+    public List<CompactPostsAdapter.PostData> getData(String where) {
+        return getData(where, "ORDER BY posts.date DESC");
+    }
+
+    /**
+     * Get posts data as CompactPostsAdapter.PostData
+     */
+    public List<CompactPostsAdapter.PostData> getData(String where, String appendQuery) {
+        // Query posts
+        String queryString = "SELECT post_id, fullname, title, posts.description, COUNT(files.attachment_id) + COUNT(links.attachment_id), unread, color, isdone, posts.date" +
+                " FROM posts LEFT JOIN courses ON posts.id_course = course_id" +
+                " LEFT JOIN fileAttachments files ON post_id = files.id_post" +
+                " LEFT JOIN linkAttachments links ON post_id = links.id_post" +
+                " LEFT JOIN tasks ON post_id = tasks.id_post" +
+                " WHERE " + where +
+                " GROUP BY post_id " + appendQuery;
+        Cursor cursor = dbhelper.getReadableDatabase().rawQuery(queryString, null);
+        List<CompactPostsAdapter.PostData> list = new ArrayList<>();
+
+        // If cursor is empty, return empty list
+        if (!cursor.moveToFirst()) {
+            cursor.close();
+            return list;
+        }
+
+        do {
+            list.add(new CompactPostsAdapter.PostData(
+                    cursor.getString(0),
+                    cursor.getString(1),
+                    cursor.getString(2),
+                    cursor.getString(3),
+                    cursor.getInt(4),
+                    cursor.getInt(5) == 1,
+                    cursor.getInt(6),
+                    cursor.getInt(7) == 1,
+                    new Date(cursor.getInt(8) * 1000L)
+            ));
+        } while (cursor.moveToNext());
+
+        cursor.close();
+        return list;
     }
 
 

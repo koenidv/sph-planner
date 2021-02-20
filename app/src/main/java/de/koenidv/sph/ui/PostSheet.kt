@@ -19,13 +19,13 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import de.koenidv.sph.R
 import de.koenidv.sph.adapters.PostsAdapter
 import de.koenidv.sph.database.CoursesDb
+import de.koenidv.sph.database.PostsDb
 import de.koenidv.sph.networking.AttachmentManager
 import de.koenidv.sph.networking.Tasks
 import de.koenidv.sph.objects.Attachment
-import de.koenidv.sph.objects.Post
 
 //  Created by koenidv on 29.12.2020.
-class PostSheet internal constructor(private val post: Post) : BottomSheetDialogFragment() {
+class PostSheet internal constructor(private val id: String) : BottomSheetDialogFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val view: View = inflater.inflate(R.layout.sheet_post, container, false)
@@ -34,6 +34,9 @@ class PostSheet internal constructor(private val post: Post) : BottomSheetDialog
         val courseTextView = view.findViewById<TextView>(R.id.courseTextView)
         val postsRecycler = view.findViewById<RecyclerView>(R.id.postsRecycler)
         val doneButton = view.findViewById<Button>(R.id.doneButton)
+
+        // Get post
+        val post = PostsDb.getInstance().getByPostId(id)
 
         // Set course text
         courseTextView.text = CoursesDb.getInstance().getFullname(post.id_course)
