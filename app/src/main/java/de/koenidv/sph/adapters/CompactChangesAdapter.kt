@@ -64,7 +64,7 @@ class CompactChangesAdapter(private val changes: List<Change>,
                         Change.TYPE_EXAM -> R.string.changes_template_exam
                         else -> R.string.changes_template_other
                     })
-                    .replace("%name", CoursesDb.getInstance().getFullname(change.id_course) ?: "?")
+                    .replace("%name", CoursesDb.getFullname(change.id_course!!) ?: "?")
                     .replace("%substitute", (change.id_subsTeacher
                             ?: "?").capitalize(Locale.getDefault()))
                     .replace("%room", change.room ?: "?")
@@ -95,10 +95,10 @@ class CompactChangesAdapter(private val changes: List<Change>,
             }
 
             // Set course
-            course.text = CoursesDb.getInstance().getFullname(change.id_course)
+            course.text = CoursesDb.getFullname(change.id_course!!)
             // Adjust course background color
             // Set background color, about 70% opacity
-            Utility.tintBackground(course, CoursesDb.getInstance().getColor(change.id_course), 0xb4000000.toInt())
+            Utility.tintBackground(course, CoursesDb.getColor(change.id_course!!), 0xb4000000.toInt())
 
             // Set lessons
             @SuppressLint("SetTextI18n")

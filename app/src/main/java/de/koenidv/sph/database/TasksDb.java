@@ -175,7 +175,7 @@ public class TasksDb {
             return null;
         }
 
-        Course course = CoursesDb.getInstance().cursorToCourse(cursor);
+        Course course = CoursesDb.INSTANCE.cursorToCourse(cursor);
         cursor.close();
         return course;
     }

@@ -84,7 +84,7 @@ class TasksAdapter(private val tasks: MutableList<Task>,
             sheet.dismiss()
             // Share task description as plaintext
             val text = SphPlanner.applicationContext().getString(R.string.tasks_share_template)
-                    .replace("%course", CoursesDb.getInstance().getFullname(task.id_course))
+                    .replace("%course", CoursesDb.getFullname(task.id_course).toString())
                     .replace("%description", task.description)
             val sendIntent: Intent = Intent().apply {
                 action = Intent.ACTION_SEND
@@ -245,10 +245,10 @@ class TasksAdapter(private val tasks: MutableList<Task>,
             }
 
             // Set course
-            course.text = CoursesDb.getInstance().getFullname(task.id_course)
+            course.text = CoursesDb.getFullname(task.id_course)
             // Adjust course background color
             // Set background color, about 70% opacity
-            Utility.tintBackground(course, CoursesDb.getInstance().getColor(task.id_course), 0xb4000000.toInt())
+            Utility.tintBackground(course, CoursesDb.getColor(task.id_course), 0xb4000000.toInt())
 
             // Tint background with theme color at 15% if task is pinned
             if (task.isPinned)

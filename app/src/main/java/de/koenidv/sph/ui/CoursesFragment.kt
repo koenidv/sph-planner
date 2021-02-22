@@ -55,7 +55,7 @@ class CoursesFragment : Fragment() {
         coursesRecycler = view.findViewById(R.id.coursesRecycler)
 
         // Get favorite courses and sort by isLK and fullname
-        courses = CoursesDb.getInstance().favorites.sortedBy { it.fullname }.sortedByDescending { it.isLK }
+        courses = CoursesDb.getFavorites().sortedBy { it.fullname }.sortedByDescending { it.isLK }
         // Set up courses recycler
         val coursesAdapter = CoursesAdapter(courses.toMutableList(), requireActivity()) {
             Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)

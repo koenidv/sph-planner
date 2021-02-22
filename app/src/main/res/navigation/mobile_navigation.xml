@@ -20,10 +20,10 @@
         <action
             android:id="@+id/overviewFromHomeAction"
             app:destination="@id/frag_course_overview"
-            app:enterAnim="@anim/nav_default_enter_anim"
-            app:exitAnim="@anim/nav_default_exit_anim"
-            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
-            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+            app:enterAnim="@anim/enter_from_right"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/exit_to_right" />
         <action
             android:id="@+id/allPostsFromHomeAction"
             app:destination="@id/frag_allposts"
@@ -258,13 +258,17 @@
     <action
         android:id="@+id/overviewAction"
         app:destination="@id/frag_course_overview"
-        app:enterAnim="@anim/popup_enter"
-        app:exitAnim="@anim/popup_exit" />
+        app:enterAnim="@anim/enter_from_right"
+        app:exitAnim="@anim/fade_out"
+        app:popEnterAnim="@anim/fade_in"
+        app:popExitAnim="@anim/exit_to_right" />
     <action
         android:id="@+id/webviewAction"
         app:destination="@id/frag_webview"
-        app:enterAnim="@anim/popup_enter"
-        app:exitAnim="@anim/popup_exit" />
+        app:enterAnim="@anim/enter_from_right"
+        app:exitAnim="@anim/fade_out"
+        app:popEnterAnim="@anim/fade_in"
+        app:popExitAnim="@anim/exit_to_right" />
     <fragment
         android:id="@+id/frag_users"
         android:name="de.koenidv.sph.ui.UsersFragment"

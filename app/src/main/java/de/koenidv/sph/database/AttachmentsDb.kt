@@ -5,8 +5,8 @@ import de.koenidv.sph.objects.Attachment
 //  Created by koenidv on 29.12.2020.
 object AttachmentsDb {
 
-    val files = FileAttachmentsDb.getInstance()
-    val links = LinkAttachmentsDb.getInstance()
+    val files: FileAttachmentsDb = FileAttachmentsDb.getInstance()
+    val links: LinkAttachmentsDb = LinkAttachmentsDb.getInstance()
 
     /**
      * Get the count of file and link attachments for a post

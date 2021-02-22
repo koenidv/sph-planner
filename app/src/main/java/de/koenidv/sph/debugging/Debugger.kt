@@ -142,7 +142,7 @@ object Debugger {
         logs.add(DebugLog("Debugger",
                 "Started logging",
                 bundleOf("school" to prefs.getString("schoolid", "0"),
-                        "gmbIdExample" to CoursesDb.getInstance().gmbIdExample)))
+                        "gmbIdExample" to CoursesDb.getGmbIdExample())))
     }
 
 

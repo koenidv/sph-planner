@@ -57,7 +57,7 @@ class CoursesAdapter(private val courses: MutableList<Course>,
                         allowCustomArgb = true) { _: MaterialDialog, color: Int ->
 
                     // Save color to db
-                    CoursesDb.getInstance().setColor(course.courseId, color)
+                    CoursesDb.setColor(course.courseId, color)
                     // Update dataset and recycler
                     course.color = color
                     courses[position] = course
