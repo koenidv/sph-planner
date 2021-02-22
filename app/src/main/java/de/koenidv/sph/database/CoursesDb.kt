@@ -9,6 +9,8 @@ import java.util.*
 //  Created by koenidv on 22.02.2021.
 object CoursesDb {
 
+    var colorCache = mutableMapOf<String, Int>()
+
     private val dbhelper = DatabaseHelper.getInstance()
 
     /**
@@ -82,18 +84,7 @@ object CoursesDb {
         val cursor = db.rawQuery(queryString, null)
         if (cursor.moveToFirst()) {
             do {
-                val newCourse = Course(
-                        cursor.getString(0),
-                        cursor.getString(1),
-                        cursor.getString(2),
-                        cursor.getString(3),
-                        cursor.getString(4),
-                        cursor.getString(5),
-                        cursor.getString(6),
-                        cursor.getInt(7) == 1,
-                        cursor.getInt(8) == 1,
-                        cursor.getInt(9))
-                returnList.add(newCourse)
+                returnList.add(cursorToCourse(cursor))
             } while (cursor.moveToNext())
         }
         cursor.close()
@@ -293,11 +284,20 @@ object CoursesDb {
      * @return Its color als color int
      */
     fun getColor(internalId: String): Int {
-        val cursor = dbhelper.readableDatabase.rawQuery("SELECT color FROM courses WHERE course_id=\"" + internalId.toLowerCase(Locale.ROOT) + "\"", null)
-        if (!cursor.moveToFirst()) return 0
-        val color = cursor.getInt(0)
-        cursor.close()
-        return color
+        if (colorCache.containsKey(internalId)) {
+            // Try to get the course's color from cache
+            return colorCache[internalId]!!
+        } else {
+            val cursor = dbhelper.readableDatabase.rawQuery("SELECT color FROM courses WHERE course_id=\"" + internalId.toLowerCase(Locale.ROOT) + "\"", null)
+            // If query returned nothing, return 0
+            if (!cursor.moveToFirst()) return 0
+            // Get color and close cursor
+            val color = cursor.getInt(0)
+            cursor.close()
+            // Update cache
+            colorCache[internalId] = color
+            return color
+        }
     }
 
     /**
@@ -309,7 +309,9 @@ object CoursesDb {
     fun setColor(internalId: String, color: Int) {
         dbhelper.writableDatabase.execSQL("UPDATE courses SET color=\""
                 + color + "\" WHERE course_id = \"" + internalId + "\"")
-        CacheManager().invalidateCourseColors()
+        // Update cache
+        // Instead of using: CacheManager().invalidateCourseColors()
+        colorCache[internalId] = color
     }
 
     /**
@@ -357,17 +359,17 @@ object CoursesDb {
      * Get a course from a coursor pointing at courses.*
      */
     fun cursorToCourse(cursor: Cursor): Course {
-        val courseId = cursor.getString(0)
-        val gmbId = cursor.getString(1)
-        val sphId = cursor.getString(2)
-        val namedId = cursor.getString(3)
-        val numberId = cursor.getString(4)
-        val fullname = cursor.getString(5)
-        val idTeacher = cursor.getString(6)
-        val isFavorite = cursor.getInt(7) == 1
-        val isLK = cursor.getInt(8) == 1
-        val color = cursor.getInt(9)
-        return Course(courseId, gmbId, sphId, namedId, numberId, fullname, idTeacher, isFavorite, isLK, color)
+        return Course(
+                cursor.getString(0),
+                cursor.getString(1),
+                cursor.getString(2),
+                cursor.getString(3),
+                cursor.getString(4),
+                cursor.getString(5),
+                cursor.getString(6),
+                cursor.getInt(7) == 1,
+                cursor.getInt(8) == 1,
+                cursor.getInt(9))
     }
 }
 

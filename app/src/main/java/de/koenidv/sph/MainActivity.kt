@@ -30,6 +30,7 @@ import com.google.android.play.core.install.model.UpdateAvailability
 import com.google.android.play.core.tasks.Task
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import de.koenidv.sph.SphPlanner.Companion.prefs
+import de.koenidv.sph.database.CacheManager
 import de.koenidv.sph.database.ChangesDb
 import de.koenidv.sph.database.FunctionTilesDb
 import de.koenidv.sph.debugging.Debugger
@@ -269,7 +270,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        SphPlanner.saveCache()
+        // Save current cache values
+        CacheManager.save()
         super.onSaveInstanceState(outState)
     }
 
