@@ -25,11 +25,11 @@ class IdParser {
      * @return Internal id for this course
      */
     fun getCourseIdWithGmb(courseGmbId: String, teacherId: String, forceNewId: Boolean = false, allCourses: List<Course>? = null): String {
-        val courseDb = CoursesDb.getInstance()
+        val courseDb = CoursesDb
 
         if (!forceNewId) {
             // We need to use courseGmbId here as gmb ids are stored unmodified (except for case)
-            val existingCourseId = CoursesDb.getInstance().getCourseIdByGmbId(
+            val existingCourseId = CoursesDb.getCourseIdByGmbId(
                     courseGmbId.toLowerCase(Locale.ROOT))
             if (existingCourseId != null) return existingCourseId
         }
@@ -51,7 +51,7 @@ class IdParser {
         var coursesWithSameId: List<Course>
         // Get courses with same subject from dataset or database
         coursesWithSameId = allCourses?.filter { it.courseId.startsWith(classType + "_") }
-                ?: CoursesDb.getInstance().getByInternalPrefix(classType + "_")
+                ?: CoursesDb.getByInternalPrefix(classType + "_")
         coursesWithSameId = coursesWithSameId.filter { it.isLK == gmbId.contains("lk") }
         var checkForNewIndex = coursesWithSameId.isNotEmpty()
         var courseToCheck: Course
@@ -88,7 +88,7 @@ class IdParser {
      * Get an existing internal id for a gmb id, without a teacher
      */
     fun getCourseIdWithGmb(courseGmbId: String): String? =
-            CoursesDb.getInstance().getCourseIdByGmbId(
+            CoursesDb.getCourseIdByGmbId(
                     courseGmbId.toLowerCase(Locale.ROOT)
             )
 
@@ -101,7 +101,7 @@ class IdParser {
      * @return Internal id for this course
      */
     fun getCourseIdWithSph(courseSphId: String, teacherId: String, isLK: Boolean?, allCourses: List<Course>? = null): String {
-        val courseDb = CoursesDb.getInstance()
+        val courseDb = CoursesDb
 
         // Extract some useful information from the external course id
         val values = Regex("""([A-Z]{1,8})(?:[a-zäöü]+)?(\d{2,3})""").find(courseSphId.replace("-", ""))!!.groupValues
@@ -115,9 +115,9 @@ class IdParser {
         // The list should only contain 0 or 1 elements (unique id)
         // Apart from classType and teacherId, isLK is the only property we can trust
         if (filteredCourses.firstOrNull() != null) {
-            if (isLK != null && filteredCourses[0].isLK == isLK) {
+            if (isLK != null && filteredCourses[0]?.isLK == isLK) {
                 return classType + "_" + teacherId.toLowerCase(Locale.ROOT) + "_" + sphIndex
-            } else if (isLK == null || filteredCourses[0].isLK == null) {
+            } else if (isLK == null || filteredCourses[0]?.isLK == null) {
                 // Just assume it's correct if nothing is specified for isLK
                 return classType + "_" + teacherId.toLowerCase(Locale.ROOT) + "_" + sphIndex
             }
@@ -127,13 +127,13 @@ class IdParser {
         // Check if there's a matching course with any index
         filteredCourses = allCourses?.filter { it.courseId == classType + "_" + teacherId.toLowerCase(Locale.ROOT) + "_" }
                 ?: courseDb.getByInternalPrefix(classType + "_" + teacherId.toLowerCase(Locale.ROOT) + "_")
-        if (isLK != null) filteredCourses = filteredCourses.filter { it.isLK == isLK }
+        if (isLK != null) filteredCourses = filteredCourses.filter { it?.isLK == isLK }
 
         // If there are multiple courses with the same subject by the same teacher which are all LK/GK,
         // there's no way for us to know which one is meant
         // Therefore we'll just return the first one and hope for the best
         // todo Ask user if course assignment is too vague
-        if (filteredCourses.isNotEmpty()) return filteredCourses[0].courseId
+        if (filteredCourses.isNotEmpty()) return filteredCourses[0]!!.courseId
 
         // If a matching course hasn't been seen before, we'll create a new id
         // Check if there are any courses with the same prefix and use the next index

@@ -127,7 +127,7 @@ class SphPlanner : Application() {
                 // Log an school course id example to GA
                 analytics.setUserProperty(
                         "courseIdExample",
-                        CoursesDb.getInstance().gmbIdExample)
+                        CoursesDb.getGmbIdExample())
 
                 // Attachments were moved to files/attachments/
                 // Delete all attachments in the old directory, but keep Firebase files

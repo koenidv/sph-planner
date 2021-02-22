@@ -39,17 +39,17 @@ class PostSheet internal constructor(private val id: String) : BottomSheetDialog
         val post = PostsDb.getInstance().getByPostId(id)
 
         // Set course text
-        courseTextView.text = CoursesDb.getInstance().getFullname(post.id_course)
+        courseTextView.text = CoursesDb.getFullname(post.id_course)
         // Adjust course background color
         // Set background color, about 70% opacity
         val opacity: Int = 0xb4000000.toInt()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             (courseTextView.background as StateListDrawable).colorFilter = BlendModeColorFilter(
-                    CoursesDb.getInstance().getColor(post.id_course) and 0x00FFFFFF or opacity, BlendMode.SRC_ATOP)
+                    CoursesDb.getColor(post.id_course) and 0x00FFFFFF or opacity, BlendMode.SRC_ATOP)
         } else {
             @Suppress("DEPRECATION") // not in < Q
             (courseTextView.background as StateListDrawable).setColorFilter(
-                    CoursesDb.getInstance().getColor(post.id_course) and 0x00FFFFFF or opacity, PorterDuff.Mode.SRC_ATOP)
+                    CoursesDb.getColor(post.id_course) and 0x00FFFFFF or opacity, PorterDuff.Mode.SRC_ATOP)
         }
 
         postsRecycler.adapter = PostsAdapter(

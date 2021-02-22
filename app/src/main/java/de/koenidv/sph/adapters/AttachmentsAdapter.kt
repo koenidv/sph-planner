@@ -77,7 +77,7 @@ class AttachmentsAdapter(private var attachments: List<Attachment>,
 
             // Show course color if wanted
             if (showCourse) {
-                Utility.tintBackground(layout, CoursesDb.getInstance().getColor(attachment.courseId()), 0x26000000)
+                Utility.tintBackground(layout, CoursesDb.getColor(attachment.courseId()), 0x26000000)
             }
         }
     }

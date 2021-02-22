@@ -235,11 +235,11 @@ class OnboardingSupportlistFragment : Fragment() {
                                     // Log an school course id example to GA
                                     analytics.setUserProperty(
                                             "courseIdExample",
-                                            CoursesDb.getInstance().gmbIdExample)
+                                            CoursesDb.getGmbIdExample())
                                     if (Debugger.DEBUGGING_ENABLED)
                                         DebugLog("FeaturesFrag",
                                                 "EXAMPLE GMBID: " +
-                                                        CoursesDb.getInstance().gmbIdExample,
+                                                        CoursesDb.getGmbIdExample(),
                                                 type = Debugger.LOG_TYPE_VAR)
                                                 .log()
                                     // Log conversion to GA
