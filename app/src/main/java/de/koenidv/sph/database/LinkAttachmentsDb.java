@@ -53,7 +53,8 @@ public class LinkAttachmentsDb {
         if (cursor.getCount() == 0) {
             db.insert("linkAttachments", null, cv);
         } else {
-            // Don't update pinned attribute
+            // Don't update pinned attribute or nane
+            cv.remove("name");
             cv.remove("pinned");
             db.update("linkAttachments", cv, "attachment_id = \"" + postlink.getAttachmentId() + "\"", null);
         }
