@@ -289,7 +289,7 @@ class Cryption {
      * @param callback Callback when decryption is complete
      */
     private fun decrypt(data: String, secret: String, callback: (decrypted: String?) -> Unit) {
-        val dataJs = data.replace("\\", "")
+        val dataJs = data.replace("\\\\", "")
         execute("decrypt", arrayOf(dataJs, secret), callback)
     }
 
@@ -300,8 +300,7 @@ class Cryption {
      * @param callback Callback when encryption is complete
      */
     private fun encrypt(data: String, secret: String, callback: (encrypted: String?) -> Unit) {
-        val dataJs = data.replace("\\", "")
-        execute("encrypt", arrayOf(dataJs, secret), callback)
+        execute("encrypt", arrayOf(data, secret), callback)
     }
 
     /**
