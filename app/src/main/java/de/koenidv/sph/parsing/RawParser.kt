@@ -104,7 +104,8 @@ class RawParser {
                                     "EVA", "Eigenverantwortliches Arbeiten" -> Change.TYPE_EVA
                                     "Entfall" -> Change.TYPE_CANCELLED
                                     "Freisetzung" -> Change.TYPE_FREED
-                                    "Vertretung", "Statt-Vertretung" -> Change.TYPE_SUBSTITUTE
+                                    "Vertretung", "Statt-Vertretung",
+                                    "Vertr.", "Vertr" -> Change.TYPE_SUBSTITUTE
                                     "Betreuung" -> Change.TYPE_CARE
                                     "Raum", "Raumwechsel" -> Change.TYPE_ROOM
                                     "Verlegung", "Tausch" -> Change.TYPE_SWITCHED
