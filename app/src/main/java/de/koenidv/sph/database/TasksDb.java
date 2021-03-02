@@ -8,6 +8,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import de.koenidv.sph.networking.Tasks.TaskData;
+import de.koenidv.sph.objects.Course;
+import de.koenidv.sph.objects.Post;
 import de.koenidv.sph.objects.Task;
 
 public class TasksDb {
@@ -94,6 +97,105 @@ public class TasksDb {
         Cursor cursor = db.rawQuery(queryString, null);
         // Get posts with the cursor
         return getWithCursor(cursor);
+    }
+
+    /**
+     * Get undone tasks data
+     */
+    public List<TaskData> getUndoneData(boolean optionalValues) {
+        return getData(optionalValues, "isdone=0");
+    }
+
+    /**
+     * Get tasks data by task id
+     */
+    public TaskData getDataById(String id, boolean optionalValues) {
+        List<TaskData> tasks = getData(optionalValues, "taskid=\"" + id + "\"");
+        if (tasks.size() > 0) return tasks.get(0);
+        else return null;
+    }
+
+    /**
+     * Gets tasks data as Tasks.TaskData
+     */
+    public List<TaskData> getData(boolean optionalValues, String where) {
+        // Optional values
+        String optSelect;
+        if (optionalValues) optSelect = ", date, duedate, pinned";
+        else optSelect = "";
+        final SQLiteDatabase db = dbhelper.getReadableDatabase();
+
+        // Query tasks
+        String queryString = "SELECT task_id, description, isdone, courses.color" + optSelect +
+                " FROM tasks LEFT JOIN courses ON id_course = course_id WHERE " + where +
+                " ORDER BY pinned DESC, dueDate IS NULL, dueDate ASC, date DESC";
+        Cursor cursor = db.rawQuery(queryString, null);
+        List<TaskData> list = new ArrayList<>();
+
+        // If cursor is empty, return empty list
+        if (!cursor.moveToFirst()) {
+            cursor.close();
+            return list;
+        }
+
+        // Get values from cursor
+        String id, description;
+        boolean isDone;
+        Boolean isPinned = null;
+        int color;
+        Long date = null, duedate = null;
+
+        do {
+            id = cursor.getString(0);
+            description = cursor.getString(1);
+            isDone = cursor.getInt(2) == 1;
+            color = cursor.getInt(3);
+            if (optionalValues) {
+                date = cursor.getLong(4);
+                duedate = cursor.getLong(5);
+                isPinned = cursor.getInt(6) == 1;
+            }
+            list.add(new TaskData(id, description, isDone, color, date, duedate, isPinned));
+        } while (cursor.moveToNext());
+
+        cursor.close();
+        return list;
+    }
+
+    /**
+     * Get the corresponding course for a task id
+     */
+    public Course getCourseByTaskId(String taskId) {
+        Cursor cursor = dbhelper.getReadableDatabase().rawQuery(
+                "SELECT course.* FROM tasks WHERE task_id=\"" + taskId + "\"" +
+                        "LEFT JOIN courses course ON id_course = course_id", null);
+
+        if (!cursor.moveToFirst()) {
+            cursor.close();
+            return null;
+        }
+
+        Course course = CoursesDb.INSTANCE.cursorToCourse(cursor);
+        cursor.close();
+        return course;
+    }
+
+    /**
+     * Get the corresponding post for a task id
+     */
+    public Post getPostByTaskId(String taskId) {
+        Cursor cursor = dbhelper.getReadableDatabase().rawQuery(
+                "SELECT post.* FROM tasks WHERE task_id=\"" + taskId + "\"" +
+                        "LEFT JOIN posts post ON id_post = post_id", null);
+
+        if (!cursor.moveToFirst()) {
+            cursor.close();
+            return null;
+        }
+
+        Post post = PostsDb.getInstance().cursorToPost(cursor);
+        cursor.close();
+        return post;
     }
 
     public List<Task> getByCourseId(String course_id) {

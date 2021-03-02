@@ -2,7 +2,6 @@ package de.koenidv.sph.database
 
 import android.content.ContentValues
 import android.database.Cursor
-import android.util.Log
 import de.koenidv.sph.objects.Change
 import java.util.*
 
@@ -88,7 +87,6 @@ class ChangesDb private constructor() {
      * Ordered by date, ascending
      */
     fun getFavorites(): List<Change> {
-        Log.d("SPH-PLANNER", Date().time.toString())
         return getWithCursor(dbhelper.readableDatabase.rawQuery("SELECT * from changes " +
                 "INNER JOIN courses ON changes.id_course = courses.course_id " +
                 "WHERE changes.date >= ${(Date().time / 1000) - (24 * 60 * 60)} " +

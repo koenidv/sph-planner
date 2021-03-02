@@ -11,12 +11,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import de.koenidv.sph.R
 import de.koenidv.sph.adapters.TasksAdapter
-import de.koenidv.sph.database.PostsDb
+import de.koenidv.sph.database.TasksDb
 import de.koenidv.sph.networking.Tasks
-import de.koenidv.sph.objects.Task
 
 //  Created by koenidv on 29.12.2020.
-class TaskSheet internal constructor(private val task: Task) : BottomSheetDialogFragment() {
+class TaskSheet internal constructor(private val taskId: String) : BottomSheetDialogFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val view: View = inflater.inflate(R.layout.sheet_task, container, false)
@@ -24,16 +23,16 @@ class TaskSheet internal constructor(private val task: Task) : BottomSheetDialog
         val taskRecycler = view.findViewById<RecyclerView>(R.id.taskRecycler)
         val doneButton = view.findViewById<Button>(R.id.doneButton)
 
+        val task = TasksDb.getInstance().getByTaskId(taskId)
+
         // Set up recycler view with just one item
         taskRecycler.adapter = TasksAdapter(
-                mutableListOf(task),
+                task,
                 requireActivity(),
                 onDateClick = {
                     // Show single post bottom sheet
                     dismiss()
-                    PostSheet(
-                            PostsDb.getInstance().getByPostId(it)
-                    ).show(parentFragmentManager, "post")
+                    PostSheet(it).show(parentFragmentManager, "post")
                 },
                 onCourseClick = {
                     dismiss()

@@ -117,7 +117,7 @@ class NetworkManager {
                     if (time - prefs.getLong("updated_posts_${arguments.getString("courseId")}", 0) > 2 * 60 * 1000) {
                         // Update posts for this course
                         Posts(this).load(listOf(
-                                CoursesDb.getInstance().getByInternalId(arguments.getString("courseId")))) {
+                                CoursesDb.getByInternalId(arguments.getString("courseId"))!!)) {
 
                             if (it == SUCCESS) {
                                 // Send broadcast to update posts, tasks and attachments in CourseOverviewFragment

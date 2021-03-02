@@ -47,8 +47,8 @@ class CourseOverviewFragment : Fragment() {
             // This includes attachments, tasks
             if (intent.getStringExtra("content") == "posts") {
                 val allPosts: List<Post> = if (!isExanded) {
-                    // Not expanded, get 2 latest posts
-                    PostsDb.getInstance().getByCourseId(courseId, 2)
+                    // Not expanded, get 5 latest posts
+                    PostsDb.getInstance().getByCourseId(courseId, 5)
                 } else {
                     // Expanded, get all posts
                     PostsDb.getInstance().getByCourseId(courseId)
@@ -88,7 +88,7 @@ class CourseOverviewFragment : Fragment() {
                         PostsDb.getInstance().markAsRead(postsToShow[0].postId, postsToShow.getOrNull(1)?.postId)
                         // todo properly update recyclerview
                         if (changed == 1) {
-                            postsRecycler.adapter?.notifyItemRangeRemoved(2 - changed, 1)
+                            postsRecycler.adapter?.notifyItemRangeRemoved(5 - changed, 1)
                             postsRecycler.adapter?.notifyItemRangeInserted(0, changed)
                         } else postsRecycler.adapter?.notifyDataSetChanged()
                     } else {
@@ -125,7 +125,7 @@ class CourseOverviewFragment : Fragment() {
 
         // Get passed course id argument
         courseId = arguments?.getString("courseId") ?: ""
-        val course: Course? = CoursesDb.getInstance().getByInternalId(courseId)
+        val course: Course? = CoursesDb.getByInternalId(courseId)
 
         // Set action bar title
         val appendix = if (course?.isLK == true) getString(R.string.course_appendix_lk) else ""
@@ -228,12 +228,12 @@ class CourseOverviewFragment : Fragment() {
 
         /*
          * Posts recycler
-         * Set up with first 2 posts only
+         * Set up with first 5 posts only
          * Then load more on button click
          */
 
         if (posts.isNotEmpty()) {
-            postsToShow = posts.take(2).toMutableList()
+            postsToShow = posts.take(5).toMutableList()
 
             // Movement method to open links in-app
             val movementMethod = BetterLinkMovementMethod.newInstance()
@@ -251,7 +251,7 @@ class CourseOverviewFragment : Fragment() {
                     movementMethod,
                     onAttachmentClick,
                     onAttachmentLongClick,
-                    Tasks().onCheckedChanged(requireActivity(), course?.number_id!!))
+                    Tasks().onCheckedChanged(requireActivity()))
             postsRecycler.adapter = postsAdapter
 
             loadMorePostsButton.setOnClickListener {

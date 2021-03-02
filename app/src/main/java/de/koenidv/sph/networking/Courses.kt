@@ -29,7 +29,7 @@ class Courses(private val networkManager: NetworkManager = NetworkManager()) {
 
         val prefs = SphPlanner.applicationContext().getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
         // Remove old courses, it'll just lead to isses
-        val coursesDb = CoursesDb.getInstance()
+        val coursesDb = CoursesDb
         coursesDb.clear()
         // Set courses last updated to 0 in case this gets cancelled
         prefs.edit().putLong("courses_last_updated", 0).apply()

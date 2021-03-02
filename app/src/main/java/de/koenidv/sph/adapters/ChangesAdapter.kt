@@ -54,7 +54,7 @@ class ChangesAdapter(private val changes: List<Change>,
             currentChange = change
 
             // Check if the attached course is favorite
-            val isFavorite = CoursesDb.getInstance().isFavorite(change.id_course)
+            val isFavorite = CoursesDb.isFavorite(change.id_course)
 
             // Set title
             var titletext = applicationContext().getString(
@@ -78,7 +78,7 @@ class ChangesAdapter(private val changes: List<Change>,
                 isFavorite == true -> {
                     // Favorite courses: Use course name
                     titletext.replace("%name",
-                            CoursesDb.getInstance().getFullname(change.id_course) ?: "?")
+                            CoursesDb.getFullname(change.id_course!!) ?: "?")
                 }
                 change.type == Change.TYPE_HOLIDAYS -> {
                     // Special holidays type: Use provided classname with holiday description
@@ -150,10 +150,10 @@ class ChangesAdapter(private val changes: List<Change>,
                 courseLayout.visibility = View.GONE
             } else {
                 courseLayout.visibility = View.VISIBLE
-                course.text = CoursesDb.getInstance().getFullname(change.id_course)
+                course.text = CoursesDb.getFullname(change.id_course!!)
                 // Adjust course background color
                 // Set background color, about 70% opacity
-                Utility.tintBackground(course, CoursesDb.getInstance().getColor(change.id_course), 0xb4000000.toInt())
+                Utility.tintBackground(course, CoursesDb.getColor(change.id_course!!), 0xb4000000.toInt())
             }
 
             // Set background color according to change type (15% opacity)

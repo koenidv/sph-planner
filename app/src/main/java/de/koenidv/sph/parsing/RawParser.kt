@@ -336,14 +336,14 @@ class RawParser {
         val uniformNamedId = CourseInfo.parseNamedId(courseName)
 
         // Get courses that might be the same as this one
-        var similiarCourses = CoursesDb.getInstance().getByNamedId(uniformNamedId).toMutableList()
+        var similiarCourses = CoursesDb.getByNamedId(uniformNamedId).toMutableList()
 
         // If no similiar course was found, try getting all courses with the same subject and teacher
         var courseIdPrefix: String? = null
         if (similiarCourses.isEmpty()) {
             courseIdPrefix = IdParser().getCourseIdPrefixWithNamedId(uniformNamedId, teacherId)
             if (courseIdPrefix != null)
-                similiarCourses.addAll(CoursesDb.getInstance().getByInternalPrefix(courseIdPrefix)
+                similiarCourses.addAll(CoursesDb.getByInternalPrefix(courseIdPrefix)
                         .filter { it.isLK == null || it.isLK == isLK })
         }
 
@@ -351,7 +351,7 @@ class RawParser {
         // If contains text in brackets and no colon in between,
         // we'll assume that's a sph id and try to find a matching course
         if (courseName.contains("""\([^,]+\)""".toRegex())) {
-            val courseToAdd = CoursesDb.getInstance().getBySphId(
+            val courseToAdd = CoursesDb.getBySphId(
                     courseName.substring(
                             courseName.indexOf("(") + 1,
                             courseName.lastIndexOf(")"))

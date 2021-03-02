@@ -91,7 +91,7 @@ class TimetableViewFragment : Fragment() {
         }
 
         // Highlight today's recycler with the theme color at ~15% opacity
-        val background = ContextCompat.getDrawable(requireContext(), R.drawable.rounded_rectangle)
+        val background = ContextCompat.getDrawable(requireContext(), R.drawable.background_rounded_rectangle)
         // Sometimes uses a different color if quickly fragments are quickly switched
         background?.setTint(prefs.getInt("themeColor", 0))
         background?.alpha = 40

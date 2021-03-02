@@ -46,9 +46,9 @@ class TimetableDb private constructor() {
         val db = dbhelper.readableDatabase
         // todo get courses with lessons query
         val courses = if (favorites)
-            CoursesDb.getInstance().favorites
+            CoursesDb.getFavorites()
         else
-            CoursesDb.getInstance().all
+            CoursesDb.getAll()
 
         // Get lessons matching the request
         val query: String = if (favorites) {

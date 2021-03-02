@@ -50,7 +50,7 @@ class Posts(private val networkManager: NetworkManager = NetworkManager()) {
                 val courseids = mutableListOf<String>()
                 val rows = Jsoup.parse(response!!).select("#aktuell tbody tr")
                 val postsdb = PostsDb.getInstance()
-                val coursesdb = CoursesDb.getInstance()
+                val coursesdb = CoursesDb
                 val timenow = Date().time
 
                 var numberId: String
@@ -129,7 +129,7 @@ class Posts(private val networkManager: NetworkManager = NetworkManager()) {
              semester: String? = null,
              callback: (success: Int) -> Unit) {
         // Use all courses with number_id if nothing was specified
-        val courses = coursesToLoad ?: CoursesDb.getInstance().withNumberId
+        val courses = coursesToLoad ?: CoursesDb.getWithNumberId()
         // Save all errors in a list, only return one later
         val errors = mutableListOf<Int>()
         // Get all current posts for comparison

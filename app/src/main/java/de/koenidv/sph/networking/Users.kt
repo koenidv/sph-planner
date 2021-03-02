@@ -43,7 +43,7 @@ class Users {
             }
 
             val users = mutableListOf<User>()
-            val favoriteTeachers = CoursesDb.getInstance().favoriteTeacherIds
+            val favoriteTeachers = CoursesDb.getFavoriteTeacherIds()
 
             // Iterate through every single char
             var char = 'a'
@@ -95,7 +95,7 @@ class Users {
      */
     fun loadUsersForQuery(query: String,
                           currentUsers: List<User> = UsersDb.all(),
-                          favoriteTeachers: List<String> = CoursesDb.getInstance().favoriteTeacherIds,
+                          favoriteTeachers: List<String> = CoursesDb.getFavoriteTeacherIds(),
                           callback: (Int, List<User>) -> Unit) {
         // Log fetching users
         if (Debugger.DEBUGGING_ENABLED)

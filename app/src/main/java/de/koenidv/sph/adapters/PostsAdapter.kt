@@ -17,6 +17,7 @@ import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.database.AttachmentsDb
 import de.koenidv.sph.database.TasksDb
+import de.koenidv.sph.networking.Tasks
 import de.koenidv.sph.objects.Attachment
 import de.koenidv.sph.objects.Post
 import de.koenidv.sph.objects.Task
@@ -30,7 +31,7 @@ class PostsAdapter(private val posts: List<Post>,
                    private val linkMethod: BetterLinkMovementMethod?,
                    private val onAttachmentClick: (Attachment, View) -> Unit,
                    private val onAttachmentLongClick: (Attachment, View) -> Unit,
-                   private val onTaskCheckedChanged: (task: Task, isDone: Boolean) -> Unit) :
+                   private val onTaskCheckedChanged: (taskdata: Tasks.TaskData, isDone: Boolean) -> Unit) :
         RecyclerView.Adapter<PostsAdapter.ViewHolder>() {
 
     val prefs: SharedPreferences = SphPlanner.applicationContext().getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
@@ -40,7 +41,7 @@ class PostsAdapter(private val posts: List<Post>,
      * Provides a reference to the type of view
      * (custom ViewHolder).
      */
-    class ViewHolder(view: View, onTaskCheckedChanged: (task: Task, isDone: Boolean) -> Unit) : RecyclerView.ViewHolder(view) {
+    class ViewHolder(view: View, onTaskCheckedChanged: (taskData: Tasks.TaskData, isDone: Boolean) -> Unit) : RecyclerView.ViewHolder(view) {
         private val layout: ConstraintLayout = view.findViewById(R.id.postLayout)
         private val card: MaterialCardView = view.findViewById(R.id.materialCardView)
         private val dateText: TextView = view.findViewById(R.id.dateTextView)
@@ -63,7 +64,9 @@ class PostsAdapter(private val posts: List<Post>,
             taskCheckBox.setOnCheckedChangeListener { _, isChecked ->
                 if (taskset)
                     currentTask?.let {
-                        onTaskCheckedChanged(it, isChecked)
+                        onTaskCheckedChanged(
+                                Tasks.TaskData(it.taskId, it.description, it.isDone),
+                                isChecked)
                         if (isChecked) {
                             // Remove colored background (set transparent)
                             taskHighlight.setBackgroundColor(0x00FFFFFF)
