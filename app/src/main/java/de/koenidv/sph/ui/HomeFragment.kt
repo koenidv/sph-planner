@@ -37,6 +37,8 @@ import java.util.*
 
 class HomeFragment : Fragment() {
 
+    private lateinit var changesAdapter: CompactChangesAdapter
+    private lateinit var changesRecycler: RecyclerView
     private lateinit var tasks: MutableList<Tasks.TaskData>
     private lateinit var tasksRecycler: RecyclerView
     private lateinit var tasksTitle: TextView
@@ -142,6 +144,16 @@ class HomeFragment : Fragment() {
                     val postIndex = posts.indexOfFirst { it.id == postId }
                     if (postIndex != -1) unreadPostsRecycler.adapter?.notifyItemChanged(postIndex)
                 }
+            } else if (intent.getStringExtra("content") == "changes" &&
+                    FunctionTilesDb.getInstance().supports(FunctionTile.FEATURE_CHANGES)) {
+
+                // Update changes ui
+
+                changesAdapter.changes = ChangesDb.instance!!.getFavorites()
+                changesAdapter.notifyDataSetChanged()
+                // Make sure the layout is visible
+                changesRecycler.visibility = View.VISIBLE
+
             } else if (intent.getStringExtra("content") == "messages" &&
                     ::messagesAdapter.isInitialized &&
                     Firebase.remoteConfig.getBoolean("messages_enabled")) {
@@ -207,7 +219,6 @@ class HomeFragment : Fragment() {
          * Timetable
          */
 
-
         val timetableLayout = view.findViewById<LinearLayout>(R.id.timetableLayout)
         val timetable = view.findViewById<FragmentContainerView>(R.id.timetableFragment)
         if (FunctionTilesDb.getInstance().supports(FunctionTile.FEATURE_TIMETABLE)) {
@@ -258,19 +269,20 @@ class HomeFragment : Fragment() {
 
         val changesTitle = view.findViewById<TextView>(R.id.changesTitleTextView)
         val changesLayout = view.findViewById<LinearLayout>(R.id.changesLayout)
-        val changesRecycler = view.findViewById<RecyclerView>(R.id.changesRecycler)
+        changesRecycler = view.findViewById(R.id.changesRecycler)
 
         if (FunctionTilesDb.getInstance().supports(FunctionTile.FEATURE_CHANGES)) {
 
             // Get changes for favorite courses and display them
             val personalizedChanges = ChangesDb.instance!!.getFavorites()
-            if (personalizedChanges.isNotEmpty()) {
-                changesRecycler.setHasFixedSize(true)
-                changesRecycler.adapter = CompactChangesAdapter(personalizedChanges) {
-                    requireActivity().findNavController(R.id.nav_host_fragment)
-                            .navigate(R.id.changesFromHomeAction, bundleOf("favorites" to personalizedChanges.isNotEmpty()))
-                }
-            } else {
+            // Create changes adapter
+            changesAdapter = CompactChangesAdapter(personalizedChanges) {
+                requireActivity().findNavController(R.id.nav_host_fragment)
+                        .navigate(R.id.changesFromHomeAction, bundleOf("favorites" to personalizedChanges.isNotEmpty()))
+            }
+            changesRecycler.adapter = changesAdapter
+            changesRecycler.setHasFixedSize(true)
+            if (personalizedChanges.isEmpty()) {
                 changesTitle.text = getString(R.string.changes_personalized_none)
                 changesRecycler.visibility = View.GONE
             }
