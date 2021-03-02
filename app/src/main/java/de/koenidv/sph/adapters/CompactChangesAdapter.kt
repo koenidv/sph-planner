@@ -19,7 +19,7 @@ import java.util.*
 
 
 //  Created by koenidv on 20.12.2020.
-class CompactChangesAdapter(private val changes: List<Change>,
+class CompactChangesAdapter(var changes: List<Change>,
                             private val onClick: (Change) -> Unit) :
         RecyclerView.Adapter<CompactChangesAdapter.ViewHolder>() {
 
