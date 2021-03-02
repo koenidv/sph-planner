@@ -72,7 +72,7 @@ class CourseOverviewFragment : Fragment() {
                 // New posts will most probably be the latest ones
                 // Even if not, it's good to have freshly fetched posts at the top of the list
                 for (post in allPosts) {
-                    if (!posts.contains(post)) {
+                    if (posts.indexOfFirst { it.postId == post.postId } == -1) {
                         posts.add(0, post)
                         changed++
                     }
