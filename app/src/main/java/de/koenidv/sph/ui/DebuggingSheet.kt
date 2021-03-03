@@ -89,7 +89,7 @@ class DebuggingSheet internal constructor() : BottomSheetDialogFragment() {
                         .apply {
                             flags = Intent.FLAG_ACTIVITY_NEW_TASK
                         }
-                requireContext().startActivity(chooser)
+                context?.startActivity(chooser)
             }
         }
 

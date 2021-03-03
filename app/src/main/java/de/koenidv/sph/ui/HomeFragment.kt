@@ -152,7 +152,8 @@ class HomeFragment : Fragment() {
                 changesAdapter.changes = ChangesDb.instance!!.getFavorites()
                 changesAdapter.notifyDataSetChanged()
                 // Make sure the layout is visible
-                changesRecycler.visibility = View.VISIBLE
+                if (changesAdapter.changes.isNotEmpty())
+                    changesRecycler.visibility = View.VISIBLE
 
             } else if (intent.getStringExtra("content") == "messages" &&
                     ::messagesAdapter.isInitialized &&

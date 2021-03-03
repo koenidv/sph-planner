@@ -110,7 +110,7 @@ public class TasksDb {
      * Get tasks data by task id
      */
     public TaskData getDataById(String id, boolean optionalValues) {
-        List<TaskData> tasks = getData(optionalValues, "taskid=\"" + id + "\"");
+        List<TaskData> tasks = getData(optionalValues, "task_id=\"" + id + "\"");
         if (tasks.size() > 0) return tasks.get(0);
         else return null;
     }
@@ -167,8 +167,8 @@ public class TasksDb {
      */
     public Course getCourseByTaskId(String taskId) {
         Cursor cursor = dbhelper.getReadableDatabase().rawQuery(
-                "SELECT course.* FROM tasks WHERE task_id=\"" + taskId + "\"" +
-                        "LEFT JOIN courses course ON id_course = course_id", null);
+                "SELECT course.* FROM tasks LEFT JOIN courses course ON id_course = course_id " +
+                        "WHERE task_id=\"" + taskId + "\"", null);
 
         if (!cursor.moveToFirst()) {
             cursor.close();
@@ -185,8 +185,8 @@ public class TasksDb {
      */
     public Post getPostByTaskId(String taskId) {
         Cursor cursor = dbhelper.getReadableDatabase().rawQuery(
-                "SELECT post.* FROM tasks WHERE task_id=\"" + taskId + "\"" +
-                        "LEFT JOIN posts post ON id_post = post_id", null);
+                "SELECT post.* FROM tasks LEFT JOIN posts post ON id_post = post_id " +
+                        "WHERE task_id=\"" + taskId + "\"", null);
 
         if (!cursor.moveToFirst()) {
             cursor.close();

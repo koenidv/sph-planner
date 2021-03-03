@@ -120,6 +120,9 @@ class Tasks {
                             .addBodyParameter("id", numberId)
                             .addBodyParameter("entry", postId.substringAfterLast("_"))
                             .addBodyParameter("b", if (isDone) "done" else "undone")
+                            .addHeaders(mapOf(
+                                    "X-Requested-With" to "XMLHttpRequest",
+                                    "User-Agent" to "koenidv/sph-planner"))
                             .setTag(taskId)
                             .build()
                             .getAsString(object : StringRequestListener {
