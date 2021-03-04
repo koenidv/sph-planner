@@ -132,11 +132,12 @@ class OptionsSheet internal constructor() : BottomSheetDialogFragment() {
 
         return view
     }
-}
 
-private fun Button.bottomSheetClick(context: BottomSheetDialogFragment, sheet: BottomSheetDialogFragment) {
-    this.setOnClickListener {
-        context.dismiss()
-        sheet.show(context.parentFragmentManager, sheet::class.toString())
+    private fun Button.bottomSheetClick(context: BottomSheetDialogFragment, sheet: BottomSheetDialogFragment) {
+        this.setOnClickListener {
+            context.dismiss()
+            sheet.show(context.parentFragmentManager, sheet::class.toString())
+        }
     }
+
 }

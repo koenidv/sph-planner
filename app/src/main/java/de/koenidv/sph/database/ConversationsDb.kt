@@ -44,9 +44,7 @@ class ConversationsDb {
             return null
         }
         // Else return the queried conversation
-        val conversation = toConversation(cursor, withFirstMessage)
-        cursor.close()
-        return conversation
+        return cursor.getConversation(withFirstMessage, true)
     }
 
     /**
@@ -182,26 +180,6 @@ class ConversationsDb {
     }
 
     /**
-     * Get a conversation from a cursor pointing at such
-     */
-    private fun toConversation(cursor: Cursor, withFirstMessage: Boolean): Conversation {
-        return Conversation(
-                cursor.getString(0),
-                cursor.getString(1),
-                cursor.getString(2),
-                cursor.getInt(3),
-                cursor.getString(4),
-                cursor.getString(5),
-                Date(cursor.getInt(6) * 1000L),
-                cursor.getInt(7) == 1,
-                cursor.getInt(8) == 1
-        ).apply {
-            if (withFirstMessage)
-                firstMessage = MessagesDb.getMessage(this.firstIdMess)
-        }
-    }
-
-    /**
      * Get a list of conversations from the cursor and close it
      */
     private fun toConversationList(cursor: Cursor, withFirstMessage: Boolean = false): List<Conversation> {
@@ -210,12 +188,35 @@ class ConversationsDb {
         if (!cursor.moveToFirst()) return returnList
 
         do {
-            returnList.add(toConversation(cursor, withFirstMessage))
+            returnList.add(cursor.getConversation(withFirstMessage))
         } while (cursor.moveToNext())
 
         cursor.close()
         return returnList
+    }
 
+    /**
+     * Get a conversation from a cursor pointing at such
+     */
+    private fun Cursor.getConversation(withFirstMessage: Boolean, close: Boolean = false): Conversation {
+        val conversation = Conversation(
+                this.getString(0),
+                this.getString(1),
+                this.getString(2),
+                this.getInt(3),
+                this.getString(4),
+                this.getString(5),
+                Date(this.getInt(6) * 1000L),
+                this.getInt(7) == 1,
+                this.getInt(8) == 1
+        ).apply {
+            if (withFirstMessage)
+                firstMessage = MessagesDb.getMessage(this.firstIdMess)
+            // todo use left join for first message
+        }
+
+        if (close) this.close()
+        return conversation
     }
 
 }

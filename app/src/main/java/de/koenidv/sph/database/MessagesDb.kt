@@ -9,7 +9,7 @@ import java.util.*
 //  Created by koenidv on 09.01.2021.
 object MessagesDb {
 
-    var writable: SQLiteDatabase = DatabaseHelper.getInstance().writableDatabase
+    private var writable: SQLiteDatabase = DatabaseHelper.getInstance().writableDatabase
 
     fun getMessage(messageId: String): Message? {
         val cursor: Cursor = writable.rawQuery(
@@ -21,9 +21,7 @@ object MessagesDb {
             return null
         }
         // Else return the queried conversation
-        val conversation = toMessage(cursor)
-        cursor.close()
-        return conversation
+        return cursor.getMessage(true)
     }
 
     fun getConversation(conversationId: String): List<Message> =
@@ -67,25 +65,6 @@ object MessagesDb {
     }
 
     /**
-     * Get a message from a cursor pointing at such
-     */
-    private fun toMessage(cursor: Cursor): Message {
-        return Message(
-                messId = cursor.getString(0),
-                idConv = cursor.getString(1),
-                idSender = cursor.getString(2),
-                senderName = cursor.getString(3),
-                senderType = cursor.getString(4),
-                date = Date(cursor.getInt(5) * 1000L),
-                subject = cursor.getString(6),
-                content = cursor.getString(7),
-                unread = cursor.getInt(8) == 1,
-                recipients = cursor.getString(9).split(";"),
-                recipientCount = cursor.getInt(10),
-        )
-    }
-
-    /**
      * Get a list of messages from the cursor and close it
      */
     private fun toMessagesList(cursor: Cursor): List<Message> {
@@ -94,12 +73,33 @@ object MessagesDb {
         if (!cursor.moveToFirst()) return returnList
 
         do {
-            returnList.add(toMessage(cursor))
+            returnList.add(cursor.getMessage())
         } while (cursor.moveToNext())
 
         cursor.close()
         return returnList
 
+    }
+
+    /**
+     * Get a message from a cursor pointing at such
+     */
+    private fun Cursor.getMessage(close: Boolean = false): Message {
+        val message = Message(
+                messId = this.getString(0),
+                idConv = this.getString(1),
+                idSender = this.getString(2),
+                senderName = this.getString(3),
+                senderType = this.getString(4),
+                date = Date(this.getInt(5) * 1000L),
+                subject = this.getString(6),
+                content = this.getString(7),
+                unread = this.getInt(8) == 1,
+                recipients = this.getString(9).split(";"),
+                recipientCount = this.getInt(10),
+        )
+        if (close) this.close()
+        return message
     }
 
 }
