@@ -13,6 +13,9 @@ import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.database.CoursesDb
 import org.json.JSONObject
+import java.io.BufferedReader
+import java.io.IOException
+import java.io.InputStreamReader
 
 
 //  Created by koenidv on 05.02.2021.
@@ -26,6 +29,7 @@ object Debugger {
     const val LOG_TYPE_ERROR = 3
 
     private val logs = mutableListOf<DebugLog>()
+    private var logcatAdded = false
 
     val prefs: SharedPreferences = SphPlanner.applicationContext()
             .getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
@@ -43,15 +47,29 @@ object Debugger {
     }
 
     /**
+     * Check if the log contains any entries
+     */
+    fun isEmpty() = logs.isEmpty()
+
+    /**
+     * Enable or Disable logging
+     */
+    fun setEnabled(enabled: Boolean) {
+        DEBUGGING_ENABLED = enabled
+        prefs.edit().putBoolean("debugging_enabled", enabled).apply()
+        if (enabled) addStartLog()
+    }
+
+    /**
      * Get an html document's title from its source
      */
     fun responseTitle(response: String): String {
         return try {
-            response.substring(
-                    response.indexOf("<title>" + 7),
-                    response.indexOf("</title>"))
+            response
+                    .substringAfter("<title>")
+                    .substringBefore("<")
         } catch (e: Exception) {
-            "Reponse String does not contain a title"
+            "Getting a title from response failed: " + response.take(200)
         }
     }
 
@@ -59,6 +77,7 @@ object Debugger {
      * Uploads the log to dogbin, then shows a share sheet with the link
      */
     fun share() {
+        addLogcat()
         upload {
             // Share link to to dogbin
             val sendIntent: Intent = Intent().apply {
@@ -79,6 +98,7 @@ object Debugger {
      * Copies the log to the clipboard, then opens the online log viewer
      */
     fun view() {
+        addLogcat()
         // Copy the log
         val clipboard: ClipboardManager = SphPlanner.applicationContext()
                 .getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
@@ -122,20 +142,6 @@ object Debugger {
     }
 
     /**
-     * Check if the log contains any entries
-     */
-    fun isEmpty() = logs.isEmpty()
-
-    /**
-     * Enable or Disable logging
-     */
-    fun setEnabled(enabled: Boolean) {
-        DEBUGGING_ENABLED = enabled
-        prefs.edit().putBoolean("debugging_enabled", enabled).apply()
-        if (enabled) addStartLog()
-    }
-
-    /**
      * Add a log with school id and an gmbId example on startup
      */
     private fun addStartLog() {
@@ -145,5 +151,29 @@ object Debugger {
                         "gmbIdExample" to CoursesDb.getGmbIdExample())))
     }
 
+    /**
+     * Append this session's logcat to the log
+     */
+    private fun addLogcat() {
+        if (!logcatAdded) {
+            // Try appending this session's logcat
+            try {
+                val process = Runtime.getRuntime().exec("logcat -d")
+                val bufferedReader = BufferedReader(
+                        InputStreamReader(process.inputStream))
+                val log = mutableMapOf<String, String>()
+                var line: String?
+                while (bufferedReader.readLine().also { line = it } != null) {
+                    log[(log.size + 1).toString()] = line.toString()
+                }
+                DebugLog("logcat", "Last crash's logcat",
+                        bundleOf(*log.toList().toTypedArray())).log()
+                logcatAdded = true
+            } catch (e: IOException) {
+                DebugLog("logcat", "Including logcat failed",
+                        type = LOG_TYPE_ERROR).log()
+            }
+        }
+    }
 
 }

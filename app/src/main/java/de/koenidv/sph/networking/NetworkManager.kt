@@ -74,7 +74,7 @@ class NetworkManager {
                 if (time - prefs.getLong("updated_messages", 0) > 20 * 60 * 1000)
                     updateList.add("messages")
                 // holidays after 1 month
-                if (time - prefs.getLong("updated_messages", 0) > 31 * 86400000L)
+                if (time - prefs.getLong("updated_holidays", 0) > 31 * 86400000L)
                     updateList.add("holidays")
             }
             R.id.nav_courses, R.id.frag_tasks, R.id.frag_allposts, R.id.frag_attachments -> {

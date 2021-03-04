@@ -15,6 +15,7 @@ import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.debugging.Debugger
 import de.koenidv.sph.networking.TokenManager
 
+
 //  Created by koenidv on 16.12.2020.
 // Bottom sheet to let the user select a dark/light theme and accent color combination
 class DebuggingSheet internal constructor() : BottomSheetDialogFragment() {

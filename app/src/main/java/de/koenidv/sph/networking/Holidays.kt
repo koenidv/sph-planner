@@ -6,6 +6,7 @@ import com.androidnetworking.interfaces.JSONArrayRequestListener
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner.Companion.applicationContext
+import de.koenidv.sph.SphPlanner.Companion.prefs
 import de.koenidv.sph.database.HolidaysDb
 import de.koenidv.sph.debugging.DebugLog
 import de.koenidv.sph.debugging.Debugger
@@ -70,6 +71,7 @@ class Holidays {
                             }
                         }
                         callback(NetworkManager.SUCCESS)
+                        prefs.edit().putLong("updated_holidays", Date().time).apply()
                         // Log success
                         if (Debugger.DEBUGGING_ENABLED)
                             DebugLog("Holidays", "Holidays fetched: Success",
