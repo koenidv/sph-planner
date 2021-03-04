@@ -43,13 +43,13 @@ class OptionsSheet internal constructor() : BottomSheetDialogFragment() {
                             // Clear SharedPrefs
                             // todo check if we still need something
                             prefs.edit().clear().apply()
+                            SphPlanner.cacheprefs.edit().clear().apply()
                             // Clear cookies (especcially sid token)
                             de.koenidv.sph.networking.CookieStore.clearCookies()
                             // Delete all downloaded attachments
                             File(requireContext().filesDir.toString() + "/attachments/").deleteRecursively()
-                            // todo Delete database
-                            // requireContext().deleteDatabase("database")
-                            DatabaseHelper.newInstance()
+                            // Delete all data from database
+                            DatabaseHelper.getInstance().deleteAll()
                             // Switch to OnboardingActivity
                             startActivity(Intent(context, OnboardingActivity().javaClass).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP))
                             requireActivity().finish()

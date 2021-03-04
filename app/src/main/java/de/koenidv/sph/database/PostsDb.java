@@ -115,7 +115,7 @@ public class PostsDb {
         do {
             list.add(new CompactPostsAdapter.PostData(
                     cursor.getString(0),
-                    cursor.getString(1),
+                    cursor.getString(1) + "", // Non-Null String!
                     cursor.getString(2),
                     cursor.getString(3),
                     cursor.getInt(4),

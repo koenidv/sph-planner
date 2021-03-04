@@ -124,4 +124,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "recipients TEXT," +
                 "recipientsCount INTEGER);");
     }
+
+    /**
+     * Delete ALL entries from ALL tables
+     */
+    public void deleteAll() {
+        // List of tables to be deleted
+        String[] tables = {"changes", "conversations", "courses", "fileAttachments", "holidays",
+                "linkAttachments", "messages", "posts", "tasks", "tiles", "timetable", "users"};
+        SQLiteDatabase db = getWritableDatabase();
+
+        // Delete each table
+        for (String table : tables) {
+            db.delete(table, null, null);
+        }
+    }
 }
