@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.TextView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import de.koenidv.sph.R
@@ -33,6 +34,9 @@ class OptionsSheet internal constructor() : BottomSheetDialogFragment() {
         } catch (e: PackageManager.NameNotFoundException) {
         }
 
+        /**
+         * Sign out and delete all local data
+         */
         view.findViewById<View>(R.id.logoutButton).setOnClickListener {
             // Ask if user actually wants to log out
             AlertDialog.Builder(context)
@@ -59,7 +63,39 @@ class OptionsSheet internal constructor() : BottomSheetDialogFragment() {
                     .show()
         }
 
+        /**
+         * Theme, Debugging, Contact
+         * Each opens the corresponding bottom sheet
+         */
+        view.findViewById<Button>(R.id.chooseThemeButton).bottomSheetClick(this, ThemeSheet())
+        view.findViewById<Button>(R.id.debuggingButton).bottomSheetClick(this, DebuggingSheet())
+        view.findViewById<Button>(R.id.contactButton).bottomSheetClick(this, ContactSheet())
 
+        /**
+         * Share
+         */
+        view.findViewById<View>(R.id.shareButton).setOnClickListener {
+            dismiss()
+            // Share a text inviting people to use the app
+            val sendIntent: Intent = Intent().apply {
+                action = Intent.ACTION_SEND
+                putExtra(Intent.EXTRA_TEXT, getString(R.string.share_text))
+                this.type = "text/plain"
+                SphPlanner.prefs.edit().putBoolean("share_done", true).apply()
+            }
+            startActivity(Intent.createChooser(sendIntent, getString(R.string.share_action)))
+        }
+
+        /**
+         * Done, dismiss sheet
+         */
+        view.findViewById<View>(R.id.doneButton).setOnClickListener {
+            // Dismiss the sheet
+            dismiss()
+        }
+
+        // If we're implementing notifications again,
+        // somewhat useful reference for enqueing background workers
         // Background update toggle group
         /*val backgroundToggleGroup: MaterialButtonToggleGroup = view.findViewById(R.id.backgroundToggleGroup)
         if (prefs.getBoolean("backgroundRefresh", true)) backgroundToggleGroup.check(R.id.backgroundOnButton) else backgroundToggleGroup.check(R.id.backgroundOffButton)
@@ -94,45 +130,13 @@ class OptionsSheet internal constructor() : BottomSheetDialogFragment() {
             }
         }*/
 
-        /**
-         * Choose a theme
-         * Open a bottom sheet to let the user choose a theme combination
-         */
-        view.findViewById<View>(R.id.chooseThemeButton).setOnClickListener {
-            ThemeSheet().show(parentFragmentManager, "themeSheet")
-            dismiss()
-        }
-
-        /**
-         * Debugging
-         */
-        view.findViewById<View>(R.id.debuggingButton).setOnClickListener {
-            dismiss()
-            DebuggingSheet().show(parentFragmentManager, "debugging")
-        }
-
-        /**
-         * Contact
-         */
-        view.findViewById<View>(R.id.contactButton).setOnClickListener {
-            dismiss()
-            ContactSheet().show(parentFragmentManager, "contact")
-        }
-        view.findViewById<View>(R.id.shareButton).setOnClickListener {
-            dismiss()
-            // Share a text inviting people to use the app
-            val sendIntent: Intent = Intent().apply {
-                action = Intent.ACTION_SEND
-                putExtra(Intent.EXTRA_TEXT, getString(R.string.share_text))
-                this.type = "text/plain"
-                SphPlanner.prefs.edit().putBoolean("share_done", true).apply()
-            }
-            startActivity(Intent.createChooser(sendIntent, getString(R.string.share_action)))
-        }
-        view.findViewById<View>(R.id.doneButton).setOnClickListener {
-            // Dismiss the sheet
-            dismiss()
-        }
         return view
+    }
+}
+
+private fun Button.bottomSheetClick(context: BottomSheetDialogFragment, sheet: BottomSheetDialogFragment) {
+    this.setOnClickListener {
+        context.dismiss()
+        sheet.show(context.parentFragmentManager, sheet::class.toString())
     }
 }
