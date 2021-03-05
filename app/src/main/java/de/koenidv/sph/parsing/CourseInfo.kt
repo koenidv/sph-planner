@@ -1,6 +1,12 @@
 package de.koenidv.sph.parsing
 
+import android.util.Log
+import androidx.core.os.bundleOf
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import de.koenidv.sph.R
+import de.koenidv.sph.SphPlanner.Companion.TAG
+import de.koenidv.sph.debugging.DebugLog
+import de.koenidv.sph.debugging.Debugger
 import java.util.*
 
 //  Created by koenidv on 08.12.2020.
@@ -32,7 +38,19 @@ object CourseInfo {
      */
     fun getShortnameFromInternald(courseId: String): String {
         // Check if the provided id is in fact an internal one
-        require(IdParser().getCourseIdType(courseId) == TYPE_INTERNAL)
+        if (IdParser().getCourseIdType(courseId) != TYPE_INTERNAL) {
+            DebugLog("CrsInf",
+                    "Shortname: Id does not seem to be of type internal",
+                    bundleOf("id" to courseId),
+                    Debugger.LOG_TYPE_WARNING).log()
+            Log.w("$TAG CourseInfo", "Id does not seem to be of type internal")
+            try {
+                throw Exception(
+                        "CourseInfo#getShortnameFromInternalId: Failed internal id requirement for id $courseId")
+            } catch (e: Exception) {
+                FirebaseCrashlytics.getInstance().recordException(e)
+            }
+        }
         // Get subject from course id
         val subject = courseId.substringBefore("_")
         // Get a map of short and full names
