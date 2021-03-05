@@ -5,11 +5,14 @@ import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.toColorInt
+import androidx.core.os.bundleOf
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner.Companion.TAG
 import de.koenidv.sph.SphPlanner.Companion.applicationContext
 import de.koenidv.sph.database.CoursesDb
+import de.koenidv.sph.debugging.DebugLog
+import de.koenidv.sph.debugging.Debugger
 import de.koenidv.sph.objects.*
 import org.jsoup.Jsoup
 import org.jsoup.select.Elements
@@ -593,150 +596,154 @@ class RawParser {
 
         // Parse data for every row
         for (row in rawPosts) {
-            cells = row.select("td")
-            // Cells: 0: Some metadata, 1: Content, 2: Attendance (encrypted)
-            sphPostId = row.select("tr[data-entry]").attr("data-entry")
-            date = dateFormat.parse(cells[0].childNodes()[1].toString())!!
-            postId = courseId + "_post-" + internalDateFormat.format(date) + "_" + sphPostId
+            try {
+                cells = row.select("td")
+                // Cells: 0: Some metadata, 1: Content, 2: Attendance (encrypted)
+                sphPostId = row.select("tr[data-entry]").attr("data-entry")
+                date = dateFormat.parse(cells[0].childNodes()[1].toString())!!
+                postId = courseId + "_post-" + internalDateFormat.format(date) + "_" + sphPostId
 
-            /*
+                /*
              * Posts
              */
 
-            // Check if current post was already in the db and if so, use it again
-            // This is mainly to set the unread attribute
-            if (currentPostIds.contains(postId)) {
-                posts.add(currentPosts[currentPostIds.indexOf(postId)])
-            } else {
-                // Get information from html
-                postTitle = cells[1].selectFirst("b").wholeText().trim()
-                // Correct weird stuff that sph does
-                postTitle = postTitle.replace("""&amp;amp;quot;""", "\"")
-                if (postTitle == "kein Thema") postTitle = null
-                // Description might include html. We'll just get the text for now.
-                postDescription = try {
-                    cells[1].select("i[title=\"Ausführlicher Inhalt\"]").parents()[0].wholeText().trim()
-                } catch (iobe: IndexOutOfBoundsException) {
-                    // No description available
-                    null
+                // Check if current post was already in the db and if so, use it again
+                // This is mainly to set the unread attribute
+                if (currentPostIds.contains(postId)) {
+                    posts.add(currentPosts[currentPostIds.indexOf(postId)])
+                } else {
+                    // Get information from html
+                    postTitle = cells[1].selectFirst("b").wholeText().trim()
+                    // Correct weird stuff that sph does
+                    postTitle = postTitle.replace("""&amp;amp;quot;""", "\"")
+                    if (postTitle == "kein Thema") postTitle = null
+                    // Description might include html. We'll just get the text for now.
+                    postDescription = try {
+                        cells[1].select("i[title=\"Ausführlicher Inhalt\"]").parents()[0].wholeText().trim()
+                    } catch (iobe: IndexOutOfBoundsException) {
+                        // No description available
+                        null
+                    }
+                    // Correct weird stuff that sph does
+                    postDescription = postDescription?.replace("&amp;amp;quot;", "\"")
+                    // Add new post to posts list
+                    posts.add(Post(
+                            postId,
+                            courseId,
+                            date,
+                            postTitle,
+                            postDescription,
+                            !markAsRead // We know it's unread because it wasn't in the current posts list
+                    ))
                 }
-                // Correct weird stuff that sph does
-                postDescription = postDescription?.replace("&amp;amp;quot;", "\"")
-                // Add new post to posts list
-                posts.add(Post(
-                        postId,
-                        courseId,
-                        date,
-                        postTitle,
-                        postDescription,
-                        !markAsRead // We know it's unread because it wasn't in the current posts list
-                ))
-            }
 
-            /*
+                /*
              * Tasks
              */
 
-            // If post contains a task
-            if (cells[1].toString().contains("<span class=\"homework\">")) {
-                // There can only be one task per post, it seems
-                taskId = courseId + "_task-" + internalDateFormat.format(date) + "_1"
-                taskDone = !cells[1].select("span.homework span.done").hasClass("hidden")
-                taskDescription = cells[1].select("span.homework").nextAll("span.markup")[0].wholeText()
-                // Add new task to tasks list
-                tasks.add(Task(
-                        taskId,
-                        courseId,
-                        postId,
-                        taskDescription,
-                        date,
-                        taskDone
-                ))
-            }
-
-            /*
-             * File attachments
-             */
-
-            // Todo dont replace old files, localpath will be lost
-
-            // If post contains attachments
-            if (cells[1].select("div.files").size != 0) {
-                // For every file attachment
-                for (file in cells[1].select("div.files div.file")) {
-                    fileId = IdParser().getFileAttachmentId(courseId, date, attachIds)
-                    attachIds.add(fileId)
-
-                    // Get file info
-                    fileName = file.toString().substring(file.toString().indexOf("</span>") + 7,
-                            file.toString().indexOf("<small>"))
-                            .replace("_", " ").replace("-", " ").trim()
-                    fileSize = file.select("small").text()
-                    fileSize = fileSize.substring(1, fileSize.length - 1) // Remove brackets
-                    fileType = fileName.substring(
-                            fileName.lastIndexOf(".") + 1).toLowerCase(Locale.ROOT)
-                    fileName = fileName.substring(0, fileName.lastIndexOf("."))
-
-                    // Parse file url
-                    fileUrl = ("https://start.schulportal.hessen.de/meinunterricht.php?a=downloadFile&id="
-                            + doc.select("h1[data-book]")[0].attr("data-book") // NumberId of this course
-                            + "&e=" + sphPostId
-                            + "&f=" + URLEncoder.encode(file.attr("data-file"), "utf-8"))
-
-                    // Add new Attachment to lst
-                    files.add(FileAttachment(
-                            fileId,
+                // If post contains a task
+                if (cells[1].toString().contains("<span class=\"homework\">")) {
+                    // There can only be one task per post, it seems
+                    taskId = courseId + "_task-" + internalDateFormat.format(date) + "_1"
+                    taskDone = !cells[1].select("span.homework span.done").hasClass("hidden")
+                    taskDescription = cells[1].select("span.homework").nextAll("span.markup")[0].wholeText()
+                    // Add new task to tasks list
+                    tasks.add(Task(
+                            taskId,
                             courseId,
                             postId,
-                            fileName,
+                            taskDescription,
                             date,
-                            fileUrl,
-                            fileSize,
-                            fileType,
-                            // Set post as not pinned
-                            // This will not overwrite if the attachment was pinned before
-                            false,
-                            null
+                            taskDone
                     ))
                 }
-            }
 
-            /*
+                /*
+                 * File attachments
+                 */
+
+                // If post contains attachments
+                if (cells[1].select("div.files").size != 0) {
+                    // For every file attachment
+                    for (file in cells[1].select("div.files div.file")) {
+                        fileId = IdParser().getFileAttachmentId(courseId, date, attachIds)
+                        attachIds.add(fileId)
+
+                        // Get file info
+                        fileName = file.toString().substring(file.toString().indexOf("</span>") + 7,
+                                file.toString().indexOf("<small>"))
+                                .replace("_", " ").replace("-", " ").trim()
+                        fileSize = file.select("small").text()
+                        fileSize = fileSize.substring(1, fileSize.length - 1) // Remove brackets
+                        fileType = fileName.substring(
+                                fileName.lastIndexOf(".") + 1).toLowerCase(Locale.ROOT)
+                        fileName = fileName.substring(0, fileName.lastIndexOf("."))
+
+                        // Parse file url
+                        fileUrl = ("https://start.schulportal.hessen.de/meinunterricht.php?a=downloadFile&id="
+                                + doc.select("h1[data-book]")[0].attr("data-book") // NumberId of this course
+                                + "&e=" + sphPostId
+                                + "&f=" + URLEncoder.encode(file.attr("data-file"), "utf-8"))
+
+                        // Add new Attachment to lst
+                        files.add(FileAttachment(
+                                fileId,
+                                courseId,
+                                postId,
+                                fileName,
+                                date,
+                                fileUrl,
+                                fileSize,
+                                fileType,
+                                // Set post as not pinned
+                                // This will not overwrite if the attachment was pinned before
+                                false,
+                                null
+                        ))
+                    }
+                }
+
+                /*
              * Links
              * sph returns links as plain text and converts them using js,
              * so we'll have to use some markdown
              */
 
-            // For description and homework
-            for (content in cells[1].select("span.markup")) {
-                // Get links from content
-                linkMatches = Regex("""(http[^\s|<|"]*)""".trimMargin()).find(content.toString())?.groupValues
-                if (linkMatches != null) {
-                    // Remove doubled entries
-                    linkMatches = linkMatches.distinct()
-                    for (link in linkMatches) {
-                        // Filter out entire match and some more stuff
-                        if (link.startsWith("http")) {
-                            // Add link
-                            linkId = IdParser().getLinkAttachmentId(courseId, date, linkIds)
-                            linkIds.add(linkId)
-                            links.add(LinkAttachment(
-                                    linkId,
-                                    courseId,
-                                    postId,
-                                    link.trim(),
-                                    date,
-                                    link.trim(),
-                                    false,
-                                    null
-                            ))
+                // For description and homework
+                for (content in cells[1].select("span.markup")) {
+                    // Get links from content
+                    linkMatches = Regex("""(http[^\s|<|"]*)""".trimMargin()).find(content.toString())?.groupValues
+                    if (linkMatches != null) {
+                        // Remove doubled entries
+                        linkMatches = linkMatches.distinct()
+                        for (link in linkMatches) {
+                            // Filter out entire match and some more stuff
+                            if (link.startsWith("http")) {
+                                // Add link
+                                linkId = IdParser().getLinkAttachmentId(courseId, date, linkIds)
+                                linkIds.add(linkId)
+                                links.add(LinkAttachment(
+                                        linkId,
+                                        courseId,
+                                        postId,
+                                        link.trim(),
+                                        date,
+                                        link.trim(),
+                                        false,
+                                        null
+                                ))
+                            }
                         }
                     }
                 }
+
+                // todo Parse submissions
+            } catch (npe: NullPointerException) {
+                DebugLog("Parser", "NPE on parsing posts for $courseId",
+                        bundleOf("row" to row.toString()), Debugger.LOG_TYPE_ERROR).log()
+                npe.printStackTrace()
+                FirebaseCrashlytics.getInstance().recordException(npe)
             }
-
-            // todo Parse submissions
-
         }
 
         onParsed(posts, files, tasks, links)

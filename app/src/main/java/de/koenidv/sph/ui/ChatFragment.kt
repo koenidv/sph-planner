@@ -126,6 +126,8 @@ class ChatFragment : Fragment() {
                         text, "all",
                         conversation) { success ->
 
+                    if (context == null) return@sendReply
+
                     if (success == NetworkManager.SUCCESS) {
                         // Sending the reply was successful, enable input
                         input.isEnabled = true

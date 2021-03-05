@@ -112,7 +112,11 @@ class ConversationsFragment : Fragment() {
             try {
                 (requireActivity() as MainActivity).swipeRefresh.isRefreshing = true
                 Messages().fetch(forceRefresh = true, archived = true) {
-                    (requireActivity() as MainActivity).swipeRefresh.isRefreshing = false
+                    // Sometimes this is not running on ui and would crash
+                    activity?.runOnUiThread {
+                        // Set ptr not refreshing
+                        (activity as MainActivity).swipeRefresh.isRefreshing = false
+                    }
                 }
             } catch (e: IllegalStateException) {
                 e.printStackTrace()
