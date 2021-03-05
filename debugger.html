@@ -18,7 +18,7 @@
     <div id="results"></div>
 
     <template id="template">
-        <div id="result">
+        <div id="result" onclick="this.classList.toggle('expanded')">
             <h3 id="title"></h3>
             <p id="source"></p>
             <p id="data"></p>
@@ -67,8 +67,14 @@
                             break;
                     }
 
-                    for (key in entry.data.mMap) {
-                        datatext.textContent += key + ": " + JSON.stringify(entry.data.mMap[key], null, 4) + "\n";
+                    if (entry.source !== "logcat") {
+                        for (key in entry.data.mMap) {
+                            datatext.textContent += key + ": " + JSON.stringify(entry.data.mMap[key], null, 4) + "\n";
+                        }
+                    } else {
+                        for (key in entry.data.mMap) {
+                            datatext.textContent += entry.data.mMap[key] + "\n";
+                        }
                     }
 
                     // Append clone to document
@@ -171,6 +177,10 @@
             margin: 0;
         }
 
+        #source {
+            font-style: italic;
+        }
+
         #data {
             white-space: pre-wrap;
             overflow-wrap: break-word;
@@ -182,6 +192,17 @@
             background-color: rgba(20, 20, 20, 0.5);
             border-radius: 2px;
             z-index: 1;
+            /* Expand stuff */
+            max-height: 400px;
+            mask-image: linear-gradient(to bottom, black 320px, transparent 420px);
+            -webkit-mask-image: linear-gradient(to bottom, black 320px, transparent 420px);
+            overflow: hidden;
+        }
+
+        #result.expanded {
+            max-height: fit-content;
+            mask-image: none;
+            -webkit-mask-image: none;
         }
 
         #result.success {
