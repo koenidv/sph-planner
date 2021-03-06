@@ -121,7 +121,7 @@ class TasksAdapter(private val tasks: MutableList<Task>,
 
     /**
      * Provides a reference to the type of view
-     * (custom ViewHolder).
+     * (custom ConversationViewHolder).
      */
     class ViewHolder(view: View,
                      onDateClick: (postId: String) -> Unit,
@@ -270,7 +270,7 @@ class TasksAdapter(private val tasks: MutableList<Task>,
 
     // Replaces the contents of a view (invoked by the layout manager)
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
-        // Bind data to ViewHolder
+        // Bind data to ConversationViewHolder
         viewHolder.bind(tasks[position])
     }
 

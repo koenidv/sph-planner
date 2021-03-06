@@ -29,7 +29,7 @@ class ChatMediaAdapter(private val media: List<ChatMedia>, private val isOwn: Bo
 
     /**
      * Provides a reference to the type of view
-     * (custom ViewHolder).
+     * (custom ConversationViewHolder).
      */
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         private val outerLayout = view.findViewById<ConstraintLayout>(R.id.messageOuter)
@@ -85,7 +85,7 @@ class ChatMediaAdapter(private val media: List<ChatMedia>, private val isOwn: Bo
 
     // Replaces the contents of a view (invoked by the layout manager)
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
-        // Bind data to ViewHolder
+        // Bind data to ConversationViewHolder
         viewHolder.bind(media[position], isOwn)
     }
 

@@ -41,7 +41,7 @@ class UsersAdapter(private val users: List<User>,
 
     /**
      * Provides a reference to the type of view
-     * (custom ViewHolder).
+     * (custom ConversationViewHolder).
      */
     class ViewHolder(view: View, onclick: (User) -> Unit) : RecyclerView.ViewHolder(view) {
         private val layout = view.findViewById<ConstraintLayout>(R.id.userLayout)
@@ -82,7 +82,7 @@ class UsersAdapter(private val users: List<User>,
 
     // Replaces the contents of a view (invoked by the layout manager)
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
-        // Bind data to ViewHolder
+        // Bind data to ConversationViewHolder
         viewHolder.bind(users[position], themeColor)
     }
 

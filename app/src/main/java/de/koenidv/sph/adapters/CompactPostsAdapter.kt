@@ -32,7 +32,7 @@ class CompactPostsAdapter(private val postData: List<PostData>,
 
     /**
      * Provides a reference to the type of view
-     * (custom ViewHolder).
+     * (custom ConversationViewHolder).
      */
     class ViewHolder(view: View, onClick: (PostData, View) -> Unit) : RecyclerView.ViewHolder(view) {
         private val layout = view.findViewById<ConstraintLayout>(R.id.postLayout)
@@ -102,7 +102,7 @@ class CompactPostsAdapter(private val postData: List<PostData>,
 
     // Replaces the contents of a view (invoked by the layout manager)
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
-        // Bind data to ViewHolder
+        // Bind data to ConversationViewHolder
         viewHolder.bind(postData[position])
     }
 

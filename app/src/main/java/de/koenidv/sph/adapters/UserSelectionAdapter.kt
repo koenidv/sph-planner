@@ -38,7 +38,7 @@ class UserSelectionAdapter(users: List<User>, preselect: String? = null, private
 
     /**
      * Provides a reference to the type of view
-     * (custom ViewHolder).
+     * (custom ConversationViewHolder).
      */
     class ViewHolder(view: View, onSelect: (UserData) -> Unit) : RecyclerView.ViewHolder(view) {
         private val name = view.findViewById<TextView>(android.R.id.text1)
@@ -78,7 +78,7 @@ class UserSelectionAdapter(users: List<User>, preselect: String? = null, private
 
     // Replaces the contents of a view (invoked by the layout manager)
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
-        // Bind data to ViewHolder
+        // Bind data to ConversationViewHolder
         viewHolder.bind(displayedUsers[position])
     }
 

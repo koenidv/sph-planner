@@ -24,7 +24,7 @@ class AttachmentsAdapter(private var attachments: List<Attachment>,
 
     /**
      * Provides a reference to the type of view
-     * (custom ViewHolder).
+     * (custom ConversationViewHolder).
      */
     class ViewHolder(view: View,
                      onAttachmentClick:
@@ -93,7 +93,7 @@ class AttachmentsAdapter(private var attachments: List<Attachment>,
 
     // Replaces the contents of a view (invoked by the layout manager)
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
-        // Bind data to ViewHolder
+        // Bind data to ConversationViewHolder
         viewHolder.bind(attachments[position], showCourse)
     }
 

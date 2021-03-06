@@ -26,7 +26,7 @@ class ChangesAdapter(private val changes: List<Change>,
 
     /**
      * Provides a reference to the type of view
-     * (custom ViewHolder).
+     * (custom ConversationViewHolder).
      */
     class ViewHolder(view: View, onCourseClick: (String) -> Unit) : RecyclerView.ViewHolder(view) {
         private val layout = view.findViewById<ConstraintLayout>(R.id.changeLayout)
@@ -173,7 +173,7 @@ class ChangesAdapter(private val changes: List<Change>,
 
     // Replaces the contents of a view (invoked by the layout manager)
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
-        // Bind data to ViewHolder
+        // Bind data to ConversationViewHolder
         val lastDate = try {
             changes[position - 1].date.time
         } catch (e: IndexOutOfBoundsException) {

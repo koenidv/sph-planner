@@ -39,7 +39,7 @@ class PostsAdapter(private val posts: List<Post>,
 
     /**
      * Provides a reference to the type of view
-     * (custom ViewHolder).
+     * (custom ConversationViewHolder).
      */
     class ViewHolder(view: View, onTaskCheckedChanged: (taskData: Tasks.TaskData, isDone: Boolean) -> Unit) : RecyclerView.ViewHolder(view) {
         private val layout: ConstraintLayout = view.findViewById(R.id.postLayout)
@@ -152,7 +152,7 @@ class PostsAdapter(private val posts: List<Post>,
     // Replaces the contents of a view (invoked by the layout manager)
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
         val post = posts[position]
-        // Bind data to ViewHolder
+        // Bind data to ConversationViewHolder
         viewHolder.bind(
                 post,
                 attachmentsViewPool,

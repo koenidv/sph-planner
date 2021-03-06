@@ -78,7 +78,7 @@ class CoursesAdapter(private val courses: MutableList<Course>,
 
     /**
      * Provides a reference to the type of view
-     * (custom ViewHolder).
+     * (custom ConversationViewHolder).
      */
     class ViewHolder(view: View, val onClick: (Course) -> Unit, onLongClick: (Course, Int) -> Unit) : RecyclerView.ViewHolder(view) {
         val layout: LinearLayout = view.findViewById(R.id.itemLayout)
@@ -153,7 +153,7 @@ class CoursesAdapter(private val courses: MutableList<Course>,
 
     // Replaces the contents of a view (invoked by the layout manager)
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
-        // Bind data to ViewHolder
+        // Bind data to ConversationViewHolder
         viewHolder.bind(courses[position])
     }
 

@@ -10,10 +10,12 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.FragmentActivity
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.button.MaterialButton
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner.Companion.applicationContext
 import de.koenidv.sph.database.UsersDb
 import de.koenidv.sph.parsing.Utility
+import de.koenidv.sph.ui.ContactSheet
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -23,7 +25,7 @@ class ConversationsAdapter(val conversations: MutableList<ConversationInfo>,
                            private val activity: FragmentActivity,
                            private val compactMode: Boolean = false,
                            private val onSelectModeChange: ((Boolean) -> Unit)? = null) :
-        RecyclerView.Adapter<ConversationsAdapter.ViewHolder>() {
+        RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     class ConversationInfo(
             val id: String,
@@ -37,6 +39,7 @@ class ConversationsAdapter(val conversations: MutableList<ConversationInfo>,
 
     private val selectedItems = mutableListOf<Int>()
     private var selectMode = false
+
 
     private fun selectItem(position: Int) {
         if (!compactMode && onSelectModeChange != null) {
@@ -68,8 +71,13 @@ class ConversationsAdapter(val conversations: MutableList<ConversationInfo>,
                             bundleOf("conversationId" to conversation.id))
         }
     }
+
     private val onLongClick: (Int) -> Unit = {
         selectItem(it)
+    }
+
+    private val archiveButtonClick: (View) -> Unit = {
+        ContactSheet().show(activity.supportFragmentManager, "")
     }
 
     // Get theme color
@@ -79,11 +87,11 @@ class ConversationsAdapter(val conversations: MutableList<ConversationInfo>,
 
     /**
      * Provides a reference to the type of view
-     * (custom ViewHolder).
+     * (custom ConversationViewHolder).
      */
-    class ViewHolder(view: View,
-                     onClick: (ConversationInfo, Int) -> Unit,
-                     onLongClick: (Int) -> Unit) : RecyclerView.ViewHolder(view) {
+    class ConversationViewHolder(view: View,
+                                 onClick: (ConversationInfo, Int) -> Unit,
+                                 onLongClick: (Int) -> Unit) : RecyclerView.ViewHolder(view) {
         private val layout = view.findViewById<ConstraintLayout>(R.id.conversationLayout)
         private val subject = view.findViewById<TextView>(R.id.subjectTextView)
         private val participants = view.findViewById<TextView>(R.id.participantsTextView)
@@ -180,25 +188,48 @@ class ConversationsAdapter(val conversations: MutableList<ConversationInfo>,
 
     }
 
+    class ArchiveViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        private val archiveButton = view.findViewById<MaterialButton>(R.id.archiveButton)
+
+        fun bind(onClick: (View) -> Unit) {
+            archiveButton.setOnClickListener(onClick)
+        }
+    }
+
+    override fun getItemViewType(position: Int): Int =
+            if (!compactMode && position + 1 == itemCount) VIEW_ARCHIVE
+            else VIEW_CONVERSATION
+
     // Creates new views (invoked by the layout manager)
-    override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): ViewHolder {
+    override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         // Create a new view, which defines the UI of the list item
-        val view = LayoutInflater.from(viewGroup.context)
-                .inflate(
-                        if (compactMode) R.layout.item_conversation_compact
-                        else R.layout.item_conversation,
-                        viewGroup, false)
-        return ViewHolder(view, onClick, onLongClick)
+        return if (viewType == VIEW_CONVERSATION) {
+            val view = LayoutInflater.from(viewGroup.context)
+                    .inflate(
+                            if (compactMode) R.layout.item_conversation_compact
+                            else R.layout.item_conversation,
+                            viewGroup, false)
+            ConversationViewHolder(view, onClick, onLongClick)
+        } else {
+            ArchiveViewHolder(
+                    LayoutInflater.from(viewGroup.context).inflate(
+                            R.layout.item_conversation_see_archived, viewGroup, false)
+            )
+        }
     }
 
     // Replaces the contents of a view (invoked by the layout manager)
-    override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
-        // Bind data to ViewHolder
-        viewHolder.bind(conversations[position], selectedItems.contains(position), themeColor, compactMode)
+    override fun onBindViewHolder(viewHolder: RecyclerView.ViewHolder, position: Int) {
+        // Bind data to ConversationViewHolder or ArchiveViewHolder
+        if (viewHolder is ConversationViewHolder) {
+            viewHolder.bind(conversations[position], selectedItems.contains(position), themeColor, compactMode)
+        } else if (viewHolder is ArchiveViewHolder) {
+            viewHolder.bind(archiveButtonClick)
+        }
     }
 
     // Return the size of your dataset (invoked by the layout manager)
-    override fun getItemCount() = conversations.size
+    override fun getItemCount() = conversations.size + if (!compactMode) 1 else 0
 
     /**
      * Get currently selected items
@@ -213,5 +244,10 @@ class ConversationsAdapter(val conversations: MutableList<ConversationInfo>,
         selectedItems.clear()
         selectMode = false
         onSelectModeChange?.invoke(false)
+    }
+
+    private companion object {
+        const val VIEW_CONVERSATION = 0
+        const val VIEW_ARCHIVE = 1
     }
 }

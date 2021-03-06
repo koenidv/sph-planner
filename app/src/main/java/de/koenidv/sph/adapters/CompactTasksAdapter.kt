@@ -21,7 +21,7 @@ class CompactTasksAdapter(private val tasks: List<Tasks.TaskData>,
 
     /**
      * Provides a reference to the type of view
-     * (custom ViewHolder).
+     * (custom ConversationViewHolder).
      */
     class ViewHolder(view: View,
                      onClick: (taskData: Tasks.TaskData) -> Unit,
@@ -84,7 +84,7 @@ class CompactTasksAdapter(private val tasks: List<Tasks.TaskData>,
 
     // Replaces the contents of a view (invoked by the layout manager)
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
-        // Bind data to ViewHolder
+        // Bind data to ConversationViewHolder
         viewHolder.bind(tasks[position])
     }
 

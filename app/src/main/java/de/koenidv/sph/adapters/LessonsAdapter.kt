@@ -32,7 +32,7 @@ class LessonsAdapter(private var dataset: List<List<TimetableEntry>>,
 
     /**
      * Provides a reference to the type of view
-     * (custom ViewHolder).
+     * (custom ConversationViewHolder).
      */
     class ViewHolder(view: View, val onClick: (List<TimetableEntry>) -> Unit) : RecyclerView.ViewHolder(view) {
         val outerlayout: LinearLayout = view.findViewById(R.id.outerLayout)
@@ -120,7 +120,7 @@ class LessonsAdapter(private var dataset: List<List<TimetableEntry>>,
 
     // Replaces the contents of a view (invoked by the layout manager)
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
-        // Bind data to ViewHolder
+        // Bind data to ConversationViewHolder
         // sph will not mix different rowspans, therefore we can just check the first item
         if (!dataset.getOrNull(position).isNullOrEmpty()
                 && dataset[position][0].lesson.isDisplayed != true) {
@@ -146,7 +146,7 @@ class LessonsAdapter(private var dataset: List<List<TimetableEntry>>,
                 hourcount++
             }
 
-            // Make sure ViewHolder is visible after layout changed
+            // Make sure ConversationViewHolder is visible after layout changed
             viewHolder.outerlayout.visibility = View.VISIBLE
 
             // Remove padding if this is the last visible element

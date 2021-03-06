@@ -24,7 +24,7 @@ class ChatAdapter(val messages: MutableList<Message>, private val conversationIn
 
     /**
      * Provides a reference to the type of view
-     * (custom ViewHolder).
+     * (custom ConversationViewHolder).
      */
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         private val outerLayout = view.findViewById<ConstraintLayout>(R.id.messageOuter)
@@ -138,7 +138,7 @@ class ChatAdapter(val messages: MutableList<Message>, private val conversationIn
             // Head item ("Conversation with xy")
             (viewHolder as HeaderViewHolder).bind(conversationInfo)
         } else {
-            // Bind data to ViewHolder
+            // Bind data to ConversationViewHolder
             (viewHolder as ViewHolder).bind(messages[position - 1])
         }
     }

@@ -252,6 +252,7 @@
     <string name="messages_empty_title">You currently have no conversations</string>
     <string name="messages_empty_new">Start a new conversation</string>
     <string name="messages_empty_refresh">Check for new conversations</string>
+    <string name="messages_see_archive">Archived conversations</string>
 
     <!-- Users-->
     <string name="users_title">Teachers</string>
