@@ -9,10 +9,11 @@
 
 <body>
 
-    <h1><a href="https://github.com/koenidv/sph-planner">SPHplanner debugging tool</a></h1>
+    <h1 id="pagetitle"><a href="https://github.com/koenidv/sph-planner">SPHplanner debugging tool</a>
+    </h1>
 
-    <input id="data" type="text" placeholder="Paste debug log">
-    <button id="runBtn" onclick="analyze()">Analyze</button>
+    <input id="data" type="text" placeholder="Paste log or url">
+    <button id="runBtn" onclick="analyzeOrFetch(document.querySelector('#data').value)">Analyze</button>
     <h4 id="brutalist">Brutalist aesthetic go brrr</h4>
 
     <div id="results"></div>
@@ -31,13 +32,47 @@
         const input = document.querySelector("#data");
         input.focus();
 
-        function analyze() {
+        // If input seems to be a raw log, analyze it,
+        // else try to fetch it from dogbin
+        function analyzeOrFetch(data) {
+
+            if (data.startsWith("[")) {
+                analyze(data)
+            } else if (data.startsWith("http") || data.length == 10) {
+                // Get the part after the last / or whole string
+                data = /[^/]*$/.exec(data)[0];
+                // Prepend dogbin raw url
+                data = "https://del.dog/raw/" + data;
+                // Update ui
+                input.value = "";
+                document.querySelector("#pagetitle").classList.add("loading")
+                // Fetch raw log from dogbin and analyze
+                fetch(data)
+                    .then(response => {
+                        response.text().then(text => {
+                            analyze(text);
+                            document.querySelector("#pagetitle").classList.remove("loading")
+                        }).catch(it => console.log(it))
+                    })
+                    .catch(it => {
+                        console.log("Fetch failed: " + it);
+                        input.classList.add("error");
+                        document.querySelector("#pagetitle").classList.remove("loading")
+                    })
+            } else {
+                input.value = "";
+                input.classList.add("error");
+            }
+        }
+
+
+        function analyze(text) {
 
             try {
                 input.classList.remove("error");
                 document.querySelector("#brutalist").style.display = "none";
 
-                const data = JSON.parse(input.value);
+                const data = JSON.parse(text);
                 const results = document.querySelector("#results");
                 const template = document.querySelector("#template").content;
                 const container = template.querySelector("#result");
@@ -46,9 +81,11 @@
                 const datatext = template.querySelector("#data");
 
                 for (const entry of data) {
+                    // Set title and source info
                     title.textContent = entry.description;
                     source.textContent = entry.source + " @ " + getTime(entry.timestamp);
 
+                    // Determine log entry type
                     switch (entry.type) {
                         case -1:
                             container.classList.add("success");
@@ -68,10 +105,12 @@
                     }
 
                     if (entry.source !== "logcat") {
+                        // If entry is not from logcat, display each data entry with its key
                         for (key in entry.data.mMap) {
                             datatext.textContent += key + ": " + JSON.stringify(entry.data.mMap[key], null, 4) + "\n";
                         }
                     } else {
+                        // Else display each entry value as one line
                         for (key in entry.data.mMap) {
                             datatext.textContent += entry.data.mMap[key] + "\n";
                         }
@@ -102,17 +141,17 @@
             return formattedTime = hours.substr("-2") + ":" + minutes.substr(-2) + ":" + seconds.substr(-2) + ":" + millis.substr(-3);
         }
 
+        // Analyze on enter
         input.addEventListener("keyup", function (event) {
             if (event.key === "Enter") {
-                analyze();
+                analyzeOrFetch(input.value);
             }
         });
 
         // Paste from clipboard on page load
         navigator.clipboard.readText().then(text => {
-            if (text.startsWith("[")) {
-                input.value = text;
-                analyze();
+            if (text.startsWith("[") || text.startsWith("http") || text.length == 10) {
+                analyzeOrFetch(text)
             }
         });
 
@@ -219,6 +258,24 @@
 
         #result.error {
             background-color: rgba(220, 20, 60, 0.5);
+        }
+
+        @keyframes flickerAnimation {
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        #pagetitle.loading {
+            animation: flickerAnimation 0.6s infinite;
         }
     </style>
 
