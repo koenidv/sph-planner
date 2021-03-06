@@ -12,13 +12,12 @@
         android:orientation="vertical">
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/taskRecycler"
+            android:id="@+id/recycler"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:nestedScrollingEnabled="false"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            tools:itemCount="1"
-            tools:listitem="@layout/item_task" />
+            tools:listitem="@layout/item_conversation_archived" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/doneButton"

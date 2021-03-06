@@ -312,4 +312,12 @@
         app:popEnterAnim="@anim/fade_in"
         app:popExitAnim="@anim/exit_to_right" />
 
+    <action
+        android:id="@+id/chatAction"
+        app:destination="@id/chatFragment"
+        app:enterAnim="@anim/enter_from_right"
+        app:exitAnim="@anim/fade_out"
+        app:popEnterAnim="@anim/fade_in"
+        app:popExitAnim="@anim/exit_to_right" />
+
 </navigation>

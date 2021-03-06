@@ -247,7 +247,7 @@ class HomeFragment : Fragment() {
             // Get info for unread conversations
             val unreadMessages = ConversationsDb().getConversationInfo(
                     "conversations.unread=1").toMutableList()
-            messagesAdapter = ConversationsAdapter(unreadMessages, requireActivity(), true)
+            messagesAdapter = ConversationsAdapter(unreadMessages, requireActivity(), compactMode = true)
             messagesRecycler.adapter = messagesAdapter
 
             // If no unread messages are to be displayed, hide the layout

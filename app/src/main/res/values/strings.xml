@@ -253,6 +253,7 @@
     <string name="messages_empty_new">Start a new conversation</string>
     <string name="messages_empty_refresh">Check for new conversations</string>
     <string name="messages_see_archive">Archived conversations</string>
+    <string name="messages_archive_title">Archive</string>
 
     <!-- Users-->
     <string name="users_title">Teachers</string>
@@ -405,4 +406,5 @@
     <string name="imagedescr_newconversation">Start a new conversation</string>
     <string name="imagedescr_external">External Image</string>
     <string name="imagedescr_identicon">Identicon</string>
+    <string name="imagedescr_unarchive">Unarchive</string>
 </resources>

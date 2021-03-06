@@ -333,5 +333,8 @@
     <string name="share_action">Sharing is caring</string>
     <string name="share_prompt">Magst du die App? Dann teile sie doch mit deinen Freunden :)</string>
     <string name="share_button">Teilen</string>
+    <string name="messages_see_archive">Archivierte Unterhaltungen</string>
+    <string name="messages_archive_title">Archiv</string>
+    <string name="imagedescr_unarchive">Wiederherstellen</string>
 
 </resources>

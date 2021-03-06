@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.os.bundleOf
@@ -15,7 +16,7 @@ import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner.Companion.applicationContext
 import de.koenidv.sph.database.UsersDb
 import de.koenidv.sph.parsing.Utility
-import de.koenidv.sph.ui.ContactSheet
+import de.koenidv.sph.ui.ConversationsArchiveSheet
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -23,7 +24,8 @@ import java.util.*
 //  Created by koenidv on 12.02.2021.
 class ConversationsAdapter(val conversations: MutableList<ConversationInfo>,
                            private val activity: FragmentActivity,
-                           private val compactMode: Boolean = false,
+                           private val archived: Boolean = false,
+                           private val compactMode: Boolean = archived,
                            private val onSelectModeChange: ((Boolean) -> Unit)? = null) :
         RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -36,6 +38,16 @@ class ConversationsAdapter(val conversations: MutableList<ConversationInfo>,
             val isOwn: Boolean,
             val isUnread: Boolean
     )
+
+    /**
+     * Optional callback when any item is clicked
+     */
+    var clickCallback: (() -> Unit)? = null
+
+    /**
+     * Optional callback specified if archive mode is used, called on unarchive button click
+     */
+    var unarchiveCallback: ((ConversationInfo, Int) -> Unit)? = null
 
     private val selectedItems = mutableListOf<Int>()
     private var selectMode = false
@@ -60,24 +72,32 @@ class ConversationsAdapter(val conversations: MutableList<ConversationInfo>,
         }
     }
 
+    // If in select mode, select this conversation, else navigate to the corresponding fragment
     private val onClick: (ConversationInfo, Int) -> Unit = { conversation, position ->
         if (selectMode) {
             selectItem(position)
         } else {
+            clickCallback?.invoke()
             Navigation.findNavController(activity, R.id.nav_host_fragment)
                     .navigate(
-                            if (compactMode) R.id.chatFromHomeAction
+                            if (compactMode) R.id.chatAction
                             else R.id.chatFromConversationsAction,
                             bundleOf("conversationId" to conversation.id))
         }
     }
 
+    // Select this item and enable select mode
     private val onLongClick: (Int) -> Unit = {
         selectItem(it)
     }
 
+    // Display the archive bottom sheet
     private val archiveButtonClick: (View) -> Unit = {
-        ContactSheet().show(activity.supportFragmentManager, "")
+        ConversationsArchiveSheet {
+            // Insert the now unarchived item at the top
+            conversations.add(0, it)
+            notifyItemInserted(0)
+        }.show(activity.supportFragmentManager, "conv-archive")
     }
 
     // Get theme color
@@ -91,12 +111,15 @@ class ConversationsAdapter(val conversations: MutableList<ConversationInfo>,
      */
     class ConversationViewHolder(view: View,
                                  onClick: (ConversationInfo, Int) -> Unit,
-                                 onLongClick: (Int) -> Unit) : RecyclerView.ViewHolder(view) {
+                                 onLongClick: (Int) -> Unit,
+                                 unarchiveCallback: ((ConversationInfo, Int) -> Unit)?) :
+            RecyclerView.ViewHolder(view) {
         private val layout = view.findViewById<ConstraintLayout>(R.id.conversationLayout)
         private val subject = view.findViewById<TextView>(R.id.subjectTextView)
         private val participants = view.findViewById<TextView>(R.id.participantsTextView)
         private val date = view.findViewById<TextView>(R.id.dateTextView)
         private val unread = view.findViewById<TextView>(R.id.unreadTextView)
+        private val unarchiveButton = view.findViewById<ImageButton>(R.id.unarchiveButton)
 
         private var currentConversation: ConversationInfo? = null
 
@@ -110,6 +133,12 @@ class ConversationsAdapter(val conversations: MutableList<ConversationInfo>,
             layout.setOnLongClickListener {
                 onLongClick(adapterPosition)
                 true
+            }
+
+            unarchiveButton?.setOnClickListener {
+                currentConversation?.let {
+                    unarchiveCallback?.invoke(it, adapterPosition)
+                }
             }
 
         }
@@ -206,10 +235,13 @@ class ConversationsAdapter(val conversations: MutableList<ConversationInfo>,
         return if (viewType == VIEW_CONVERSATION) {
             val view = LayoutInflater.from(viewGroup.context)
                     .inflate(
-                            if (compactMode) R.layout.item_conversation_compact
-                            else R.layout.item_conversation,
+                            when {
+                                archived -> R.layout.item_conversation_archived
+                                compactMode -> R.layout.item_conversation_compact
+                                else -> R.layout.item_conversation
+                            },
                             viewGroup, false)
-            ConversationViewHolder(view, onClick, onLongClick)
+            ConversationViewHolder(view, onClick, onLongClick, unarchiveCallback)
         } else {
             ArchiveViewHolder(
                     LayoutInflater.from(viewGroup.context).inflate(
