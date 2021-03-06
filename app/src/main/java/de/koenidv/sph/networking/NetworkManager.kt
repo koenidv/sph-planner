@@ -64,14 +64,14 @@ class NetworkManager {
 
         when (destinationId) {
             R.id.nav_home, R.id.nav_explore -> {
-                // Update changes after 10min
-                if (time - prefs.getLong("updated_changes", 0) > 10 * 60 * 1000)
+                // Update changes after 5min
+                if (time - prefs.getLong("updated_changes", 0) > 5 * 60 * 1000)
                     updateList.add("changes")
-                // posts after 30min
-                if (time - prefs.getLong("updated_posts", 0) > 30 * 60 * 1000)
+                // posts after 15min
+                if (true || time - prefs.getLong("updated_posts", 0) > 15 * 60 * 1000)
                     updateList.add("posts")
-                // messages after 20min
-                if (time - prefs.getLong("updated_messages", 0) > 20 * 60 * 1000)
+                // messages after 15min
+                if (time - prefs.getLong("updated_messages", 0) > 15 * 60 * 1000)
                     updateList.add("messages")
                 // holidays after 1 month
                 if (time - prefs.getLong("updated_holidays", 0) > 31 * 86400000L)

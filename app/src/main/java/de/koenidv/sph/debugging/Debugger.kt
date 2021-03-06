@@ -58,6 +58,7 @@ object Debugger {
         DEBUGGING_ENABLED = enabled
         prefs.edit().putBoolean("debugging_enabled", enabled).apply()
         if (enabled) addStartLog()
+        else logcatAdded = false
     }
 
     /**

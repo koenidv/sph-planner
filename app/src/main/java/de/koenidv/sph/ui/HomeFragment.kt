@@ -105,7 +105,7 @@ class HomeFragment : Fragment() {
                 // Add all new tasks to the top of the tasks list
                 val unreadTasks = TasksDb.getInstance().getUndoneData(false)
                 for (task in unreadTasks) {
-                    if (!tasks.contains(task)) {
+                    if (tasks.indexOfFirst { it.id == task.id } == -1) {
                         tasks.add(0, task)
                         tasksRecycler.adapter?.notifyItemInserted(0)
                         tasksRecycler.adapter?.notifyItemRemoved(5)

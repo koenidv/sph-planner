@@ -1,7 +1,6 @@
 package de.koenidv.sph.ui
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,7 +11,6 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.RecyclerView
 import de.koenidv.sph.R
-import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.adapters.LessonsAdapter
 import de.koenidv.sph.database.ChangesDb
 import de.koenidv.sph.database.TimetableDb
@@ -22,7 +20,6 @@ import de.koenidv.sph.parsing.Utility
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.util.*
 
 
 // Created on 24.12.2020 by koenidv.
@@ -52,9 +49,7 @@ class TimetableViewFragment : Fragment() {
         val prefs = requireContext().getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
 
         // Get favorites if viewAll is false, all lessons otherwise
-        val time1 = Date().time
         timetable = TimetableDb.instance!!.get(!viewAll)
-        Log.d(SphPlanner.TAG, "Time used for timetable mapping: " + (Date().time - time1) + "ms")
         val recyclerViewPool = RecyclerView.RecycledViewPool()
 
         // Get the 5 recyclerviews
@@ -81,13 +76,11 @@ class TimetableViewFragment : Fragment() {
 
         // Set up lessons adapters
         if (!timetable.isNullOrEmpty()) {
-            val time2 = Date().time
             monday.adapter = LessonsAdapter(timetable[0], expanded, viewAll, onClick = onClick)
             tuesday.adapter = LessonsAdapter(timetable[1], expanded, viewAll, onClick = onClick)
             wednesday.adapter = LessonsAdapter(timetable[2], expanded, viewAll, onClick = onClick)
             thursday.adapter = LessonsAdapter(timetable[3], expanded, viewAll, onClick = onClick)
             friday.adapter = LessonsAdapter(timetable[4], expanded, viewAll, onClick = onClick)
-            Log.d(SphPlanner.TAG, "Time used for timetable recycler creation: " + (Date().time - time2) + "ms")
         }
 
         // Highlight today's recycler with the theme color at ~15% opacity

@@ -48,6 +48,7 @@ object CourseInfo {
                 throw Exception(
                         "CourseInfo#getShortnameFromInternalId: Failed internal id requirement for id $courseId")
             } catch (e: Exception) {
+                FirebaseCrashlytics.getInstance().log("shortname: Failed internal id requirement for id $courseId")
                 FirebaseCrashlytics.getInstance().recordException(e)
             }
         }
