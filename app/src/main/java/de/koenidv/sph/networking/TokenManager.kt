@@ -2,8 +2,6 @@ package de.koenidv.sph.networking
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.net.ConnectivityManager
-import android.net.NetworkInfo
 import android.util.Log
 import android.widget.Toast
 import androidx.core.os.bundleOf
@@ -21,12 +19,6 @@ import de.koenidv.sph.debugging.DebugLog
 import de.koenidv.sph.debugging.Debugger
 import de.koenidv.sph.debugging.Debugger.LOG_TYPE_ERROR
 import de.koenidv.sph.debugging.Debugger.LOG_TYPE_WARNING
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import okhttp3.MultipartBody
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.RequestBody
 import java.util.*
 
 
@@ -94,19 +86,7 @@ object TokenManager {
                 CookieStore.clearCookies()
 
                 // Try loading sph's sign in page and save the sid cookie
-                if (Firebase.remoteConfig.getBoolean("token_fix_0130")) {
-
-                    // As of 2021/01/30, we now need to send the credentials data using
-                    // multipart/form-data instead of application/x-www-form-urlencoded
-                    // Why though? Don't ask me...
-                    getTokenWithMultipart(onComplete)
-
-                } else {
-
-                    // If sph changes this back, just use the old logic
-                    getTokenWithUrlencoded(onComplete)
-
-                }
+                getTokenWithUrlencoded(onComplete)
             } else {
                 // Log token failure
                 if (Debugger.DEBUGGING_ENABLED) {
@@ -231,6 +211,7 @@ object TokenManager {
     /**
      * Send credentials as application/x-www-form-urlencoded,
      * validate response and save sid cookie if possible
+     * 06.03.2021: Removed tempary fix using multipart form data
      */
     private fun getTokenWithUrlencoded(onComplete: (success: Int, token: String?) -> Unit) {
         AndroidNetworking.post(applicationContext().getString(R.string.url_login))
@@ -273,53 +254,6 @@ object TokenManager {
                         handleError(error, onComplete)
                     }
                 })
-    }
-
-    /**
-     * Send credentials as multipart/form-data,
-     * validate response and save sid cookie if possible
-     */
-    private fun getTokenWithMultipart(onComplete: (success: Int, token: String?) -> Unit) {
-        // Log 0130 fix
-        if (Debugger.DEBUGGING_ENABLED) DebugLog("TokenMgr", "Using 0130 fix").log()
-
-        if (isOnline()) {
-            GlobalScope.launch {
-                Log.d(TAG, "Using fallback token request (0130)")
-                val client = OkHttpClient().newBuilder()
-                        .cookieJar(CookieStore)
-                        .build()
-                val body: RequestBody = MultipartBody.Builder().setType(MultipartBody.FORM)
-                        .build()
-                val request: Request = Request.Builder()
-                        .url("https://login.schulportal.hessen.de/")
-                        .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.22 Safari/537.36")
-                        .method("POST", body)
-                        .build()
-
-                @Suppress("BlockingMethodInNonBlockingContext")
-                val response = client.newCall(request).execute()
-
-                @Suppress("BlockingMethodInNonBlockingContext")
-                val responsebody = response.body()?.string()
-
-                if (response.isSuccessful && responsebody != null) {
-                    validateTokenResponse(responsebody, onComplete)
-                } else {
-                    onComplete(NetworkManager.FAILED_SERVER_ERROR, null)
-                }
-            }
-        } else onComplete(NetworkManager.FAILED_NO_NETWORK, null)
-    }
-
-    /** Check if device is online,
-     * copied from https://developer.android.com/training/basics/network-ops/managing */
-    @Suppress("DEPRECATION")
-    private fun isOnline(): Boolean {
-        val connMgr = applicationContext()
-                .getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val networkInfo: NetworkInfo? = connMgr.activeNetworkInfo
-        return networkInfo?.isConnected == true
     }
 
     // Resets the authentication token
