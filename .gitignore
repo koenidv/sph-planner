@@ -27,3 +27,7 @@ local.properties
 /.idea/vcs.xml
 /.idea/discord.xml
 *.iml
+
+# Floobits
+.floo
+.flooignore
