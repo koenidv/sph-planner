@@ -142,15 +142,14 @@ class Users {
                                             text.contains("""\(.*\)""".toRegex())) {
 
                                         // Get the name and shorthand
-                                        lastname = text.substring(0, text.indexOf(","))
-                                        firstname = text.substring(
-                                                text.indexOf(", ") + 2,
-                                                text.indexOf(" (")
-                                        )
-                                        teacherId = text.substring(
-                                                text.indexOf(" (") + 2,
-                                                text.indexOf(")")
-                                        ).toLowerCase(Locale.ROOT)
+                                        lastname = text.substringBefore(",")
+                                        firstname = text
+                                                .substringAfter(", ")
+                                                .substringBefore(" (")
+                                        teacherId = text
+                                                .substringAfterLast("(")
+                                                .substringBefore(")")
+                                                .toLowerCase(Locale.ROOT)
 
                                         // Add it to the list
                                         returnUsers.add(User(

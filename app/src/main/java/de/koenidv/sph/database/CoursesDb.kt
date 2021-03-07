@@ -352,7 +352,7 @@ object CoursesDb {
         if (!cursor.moveToFirst()) return "nocourses"
         val example = cursor.getString(0)
         cursor.close()
-        return example
+        return example ?: "course is null"
     }
 
     /**

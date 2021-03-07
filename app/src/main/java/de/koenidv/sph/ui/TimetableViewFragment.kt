@@ -167,6 +167,8 @@ class TimetableViewFragment : Fragment() {
      * Show all lessons or only favorite courses
      */
     fun setViewAll(viewAll: Boolean) {
+        if (view == null) return // Avoid IllegalStateException if view is not done creating
+
         if (this.viewAll != viewAll) {
             this.viewAll = viewAll
             // Recreate if pesonal timetable was for some reason not shown
