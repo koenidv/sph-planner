@@ -1,13 +1,5 @@
 apikeys.properties
-*.iml
 .gradle
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
 .DS_Store
 /build
 /captures
@@ -16,4 +8,26 @@ apikeys.properties
 local.properties
 /node_modules
 /app/release
+
+# User-specific configurations
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+/.idea/tasks.xml
+/.idea/.name
+/.idea/compiler.xml
+/.idea/copyright/profiles_settings.xml
+/.idea/encodings.xml
+/.idea/misc.xml
+/.idea/scopes/scope_settings.xml
+/.idea/vcs.xml
 /.idea/discord.xml
+*.iml
+
+# Floobits
+.floo
+.flooignore
