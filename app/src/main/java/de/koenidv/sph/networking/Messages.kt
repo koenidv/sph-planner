@@ -255,10 +255,10 @@ class Messages {
                 // Post to sph to get messages data
                 NetworkManager().postJsonAuthed(applicationContext().getString(R.string.url_messages),
                         body = mapOf("a" to "read", "uniqid" to firstMessageId)) { netSuccess, json ->
-                    if (netSuccess == NetworkManager.SUCCESS && json != null && json.has("message")) {
+                    if (netSuccess == NetworkManager.SUCCESS && json != null && !json.isNull("message")) {
                         // If net request was successfull, decrypt the message
                         // Actually message-s, but it's just one with replies
-                        cryption.decrypt(json.get("message").toString()) {
+                        cryption.decrypt(json.getString("message")) {
                             // Parse decrypted data
                             val data = JsonParser.parseString(it).asJsonObject
                             // Disallow replies if the first message was trashed

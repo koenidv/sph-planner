@@ -27,6 +27,8 @@ class ConversationsArchiveSheet(
             adapter.notifyItemRemoved(position)
             // Add the conversation to the actual list (not archived)
             onUnarchive(info)
+            // If there are no archived conversations left, dismiss the sheet
+            if (conversations.isEmpty()) dismiss()
         }
 
         recycler.adapter = adapter

@@ -113,6 +113,18 @@ class ConversationsDb {
     }
 
     /**
+     * Checks if any archived conversation exists
+     */
+    fun archivedExists(): Boolean {
+        val cursor = writable.rawQuery(
+                "SELECT conversation_id FROM conversations WHERE archived=1",
+                null, null)
+        val exists = cursor.moveToFirst()
+        cursor.close()
+        return exists
+    }
+
+    /**
      * Returns unread value for a conversation, or null if there is no such conversation
      */
     fun isUnread(convId: String): Boolean? {

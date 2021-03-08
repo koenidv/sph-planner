@@ -74,30 +74,32 @@ class ConversationsFragment : Fragment() {
             }
         })
 
+        // Button for creating a new conversation or archiving selected conversations
         fab.setOnClickListener {
-            if (recyclerEditMode) {
+            if (!recyclerEditMode) {
+                // If not in edit mode, start a new conversations
+                newConversation()
+            } else {
                 // Archive selected conversations
-                // todo archive in db
                 var index: Int
                 val selected = adapter.getSelected()
                 val messages = Messages()
                 adapter.clearSelected()
                 for (conversation in selected) {
+                    // Mark this conversation as archived in db and on sph
+                    val firstMsgId = conversationsDb.getFirstMessageId(conversation.id)
+                    if (firstMsgId != null)
+                        messages.setArchived(conversation.id, firstMsgId, true)
                     // Remove this item from the recycler view
                     index = conversations.indexOf(conversation)
                     if (index != -1) {
                         conversations.removeAt(index)
                         adapter.notifyItemRemoved(index)
                     }
-                    val firstMsgId = conversationsDb.getFirstMessageId(conversation.id)
-                    if (firstMsgId != null)
-                        messages.setArchived(conversation.id, firstMsgId, true)
 
                     // If there are no conversations left, show emptyConversationsLayout
                     if (adapter.conversations.isEmpty()) emptyLayout.visibility = View.VISIBLE
                 }
-            } else {
-                newConversation()
             }
         }
 

@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner.Companion.applicationContext
+import de.koenidv.sph.database.ConversationsDb
 import de.koenidv.sph.database.UsersDb
 import de.koenidv.sph.parsing.Utility
 import de.koenidv.sph.ui.ConversationsArchiveSheet
@@ -51,6 +52,7 @@ class ConversationsAdapter(val conversations: MutableList<ConversationInfo>,
 
     private val selectedItems = mutableListOf<Int>()
     private var selectMode = false
+    private var archiveButtonVisible = ConversationsDb().archivedExists()
 
 
     private fun selectItem(position: Int) {
@@ -220,8 +222,11 @@ class ConversationsAdapter(val conversations: MutableList<ConversationInfo>,
     class ArchiveViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         private val archiveButton = view.findViewById<MaterialButton>(R.id.archiveButton)
 
-        fun bind(onClick: (View) -> Unit) {
-            archiveButton.setOnClickListener(onClick)
+        fun bind(visible: Boolean, onClick: (View) -> Unit) {
+            archiveButton.apply {
+                setOnClickListener(onClick)
+                visibility = if (visible) View.VISIBLE else View.GONE
+            }
         }
     }
 
@@ -256,8 +261,51 @@ class ConversationsAdapter(val conversations: MutableList<ConversationInfo>,
         if (viewHolder is ConversationViewHolder) {
             viewHolder.bind(conversations[position], selectedItems.contains(position), themeColor, compactMode)
         } else if (viewHolder is ArchiveViewHolder) {
-            viewHolder.bind(archiveButtonClick)
+            viewHolder.bind(archiveButtonVisible, archiveButtonClick)
         }
+    }
+
+    /**
+     * Whenever an item was inserted (possibly unarchived) or removed (propably archived),
+     * we need to check if there are any archived conversations and show/hide
+     * the see archive button accordingly
+     */
+
+    // If the current visibility of the archived button does not match the
+    // existance of archived conversations, update it
+    fun checkForArchived() {
+        val anyArchived = ConversationsDb().archivedExists()
+        if (anyArchived != archiveButtonVisible) {
+            archiveButtonVisible = anyArchived
+            // Archived button is at conversations#size + 1
+            notifyItemChanged(conversations.size + 1)
+        }
+    }
+
+    // Check for archived conversations when the dataset changed
+    private val archivedDatasetObserver = object : RecyclerView.AdapterDataObserver() {
+        override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+            checkForArchived()
+            super.onItemRangeInserted(positionStart, itemCount)
+        }
+
+        override fun onItemRangeRemoved(positionStart: Int, itemCount: Int) {
+            checkForArchived()
+            super.onItemRangeRemoved(positionStart, itemCount)
+        }
+    }
+
+    // Attach archivedDatasetObserver
+    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+        // Only if the button should be shown at all
+        if (!compactMode) registerAdapterDataObserver(archivedDatasetObserver)
+        super.onAttachedToRecyclerView(recyclerView)
+    }
+
+    // Detach the archived observer
+    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
+        if (!compactMode) unregisterAdapterDataObserver(archivedDatasetObserver)
+        super.onDetachedFromRecyclerView(recyclerView)
     }
 
     // Return the size of your dataset (invoked by the layout manager)
