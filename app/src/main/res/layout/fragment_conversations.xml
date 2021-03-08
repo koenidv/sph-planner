@@ -13,6 +13,7 @@
         android:clipToPadding="false"
         android:paddingTop="8dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        tools:itemCount="2"
         tools:listitem="@layout/item_conversation" />
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
@@ -42,11 +43,18 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:visibility="visible">
 
+        <ImageView
+            android:id="@+id/noConversationsImage"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:contentDescription="@string/imagedescr_info"
+            android:src="@drawable/undraw_chat" />
+
         <TextView
             android:id="@+id/noConversationsTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
+            android:layout_marginBottom="16dp"
             android:text="@string/messages_empty_title"
             android:textSize="16sp" />
 
@@ -54,6 +62,9 @@
             android:id="@+id/noConversationsNewButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            app:icon="@drawable/ic_edit"
+            app:iconPadding="8dp"
+            app:iconSize="18dp"
             android:text="@string/messages_empty_new" />
 
         <com.google.android.material.button.MaterialButton
@@ -61,8 +72,20 @@
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            app:icon="@drawable/ic_refresh"
+            app:iconPadding="8dp"
+            app:iconSize="18dp"
             android:text="@string/messages_empty_refresh" />
 
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/seeArchiveButton"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/messages_see_archive"
+            app:icon="@drawable/ic_inventory"
+            app:iconPadding="8dp"
+            app:iconSize="18dp" />
 
     </LinearLayout>
 

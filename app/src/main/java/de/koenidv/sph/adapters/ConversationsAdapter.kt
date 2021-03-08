@@ -52,7 +52,7 @@ class ConversationsAdapter(val conversations: MutableList<ConversationInfo>,
 
     private val selectedItems = mutableListOf<Int>()
     private var selectMode = false
-    private var archiveButtonVisible = ConversationsDb().archivedExists()
+    private var archiveButtonVisible = ConversationsDb().archivedExists() && conversations.isNotEmpty()
 
 
     private fun selectItem(position: Int) {
@@ -274,7 +274,7 @@ class ConversationsAdapter(val conversations: MutableList<ConversationInfo>,
     // If the current visibility of the archived button does not match the
     // existance of archived conversations, update it
     fun checkForArchived() {
-        val anyArchived = ConversationsDb().archivedExists()
+        val anyArchived = ConversationsDb().archivedExists() && conversations.isNotEmpty()
         if (anyArchived != archiveButtonVisible) {
             archiveButtonVisible = anyArchived
             // Archived button is at conversations#size + 1

@@ -30,6 +30,7 @@ class ConversationsFragment : Fragment() {
     private lateinit var adapter: ConversationsAdapter
     private lateinit var layoutManager: LinearLayoutManager
     lateinit var emptyLayout: LinearLayout
+    lateinit var newConversationFab: ExtendedFloatingActionButton
 
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -39,7 +40,7 @@ class ConversationsFragment : Fragment() {
         SphPlanner.openInBrowserUrl = getString(R.string.url_messages)
 
         val conversationsRecycler = view.findViewById<RecyclerView>(R.id.conversationsRecycler)
-        val fab = view.findViewById<ExtendedFloatingActionButton>(R.id.newConversationFab)
+        newConversationFab = view.findViewById<ExtendedFloatingActionButton>(R.id.newConversationFab)
 
         var recyclerEditMode = false
         val conversations = conversationsDb.getConversationInfo().toMutableList()
@@ -47,14 +48,14 @@ class ConversationsFragment : Fragment() {
         // Display conversations
         adapter = ConversationsAdapter(conversations, requireActivity()) { selectMode ->
             recyclerEditMode = selectMode
-            fab.setText(
+            newConversationFab.setText(
                     if (selectMode) R.string.messages_archive_conversations
                     else R.string.messages_new_button)
-            fab.setIconResource(
+            newConversationFab.setIconResource(
                     if (selectMode) R.drawable.ic_archive
                     else R.drawable.ic_edit
             )
-            fab.extend()
+            newConversationFab.extend()
         }
         conversationsRecycler.adapter = adapter
         layoutManager = conversationsRecycler.layoutManager as LinearLayoutManager
@@ -65,17 +66,17 @@ class ConversationsFragment : Fragment() {
                 super.onScrolled(recyclerView, dx, dy)
                 // Don't shrink if in edit mode
                 if (!recyclerEditMode) {
-                    if (dy > 0 && fab.isExtended) {
-                        fab.shrink()
-                    } else if (dy < 0 && !fab.isExtended) {
-                        fab.extend()
+                    if (dy > 0 && newConversationFab.isExtended) {
+                        newConversationFab.shrink()
+                    } else if (dy < 0 && !newConversationFab.isExtended) {
+                        newConversationFab.extend()
                     }
                 }
             }
         })
 
         // Button for creating a new conversation or archiving selected conversations
-        fab.setOnClickListener {
+        newConversationFab.setOnClickListener {
             if (!recyclerEditMode) {
                 // If not in edit mode, start a new conversations
                 newConversation()
@@ -98,7 +99,7 @@ class ConversationsFragment : Fragment() {
                     }
 
                     // If there are no conversations left, show emptyConversationsLayout
-                    if (adapter.conversations.isEmpty()) emptyLayout.visibility = View.VISIBLE
+                    if (adapter.conversations.isEmpty()) setEmptyLayoutVisible(true)
                 }
             }
         }
@@ -107,8 +108,11 @@ class ConversationsFragment : Fragment() {
         emptyLayout = view.findViewById(R.id.noConversationsLayout)
         val newButton = view.findViewById<MaterialButton>(R.id.noConversationsNewButton)
         val refreshButton = view.findViewById<MaterialButton>(R.id.noConversationsRefreshButton)
+        val archivedButton = view.findViewById<MaterialButton>(R.id.seeArchiveButton)
 
+        // Start a new conversation
         newButton.setOnClickListener { newConversation() }
+        // Refresh conversations
         refreshButton.setOnClickListener {
             // Set ptr as refreshing
             try {
@@ -124,16 +128,27 @@ class ConversationsFragment : Fragment() {
                 e.printStackTrace()
             }
         }
-
-        if (conversations.isEmpty()) {
-            emptyLayout.visibility = View.VISIBLE
+        // View conversations archive
+        archivedButton.setOnClickListener {
+            ConversationsArchiveSheet {
+                // Insert the unarchived items at the top
+                conversations.add(0, it)
+                adapter.notifyItemInserted(0)
+                // Make sure emptyConversationsLayout is hidden as there are conversations now
+                if (emptyLayout.visibility == View.VISIBLE) setEmptyLayoutVisible(false)
+            }.show(parentFragmentManager, "conv-archive")
         }
-
-
+        // If there are no conversations, display placeholder
+        if (conversations.isEmpty()) {
+            setEmptyLayoutVisible(true)
+        }
 
         return view
     }
 
+    /**
+     * Show a bottom sheet with options to start a new conversation
+     */
     private fun newConversation() {
         // Show a bottom sheet to start a new conversation
         NewConversationSheet { subject, recipients ->
@@ -143,6 +158,23 @@ class ConversationsFragment : Fragment() {
                             "recipients" to recipients
                     ))
         }.show(parentFragmentManager, "newconversation")
+    }
+
+    /**
+     * Update emptyLayout visibility
+     */
+    private fun setEmptyLayoutVisible(visible: Boolean) {
+        val archivedButton = emptyLayout.findViewById<MaterialButton>(R.id.seeArchiveButton)
+        if (visible) {
+            emptyLayout.visibility = View.VISIBLE
+            newConversationFab.visibility = View.GONE
+            archivedButton.visibility =
+                    if (ConversationsDb().archivedExists()) View.VISIBLE
+                    else View.GONE
+        } else {
+            emptyLayout.visibility = View.GONE
+            newConversationFab.visibility = View.VISIBLE
+        }
     }
 
     // Update conversations on uichange broadcast
@@ -184,8 +216,7 @@ class ConversationsFragment : Fragment() {
                     }
 
                     // Make sure emptyConversationsLayout is hidden as there are conversations now
-                    if (emptyLayout.visibility == View.VISIBLE)
-                        emptyLayout.visibility = View.GONE
+                    if (emptyLayout.visibility == View.VISIBLE) setEmptyLayoutVisible(false)
                 }
 
             }
