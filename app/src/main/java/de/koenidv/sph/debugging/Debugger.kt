@@ -10,7 +10,7 @@ import com.androidnetworking.error.ANError
 import com.androidnetworking.interfaces.JSONObjectRequestListener
 import com.google.gson.GsonBuilder
 import de.koenidv.sph.R
-import de.koenidv.sph.SphPlanner
+import de.koenidv.sph.SphPlanner.Companion.appContext
 import de.koenidv.sph.database.CoursesDb
 import org.json.JSONObject
 import java.io.BufferedReader
@@ -31,7 +31,7 @@ object Debugger {
     private val logs = mutableListOf<DebugLog>()
     private var logcatAdded = false
 
-    val prefs: SharedPreferences = SphPlanner.applicationContext()
+    val prefs: SharedPreferences = appContext()
             .getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
 
     init {
@@ -87,11 +87,11 @@ object Debugger {
                 this.type = "text/plain"
             }
             val chooser = Intent.createChooser(sendIntent,
-                    SphPlanner.applicationContext().getString(R.string.debugger_share_long))
+                    appContext().getString(R.string.debugger_share_long))
                     .apply {
                         flags = Intent.FLAG_ACTIVITY_NEW_TASK
                     }
-            SphPlanner.applicationContext().startActivity(chooser)
+            appContext().startActivity(chooser)
         }
     }
 
@@ -101,24 +101,23 @@ object Debugger {
     fun view() {
         addLogcat()
         // Copy the log
-        val clipboard: ClipboardManager = SphPlanner.applicationContext()
+        val clipboard: ClipboardManager = appContext()
                 .getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         val clip = ClipData.newPlainText("sphplanner-debug",
                 GsonBuilder().setPrettyPrinting().create().toJson(logs))
         clipboard.setPrimaryClip(clip)
         // Open the website
-        SphPlanner.applicationContext().startActivity(
+        appContext().startActivity(
                 Intent(Intent.ACTION_VIEW,
                         Uri.parse("https://koenidv.github.io/sph-planner/debugger"))
                         .apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK })
     }
 
     /**
-     * Uploads all logged entries and calls back with a link to it
+     * Uploads all logged entries and calls back with a debuggerlink to it
      */
     private fun upload(callback: (url: String) -> Unit) {
-        // Upload text to https://del.dog, API key in BuildConfig
-        // If you need the apikeys.properties file, contact koenidv
+        // Upload text to https://del.dog
         AndroidNetworking.post("https://del.dog/documents")
                 // Add pretty-printed json object string as body
                 .addStringBody(GsonBuilder().setPrettyPrinting().create().toJson(logs))
@@ -126,16 +125,17 @@ object Debugger {
                 .getAsJSONObject(object : JSONObjectRequestListener {
                     override fun onResponse(response: JSONObject) {
                         try {
-                            callback("https://del.dog/" + response.get("key"))
+                            callback(appContext().getString(
+                                    R.string.url_web_debugger, response.get("key")))
                         } catch (e: Exception) {
-                            Toast.makeText(SphPlanner.applicationContext(),
+                            Toast.makeText(appContext(),
                                     "Uploading to dogbin failed: " + e.message,
                                     Toast.LENGTH_LONG).show()
                         }
                     }
 
                     override fun onError(anError: ANError?) {
-                        Toast.makeText(SphPlanner.applicationContext(),
+                        Toast.makeText(appContext(),
                                 "Uploading to dogbin failed", Toast.LENGTH_LONG).show()
                     }
 
@@ -167,11 +167,11 @@ object Debugger {
                 while (bufferedReader.readLine().also { line = it } != null) {
                     log[(log.size + 1).toString()] = line.toString()
                 }
-                DebugLog("logcat", "Last crash's logcat",
+                DebugLog("logcat", "Logcat dump",
                         bundleOf(*log.toList().toTypedArray())).log()
                 logcatAdded = true
             } catch (e: IOException) {
-                DebugLog("logcat", "Including logcat failed",
+                DebugLog("logcat", "Dumping logcat failed",
                         type = LOG_TYPE_ERROR).log()
             }
         }

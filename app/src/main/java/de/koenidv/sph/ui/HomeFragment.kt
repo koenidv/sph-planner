@@ -61,7 +61,7 @@ class HomeFragment : Fragment() {
             tasksRecyclerLayout.visibility = View.GONE
         } else {
             // Else update the title to show the number of undone tasks
-            tasksTitle.text = SphPlanner.applicationContext().resources.getQuantityString(
+            tasksTitle.text = SphPlanner.appContext().resources.getQuantityString(
                     R.plurals.tasks_personalized_title_count,
                     tasks.size,
                     tasks.size)

@@ -114,7 +114,7 @@ class CourseOverviewFragment : Fragment() {
                               container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
         val view = inflater.inflate(R.layout.fragment_course_overview, container, false)
-        val prefs: SharedPreferences = SphPlanner.applicationContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
+        val prefs: SharedPreferences = SphPlanner.appContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
 
         val pinsTitleText = view.findViewById<TextView>(R.id.pinsTitleTextView)
         val pinsRecycler = view.findViewById<RecyclerView>(R.id.pinsRecycler)

@@ -83,7 +83,7 @@ class TasksAdapter(private val tasks: MutableList<Task>,
         share?.setOnClickListener {
             sheet.dismiss()
             // Share task description as plaintext
-            val text = SphPlanner.applicationContext().getString(R.string.tasks_share_template)
+            val text = SphPlanner.appContext().getString(R.string.tasks_share_template)
                     .replace("%course", CoursesDb.getFullname(task.id_course).toString())
                     .replace("%description", task.description)
             val sendIntent: Intent = Intent().apply {
@@ -176,7 +176,7 @@ class TasksAdapter(private val tasks: MutableList<Task>,
             }
         }
 
-        private val themeColor = SphPlanner.applicationContext()
+        private val themeColor = SphPlanner.appContext()
                 .getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
                 .getInt("themeColor", 0)
 
@@ -208,7 +208,7 @@ class TasksAdapter(private val tasks: MutableList<Task>,
                         due.setText(R.string.tasks_due_overdue)
                         Utility.tintBackground(
                                 due,
-                                SphPlanner.applicationContext().getColor(R.color.design_default_color_error),
+                                SphPlanner.appContext().getColor(R.color.design_default_color_error),
                                 0xb4000000.toInt())
                     } else {
                         dueLayout.visibility = View.GONE
@@ -239,7 +239,7 @@ class TasksAdapter(private val tasks: MutableList<Task>,
                     due.text = SimpleDateFormat("d. MMM", Locale.getDefault())
                             .format(task.dueDate!!)
                     Utility.tintBackground(due,
-                            SphPlanner.applicationContext().getColor(R.color.grey_800),
+                            SphPlanner.appContext().getColor(R.color.grey_800),
                             0xb4000000.toInt())
                 }
             }

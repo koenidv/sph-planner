@@ -27,7 +27,7 @@ class Courses(private val networkManager: NetworkManager = NetworkManager()) {
         if (Debugger.DEBUGGING_ENABLED)
             DebugLog("Courses", "Starting course indexing").log()
 
-        val prefs = SphPlanner.applicationContext().getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
+        val prefs = SphPlanner.appContext().getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
         // Remove old courses, it'll just lead to isses
         val coursesDb = CoursesDb
         coursesDb.clear()
@@ -72,7 +72,7 @@ class Courses(private val networkManager: NetworkManager = NetworkManager()) {
             when (loadList[index]) {
                 "timetable" -> {
                     networkManager.getSiteAuthed(
-                            SphPlanner.applicationContext().getString(R.string.url_timetable),
+                            SphPlanner.appContext().getString(R.string.url_timetable),
                             callback = { success: Int, response: String? ->
                                 if (success == NetworkManager.SUCCESS) {
                                     // Save parsed courses from timetable
@@ -90,7 +90,7 @@ class Courses(private val networkManager: NetworkManager = NetworkManager()) {
                 }
                 "studygroups" -> {
                     networkManager.getSiteAuthed(
-                            SphPlanner.applicationContext().getString(R.string.url_studygroups),
+                            SphPlanner.appContext().getString(R.string.url_studygroups),
                             callback = { success: Int, response: String? ->
                                 if (success == NetworkManager.SUCCESS) {
                                     // We now know which courses are favorites,
@@ -111,7 +111,7 @@ class Courses(private val networkManager: NetworkManager = NetworkManager()) {
                 }
                 "mycourses" -> {
                     networkManager.getSiteAuthed(
-                            SphPlanner.applicationContext().getString(R.string.url_mycourses),
+                            SphPlanner.appContext().getString(R.string.url_mycourses),
                             callback = { success: Int, response: String? ->
                                 if (success == NetworkManager.SUCCESS) {
                                     // Save parsed courses from posts overview

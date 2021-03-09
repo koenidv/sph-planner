@@ -33,7 +33,7 @@ class OnboardingSupportlistFragment : Fragment() {
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_onboarding_supportlist, container, false)
-        val prefs = SphPlanner.applicationContext().getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
+        val prefs = SphPlanner.appContext().getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
 
         val featuresLoading = view.findViewById<ProgressBar>(R.id.featuresLoading)
         val titleText = view.findViewById<TextView>(R.id.headTextView)

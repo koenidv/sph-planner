@@ -17,7 +17,7 @@ data class FileAttachment(
         var pinned: Boolean, // Whether the file is pinned by user
         var lastUse: Date? // Last usage of this file
 ) {
-    fun localDirectory() = SphPlanner.applicationContext().filesDir.toString() + "/attachments/"
+    fun localDirectory() = SphPlanner.appContext().filesDir.toString() + "/attachments/"
     fun localFileName() = "${attachmentId}.${fileType}"
     fun localPath() = localDirectory() + localFileName()
 }

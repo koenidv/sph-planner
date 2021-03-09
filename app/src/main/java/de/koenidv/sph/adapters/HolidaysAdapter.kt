@@ -8,9 +8,9 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
-import de.koenidv.sph.objects.Holiday
 import de.koenidv.sph.R
-import de.koenidv.sph.SphPlanner.Companion.applicationContext
+import de.koenidv.sph.SphPlanner.Companion.appContext
+import de.koenidv.sph.objects.Holiday
 import de.koenidv.sph.parsing.Utility
 import java.text.SimpleDateFormat
 import java.util.*
@@ -38,43 +38,43 @@ class HolidaysAdapter(private val holidays: List<Holiday>) :
         val year = currentHoliday.year
 
         name.text = when (currentName) {
-            "osterferien" -> applicationContext().getString(R.string.holidays_spring) + " $year"
-            "sommerferien" -> applicationContext().getString(R.string.holidays_summer) + " $year"
-            "herbstferien" -> applicationContext().getString(R.string.holidays_autumn) + " $year"
-            "weihnachtsferien" -> applicationContext().getString(R.string.holidays_winter) + " $year"
+            "osterferien" -> appContext().getString(R.string.holidays_spring) + " $year"
+            "sommerferien" -> appContext().getString(R.string.holidays_summer) + " $year"
+            "herbstferien" -> appContext().getString(R.string.holidays_autumn) + " $year"
+            "weihnachtsferien" -> appContext().getString(R.string.holidays_winter) + " $year"
             else -> currentName
         }
 
         //date stuff
-        val formatter = SimpleDateFormat(applicationContext().getString(R.string.holidays_date_template), Locale.getDefault())
-        val formatter2 = SimpleDateFormat(applicationContext().getString(R.string.holidays_date_template2), Locale.getDefault())
+        val formatter = SimpleDateFormat(appContext().getString(R.string.holidays_date_template), Locale.getDefault())
+        val formatter2 = SimpleDateFormat(appContext().getString(R.string.holidays_date_template2), Locale.getDefault())
         val startDate = formatter.format(currentHoliday.start)
         val endDate = formatter2.format(currentHoliday.end)
         val currentDate = Date().time
         val remainingTime = currentHoliday.start.time - currentDate
         val remainingDays = remainingTime / 86400000
 
-        date.text = applicationContext().getString(R.string.holidays_date)
+        date.text = appContext().getString(R.string.holidays_date)
                 .replace("%s", startDate)
                 .replace("%e", endDate)
 
         //remaining
         if (remainingDays >= 14) {
-            remaining.text = applicationContext().getString(R.string.holidays_remaining_weeks)
+            remaining.text = appContext().getString(R.string.holidays_remaining_weeks)
                     .replace("%w", (remainingDays / 7).toString())
                     .replace("%d", (remainingDays - (remainingDays / 7) * 7).toString())
         } else {
-            remaining.text = applicationContext().getString(R.string.holidays_remaining_days, remainingDays)
+            remaining.text = appContext().getString(R.string.holidays_remaining_days, remainingDays)
         }
         // TODO: 13/02/2021 make use of plurals/singulars
 
         // Tint background with holiday color at 15% for next 4 Holidays
         if (position < 4) {
             val color = when (currentName) {
-                "osterferien" -> applicationContext().getColor(R.color.holiday_color_spring)
-                "sommerferien" -> applicationContext().getColor(R.color.holiday_color_summer)
-                "herbstferien" -> applicationContext().getColor(R.color.holiday_color_autumn)
-                "weihnachtsferien" -> applicationContext().getColor(R.color.holiday_color_winter)
+                "osterferien" -> appContext().getColor(R.color.holiday_color_spring)
+                "sommerferien" -> appContext().getColor(R.color.holiday_color_summer)
+                "herbstferien" -> appContext().getColor(R.color.holiday_color_autumn)
+                "weihnachtsferien" -> appContext().getColor(R.color.holiday_color_winter)
                 else -> Color.TRANSPARENT
             }
             Utility.tintBackground(layout, color, 0x32000000)

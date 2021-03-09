@@ -107,7 +107,7 @@ class Users {
                 return@getToken
             }
             // Not get the all recipients for the current character
-            AndroidNetworking.post(SphPlanner.applicationContext().getString(R.string.url_messages))
+            AndroidNetworking.post(SphPlanner.appContext().getString(R.string.url_messages))
                     .addBodyParameter("a", "searchRecipt")
                     .addBodyParameter("q", query)
                     .build()
@@ -234,7 +234,7 @@ class Users {
      */
     fun sendEmail(user: User) {
         // Get the template
-        var template = SphPlanner.applicationContext()
+        var template = SphPlanner.appContext()
                 .getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
                 .getString("users_mail_template", "")!!
 
@@ -261,14 +261,14 @@ class Users {
                 .apply {
                     data = Uri.parse("mailto:$template")
                 },
-                SphPlanner.applicationContext().getString(R.string.users_email_title)
+                SphPlanner.appContext().getString(R.string.users_email_title)
                         .replace("%firstname", user.firstname.toString())
                         .replace("%lastname", user.lastname.toString()))
                 .apply {
                     flags = Intent.FLAG_ACTIVITY_NEW_TASK
                 }
 
-        SphPlanner.applicationContext().startActivity(emailIntent)
+        SphPlanner.appContext().startActivity(emailIntent)
     }
 
 }

@@ -9,7 +9,7 @@ import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import de.koenidv.sph.R
-import de.koenidv.sph.SphPlanner.Companion.applicationContext
+import de.koenidv.sph.SphPlanner.Companion.appContext
 import de.koenidv.sph.database.CoursesDb
 import de.koenidv.sph.objects.Change
 import de.koenidv.sph.parsing.ChangeInfo
@@ -57,7 +57,7 @@ class ChangesAdapter(private val changes: List<Change>,
             val isFavorite = CoursesDb.isFavorite(change.id_course)
 
             // Set title
-            var titletext = applicationContext().getString(
+            var titletext = appContext().getString(
                     when (change.type) {
                         Change.TYPE_EVA -> R.string.changes_template_eva
                         Change.TYPE_CANCELLED -> R.string.changes_template_cancelled
@@ -129,13 +129,13 @@ class ChangesAdapter(private val changes: List<Change>,
                 date.text = when {
                     change.date.time - time <= -24 * 60 * 60 * 1000 ->
                         // Past date
-                        applicationContext().getString(R.string.changes_date_past)
+                        appContext().getString(R.string.changes_date_past)
                     change.date.time - time <= 0 ->
                         // Date is within the last 24 hours, which means its today
-                        applicationContext().getString(R.string.changes_date_today)
+                        appContext().getString(R.string.changes_date_today)
                     change.date.time - time <= 24 * 60 * 60 * 1000 ->
                         // Tomorrow
-                        applicationContext().getString(R.string.changes_date_tomorrow)
+                        appContext().getString(R.string.changes_date_tomorrow)
                     change.date.time - time <= 7 * 86400 * 1000 ->
                         // Next week
                         otherDateFormat.format(change.date)

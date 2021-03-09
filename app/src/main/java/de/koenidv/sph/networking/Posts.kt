@@ -40,12 +40,12 @@ class Posts(private val networkManager: NetworkManager = NetworkManager()) {
             DebugLog("Posts", "Updating posts").log()
 
         // Get my courses page
-        networkManager.getSiteAuthed(SphPlanner.applicationContext()
+        networkManager.getSiteAuthed(SphPlanner.appContext()
                 .getString(R.string.url_mycourses)) { success, response ->
             if (success == NetworkManager.SUCCESS) {
                 // Check which courses should be updated
                 // Any course that is not in this list does not have any posts.
-                val prefs = SphPlanner.applicationContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
+                val prefs = SphPlanner.appContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
                 val courses = mutableListOf<Course>()
                 val courseids = mutableListOf<String>()
                 val rows = Jsoup.parse(response!!).select("#aktuell tbody tr")
@@ -106,7 +106,7 @@ class Posts(private val networkManager: NetworkManager = NetworkManager()) {
                         val uiBroadcast = Intent("uichange")
                         uiBroadcast.putExtra("content", "posts")
                         uiBroadcast.putExtra("courses", courseids.toTypedArray())
-                        LocalBroadcastManager.getInstance(SphPlanner.applicationContext()).sendBroadcast(uiBroadcast)
+                        LocalBroadcastManager.getInstance(SphPlanner.appContext()).sendBroadcast(uiBroadcast)
                         callback(it)
                     }
 
@@ -146,7 +146,7 @@ class Posts(private val networkManager: NetworkManager = NetworkManager()) {
                             "semester" to semester,
                             "courses" to courses)).log()
 
-        val prefs = SphPlanner.applicationContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
+        val prefs = SphPlanner.appContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
         val time = Date().time
         var url: String?
 
@@ -180,11 +180,11 @@ class Posts(private val networkManager: NetworkManager = NetworkManager()) {
         // Load every course
         for (course in courses) {
             url = if (semester == null) {
-                SphPlanner.applicationContext()
+                SphPlanner.appContext()
                         .getString(R.string.url_course_overview)
                         .replace("%numberid", course.number_id.toString())
             } else {
-                SphPlanner.applicationContext()
+                SphPlanner.appContext()
                         .getString(R.string.url_course_overview_semester)
                         .replace("%numberid", course.number_id.toString())
                         .replace("%semester", semester)
@@ -258,7 +258,7 @@ class Posts(private val networkManager: NetworkManager = NetworkManager()) {
                     prefs.edit().putLong("updated_posts_${course.courseId}", time).apply()
                 } else {
                     Log.d(SphPlanner.TAG, "Couldn't load " +
-                            SphPlanner.applicationContext().getString(R.string.url_course_overview)
+                            SphPlanner.appContext().getString(R.string.url_course_overview)
                                     .replace("%numberid", course.number_id
                                             .toString()))
                     errors.add(success)

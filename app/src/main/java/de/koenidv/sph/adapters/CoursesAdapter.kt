@@ -113,17 +113,17 @@ class CoursesAdapter(private val courses: MutableList<Course>,
 
             // Set data
             var name = course.fullname
-            if (course.isLK == true) name += SphPlanner.applicationContext().getString(R.string.course_appendix_lk)
+            if (course.isLK == true) name += SphPlanner.appContext().getString(R.string.course_appendix_lk)
             nameText.text = name
             // Create info text
             var infotext = ""
             if (openTasks > 0) {
                 if (infotext != "") infotext += "\n"
-                infotext += SphPlanner.applicationContext().resources.getQuantityString(R.plurals.course_info_undone_tasks, openTasks, openTasks)
+                infotext += SphPlanner.appContext().resources.getQuantityString(R.plurals.course_info_undone_tasks, openTasks, openTasks)
             }
             if (openPosts > 0) {
                 if (infotext != "") infotext += "\n"
-                infotext += SphPlanner.applicationContext().resources.getQuantityString(R.plurals.course_info_unread_posts, openPosts, openPosts)
+                infotext += SphPlanner.appContext().resources.getQuantityString(R.plurals.course_info_unread_posts, openPosts, openPosts)
             }
             // Set info text if it is not empty
             if (infotext != "") {

@@ -36,7 +36,7 @@ class SphPlanner : Application() {
         private var instance: SphPlanner? = null
 
         // Returns the applications context for usage everywhere within the app
-        fun applicationContext(): Context {
+        fun appContext(): Context {
             return instance!!.applicationContext
         }
 
@@ -70,7 +70,7 @@ class SphPlanner : Application() {
                 .cookieJar(CookieStore)
                 /*.connectTimeout(60, TimeUnit.SECONDS)*/ // sph timeout is 30 seconds
                 .build()
-        AndroidNetworking.initialize(applicationContext(), okHttpClient)
+        AndroidNetworking.initialize(appContext(), okHttpClient)
 
         upgrade()
     }

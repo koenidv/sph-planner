@@ -54,7 +54,7 @@ class UserSelectionAdapter(users: List<User>, preselect: String? = null, private
             currentUser = user
 
             // Set user name
-            name.text = SphPlanner.applicationContext().getString(R.string.users_name_template_last)
+            name.text = SphPlanner.appContext().getString(R.string.users_name_template_last)
                     .replace("%firstname", user.user.firstname.toString())
                     .replace("%lastname", user.user.lastname.toString())
 

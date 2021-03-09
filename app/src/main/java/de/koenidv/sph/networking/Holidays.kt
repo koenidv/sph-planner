@@ -5,7 +5,7 @@ import com.androidnetworking.error.ANError
 import com.androidnetworking.interfaces.JSONArrayRequestListener
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import de.koenidv.sph.R
-import de.koenidv.sph.SphPlanner.Companion.applicationContext
+import de.koenidv.sph.SphPlanner.Companion.appContext
 import de.koenidv.sph.SphPlanner.Companion.prefs
 import de.koenidv.sph.database.HolidaysDb
 import de.koenidv.sph.debugging.DebugLog
@@ -29,7 +29,7 @@ class Holidays {
             DebugLog("Holidays", "Fetching holidays").log()
 
         // Get all holidays for HE from ferien-api.de
-        AndroidNetworking.get(applicationContext().getString(R.string.url_holidays))
+        AndroidNetworking.get(appContext().getString(R.string.url_holidays))
                 .build()
                 .getAsJSONArray(object : JSONArrayRequestListener {
                     override fun onResponse(response: JSONArray?) {

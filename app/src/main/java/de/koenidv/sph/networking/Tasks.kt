@@ -58,7 +58,7 @@ class Tasks {
                 if (callback != null) callback(task, isDone)
             } else {
                 Snackbar.make(activity.findViewById(R.id.nav_host_fragment),
-                        SphPlanner.applicationContext().getString(R.string.task_not_synchronized)
+                        SphPlanner.appContext().getString(R.string.task_not_synchronized)
                                 + " ($it)", Snackbar.LENGTH_SHORT)
                         .setAnchorView(R.id.nav_view).show()
             }
@@ -72,7 +72,7 @@ class Tasks {
             uiBroadcast.putExtra("taskId", task.id)
             uiBroadcast.putExtra("postId", post.postId)
             uiBroadcast.putExtra("isDone", isDone)
-            LocalBroadcastManager.getInstance(SphPlanner.applicationContext()).sendBroadcast(uiBroadcast)
+            LocalBroadcastManager.getInstance(SphPlanner.appContext()).sendBroadcast(uiBroadcast)
         }
 
         // If this is the first time the user marked a task as done, show an info
@@ -115,7 +115,7 @@ class Tasks {
 
                     // Send a post request to let sph know the task is done
                     AndroidNetworking.post(
-                            SphPlanner.applicationContext().getString(R.string.url_mycourses))
+                            SphPlanner.appContext().getString(R.string.url_mycourses))
                             .addBodyParameter("a", "sus_homeworkDone")
                             .addBodyParameter("id", numberId)
                             .addBodyParameter("entry", postId.substringAfterLast("_"))

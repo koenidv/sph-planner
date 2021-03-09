@@ -10,7 +10,7 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics
 import de.koenidv.sph.BuildConfig
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner.Companion.TAG
-import de.koenidv.sph.SphPlanner.Companion.applicationContext
+import de.koenidv.sph.SphPlanner.Companion.appContext
 import de.koenidv.sph.networking.NetworkManager.Companion.FAILED_CRYPTION
 import de.koenidv.sph.networking.NetworkManager.Companion.FAILED_SERVER_ERROR
 import de.koenidv.sph.networking.NetworkManager.Companion.FAILED_UNKNOWN
@@ -83,7 +83,7 @@ class Cryption {
      * Or null if authentication failed
      */
     private fun getCryptor(callback: (Int, Cryption?) -> Unit) {
-        val prefs = applicationContext().getSharedPreferences(
+        val prefs = appContext().getSharedPreferences(
                 "sharedPrefs", Context.MODE_PRIVATE)
         // Get the current session id token to check if it has changed
         TokenManager.getToken { tokensuccess, token ->
@@ -183,7 +183,7 @@ class Cryption {
      */
     private fun getPublicKey(callback: (publicKey: String?) -> Unit) {
         NetworkManager().getJson(
-                applicationContext().getString(R.string.url_cryption_publickey)) { success, result ->
+                appContext().getString(R.string.url_cryption_publickey)) { success, result ->
             if (success == SUCCESS && result?.get("publickey") != null) {
                 callback(result.get("publickey").toString())
             } else {
@@ -228,7 +228,7 @@ class Cryption {
             }
 
             // Get the handshake url with a random value for s between 0 and 2000
-            val url = applicationContext().getString(
+            val url = appContext().getString(
                     R.string.url_cryption_handshake, (Math.random() * 2000).roundToInt().toString())
 
             // Send a post to the handshake server
@@ -252,9 +252,9 @@ class Cryption {
                                 "requestCancelledError" -> callback(NetworkManager.FAILED_CANCELLED, null)
                                 else -> {
                                     callback(FAILED_UNKNOWN, null)
-                                    Toast.makeText(applicationContext(), "Error for $url",
+                                    Toast.makeText(appContext(), "Error for $url",
                                             Toast.LENGTH_LONG).show()
-                                    Toast.makeText(applicationContext(),
+                                    Toast.makeText(appContext(),
                                             error.errorCode.toString()
                                                     + ": " + error.errorDetail,
                                             Toast.LENGTH_LONG).show()
@@ -321,7 +321,7 @@ class Cryption {
             if (!::rhino.isInitialized || !::scope.isInitialized) {
                 Log.d("$TAG js", "Starting Rhino VM")
                 // Get the js file
-                val source = applicationContext().resources.openRawResource(R.raw.cryption)
+                val source = appContext().resources.openRawResource(R.raw.cryption)
                         .bufferedReader().use { it.readText() }
 
                 // Initialize the Rhino VM using enter()

@@ -50,7 +50,7 @@ object UsersDb {
                 return userid
             }
             // Get template
-            var name = SphPlanner.applicationContext().getString(
+            var name = SphPlanner.appContext().getString(
                     if (lastnamefirst) R.string.users_name_template_last
                     else R.string.users_name_template_first)
             // Replace placeholders

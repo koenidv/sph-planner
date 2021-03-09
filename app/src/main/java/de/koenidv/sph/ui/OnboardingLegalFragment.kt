@@ -20,7 +20,7 @@ class OnboardingLegalFragment : Fragment() {
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_onboarding_legal, container, false)
-        val prefs = SphPlanner.applicationContext().getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
+        val prefs = SphPlanner.appContext().getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
 
         // If user already agreed to the legal stuff but then cancelled the setup,
         // continue to the next step

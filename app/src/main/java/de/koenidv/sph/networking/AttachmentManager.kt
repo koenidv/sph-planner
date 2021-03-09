@@ -28,7 +28,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner.Companion.TAG
-import de.koenidv.sph.SphPlanner.Companion.applicationContext
+import de.koenidv.sph.SphPlanner.Companion.appContext
 import de.koenidv.sph.database.FileAttachmentsDb
 import de.koenidv.sph.database.LinkAttachmentsDb
 import de.koenidv.sph.objects.Attachment
@@ -55,7 +55,7 @@ class AttachmentManager {
     // Movement method to open links in-app
     fun movementMethod(activity: Activity, webViewAction: Int): BetterLinkMovementMethod = BetterLinkMovementMethod.newInstance()
             .setOnLinkClickListener { _, url ->
-                val prefs: SharedPreferences = applicationContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
+                val prefs: SharedPreferences = appContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
                 if (prefs.getBoolean("open_links_inapp", true)) {
                     // Open WebViewFragment with respective url on click
                     Navigation.findNavController(activity, R.id.nav_host_fragment)
@@ -419,7 +419,7 @@ class AttachmentManager {
                 val okHttpClient = OkHttpClient.Builder()
                         .cookieJar(CookieStore)
                         .build()
-                AndroidNetworking.initialize(applicationContext(), okHttpClient)
+                AndroidNetworking.initialize(appContext(), okHttpClient)
 
                 // Download attachment
                 AndroidNetworking.download(file.url, file.localDirectory(), file.localFileName())
@@ -467,7 +467,7 @@ class AttachmentManager {
      */
     private fun openAttachmentFile(attachment: FileAttachment) {
         val fileToOpen = File(attachment.localPath())
-        val path = FileProvider.getUriForFile(applicationContext(), applicationContext().packageName + ".provider", fileToOpen)
+        val path = FileProvider.getUriForFile(appContext(), appContext().packageName + ".provider", fileToOpen)
 
         val fileIntent = Intent(Intent.ACTION_VIEW)
         fileIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
@@ -477,10 +477,10 @@ class AttachmentManager {
         // Try opening the file with the correct application
         // If no application can be found, let the user decide
         try {
-            applicationContext().startActivity(fileIntent)
+            appContext().startActivity(fileIntent)
         } catch (exception: ActivityNotFoundException) {
             fileIntent.setDataAndType(path, "*/*")
-            applicationContext().startActivity(fileIntent)
+            appContext().startActivity(fileIntent)
         }
         // Update last use date
         FileAttachmentsDb.getInstance().used(attachment.attachmentId)
@@ -492,7 +492,7 @@ class AttachmentManager {
     private fun shareAttachmentFile(attachment: FileAttachment, activity: Activity) {
         // Get a uri to the file
         val fileToShare = File(attachment.localPath())
-        val uri = FileProvider.getUriForFile(applicationContext(), applicationContext().packageName + ".provider", fileToShare)
+        val uri = FileProvider.getUriForFile(appContext(), appContext().packageName + ".provider", fileToShare)
         // Check if the file actually exists
         if (fileToShare.exists()) {
             // Create a share intent
@@ -506,12 +506,12 @@ class AttachmentManager {
 
             // Create chooser
             val chooser = Intent.createChooser(intent,
-                    applicationContext().getString(R.string.attachments_options_share))
+                    appContext().getString(R.string.attachments_options_share))
             chooser.flags = Intent.FLAG_ACTIVITY_NEW_TASK
 
             // Start intent chooser
             try {
-                applicationContext().startActivity(chooser)
+                appContext().startActivity(chooser)
                 // Update last use date
                 FileAttachmentsDb.getInstance().used(attachment.attachmentId)
             } catch (ane: ActivityNotFoundException) {

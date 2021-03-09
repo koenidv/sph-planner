@@ -20,7 +20,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public static DatabaseHelper getInstance() {
         if (DatabaseHelper.instance == null) {
-            DatabaseHelper.instance = new DatabaseHelper(SphPlanner.Companion.applicationContext());
+            DatabaseHelper.instance = new DatabaseHelper(SphPlanner.Companion.appContext());
         }
         return DatabaseHelper.instance;
     }
@@ -28,7 +28,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     // Create a new instance, even if one already exists
     // Used to recreate database after deletion
     public static DatabaseHelper newInstance() {
-        DatabaseHelper.instance = new DatabaseHelper(SphPlanner.Companion.applicationContext());
+        DatabaseHelper.instance = new DatabaseHelper(SphPlanner.Companion.appContext());
         return DatabaseHelper.instance;
     }
 

@@ -45,7 +45,7 @@ class WebViewFragment : Fragment() {
                               container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
         val view = inflater.inflate(R.layout.fragment_webview, container, false)
-        val prefs: SharedPreferences = SphPlanner.applicationContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
+        val prefs: SharedPreferences = SphPlanner.appContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
 
         // Set up WebView to show a page
         webView = view.findViewById(R.id.webview)
@@ -168,7 +168,7 @@ class WebViewFragment : Fragment() {
         super.onDestroy()
         // Recreate activity if this was the first time using webview during this application lifecycle
         // This is to work around a weird bug in WebView causing the night theme configuration to be changed
-        if (SphPlanner.applicationContext()
+        if (SphPlanner.appContext()
                         .getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
                         .getBoolean("force_webview_theme_fix", true)
                 && !SphPlanner.webViewFixed) {

@@ -67,7 +67,7 @@ class ContactSheet internal constructor() : BottomSheetDialogFragment() {
             // Get app version
             val version: String
             version = try {
-                val pInfo = SphPlanner.applicationContext().packageManager.getPackageInfo(SphPlanner.applicationContext().packageName, 0)
+                val pInfo = SphPlanner.appContext().packageManager.getPackageInfo(SphPlanner.appContext().packageName, 0)
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                     pInfo.longVersionCode.toString()
                 } else {
@@ -85,9 +85,9 @@ class ContactSheet internal constructor() : BottomSheetDialogFragment() {
                     .putExtra(Intent.EXTRA_TEXT, getString(R.string.feedback_body)
                             .replace("%app", version)
                             .replace("%android", Build.VERSION.SDK_INT.toString())
-                            .replace("%school", prefs.getString("school", "0")!!))
+                            .replace("%school", prefs.getString("schoolid", "—")!!))
             // Only open if email client is installed
-            if (emailIntent.resolveActivity(SphPlanner.applicationContext().packageManager) != null) startActivity(emailIntent)
+            if (emailIntent.resolveActivity(SphPlanner.appContext().packageManager) != null) startActivity(emailIntent)
             dismiss()
         }
 

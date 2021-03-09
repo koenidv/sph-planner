@@ -13,7 +13,7 @@ import androidx.navigation.Navigation
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
 import de.koenidv.sph.R
-import de.koenidv.sph.SphPlanner.Companion.applicationContext
+import de.koenidv.sph.SphPlanner.Companion.appContext
 import de.koenidv.sph.database.ConversationsDb
 import de.koenidv.sph.database.UsersDb
 import de.koenidv.sph.parsing.Utility
@@ -103,7 +103,7 @@ class ConversationsAdapter(val conversations: MutableList<ConversationInfo>,
     }
 
     // Get theme color
-    private val prefs = applicationContext()
+    private val prefs = appContext()
             .getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
     private val themeColor = prefs.getInt("themeColor", 0)
 
@@ -177,16 +177,16 @@ class ConversationsAdapter(val conversations: MutableList<ConversationInfo>,
             return if (now.date == date.date &&
                     now.time - date.time < 24 * 3600000) {
                 // If now is the same day in month and maximum of 24hours ago
-                SimpleDateFormat(applicationContext().getString(R.string.messages_dateformat_today),
+                SimpleDateFormat(appContext().getString(R.string.messages_dateformat_today),
                         Locale.getDefault())
                         .format(date)
             } else if (now.time - date.time < 48 * 3600000) {
-                SimpleDateFormat(applicationContext().getString(R.string.messages_dateformat_yesterday),
+                SimpleDateFormat(appContext().getString(R.string.messages_dateformat_yesterday),
                         Locale.getDefault())
                         .format(date)
             } else {
                 // todo proper relative dates
-                SimpleDateFormat(applicationContext().getString(R.string.messages_dateformat_other),
+                SimpleDateFormat(appContext().getString(R.string.messages_dateformat_other),
                         Locale.getDefault())
                         .format(date)
             }
@@ -195,7 +195,7 @@ class ConversationsAdapter(val conversations: MutableList<ConversationInfo>,
 
         private fun getRecipientText(conversation: ConversationInfo): String {
 
-            var text = applicationContext().getString(when {
+            var text = appContext().getString(when {
                 conversation.isOwn && conversation.partnerCount == 1 ->
                     // From self and only one recipient
                     R.string.messages_partic_fromself

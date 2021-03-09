@@ -24,11 +24,11 @@ class OptionsSheet internal constructor() : BottomSheetDialogFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val view: View = inflater.inflate(R.layout.sheet_options, container, false)
-        val prefs = SphPlanner.applicationContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
+        val prefs = SphPlanner.appContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
 
         // Append version to app name
         try {
-            val pInfo = SphPlanner.applicationContext().packageManager.getPackageInfo(SphPlanner.applicationContext().packageName, 0)
+            val pInfo = SphPlanner.appContext().packageManager.getPackageInfo(SphPlanner.appContext().packageName, 0)
             val appnameTitle = getString(R.string.info_app).replace("%version", pInfo.versionName)
             view.findViewById<TextView>(R.id.titleTextView).text = appnameTitle
         } catch (e: PackageManager.NameNotFoundException) {

@@ -20,6 +20,7 @@
     <string name="url_cryption_publickey" translatable="false">https://start.schulportal.hessen.de/ajax.php?f=rsaPublicKey</string>
     <string name="url_cryption_handshake" translatable="false">https://start.schulportal.hessen.de/ajax.php?f=rsaHandshake&amp;s=%s</string>
     <string name="url_status" translatable="false">https://info.schulportal.hessen.de/</string>
+    <string name="url_web_debugger" translatable="false">https://koenidv.github.io/sph-planner/debugger#%s</string>
 
     <!-- General purpose -->
     <string name="cancel">Cancel</string>

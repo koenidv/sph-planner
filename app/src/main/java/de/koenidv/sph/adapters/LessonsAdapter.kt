@@ -95,7 +95,7 @@ class LessonsAdapter(private var dataset: List<List<TimetableEntry>>,
                 (entries[0].course?.color
                         ?: 6168631)
             } else {
-                SphPlanner.applicationContext().getColor(R.color.grey_800)
+                SphPlanner.appContext().getColor(R.color.grey_800)
             }
             // Set background color with 40% opacity
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -219,12 +219,12 @@ class LessonsAdapter(private var dataset: List<List<TimetableEntry>>,
                             0x80000000.toInt())
                     // Add change type to text
                     if (change.type == Change.TYPE_ROOM) {
-                        text.text = SphPlanner.applicationContext()
+                        text.text = SphPlanner.appContext()
                                 .getString(R.string.timetable_change_template)
                                 .replace("%shortname", CourseInfo.getNameAbbreviation(change.id_course!!))
                                 .replace("%type", change.room.toString())
                     } else {
-                        text.text = SphPlanner.applicationContext()
+                        text.text = SphPlanner.appContext()
                                 .getString(R.string.timetable_change_template)
                                 .replace("%shortname", CourseInfo.getNameAbbreviation(change.id_course!!))
                                 .replace("%type", ChangeInfo.getTypeNameAbbreviation(change.type))

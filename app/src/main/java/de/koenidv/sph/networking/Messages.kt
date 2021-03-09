@@ -10,7 +10,7 @@ import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner.Companion.TAG
-import de.koenidv.sph.SphPlanner.Companion.applicationContext
+import de.koenidv.sph.SphPlanner.Companion.appContext
 import de.koenidv.sph.SphPlanner.Companion.prefs
 import de.koenidv.sph.database.ConversationsDb
 import de.koenidv.sph.database.MessagesDb
@@ -66,7 +66,7 @@ class Messages {
                 // a=headers - Titles only (read for entire message)
                 // getType=visibleOnly - Only get visible messages (could also be unvisibleOnly)
                 // last=0 - Not yet sure what that does, but it is needed to not get an error
-                NetworkManager().postJsonAuthed(applicationContext().getString(R.string.url_messages),
+                NetworkManager().postJsonAuthed(appContext().getString(R.string.url_messages),
                         body = mapOf("a" to "headers", "getType" to typeBody, "last" to "0")) { netSuccess, json ->
                     if (netSuccess == NetworkManager.SUCCESS && json != null &&
                             json.get("rows") != "false") {
@@ -166,7 +166,7 @@ class Messages {
 
                                     } else if (conversation.date != date ||
                                             conversation.answerType != answerType ||
-                                            conversation.archived != isArchived) {
+                                            (conversation.archived != isArchived && conversation.archived)) {
                                         // If the read status of this conversation has changed,
                                         // or if force refresh is enabled, update this conversation
                                         // Values other than unread, date and answertype
@@ -253,7 +253,7 @@ class Messages {
         cryption.encrypt(conversation.firstIdMess) { firstMessageId ->
             if (firstMessageId != null) {
                 // Post to sph to get messages data
-                NetworkManager().postJsonAuthed(applicationContext().getString(R.string.url_messages),
+                NetworkManager().postJsonAuthed(appContext().getString(R.string.url_messages),
                         body = mapOf("a" to "read", "uniqid" to firstMessageId)) { netSuccess, json ->
                     if (netSuccess == NetworkManager.SUCCESS && json != null && !json.isNull("message")) {
                         // If net request was successfull, decrypt the message
@@ -410,7 +410,7 @@ class Messages {
                 // Post this to sph
                 TokenManager.authenticate {
                     NetworkManager().postJsonAuthed(
-                            applicationContext().getString(R.string.url_messages),
+                            appContext().getString(R.string.url_messages),
                             mapOf("a" to "newmessage", "c" to encrypted!!)) { success, data ->
 
                         if (success != NetworkManager.SUCCESS) {
@@ -481,7 +481,7 @@ class Messages {
 
                 // Post the encrypted message to sph
                 NetworkManager().postJsonAuthed(
-                        applicationContext().getString(R.string.url_messages),
+                        appContext().getString(R.string.url_messages),
                         mapOf("a" to "reply", "c" to encrypted)) { success, data ->
 
                     if (success != NetworkManager.SUCCESS
@@ -528,7 +528,7 @@ class Messages {
         // Post to sph
         // We don't actually care about the response, leaving the lambda empty
         NetworkManager().postJsonAuthed(
-                applicationContext().getString(R.string.url_messages),
+                appContext().getString(R.string.url_messages),
                 mapOf(
                         "a" to if (archived) "deleteAll" else "recycleMsg",
                         "uniqid" to firstMessageId,
@@ -548,7 +548,7 @@ class Messages {
                         "id" to conversationId,
                         "type" to type
                 ))
-        LocalBroadcastManager.getInstance(applicationContext()).sendBroadcast(uiBroadcast)
+        LocalBroadcastManager.getInstance(appContext()).sendBroadcast(uiBroadcast)
     }
 
 

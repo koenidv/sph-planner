@@ -12,7 +12,7 @@ import androidx.constraintlayout.widget.ConstraintSet
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import de.koenidv.sph.R
-import de.koenidv.sph.SphPlanner.Companion.applicationContext
+import de.koenidv.sph.SphPlanner.Companion.appContext
 import de.koenidv.sph.database.UsersDb
 import de.koenidv.sph.objects.Message
 import me.saket.bettermovementmethod.BetterLinkMovementMethod
@@ -105,7 +105,7 @@ class ChatAdapter(val messages: MutableList<Message>, private val conversationIn
 
         fun bind(info: Pair<String, Int>) {
 
-            header.text = applicationContext().getString(
+            header.text = appContext().getString(
                     if (info.second == 0)
                         R.string.messages_header_private
                     else R.string.messages_header_group)

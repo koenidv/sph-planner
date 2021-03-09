@@ -19,7 +19,7 @@ class ThemeSheet internal constructor() : BottomSheetDialogFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val view: View = inflater.inflate(R.layout.sheet_theme, container, false)
-        val prefs = SphPlanner.applicationContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
+        val prefs = SphPlanner.appContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
         val editor = prefs.edit()
 
         // Disable follow system option below Android 10

@@ -23,19 +23,19 @@ class Changes(private val networkManager: NetworkManager = NetworkManager()) {
         if (Debugger.DEBUGGING_ENABLED)
             DebugLog("Changes", "Fetching changes").log()
       
-        networkManager.getSiteAuthed(SphPlanner.applicationContext().getString(R.string.url_changes),
+        networkManager.getSiteAuthed(SphPlanner.appContext().getString(R.string.url_changes),
                 callback = { success: Int, result: String? ->
-                            
+
                     if (success == NetworkManager.SUCCESS) {
                         ChangesDb.instance!!.removeOld()
                         ChangesDb.instance!!.save(RawParser().parseChanges(result!!))
-                        SphPlanner.applicationContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
+                        SphPlanner.appContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
                                 .edit().putLong("updated_changes", Date().time).apply()
 
                         // Send broadcast to update changes
                         val uiBroadcast = Intent("uichange")
                         uiBroadcast.putExtra("content", "changes")
-                        LocalBroadcastManager.getInstance(SphPlanner.applicationContext()).sendBroadcast(uiBroadcast)
+                        LocalBroadcastManager.getInstance(SphPlanner.appContext()).sendBroadcast(uiBroadcast)
                     }
                     callback(success)
                 })

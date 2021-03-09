@@ -40,7 +40,7 @@ class OnboardingSigninFragment : Fragment() {
 
         // If user is verified but app was closed before data could finish loading,
         // we can just skip to the next fragment
-        val prefs = SphPlanner.applicationContext().getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
+        val prefs = SphPlanner.appContext().getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
         if (prefs.getBoolean("credsVerified", false)) {
             // If logging is enabled, log this
             if (Debugger.DEBUGGING_ENABLED)

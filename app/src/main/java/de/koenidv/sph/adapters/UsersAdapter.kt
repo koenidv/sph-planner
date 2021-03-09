@@ -21,7 +21,7 @@ class UsersAdapter(private val users: List<User>,
                    private val activity: FragmentActivity) :
         RecyclerView.Adapter<UsersAdapter.ViewHolder>() {
 
-    private val prefs = SphPlanner.applicationContext()
+    private val prefs = SphPlanner.appContext()
             .getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
     private val themeColor = prefs.getInt("themeColor", 0)
 
@@ -58,7 +58,7 @@ class UsersAdapter(private val users: List<User>,
             currentUser = user
 
             // Set user name
-            name.text = SphPlanner.applicationContext().getString(R.string.users_name_template_last)
+            name.text = SphPlanner.appContext().getString(R.string.users_name_template_last)
                     .replace("%firstname", user.firstname.toString())
                     .replace("%lastname", user.lastname.toString())
 

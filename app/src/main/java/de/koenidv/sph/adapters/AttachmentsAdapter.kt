@@ -60,7 +60,7 @@ class AttachmentsAdapter(private var attachments: List<Attachment>,
             val type = attachment.fileType()
             // Replace attachment name if its an image and the name consists of only digits and whitespaces
             if (listOf("jpg", "jpeg", "png", "gif").contains(type) && TextUtils.isDigitsOnly(name.replace(" ", "")))
-                name = SphPlanner.applicationContext().getString(R.string.attachments_namereplace_picture)
+                name = SphPlanner.appContext().getString(R.string.attachments_namereplace_picture)
             nameText.text = name
 
             // Set pinned, downloaded and filetype icons

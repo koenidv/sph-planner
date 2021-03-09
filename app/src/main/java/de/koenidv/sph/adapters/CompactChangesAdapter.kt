@@ -9,7 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import de.koenidv.sph.R
-import de.koenidv.sph.SphPlanner.Companion.applicationContext
+import de.koenidv.sph.SphPlanner.Companion.appContext
 import de.koenidv.sph.database.CoursesDb
 import de.koenidv.sph.objects.Change
 import de.koenidv.sph.parsing.ChangeInfo
@@ -35,7 +35,7 @@ class CompactChangesAdapter(var changes: List<Change>,
         private val lessons = view.findViewById<TextView>(R.id.lessonsTextView)
 
         private var currentChange: Change? = null
-        private val themeColor = applicationContext()
+        private val themeColor = appContext()
                 .getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
                 .getInt("themeColor", 0)
         private val otherDateFormat = SimpleDateFormat("EEEE", Locale.getDefault())
@@ -52,7 +52,7 @@ class CompactChangesAdapter(var changes: List<Change>,
             currentChange = change
 
             // Set title
-            title.text = applicationContext().getString(
+            title.text = appContext().getString(
                     when (change.type) {
                         Change.TYPE_EVA -> R.string.changes_template_eva
                         Change.TYPE_CANCELLED -> R.string.changes_template_cancelled
@@ -75,22 +75,22 @@ class CompactChangesAdapter(var changes: List<Change>,
             when {
                 change.date.time - time <= -24 * 60 * 60 * 1000 -> {
                     // Past date
-                    date.text = applicationContext().getString(R.string.changes_date_past)
-                    Utility.tintBackground(date, applicationContext().getColor(R.color.black), 0xb4000000.toInt())
+                    date.text = appContext().getString(R.string.changes_date_past)
+                    Utility.tintBackground(date, appContext().getColor(R.color.black), 0xb4000000.toInt())
                 }
                 change.date.time - time <= 0 -> {
                     // Date is within the last 24 hours, which means its today
-                    date.text = applicationContext().getString(R.string.changes_date_today)
+                    date.text = appContext().getString(R.string.changes_date_today)
                     Utility.tintBackground(date, themeColor, 0xb4000000.toInt())
                 }
                 change.date.time - time <= 24 * 60 * 60 * 1000 -> {
                     // Tomorrow
-                    date.text = applicationContext().getString(R.string.changes_date_tomorrow)
-                    Utility.tintBackground(date, applicationContext().getColor(R.color.grey_800), 0xb4000000.toInt())
+                    date.text = appContext().getString(R.string.changes_date_tomorrow)
+                    Utility.tintBackground(date, appContext().getColor(R.color.grey_800), 0xb4000000.toInt())
                 }
                 else -> {
                     date.text = otherDateFormat.format(change.date)
-                    Utility.tintBackground(date, applicationContext().getColor(R.color.black), 0xb4000000.toInt())
+                    Utility.tintBackground(date, appContext().getColor(R.color.black), 0xb4000000.toInt())
                 }
             }
 

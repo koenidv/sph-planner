@@ -2,7 +2,7 @@ package de.koenidv.sph.networking
 
 import android.content.Context
 import de.koenidv.sph.R
-import de.koenidv.sph.SphPlanner.Companion.applicationContext
+import de.koenidv.sph.SphPlanner.Companion.appContext
 import de.koenidv.sph.database.TimetableDb
 import de.koenidv.sph.debugging.DebugLog
 import de.koenidv.sph.debugging.Debugger
@@ -22,13 +22,13 @@ class Timetable {
         if (Debugger.DEBUGGING_ENABLED)
             DebugLog("Timetable", "Fetching timetable").log()
 
-        NetworkManager().getSiteAuthed(applicationContext().getString(R.string.url_timetable),
+        NetworkManager().getSiteAuthed(appContext().getString(R.string.url_timetable),
                 callback = { success: Int, result: String? ->
-                            
+
                     if (success == NetworkManager.SUCCESS) {
                         TimetableDb.instance!!.clear()
                         TimetableDb.instance!!.save(RawParser().parseTimetable(result!!))
-                        applicationContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
+                        appContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
                                 .edit().putLong("updated_timetable", Date().time).apply()
                     }
                     callback(success)

@@ -7,7 +7,7 @@ import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import de.koenidv.sph.R
-import de.koenidv.sph.SphPlanner.Companion.applicationContext
+import de.koenidv.sph.SphPlanner.Companion.appContext
 import de.koenidv.sph.parsing.Utility
 import java.util.*
 
@@ -56,7 +56,7 @@ class CompactPostsAdapter(private val postData: List<PostData>,
 
             // Set data
             title.text = post.title ?: post.description
-                    ?: applicationContext().getString(R.string.posts_no_text)
+                    ?: appContext().getString(R.string.posts_no_text)
 
             course.text = post.courseName
 
@@ -65,7 +65,7 @@ class CompactPostsAdapter(private val postData: List<PostData>,
 
             if (post.attachmentCount > 0) {
                 attachs.visibility = View.VISIBLE
-                attachs.text = applicationContext().resources.getQuantityString(
+                attachs.text = appContext().resources.getQuantityString(
                         R.plurals.posts_info_attachments,
                         post.attachmentCount, post.attachmentCount)
             } else attachs.visibility = View.GONE
@@ -73,14 +73,14 @@ class CompactPostsAdapter(private val postData: List<PostData>,
                 task.visibility = View.VISIBLE
                 val color: Int
                 if (post.taskDone) {
-                    task.text = applicationContext().getString(R.string.posts_info_task_done)
+                    task.text = appContext().getString(R.string.posts_info_task_done)
                     // todo use theme color
                     //color = Utility().getThemedColor(R.attr.tagBackground)
-                    color = applicationContext().getColor(R.color.grey_800)
+                    color = appContext().getColor(R.color.grey_800)
                 } else {
-                    task.text = applicationContext().getString(R.string.posts_info_task_undone)
+                    task.text = appContext().getString(R.string.posts_info_task_undone)
                     //color = Utility().getThemedColor(R.attr.tagBackgroundWarning)
-                    color = applicationContext().getColor(R.color.pink_a700)
+                    color = appContext().getColor(R.color.pink_a700)
                 }
                 Utility.tintBackground(task, color, 0xb4000000.toInt())
             } else task.visibility = View.GONE

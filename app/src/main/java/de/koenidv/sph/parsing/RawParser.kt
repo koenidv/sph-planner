@@ -9,7 +9,7 @@ import androidx.core.os.bundleOf
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner.Companion.TAG
-import de.koenidv.sph.SphPlanner.Companion.applicationContext
+import de.koenidv.sph.SphPlanner.Companion.appContext
 import de.koenidv.sph.database.CoursesDb
 import de.koenidv.sph.debugging.DebugLog
 import de.koenidv.sph.debugging.Debugger
@@ -406,7 +406,7 @@ class RawParser {
             }
             else /*similiarCourses.size > 1*/ -> {
                 // todo handle multiple similiar courses
-                Toast.makeText(applicationContext(), "Too many courses", Toast.LENGTH_LONG).show()
+                Toast.makeText(appContext(), "Too many courses", Toast.LENGTH_LONG).show()
                 Log.d(TAG, "Too many courses for $uniformNamedId")
                 // currently adds first course
                 similiarCourses[0].number_id = numberId
@@ -487,7 +487,7 @@ class RawParser {
                         .attr("href")
                 // Add https://start.schulportal.hessen.de/ if that's a relative location
                 if (!locationTemp.contains("http")) {
-                    locationTemp = applicationContext().getString(R.string.url_start) + locationTemp
+                    locationTemp = appContext().getString(R.string.url_start) + locationTemp
                 }
                 // Get the tile's logo from its logo view's class
                 // The .fa- or .glyphicon- icon will be the second-to-last class before .logo
@@ -510,7 +510,7 @@ class RawParser {
                 } catch (nfe: java.lang.Exception) {
                     // If parsing the color failed for some reason, use the current theme color
                     // NumberFormatException or StringIndexOutOfBoundsException if uses rba
-                    applicationContext()
+                    appContext()
                             .getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
                             .getInt("themeColor", 0)
                 }

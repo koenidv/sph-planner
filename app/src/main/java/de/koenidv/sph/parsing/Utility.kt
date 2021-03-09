@@ -52,7 +52,7 @@ object Utility {
      * @return Parsed string map
      */
     fun parseStringArray(stringArrayResourceId: Int): Map<String, String> {
-        val stringArray: Array<String> = SphPlanner.applicationContext().resources.getStringArray(stringArrayResourceId)
+        val stringArray: Array<String> = SphPlanner.appContext().resources.getStringArray(stringArrayResourceId)
         val outputMap = mutableMapOf<String, String>()
         for (entry in stringArray) {
             val splitResult = entry.split("|")
@@ -65,7 +65,7 @@ object Utility {
      * Convert px to dp
      */
     fun dpToPx(dp: Float): Float =
-            TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, SphPlanner.applicationContext().resources.displayMetrics)
+            TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, SphPlanner.appContext().resources.displayMetrics)
 
 
     /**
@@ -84,34 +84,34 @@ object Utility {
      * Returns a contextual, sometimes random greeting for the user
      */
     fun getGreeting(): String {
-        val prefs = SphPlanner.applicationContext().getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
+        val prefs = SphPlanner.appContext().getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
         val dayOfWeek = Calendar.getInstance().get(Calendar.DAY_OF_WEEK)
         val hourOfDay = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
         val random = Math.random()
         val greeting = when {
             random < 0.05 ->
-                SphPlanner.applicationContext().getString(R.string.greeting_random_general_1)
+                SphPlanner.appContext().getString(R.string.greeting_random_general_1)
             random < 0.1 ->
-                SphPlanner.applicationContext().getString(R.string.greeting_random_general_2)
+                SphPlanner.appContext().getString(R.string.greeting_random_general_2)
             random < 0.15 ->
-                SphPlanner.applicationContext().getString(R.string.greeting_random_general_3)
+                SphPlanner.appContext().getString(R.string.greeting_random_general_3)
             dayOfWeek == Calendar.FRIDAY && random < 0.4 ->
-                SphPlanner.applicationContext().getString(R.string.greeting_friday_weekend)
+                SphPlanner.appContext().getString(R.string.greeting_friday_weekend)
             hourOfDay > 21 && random < 0.8 ->
-                SphPlanner.applicationContext().getString(R.string.greeting_night)
+                SphPlanner.appContext().getString(R.string.greeting_night)
             hourOfDay > 17 && random < 0.1 ->
-                SphPlanner.applicationContext().getString(R.string.greeting_random_evening_1)
+                SphPlanner.appContext().getString(R.string.greeting_random_evening_1)
             hourOfDay > 17 && random < 0.2 ->
-                SphPlanner.applicationContext().getString(R.string.greeting_random_evening_2)
+                SphPlanner.appContext().getString(R.string.greeting_random_evening_2)
             hourOfDay > 17 && random < 0.9 ->
-                SphPlanner.applicationContext().getString(R.string.greeting_evening)
+                SphPlanner.appContext().getString(R.string.greeting_evening)
             hourOfDay < 8 && random < 0.1 ->
-                SphPlanner.applicationContext().getString(R.string.greeting_random_morning_1)
+                SphPlanner.appContext().getString(R.string.greeting_random_morning_1)
             hourOfDay < 8 && random < 0.2 ->
-                SphPlanner.applicationContext().getString(R.string.greeting_random_morning_2)
+                SphPlanner.appContext().getString(R.string.greeting_random_morning_2)
             hourOfDay < 8 ->
-                SphPlanner.applicationContext().getString(R.string.greeting_morning)
-            else -> SphPlanner.applicationContext().getString(R.string.greeting_general)
+                SphPlanner.appContext().getString(R.string.greeting_morning)
+            else -> SphPlanner.appContext().getString(R.string.greeting_general)
         }
         return greeting.replace("%name", prefs.getString("real_name", "").toString())
     }

@@ -86,7 +86,7 @@ class DebuggingSheet internal constructor() : BottomSheetDialogFragment() {
                     this.type = "text/plain"
                 }
                 val chooser = Intent.createChooser(sendIntent,
-                        SphPlanner.applicationContext().getString(R.string.debugger_share_long))
+                        SphPlanner.appContext().getString(R.string.debugger_share_long))
                         .apply {
                             flags = Intent.FLAG_ACTIVITY_NEW_TASK
                         }

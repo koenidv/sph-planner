@@ -14,7 +14,7 @@ import com.google.firebase.ktx.Firebase
 import com.google.firebase.remoteconfig.ktx.remoteConfig
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner.Companion.TAG
-import de.koenidv.sph.SphPlanner.Companion.applicationContext
+import de.koenidv.sph.SphPlanner.Companion.appContext
 import de.koenidv.sph.debugging.DebugLog
 import de.koenidv.sph.debugging.Debugger
 import de.koenidv.sph.debugging.Debugger.LOG_TYPE_ERROR
@@ -27,7 +27,7 @@ object TokenManager {
 
     var lastTokenCheck = 0L
 
-    val prefs: SharedPreferences = applicationContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
+    val prefs: SharedPreferences = appContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
 
     var userid = prefs.getString("userid", "0")!!
 
@@ -193,7 +193,7 @@ object TokenManager {
                     onComplete(NetworkManager.FAILED_CANCELLED, null)
                 }
                 else -> {
-                    Toast.makeText(applicationContext(), error.toString(), Toast.LENGTH_LONG).show()
+                    Toast.makeText(appContext(), error.toString(), Toast.LENGTH_LONG).show()
                     onComplete(NetworkManager.FAILED_UNKNOWN, null)
                 }
             }
@@ -201,7 +201,7 @@ object TokenManager {
             if (error.errorCode == 500)
                 onComplete(NetworkManager.FAILED_SERVER_ERROR, null)
             else {
-                Toast.makeText(applicationContext(), error.toString(), Toast.LENGTH_LONG).show()
+                Toast.makeText(appContext(), error.toString(), Toast.LENGTH_LONG).show()
                 FirebaseCrashlytics.getInstance().recordException(error)
                 onComplete(NetworkManager.FAILED_UNKNOWN, null)
             }
@@ -214,7 +214,7 @@ object TokenManager {
      * 06.03.2021: Removed tempary fix using multipart form data
      */
     private fun getTokenWithUrlencoded(onComplete: (success: Int, token: String?) -> Unit) {
-        AndroidNetworking.post(applicationContext().getString(R.string.url_login))
+        AndroidNetworking.post(appContext().getString(R.string.url_login))
                 .addBodyParameter("user", prefs.getString("schoolid", "") +
                         "." + prefs.getString("user", ""))
                 .addBodyParameter("password", prefs.getString("password", ""))

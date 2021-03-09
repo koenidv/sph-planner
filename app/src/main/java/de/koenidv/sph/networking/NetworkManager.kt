@@ -16,7 +16,7 @@ import com.androidnetworking.interfaces.StringRequestListener
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner.Companion.TAG
-import de.koenidv.sph.SphPlanner.Companion.applicationContext
+import de.koenidv.sph.SphPlanner.Companion.appContext
 import de.koenidv.sph.database.CoursesDb
 import de.koenidv.sph.database.FunctionTilesDb
 import de.koenidv.sph.debugging.DebugLog
@@ -50,7 +50,7 @@ class NetworkManager {
     fun handlePullToRefresh(destinationId: Int,
                             arguments: Bundle?,
                             callback: (success: Int) -> Unit) {
-        val prefs = applicationContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
+        val prefs = appContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
         val time = Date().time
         val updateList = mutableListOf<String>()
         val updateData = mutableMapOf<String, String>()
@@ -123,7 +123,7 @@ class NetworkManager {
                                 // Send broadcast to update posts, tasks and attachments in CourseOverviewFragment
                                 val uiBroadcast = Intent("uichange")
                                 uiBroadcast.putExtra("content", "posts")
-                                LocalBroadcastManager.getInstance(applicationContext()).sendBroadcast(uiBroadcast)
+                                LocalBroadcastManager.getInstance(appContext()).sendBroadcast(uiBroadcast)
                             }
 
                             callback(it)
@@ -138,7 +138,7 @@ class NetworkManager {
                 // WebViewFragment, send a broadcast to reload webview
                 val uiBroadcast = Intent("uichange")
                 uiBroadcast.putExtra("content", "webview")
-                LocalBroadcastManager.getInstance(applicationContext()).sendBroadcast(uiBroadcast)
+                LocalBroadcastManager.getInstance(appContext()).sendBroadcast(uiBroadcast)
                 // Let the activity know it can hide the refreshing icon
                 // But wait a short while first so the user doesn't think nothing happened
                 GlobalScope.launch {
@@ -179,7 +179,7 @@ class NetworkManager {
                         .build()
                         .getAsString(object : StringRequestListener {
                             override fun onResponse(response: String) {
-                                val prefs = applicationContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
+                                val prefs = appContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
                                 val responseLine = response.replace("\n", "")
 
                                 if (responseLine.contains("- Schulportal Hessen")
@@ -244,9 +244,9 @@ class NetworkManager {
                                         callback(FAILED_CANCELLED, "Network request was cancelled")
                                     }
                                     else -> {
-                                        Toast.makeText(applicationContext(), "Error for $url",
+                                        Toast.makeText(appContext(), "Error for $url",
                                                 Toast.LENGTH_LONG).show()
-                                        Toast.makeText(applicationContext(),
+                                        Toast.makeText(appContext(),
                                                 error.errorCode.toString()
                                                         + ": " + error.errorDetail,
                                                 Toast.LENGTH_LONG).show()
@@ -443,35 +443,35 @@ class NetworkManager {
                 DebugLog("NetMgr", "Fetching ${loadList[index]}").log()
             when (loadList[index]) {
                 "userid" -> {
-                    status(applicationContext().getString(R.string.index_status_userid))
+                    status(appContext().getString(R.string.index_status_userid))
                     getOwnUserId(onDone)
                 }
                 "courses" -> {
-                    status(applicationContext().getString(R.string.index_status_courses))
+                    status(appContext().getString(R.string.index_status_courses))
                     Courses(this).createIndex(onDone, features)
                 }
                 "timetable" -> {
-                    status(applicationContext().getString(R.string.index_status_timetable))
+                    status(appContext().getString(R.string.index_status_timetable))
                     Timetable().fetch(onDone)
                 }
                 "posts" -> {
-                    status(applicationContext().getString(R.string.index_status_posts))
+                    status(appContext().getString(R.string.index_status_posts))
                     Posts(this).fetch(onDone, true)
                 }
                 "changes" -> {
-                    status(applicationContext().getString(R.string.index_status_changes))
+                    status(appContext().getString(R.string.index_status_changes))
                     Changes(this).fetch(onDone)
                 }
                 "messages" -> {
-                    status(applicationContext().getString(R.string.index_status_messages))
+                    status(appContext().getString(R.string.index_status_messages))
                     Messages().fetch(archived = true, callback = onDone)
                 }
                 "users" -> {
-                    status(applicationContext().getString(R.string.index_status_users))
+                    status(appContext().getString(R.string.index_status_users))
                     Users().fetch(onDone)
                 }
                 "holidays" -> {
-                    status(applicationContext().getString(R.string.index_status_holidays))
+                    status(appContext().getString(R.string.index_status_holidays))
                     Holidays().fetch(onDone)
                 }
                 else -> {
@@ -570,7 +570,7 @@ class NetworkManager {
                         .substringBefore("&")
 
                 TokenManager.userid = userid
-                applicationContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
+                appContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
                         .edit().putString("userid", userid).apply()
 
                 callback(SUCCESS)

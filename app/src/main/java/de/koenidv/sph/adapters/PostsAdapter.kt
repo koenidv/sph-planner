@@ -34,7 +34,7 @@ class PostsAdapter(private val posts: List<Post>,
                    private val onTaskCheckedChanged: (taskdata: Tasks.TaskData, isDone: Boolean) -> Unit) :
         RecyclerView.Adapter<PostsAdapter.ViewHolder>() {
 
-    val prefs: SharedPreferences = SphPlanner.applicationContext().getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
+    val prefs: SharedPreferences = SphPlanner.appContext().getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
     private val attachmentsViewPool = RecyclerView.RecycledViewPool()
 
     /**
@@ -56,7 +56,7 @@ class PostsAdapter(private val posts: List<Post>,
         private var taskset = false
         private var currentPost: Post? = null
         private var currentTask: Task? = null
-        private val themeColor = SphPlanner.applicationContext()
+        private val themeColor = SphPlanner.appContext()
                 .getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
                 .getInt("themeColor", 0)
 
