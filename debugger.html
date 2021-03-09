@@ -32,8 +32,10 @@
         const input = document.querySelector("#data");
         input.focus();
 
-        // If input seems to be a raw log, analyze it,
-        // else try to fetch it from dogbin
+        /**
+         * If input seems to be a raw log, analyze it,
+         * else try to fetch it from dogbin
+         */
         function analyzeOrFetch(data) {
 
             if (data.startsWith("[")) {
@@ -66,6 +68,9 @@
         }
 
 
+        /**
+         * Create a dom element for each json object
+         */
         function analyze(text) {
 
             try {
@@ -130,6 +135,9 @@
             input.value = "";
         };
 
+        /**
+         * Convert unix time into something readable
+         */
         function getTime(unix) {
             const date = new Date(unix);
             const hours = "0" + date.getHours();
@@ -148,12 +156,17 @@
             }
         });
 
-        // Paste from clipboard on page load
-        navigator.clipboard.readText().then(text => {
-            if (text.startsWith("[") || text.startsWith("http") || text.length == 10) {
-                analyzeOrFetch(text)
-            }
-        });
+        // Use url value or paste from clipboard on page load
+        // Only use /debugger#hash if hash is 11 characters long: # + dogbin slug
+        if (document.location.hash.length == 11) {
+            analyzeOrFetch(document.location.hash.substring(1));
+        } else {
+            navigator.clipboard.readText().then(text => {
+                if (text.startsWith("[") || text.startsWith("http") || text.length == 10) {
+                    analyzeOrFetch(text);
+                }
+            });
+        }
 
     </script>
 
