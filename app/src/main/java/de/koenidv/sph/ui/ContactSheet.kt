@@ -65,8 +65,7 @@ class ContactSheet internal constructor() : BottomSheetDialogFragment() {
         mailLayout.setOnClickListener {
             val prefs = requireContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
             // Get app version
-            val version: String
-            version = try {
+            val version: String = try {
                 val pInfo = SphPlanner.appContext().packageManager.getPackageInfo(SphPlanner.appContext().packageName, 0)
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                     pInfo.longVersionCode.toString()

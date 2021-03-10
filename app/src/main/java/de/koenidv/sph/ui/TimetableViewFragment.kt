@@ -152,17 +152,6 @@ class TimetableViewFragment : Fragment() {
         return view
     }
 
-    fun setExpanded(expanded: Boolean) {
-        if (this.expanded != expanded) {
-            this.expanded = expanded
-            (requireView().findViewById<RecyclerView>(R.id.mondayRecycler).adapter as LessonsAdapter).setExpanded(expanded)
-            (requireView().findViewById<RecyclerView>(R.id.tuesdayRecycler).adapter as LessonsAdapter).setExpanded(expanded)
-            (requireView().findViewById<RecyclerView>(R.id.wednesdayRecycler).adapter as LessonsAdapter).setExpanded(expanded)
-            (requireView().findViewById<RecyclerView>(R.id.thursdayRecycler).adapter as LessonsAdapter).setExpanded(expanded)
-            (requireView().findViewById<RecyclerView>(R.id.fridayRecycler).adapter as LessonsAdapter).setExpanded(expanded)
-        }
-    }
-
     /**
      * Show all lessons or only favorite courses
      */
@@ -175,12 +164,13 @@ class TimetableViewFragment : Fragment() {
             if (requireView().findViewById<RecyclerView>(R.id.mondayRecycler).adapter == null) {
                 parentFragmentManager.beginTransaction()
                         .replace(R.id.nav_host_fragment,
-                                instantiate(requireContext(), TimetableFragment().javaClass.name,
-                                        bundleOf(
-                                                "expanded" to this.expanded,
-                                                "viewAll" to this.viewAll,
-                                                "openOnClick" to this.openOnClick,
-                                                "withChanges" to this.withChanges)))
+                                TimetableFragment().also {
+                                    it.arguments = bundleOf(
+                                            "expanded" to this.expanded,
+                                            "viewAll" to this.viewAll,
+                                            "openOnClick" to this.openOnClick,
+                                            "withChanges" to this.withChanges)
+                                })
                         .commit()
             } else {
                 // Update timetable

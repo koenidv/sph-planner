@@ -222,9 +222,9 @@ class ChatFragment : Fragment() {
                     // to apply reply bar changes
                     parentFragmentManager.beginTransaction()
                             .replace(R.id.nav_host_fragment,
-                                    ChatFragment().apply {
-                                        arguments = bundleOf(
-                                                "conversationId" to this@ChatFragment.conversationId)
+                                    ChatFragment().also {
+                                        it.arguments = bundleOf(
+                                                "conversationId" to conversationId)
                                     })
                             .commit()
                 }

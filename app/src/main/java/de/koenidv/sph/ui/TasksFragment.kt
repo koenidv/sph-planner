@@ -55,11 +55,11 @@ class TasksFragment : Fragment() {
                     tasksRecycler.adapter?.notifyDataSetChanged()
                 } else {
                     // If the recycler was never set up, recreate the fragment
-                    @Suppress("DEPRECATION")
                     parentFragmentManager.beginTransaction()
                             .replace(R.id.nav_host_fragment,
-                                    instantiate(context, TasksFragment().javaClass.name,
-                                            bundleOf("undone" to undone)))
+                                    TasksFragment().also {
+                                        it.arguments = bundleOf("undone" to undone)
+                                    })
                             .commit()
                 }
             }

@@ -56,11 +56,11 @@ class CourseOverviewFragment : Fragment() {
                 // If there wasn't any post before but now is,
                 // it's easier to recreate the fragment
                 if (allPosts.isNotEmpty() && postsRecycler.adapter == null) {
-                    @Suppress("DEPRECATION")
                     parentFragmentManager.beginTransaction()
                             .replace(R.id.nav_host_fragment,
-                                    instantiate(context, CourseOverviewFragment().javaClass.name,
-                                            bundleOf("courseId" to courseId)))
+                                    CourseOverviewFragment().also {
+                                        it.arguments = bundleOf("courseId" to courseId)
+                                    })
                             .commit()
                     return
                 }

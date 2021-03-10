@@ -46,11 +46,11 @@ class ChangesFragment : Fragment() {
                     changesRecycler.adapter?.notifyDataSetChanged()
                 } else {
                     // If the recycler was never set up, recreate the fragment
-                    @Suppress("DEPRECATION")
                     parentFragmentManager.beginTransaction()
                             .replace(R.id.nav_host_fragment,
-                                    instantiate(context, ChangesFragment().javaClass.name,
-                                            bundleOf("favorites" to favorites)))
+                                    ChangesFragment().also {
+                                        it.arguments = bundleOf("favorites" to favorites)
+                                    })
                             .commit()
                 }
             }
