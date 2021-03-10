@@ -90,6 +90,8 @@ object Debugger {
                     appContext().getString(R.string.debugger_share_long))
                     .apply {
                         flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                        // todo Debugger: Custom share target
+                        // Provide a share target to open a user's email app with debug data
                     }
             appContext().startActivity(chooser)
         }

@@ -17,8 +17,10 @@ import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
@@ -38,6 +40,7 @@ import java.util.*
 // Created by koenidv on 18.12.2020.
 class ChatFragment : Fragment() {
 
+    private lateinit var conversation: Conversation
     private lateinit var conversationId: String
     private lateinit var adapter: ChatAdapter
     private lateinit var layoutManager: LinearLayoutManager
@@ -48,10 +51,16 @@ class ChatFragment : Fragment() {
 
         // Get passed course id argument
         conversationId = arguments?.getString("conversationId") ?: ""
-        val conversation = ConversationsDb().get(conversationId, false)
+        try {
+            // Get this conversation
+            conversation = ConversationsDb().get(conversationId, false)!!
+        } catch (npe: NullPointerException) {
+            // If, for some reason, this conversation was not found, navigate back
+            Navigation.findNavController(requireActivity(), R.id.nav_host_fragment).navigateUp()
+        }
 
         // Set action bar title
-        (activity as AppCompatActivity).supportActionBar?.title = conversation?.subject
+        (activity as AppCompatActivity).supportActionBar?.title = conversation.subject
 
         /*
          * Messages
@@ -61,7 +70,7 @@ class ChatFragment : Fragment() {
         val messages = MessagesDb.getConversation(conversationId).toMutableList()
 
         // Display messages
-        val info = conversation!!.getPartner()
+        val info = conversation.getPartner()
         adapter = ChatAdapter(messages, info)
         messagesRecycler.adapter = adapter
         layoutManager = messagesRecycler.layoutManager as LinearLayoutManager
@@ -181,8 +190,11 @@ class ChatFragment : Fragment() {
     * Close soft keyboard on stop
     */
     override fun onStop() {
+        // Hide soft keyboard
         val imm = requireContext().getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(requireView().windowToken, 0)
+        // Unregister broadcast receiver
+        LocalBroadcastManager.getInstance(requireActivity()).unregisterReceiver(uichangeReceiver)
         super.onStop()
     }
 
@@ -200,6 +212,22 @@ class ChatFragment : Fragment() {
                 adapter.messages.addAll(MessagesDb.getConversation(conversationId))
                 adapter.notifyDataSetChanged()
 
+            } else if (intent.getStringExtra("content") == "messages" &&
+                    intent.getStringExtra("type") == "metachanged" &&
+                    intent.getStringExtra("id") == conversationId) {
+                // Meta data changed
+                val updConv: Conversation? = intent.extras?.get("conversation") as Conversation?
+                if (updConv?.answerType != conversation.answerType) {
+                    // If this conversation's answer type changed, recreate this fragment
+                    // to apply reply bar changes
+                    parentFragmentManager.beginTransaction()
+                            .replace(R.id.nav_host_fragment,
+                                    ChatFragment().apply {
+                                        arguments = bundleOf(
+                                                "conversationId" to this@ChatFragment.conversationId)
+                                    })
+                            .commit()
+                }
             }
         }
     }
@@ -210,11 +238,4 @@ class ChatFragment : Fragment() {
         LocalBroadcastManager.getInstance(requireContext()).registerReceiver(uichangeReceiver,
                 IntentFilter("uichange"))
     }
-
-    override fun onDestroy() {
-        // Unregister broadcast receiver
-        LocalBroadcastManager.getInstance(requireActivity()).unregisterReceiver(uichangeReceiver)
-        super.onDestroy()
-    }
-
 }

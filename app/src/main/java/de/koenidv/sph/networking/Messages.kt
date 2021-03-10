@@ -44,7 +44,7 @@ class Messages {
         if (Debugger.DEBUGGING_ENABLED)
             DebugLog("Messages", "Fetching messages").log()
 
-        val typeBody = if (!archived) "visibleOnly" else "All"
+        val typeBody = if (!archived) "All" else "All"
 
         try {
             // Get a decryptor
@@ -249,25 +249,35 @@ class Messages {
     private fun fetchConversation(conversation: Conversation,
                                   cryption: Cryption,
                                   callback: (success: Int) -> Unit) {
+
         // We need to encrypt the conversation's first message id for sph
         cryption.encrypt(conversation.firstIdMess) { firstMessageId ->
             if (firstMessageId != null) {
+
                 // Post to sph to get messages data
                 NetworkManager().postJsonAuthed(appContext().getString(R.string.url_messages),
                         body = mapOf("a" to "read", "uniqid" to firstMessageId)) { netSuccess, json ->
+
                     if (netSuccess == NetworkManager.SUCCESS && json != null && !json.isNull("message")) {
+
                         // If net request was successfull, decrypt the message
                         // Actually message-s, but it's just one with replies
                         cryption.decrypt(json.getString("message")) {
+
                             // Parse decrypted data
                             val data = JsonParser.parseString(it).asJsonObject
+
                             // Disallow replies if the first message was trashed
                             if (data.get("Papierkorb").asString == "ja"
                                     && data.get("Sender").asString != json.getString("userId")
                                     && conversation.answerType != Conversation.ANSWER_TYPE_NONE) {
+
                                 // Update answertype in db
                                 ConversationsDb().setAnswertype(conversation.convId, Conversation.ANSWER_TYPE_NONE)
+                                conversation.answerType = Conversation.ANSWER_TYPE_NONE
+                                notifyFragments(conversation.convId, "metachanged", conversation)
                             }
+
                             // Save the message with all its replies
                             saveMessage(data, conversation)
 
@@ -541,12 +551,15 @@ class Messages {
      * @param conversationId Id of the updated conversation
      * @param type should be "new", "metachanged" or "contentchanged", ui will be updated accordingly
      */
-    private fun notifyFragments(conversationId: String, type: String) {
+    private fun notifyFragments(conversationId: String, type: String,
+                                conversationExtra: Conversation? = null) {
+        // Send the local broadcast
         val uiBroadcast = Intent("uichange")
                 .putExtras(bundleOf(
                         "content" to "messages",
                         "id" to conversationId,
-                        "type" to type
+                        "type" to type,
+                        "conversation" to conversationExtra
                 ))
         LocalBroadcastManager.getInstance(appContext()).sendBroadcast(uiBroadcast)
     }
