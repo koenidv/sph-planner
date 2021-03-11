@@ -166,7 +166,7 @@ class Messages {
 
                                     } else if (conversation.date != date ||
                                             conversation.answerType != answerType ||
-                                            (conversation.archived != isArchived && conversation.archived)) {
+                                            (conversation.archived != isArchived && isArchived)) {
                                         // If the read status of this conversation has changed,
                                         // or if force refresh is enabled, update this conversation
                                         // Values other than unread, date and answertype
