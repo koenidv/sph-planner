@@ -14,9 +14,11 @@ import com.androidnetworking.interfaces.JSONObjectRequestListener
 import com.androidnetworking.interfaces.OkHttpResponseListener
 import com.androidnetworking.interfaces.StringRequestListener
 import com.google.firebase.crashlytics.FirebaseCrashlytics
+import de.koenidv.sph.BuildConfig
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner.Companion.TAG
 import de.koenidv.sph.SphPlanner.Companion.appContext
+import de.koenidv.sph.SphPlanner.Companion.prefs
 import de.koenidv.sph.database.CoursesDb
 import de.koenidv.sph.database.FunctionTilesDb
 import de.koenidv.sph.debugging.DebugLog
@@ -32,6 +34,7 @@ import okhttp3.Response
 import org.json.JSONObject
 import org.jsoup.Jsoup
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 //  Created by koenidv on 11.12.2020.
 class NetworkManager {
@@ -47,11 +50,22 @@ class NetworkManager {
         const val FAILED_CRYPTION = 6
     }
 
+    /**
+     * Determine if a module should be updated
+     * Takes the module's update time preferences key, a max age and time unit
+     * @return In production, true if updated age is older than maxAge, always true in debug
+     */
+    private fun shouldUpdate(preference: String,
+                             maxAge: Long,
+                             timeUnit: TimeUnit = TimeUnit.MINUTES): Boolean =
+            BuildConfig.DEBUG || prefs.getLong(preference, 0) > timeUnit.toMillis(maxAge)
+
+    /**
+     * Handle updating when pull to refresh layout is activated
+     */
     fun handlePullToRefresh(destinationId: Int,
                             arguments: Bundle?,
                             callback: (success: Int) -> Unit) {
-        val prefs = appContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
-        val time = Date().time
         val updateList = mutableListOf<String>()
         val updateData = mutableMapOf<String, String>()
         var disableList = false
@@ -65,35 +79,30 @@ class NetworkManager {
         when (destinationId) {
             R.id.nav_home, R.id.nav_explore -> {
                 // Update changes after 5min
-                if (time - prefs.getLong("updated_changes", 0) > 5 * 60 * 1000)
-                    updateList.add("changes")
+                if (shouldUpdate("updated_changes", 5)) updateList.add("changes")
                 // posts after 15min
-                if (true || time - prefs.getLong("updated_posts", 0) > 15 * 60 * 1000)
-                    updateList.add("posts")
+                if (shouldUpdate("updated_posts", 15)) updateList.add("posts")
                 // messages after 15min
-                if (time - prefs.getLong("updated_messages", 0) > 15 * 60 * 1000)
-                    updateList.add("messages")
+                if (shouldUpdate("updated_messages", 15)) updateList.add("messages")
                 // holidays after 1 month
-                if (time - prefs.getLong("updated_holidays", 0) > 31 * 86400000L)
+                if (shouldUpdate("updated_holidays", 31, TimeUnit.DAYS))
                     updateList.add("holidays")
             }
             R.id.nav_courses, R.id.frag_tasks, R.id.frag_allposts, R.id.frag_attachments -> {
                 // 2 minutes cooldown, update all posts
-                if (time - prefs.getLong("updated_posts", 0) > 2 * 60 * 100)
-                    updateList.add("posts")
+                if (shouldUpdate("updated_posts", 2)) updateList.add("posts")
             }
             R.id.nav_messages -> {
                 // Update all messages after 30sec
-                if (time - prefs.getLong("updated_messages", 0) > 30 * 1000) {
+                if (shouldUpdate("updated_messages", 30, TimeUnit.SECONDS))
                     updateList.add("messages")
-                }
             }
             R.id.chatFragment -> {
                 // Messages for this conversation after 30sec
                 val conversationId = arguments?.getString("conversationId")
                 if (conversationId != null) {
-                    if (time - prefs.getLong("updated_messages_$conversationId", 0)
-                            > 30 * 1000) {
+                    if (shouldUpdate("updated_messages_$conversationId",
+                                    30, TimeUnit.SECONDS)) {
                         updateList.add("chat")
                         updateData["chatid"] = conversationId
                     }
@@ -105,7 +114,7 @@ class NetworkManager {
             R.id.frag_changes -> {
                 // Changes fragment
                 // Update changes after 30sec cooldown
-                if (time - prefs.getLong("updated_changes", 0) > 30 * 1000)
+                if (shouldUpdate("updated_changes", 30, TimeUnit.SECONDS))
                     updateList.add("changes")
             }
             R.id.frag_course_overview -> {
@@ -114,7 +123,9 @@ class NetworkManager {
                 // Update posts, tasks, files, links
                 if (arguments?.getString("courseId") != null) {
                     // Only after 2 minutes
-                    if (time - prefs.getLong("updated_posts_${arguments.getString("courseId")}", 0) > 2 * 60 * 1000) {
+                    if (shouldUpdate(
+                                    "updated_posts_${arguments.getString("courseId")}",
+                                    2)) {
                         // Update posts for this course
                         Posts(this).load(listOf(
                                 CoursesDb.getByInternalId(arguments.getString("courseId"))!!)) {
