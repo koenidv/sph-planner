@@ -8,6 +8,7 @@ import androidx.core.os.bundleOf
 import com.androidnetworking.AndroidNetworking
 import com.androidnetworking.error.ANError
 import com.androidnetworking.interfaces.JSONObjectRequestListener
+import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.gson.GsonBuilder
 import de.koenidv.sph.BuildConfig
 import de.koenidv.sph.R
@@ -17,6 +18,7 @@ import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
+import java.util.*
 
 
 //  Created by koenidv on 05.02.2021.
@@ -152,8 +154,13 @@ object Debugger {
     private fun addStartLog() {
         logs.add(DebugLog("Debugger",
                 "Started logging",
-                bundleOf("school" to prefs.getString("schoolid", "0"),
-                        "gmbIdExample" to CoursesDb.getGmbIdExample())))
+                bundleOf(
+                        "school" to prefs.getString("schoolid", "0"),
+                        "gmbIdExample" to CoursesDb.getGmbIdExample(),
+                        "version_code" to BuildConfig.VERSION_CODE,
+                        "build_type" to BuildConfig.BUILD_TYPE,
+                        "language" to Locale.getDefault()
+                )))
     }
 
     /**
@@ -179,6 +186,22 @@ object Debugger {
                         type = LOG_TYPE_ERROR)
             }
         }
+    }
+
+    /**
+     * Called when onboarding is completed.
+     * Save to debug log and set up user property in analytics
+     */
+    fun logOnboardingComplete() {
+        val analytics = FirebaseAnalytics.getInstance(appContext())
+        // Log an school course id example to GA
+        analytics.setUserProperty(
+                "courseIdExample",
+                CoursesDb.getGmbIdExample())
+        DebugLog("FeaturesFrag", "EXAMPLE GMBID: ${CoursesDb.getGmbIdExample()}",
+                type = LOG_TYPE_VAR)
+        // Log conversion to GA
+        analytics.logEvent("onboarding_complete", bundleOf())
     }
 
 }

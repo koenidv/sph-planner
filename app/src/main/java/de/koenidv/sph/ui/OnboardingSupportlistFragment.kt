@@ -18,7 +18,6 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics
 import de.koenidv.sph.MainActivity
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
-import de.koenidv.sph.database.CoursesDb
 import de.koenidv.sph.database.FunctionTilesDb
 import de.koenidv.sph.debugging.DebugLog
 import de.koenidv.sph.debugging.Debugger
@@ -176,7 +175,6 @@ class OnboardingSupportlistFragment : Fragment() {
             contactButton.visibility = View.VISIBLE
             if (usableFeatures) {
                 warningText.visibility = View.VISIBLE
-                // todo start indexing
                 indexLoading.visibility = View.VISIBLE
 
 
@@ -226,18 +224,7 @@ class OnboardingSupportlistFragment : Fragment() {
                                     // Mark onboarding complete
                                     prefs.edit().putBoolean("introComplete", true).apply()
 
-                                    val analytics = FirebaseAnalytics.getInstance(requireContext())
-                                    // Log an school course id example to GA
-                                    analytics.setUserProperty(
-                                            "courseIdExample",
-                                            CoursesDb.getGmbIdExample())
-                                    // todo user onboarding log unification
-                                    DebugLog("FeaturesFrag",
-                                            "EXAMPLE GMBID: " +
-                                                    CoursesDb.getGmbIdExample(),
-                                            type = Debugger.LOG_TYPE_VAR)
-                                    // Log conversion to GA
-                                    analytics.logEvent("onboarding_complete", bundleOf())
+                                    Debugger.logOnboardingComplete()
                                 } else {
                                     // Display error message
                                     indexLoading.visibility = View.GONE
