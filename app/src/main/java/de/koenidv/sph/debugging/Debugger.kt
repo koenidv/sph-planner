@@ -9,6 +9,7 @@ import com.androidnetworking.AndroidNetworking
 import com.androidnetworking.error.ANError
 import com.androidnetworking.interfaces.JSONObjectRequestListener
 import com.google.gson.GsonBuilder
+import de.koenidv.sph.BuildConfig
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner.Companion.appContext
 import de.koenidv.sph.database.CoursesDb
@@ -20,7 +21,7 @@ import java.io.InputStreamReader
 
 //  Created by koenidv on 05.02.2021.
 object Debugger {
-    var DEBUGGING_ENABLED = false
+    var DEBUGGING_ENABLED = BuildConfig.DEBUG
 
     const val LOG_TYPE_SUCCESS = -1
     const val LOG_TYPE_INFO = 0
@@ -65,6 +66,7 @@ object Debugger {
      * Get an html document's title from its source
      */
     fun responseTitle(response: String): String {
+        if (!DEBUGGING_ENABLED) return "(Debugging disabled)"
         return try {
             response
                     .substringAfter("<title>")
@@ -170,11 +172,11 @@ object Debugger {
                     log[(log.size + 1).toString()] = line.toString()
                 }
                 DebugLog("logcat", "Logcat dump",
-                        bundleOf(*log.toList().toTypedArray())).log()
+                        bundleOf(*log.toList().toTypedArray()))
                 logcatAdded = true
             } catch (e: IOException) {
                 DebugLog("logcat", "Dumping logcat failed",
-                        type = LOG_TYPE_ERROR).log()
+                        type = LOG_TYPE_ERROR)
             }
         }
     }

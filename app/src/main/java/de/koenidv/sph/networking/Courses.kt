@@ -24,8 +24,7 @@ class Courses(private val networkManager: NetworkManager = NetworkManager()) {
             callback: (success: Int) -> Unit,
             features: List<String?> = FunctionTilesDb.getInstance().supportedFeatures.map { it.type }) {
         // Log creating course index
-        if (Debugger.DEBUGGING_ENABLED)
-            DebugLog("Courses", "Starting course indexing").log()
+        DebugLog("Courses", "Starting course indexing")
 
         val prefs = SphPlanner.appContext().getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
         // Remove old courses, it'll just lead to isses
@@ -66,8 +65,7 @@ class Courses(private val networkManager: NetworkManager = NetworkManager()) {
         // Load the feature at the current index
         loadNextCourses = {
             // Log loading courses
-            if (Debugger.DEBUGGING_ENABLED)
-                DebugLog("Changes", "Loading courses from ${loadList[index]}").log()
+            DebugLog("Changes", "Loading courses from ${loadList[index]}")
 
             when (loadList[index]) {
                 "timetable" -> {
@@ -82,10 +80,9 @@ class Courses(private val networkManager: NetworkManager = NetworkManager()) {
                                 }
                                 onDone(success)
                                 // Log success
-                                if (Debugger.DEBUGGING_ENABLED)
-                                    DebugLog("Courses",
-                                            "Loaded courses from timetable: $success",
-                                            type = Debugger.LOG_TYPE_VAR).log()
+                                DebugLog("Courses",
+                                        "Loaded courses from timetable: $success",
+                                        type = Debugger.LOG_TYPE_VAR)
                             })
                 }
                 "studygroups" -> {
@@ -103,10 +100,9 @@ class Courses(private val networkManager: NetworkManager = NetworkManager()) {
                                 }
                                 onDone(success)
                                 // Log success
-                                if (Debugger.DEBUGGING_ENABLED)
-                                    DebugLog("Courses",
-                                            "Loaded courses from studygroups: $success",
-                                            type = Debugger.LOG_TYPE_VAR).log()
+                                DebugLog("Courses",
+                                        "Loaded courses from studygroups: $success",
+                                        type = Debugger.LOG_TYPE_VAR)
                             })
                 }
                 "mycourses" -> {
@@ -121,10 +117,9 @@ class Courses(private val networkManager: NetworkManager = NetworkManager()) {
                                 }
                                 onDone(success)
                                 // Log success
-                                if (Debugger.DEBUGGING_ENABLED)
-                                    DebugLog("Courses",
-                                            "Loaded courses from mycourses: $success",
-                                            type = Debugger.LOG_TYPE_VAR).log()
+                                DebugLog("Courses",
+                                        "Loaded courses from mycourses: $success",
+                                        type = Debugger.LOG_TYPE_VAR)
                             })
                 }
             }

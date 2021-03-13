@@ -11,9 +11,10 @@ import androidx.fragment.app.Fragment
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.debugging.DebugLog
-import de.koenidv.sph.debugging.Debugger
 import me.saket.bettermovementmethod.BetterLinkMovementMethod
 
+//  Created by koenidv in December 2020.
+@Suppress("unused") // Is actually used by OnboardingActivity
 class OnboardingLegalFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -26,8 +27,7 @@ class OnboardingLegalFragment : Fragment() {
         // continue to the next step
         if (prefs.getBoolean("legalVerified", false)) {
             // If logging is enabled, log this
-            if (Debugger.DEBUGGING_ENABLED)
-                DebugLog("LegalFrag", "Legal already verified, skipping").log()
+            DebugLog("LegalFrag", "Legal already verified, skipping")
             val ft = parentFragmentManager.beginTransaction()
             ft.replace(R.id.fragment, OnboardingSigninFragment()).commit()
             return null
@@ -45,8 +45,7 @@ class OnboardingLegalFragment : Fragment() {
             if (liabilityCheck.isChecked && sourcesCheck.isChecked && privacyCheck.isChecked) {
                 prefs.edit().putBoolean("legalVerified", true).apply()
                 // If logging is enabled, log this
-                if (Debugger.DEBUGGING_ENABLED)
-                    DebugLog("LegalFrag", "Verified legal conditions").log()
+                DebugLog("LegalFrag", "Verified legal conditions")
                 ft.replace(R.id.fragment, OnboardingSigninFragment()).commit()
             }
         }

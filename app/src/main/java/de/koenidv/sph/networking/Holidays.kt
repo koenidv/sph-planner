@@ -25,8 +25,7 @@ class Holidays {
      */
     fun fetch(callback: (success: Int) -> Unit) {
         // Log fetching holidays
-        if (Debugger.DEBUGGING_ENABLED)
-            DebugLog("Holidays", "Fetching holidays").log()
+        DebugLog("Holidays", "Fetching holidays")
 
         // Get all holidays for HE from ferien-api.de
         AndroidNetworking.get(appContext().getString(R.string.url_holidays))
@@ -37,10 +36,9 @@ class Holidays {
                         if (response == null) {
                             callback(NetworkManager.FAILED_UNKNOWN)
                             // Log error
-                            if (Debugger.DEBUGGING_ENABLED)
-                                DebugLog("Holidays",
-                                        "Error fetching holidays: Response is null",
-                                        type = Debugger.LOG_TYPE_ERROR).log()
+                            DebugLog("Holidays",
+                                    "Error fetching holidays: Response is null",
+                                    type = Debugger.LOG_TYPE_ERROR)
                             return
                         }
 
@@ -73,16 +71,13 @@ class Holidays {
                         callback(NetworkManager.SUCCESS)
                         prefs.edit().putLong("updated_holidays", Date().time).apply()
                         // Log success
-                        if (Debugger.DEBUGGING_ENABLED)
-                            DebugLog("Holidays", "Holidays fetched: Success",
-                                    type = Debugger.LOG_TYPE_SUCCESS).log()
+                        DebugLog("Holidays", "Holidays fetched: Success",
+                                type = Debugger.LOG_TYPE_SUCCESS)
                     }
 
                     override fun onError(error: ANError) {
                         // Log error
-                        if (Debugger.DEBUGGING_ENABLED)
-                            DebugLog("Holidays", "Error loading holidays",
-                                    error).log()
+                        DebugLog("Holidays", "Error loading holidays", error)
 
                         when (error.errorDetail) {
                             "connectionError" -> {

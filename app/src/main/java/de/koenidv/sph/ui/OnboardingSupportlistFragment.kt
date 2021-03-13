@@ -45,8 +45,7 @@ class OnboardingSupportlistFragment : Fragment() {
         val nextFab = view.findViewById<FloatingActionButton>(R.id.nextFab)
 
         // Log loading features
-        if (Debugger.DEBUGGING_ENABLED)
-            DebugLog("FeaturesFrag", "Loading features list").log()
+        DebugLog("FeaturesFrag", "Loading features list")
 
         // Get supported features
         NetworkManager().getSiteAuthed("https://start.schulportal.hessen.de/index.php") { success: Int, response: String? ->
@@ -101,10 +100,9 @@ class OnboardingSupportlistFragment : Fragment() {
             val features = featureList.map { it.type }
 
             // Log supported features
-            if (Debugger.DEBUGGING_ENABLED)
-                DebugLog("FeaturesFrag", "Loaded features list",
-                        bundleOf("features" to featureList),
-                        Debugger.LOG_TYPE_VAR).log()
+            DebugLog("FeaturesFrag", "Loaded features list",
+                    bundleOf("features" to featureList),
+                    Debugger.LOG_TYPE_VAR)
 
             // Don't crash if context is null for some reason
             if (context == null) return@getSiteAuthed
@@ -187,10 +185,8 @@ class OnboardingSupportlistFragment : Fragment() {
                  */
 
                 // Log index starting
-                if (Debugger.DEBUGGING_ENABLED) {
-                    DebugLog("FeaturesFrag", "INDEXING START").log()
-                    DebugLog("FeaturesFrag", "Resolving tile urls").log()
-                }
+                DebugLog("FeaturesFrag", "INDEXING START")
+                DebugLog("FeaturesFrag", "Resolving tile urls")
 
                 // Resolve tile urls
                 var tilesResolved = 0
@@ -218,10 +214,9 @@ class OnboardingSupportlistFragment : Fragment() {
                                 }
                             }) { indexsuccess ->
                                 // Log index status
-                                if (Debugger.DEBUGGING_ENABLED)
-                                    DebugLog("FeaturesFrag",
-                                            "INDEXING DONE: $indexsuccess",
-                                            type = Debugger.LOG_TYPE_VAR).log()
+                                DebugLog("FeaturesFrag",
+                                        "INDEXING DONE: $indexsuccess",
+                                        type = Debugger.LOG_TYPE_VAR)
 
                                 // Continue on indexing completion
                                 statusText.visibility = View.GONE
@@ -236,12 +231,11 @@ class OnboardingSupportlistFragment : Fragment() {
                                     analytics.setUserProperty(
                                             "courseIdExample",
                                             CoursesDb.getGmbIdExample())
-                                    if (Debugger.DEBUGGING_ENABLED)
-                                        DebugLog("FeaturesFrag",
-                                                "EXAMPLE GMBID: " +
-                                                        CoursesDb.getGmbIdExample(),
-                                                type = Debugger.LOG_TYPE_VAR)
-                                                .log()
+                                    // todo user onboarding log unification
+                                    DebugLog("FeaturesFrag",
+                                            "EXAMPLE GMBID: " +
+                                                    CoursesDb.getGmbIdExample(),
+                                            type = Debugger.LOG_TYPE_VAR)
                                     // Log conversion to GA
                                     analytics.logEvent("onboarding_complete", bundleOf())
                                 } else {
@@ -257,9 +251,8 @@ class OnboardingSupportlistFragment : Fragment() {
                                     warningText.setTextColor(requireContext().getColor(R.color.colorAccent))
                                     warningText.setOnClickListener {
                                         // Log retrying
-                                        if (Debugger.DEBUGGING_ENABLED)
-                                            DebugLog("FeaturesFrag",
-                                                    "Recreating on user input").log()
+                                        DebugLog("FeaturesFrag",
+                                                "Recreating on user input")
 
                                         // Clear session id
                                         TokenManager.reset()
@@ -289,10 +282,9 @@ class OnboardingSupportlistFragment : Fragment() {
                 }
             } else {
                 // Log unsupported school
-                if (Debugger.DEBUGGING_ENABLED)
                     DebugLog("FeaturesFrag", "School unsupported",
                             bundleOf("schoolid" to prefs.getString("schoolid", "0")),
-                            Debugger.LOG_TYPE_ERROR).log()
+                            Debugger.LOG_TYPE_ERROR)
                 // School unsupported. Log to analytics
                 FirebaseAnalytics.getInstance(requireContext()).logEvent(
                         "school_unsupported",
@@ -305,10 +297,9 @@ class OnboardingSupportlistFragment : Fragment() {
         // Continue button
         nextFab.setOnClickListener {
             // Log onboarding complete
-            if (Debugger.DEBUGGING_ENABLED)
                 DebugLog("FeaturesFrag",
                         "ONBOARDING COMPLETE",
-                        type = Debugger.LOG_TYPE_SUCCESS).log()
+                        type = Debugger.LOG_TYPE_SUCCESS)
             // Mark onboarding completed for Crashlytics
             FirebaseCrashlytics.getInstance().setCustomKey("onboarding_completed", true)
             // Disable debugger after indexing is complete

@@ -740,7 +740,7 @@ class RawParser {
                 // todo Parse submissions
             } catch (npe: NullPointerException) {
                 DebugLog("Parser", "NPE on parsing posts for $courseId",
-                        bundleOf("row" to row.toString()), Debugger.LOG_TYPE_ERROR).log()
+                        bundleOf("row" to row.toString()), Debugger.LOG_TYPE_ERROR)
                 npe.printStackTrace()
                 FirebaseCrashlytics.getInstance().recordException(npe)
             }

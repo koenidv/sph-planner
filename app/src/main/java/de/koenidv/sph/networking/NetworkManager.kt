@@ -71,10 +71,9 @@ class NetworkManager {
         var disableList = false
 
         // Log pull to refresh
-        if (Debugger.DEBUGGING_ENABLED)
-            DebugLog("NetMgr", "Handling PTR",
-                    bundleOf("destination" to destinationId,
-                            "args" to arguments)).log()
+        DebugLog("NetMgr", "Handling PTR",
+                bundleOf("destination" to destinationId,
+                        "args" to arguments))
 
         when (destinationId) {
             R.id.nav_home, R.id.nav_explore -> {
@@ -175,11 +174,10 @@ class NetworkManager {
         TokenManager.getToken(forceNewToken) { success: Int, _ ->
 
             // Log loading the page
-            if (Debugger.DEBUGGING_ENABLED)
-                DebugLog("NetMgr", "Loading url authenticated",
-                        bundleOf("url" to url,
-                                "forceNewToken" to forceNewToken,
-                                "tokenCb" to success)).log()
+            DebugLog("NetMgr", "Loading url authenticated",
+                    bundleOf("url" to url,
+                            "forceNewToken" to forceNewToken,
+                            "tokenCb" to success))
 
             if (success == SUCCESS) {
 
@@ -199,11 +197,10 @@ class NetworkManager {
                                         && !responseLine.contains("Schulauswahl - Schulportal Hessen")) {
                                     // Getting site was successful
                                     // Log site loaded
-                                    if (Debugger.DEBUGGING_ENABLED)
-                                        DebugLog("NetMgr", "Loaded url: Success",
-                                                bundleOf("url" to url,
-                                                        "title" to Debugger.responseTitle(response)),
-                                                Debugger.LOG_TYPE_SUCCESS).log()
+                                    DebugLog("NetMgr", "Loaded url: Success",
+                                            bundleOf("url" to url,
+                                                    "title" to Debugger.responseTitle(response)),
+                                            Debugger.LOG_TYPE_SUCCESS)
 
                                     callback(SUCCESS, response)
                                     prefs.edit().putLong("token_last_success", Date().time).apply()
@@ -212,12 +209,11 @@ class NetworkManager {
                                         || responseLine.contains("Schulauswahl - Schulportal Hessen")) {
                                     // Signin was not successful
                                     // Log error
-                                    if (Debugger.DEBUGGING_ENABLED)
-                                        DebugLog("NetMgr",
-                                                "Error loading url, invalid credentials",
-                                                bundleOf("url" to url,
-                                                        "title" to Debugger.responseTitle(response)),
-                                                Debugger.LOG_TYPE_ERROR).log()
+                                    DebugLog("NetMgr",
+                                            "Error loading url, invalid credentials",
+                                            bundleOf("url" to url,
+                                                    "title" to Debugger.responseTitle(response)),
+                                            Debugger.LOG_TYPE_ERROR)
 
                                     Log.e(TAG, "Invalid credentials for $url")
                                     prefs.edit().putLong("token_last_success", 0).apply()
@@ -227,24 +223,21 @@ class NetworkManager {
                                     callback(FAILED_MAINTENANCE, response)
 
                                     // Log maintenance
-                                    if (Debugger.DEBUGGING_ENABLED)
-                                        DebugLog("NetMgr",
-                                                "Error loading url, maintenance",
-                                                bundleOf("url" to url,
-                                                        "title" to Debugger.responseTitle(response)),
-                                                Debugger.LOG_TYPE_ERROR).log()
+                                    DebugLog("NetMgr",
+                                            "Error loading url, maintenance",
+                                            bundleOf("url" to url,
+                                                    "title" to Debugger.responseTitle(response)),
+                                            Debugger.LOG_TYPE_ERROR)
                                 }
                             }
 
                             override fun onError(error: ANError) {
                                 // Log network error
-                                if (Debugger.DEBUGGING_ENABLED)
-                                    DebugLog("TokenMgr",
-                                            "NetError loading url authenticated",
-                                            error, bundleOf(
-                                            "url" to url
-                                    )
-                                    ).log()
+                                DebugLog("TokenMgr",
+                                        "NetError loading url authenticated",
+                                        error, bundleOf(
+                                        "url" to url
+                                ))
 
                                 when (error.errorDetail) {
                                     "connectionError" -> {
@@ -360,9 +353,8 @@ class NetworkManager {
      */
     fun update(entries: List<String>, data: Map<String, String>, callback: (success: Int) -> Unit) {
         // Log updating
-        if (Debugger.DEBUGGING_ENABLED)
-            DebugLog("NetMgr", "Updating invoked",
-                    bundleOf("updateList" to entries)).log()
+        DebugLog("NetMgr", "Updating invoked",
+                bundleOf("updateList" to entries))
 
         if (entries.isNotEmpty()) {
             // Prepare token
@@ -426,9 +418,8 @@ class NetworkManager {
         loadList.add("holidays")
 
         // Log indexing status
-        if (Debugger.DEBUGGING_ENABLED)
-            DebugLog("NetMgr", "Indexing list assembled",
-                    bundleOf("loadList" to loadList)).log()
+        DebugLog("NetMgr", "Indexing list assembled",
+                bundleOf("loadList" to loadList))
 
         // Load every item in loadList
         var index = 0
@@ -448,10 +439,8 @@ class NetworkManager {
         }
         // Load the feature at the current index
         loadNextFeature = {
-            // Log feature loading
             // Log indexing status
-            if (Debugger.DEBUGGING_ENABLED)
-                DebugLog("NetMgr", "Fetching ${loadList[index]}").log()
+            DebugLog("NetMgr", "Fetching ${loadList[index]}")
             when (loadList[index]) {
                 "userid" -> {
                     status(appContext().getString(R.string.index_status_userid))
@@ -487,11 +476,9 @@ class NetworkManager {
                 }
                 else -> {
                     // Log unsupported feature
-                    if (Debugger.DEBUGGING_ENABLED)
-                        DebugLog("NetMgr",
-                                "Unsupported feature ${loadList[index]}",
-                                type = Debugger.LOG_TYPE_ERROR).log()
-                    Log.e(TAG, "Unsupported feature " + loadList[index])
+                    DebugLog("NetMgr",
+                            "Unsupported feature ${loadList[index]}",
+                            type = Debugger.LOG_TYPE_ERROR)
                 }
             }
         }
@@ -505,10 +492,9 @@ class NetworkManager {
      */
     fun resolveUrl(url: String, callback: (success: Int, resolvedUrl: String) -> Unit) {
         // Log resolving url
-        if (Debugger.DEBUGGING_ENABLED)
-            DebugLog("NetMgr", "Resolving url", bundleOf(
-                    "url" to url
-            )).log()
+        DebugLog("NetMgr", "Resolving url", bundleOf(
+                "url" to url
+        ))
 
         // Getting an access token
         TokenManager.getToken { success: Int, _ ->
@@ -527,22 +513,20 @@ class NetworkManager {
                                     callback(SUCCESS, response.request().url().toString())
 
                                     // Log success
-                                    if (Debugger.DEBUGGING_ENABLED)
-                                        DebugLog("NetMgr", "Url resolving: success",
-                                                bundleOf(
-                                                        "url" to url,
-                                                        "resolvedUrl" to response.request().url().toString()
-                                                ), Debugger.LOG_TYPE_SUCCESS).log()
+                                    DebugLog("NetMgr", "Url resolving: success",
+                                            bundleOf(
+                                                    "url" to url,
+                                                    "resolvedUrl" to response.request().url().toString()
+                                            ), Debugger.LOG_TYPE_SUCCESS)
                                 } else {
                                     callback(FAILED_UNKNOWN, url)
 
                                     // Log warning
-                                    if (Debugger.DEBUGGING_ENABLED)
-                                        DebugLog("NetMgr", "Url resolving failed",
-                                                bundleOf(
-                                                        "url" to url,
-                                                        "resolvedUrl" to response.request().url().toString()
-                                                ), Debugger.LOG_TYPE_WARNING).log()
+                                    DebugLog("NetMgr", "Url resolving failed",
+                                            bundleOf(
+                                                    "url" to url,
+                                                    "resolvedUrl" to response.request().url().toString()
+                                            ), Debugger.LOG_TYPE_WARNING)
                                 }
                             }
 
@@ -554,10 +538,9 @@ class NetworkManager {
                                 callback(FAILED_UNKNOWN, url)
 
                                 // Log warning
-                                if (Debugger.DEBUGGING_ENABLED)
-                                    DebugLog("NetMgr", "Url resolving failed",
-                                            anError, bundleOf("url" to url),
-                                            Debugger.LOG_TYPE_WARNING).log()
+                                DebugLog("NetMgr", "Url resolving failed",
+                                        anError, bundleOf("url" to url),
+                                        Debugger.LOG_TYPE_WARNING)
                             }
 
                         })

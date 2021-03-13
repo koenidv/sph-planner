@@ -1,7 +1,5 @@
 package de.koenidv.sph.networking
 
-import android.content.Context
-import android.content.SharedPreferences
 import android.util.Log
 import android.widget.Toast
 import androidx.core.os.bundleOf
@@ -15,6 +13,7 @@ import com.google.firebase.remoteconfig.ktx.remoteConfig
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner.Companion.TAG
 import de.koenidv.sph.SphPlanner.Companion.appContext
+import de.koenidv.sph.SphPlanner.Companion.prefs
 import de.koenidv.sph.debugging.DebugLog
 import de.koenidv.sph.debugging.Debugger
 import de.koenidv.sph.debugging.Debugger.LOG_TYPE_ERROR
@@ -25,10 +24,7 @@ import java.util.*
 //  Created by koenidv on 05.12.2020.
 object TokenManager {
 
-    var lastTokenCheck = 0L
-
-    val prefs: SharedPreferences = appContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
-
+    private var lastTokenCheck = 0L
     var userid = prefs.getString("userid", "0")!!
 
     /**
@@ -55,8 +51,7 @@ object TokenManager {
                 && !forceNewToken) {
 
             // Log using old access token
-            if (Debugger.DEBUGGING_ENABLED)
-                DebugLog("TokenMgr", "Using known sid token").log()
+            DebugLog("TokenMgr", "Using known sid token")
 
             // If stored session id does not match the last known token,
             // overwrite it
@@ -66,8 +61,8 @@ object TokenManager {
                     CookieStore.setToken(prefs.getString("token", "")!!)
 
                     // Log writing token to cookiestore
-                    if (Debugger.DEBUGGING_ENABLED)
-                        DebugLog("TokenMgr", "Rewriting sid cookie").log()
+
+                    DebugLog("TokenMgr", "Rewriting sid cookie")
                 }
                 // Save this time so we don't have to check again within a short time span
                 lastTokenCheck = Date().time
@@ -79,8 +74,7 @@ object TokenManager {
             // Get a new token
             if (prefs.getString("user", "") != null && prefs.getString("password", "") != null) {
                 // Log creating new access token
-                if (Debugger.DEBUGGING_ENABLED)
-                    DebugLog("TokenMgr", "Authorizing new sid token").log()
+                DebugLog("TokenMgr", "Authorizing new sid token")
 
                 // Clear old cookies to make sure we get a fresh start
                 CookieStore.clearCookies()
@@ -89,11 +83,9 @@ object TokenManager {
                 getTokenWithUrlencoded(onComplete)
             } else {
                 // Log token failure
-                if (Debugger.DEBUGGING_ENABLED) {
-                    DebugLog("TokenMgr",
-                            "Cannot authorize token, no credentials provided",
-                            type = LOG_TYPE_ERROR).log()
-                }
+                DebugLog("TokenMgr",
+                        "Cannot authorize token, no credentials provided",
+                        type = LOG_TYPE_ERROR)
             }
         }
     }
@@ -116,9 +108,8 @@ object TokenManager {
                     .apply()
 
             // Log success
-            if (Debugger.DEBUGGING_ENABLED)
-                DebugLog("TokenMgr", "Sid token authenticated: Success",
-                        type = Debugger.LOG_TYPE_SUCCESS).log()
+            DebugLog("TokenMgr", "Sid token authenticated: Success",
+                    type = Debugger.LOG_TYPE_SUCCESS)
 
             onComplete(NetworkManager.SUCCESS, CookieStore.getCookie("schulportal.hessen.de", "sid")!!)
 
@@ -129,9 +120,8 @@ object TokenManager {
             prefs.edit().putLong("token_last_success", 0).apply()
 
             // Log failure
-            if (Debugger.DEBUGGING_ENABLED)
-                DebugLog("TokenMgr", "Sid auth failed: Invalid credentials",
-                        bundleOf("response" to response), LOG_TYPE_ERROR).log()
+            DebugLog("TokenMgr", "Sid auth failed: Invalid credentials",
+                    bundleOf("response" to response), LOG_TYPE_ERROR)
             Log.e(TAG, "Login failed; Invalid credentials")
 
             onComplete(NetworkManager.FAILED_INVALID_CREDENTIALS, null)
@@ -139,10 +129,8 @@ object TokenManager {
             // Cannot login at the moment
 
             // Log failure
-            if (Debugger.DEBUGGING_ENABLED)
-                DebugLog("TokenMgr", "Sid auth failed: Maintenance",
-                        bundleOf("response" to response), LOG_TYPE_ERROR).log()
-            Log.d(TAG, "Login failed; Maintenance")
+            DebugLog("TokenMgr", "Sid auth failed: Maintenance",
+                    bundleOf("response" to response), LOG_TYPE_ERROR)
 
             onComplete(NetworkManager.FAILED_MAINTENANCE, null)
         } else if (response.contains("Login failed!")
@@ -152,19 +140,16 @@ object TokenManager {
             // Server error
 
             // Log failure
-            if (Debugger.DEBUGGING_ENABLED)
-                DebugLog("TokenMgr", "Sid auth failed: Server error",
-                        bundleOf("response" to response), LOG_TYPE_ERROR).log()
-            Log.d(TAG, "Login failed; Server error")
+            DebugLog("TokenMgr", "Sid auth failed: Server error",
+                    bundleOf("response" to response), LOG_TYPE_ERROR)
 
             onComplete(NetworkManager.FAILED_SERVER_ERROR, null)
         } else {
             // Some other error
 
             // Log failure
-            if (Debugger.DEBUGGING_ENABLED)
-                DebugLog("TokenMgr", "Sid auth failed: Unknown error",
-                        bundleOf("response" to response), LOG_TYPE_ERROR).log()
+            DebugLog("TokenMgr", "Sid auth failed: Unknown error",
+                    bundleOf("response" to response), LOG_TYPE_ERROR)
             Log.e(TAG, "Login failed; Reason unknown!")
             Log.d(TAG, response)
 
@@ -177,11 +162,7 @@ object TokenManager {
      */
     private fun handleError(error: ANError, onComplete: (success: Int, token: String?) -> Unit) {
         // Log network error
-        if (Debugger.DEBUGGING_ENABLED)
-            DebugLog("TokenMgr",
-                    "NetError getting a sid token",
-                    error
-            ).log()
+        DebugLog("TokenMgr", "NetError getting a sid token", error)
 
         if (error.errorCode == 0) {
             when (error.errorDetail) {
@@ -227,9 +208,8 @@ object TokenManager {
                             // As of 2021/01/06 we need to load the site again
                             // to actually get a session id
                             // Log 0106 fix
-                            if (Debugger.DEBUGGING_ENABLED)
-                                DebugLog("TokenMgr", "Using 0106 fix").log()
-                            Log.d(TAG, "Using second token request (0106)")
+                            DebugLog("TokenMgr", "Using 0106 fix",
+                                    type = LOG_TYPE_WARNING)
                             AndroidNetworking.get("https://start.schulportal.hessen.de/index.php?i="
                                     + prefs.getString("schoolid", "5146"))
                                     .setTag("token-2")
@@ -259,10 +239,9 @@ object TokenManager {
     // Resets the authentication token
     fun reset() {
         // Log resetting
-        if (Debugger.DEBUGGING_ENABLED)
-            DebugLog("TokenMgr",
-                    "TokenManager reset",
-                    type = LOG_TYPE_WARNING).log()
+        DebugLog("TokenMgr",
+                "TokenManager reset",
+                type = LOG_TYPE_WARNING)
 
         // Clear cookies
         CookieStore.clearCookies()

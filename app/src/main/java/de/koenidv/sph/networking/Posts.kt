@@ -36,8 +36,7 @@ class Posts(private val networkManager: NetworkManager = NetworkManager()) {
      */
     private fun update(callback: (success: Int) -> Unit) {
         // Log updating posts
-        if (Debugger.DEBUGGING_ENABLED)
-            DebugLog("Posts", "Updating posts").log()
+        DebugLog("Posts", "Updating posts")
 
         // Get my courses page
         networkManager.getSiteAuthed(SphPlanner.appContext()
@@ -111,9 +110,8 @@ class Posts(private val networkManager: NetworkManager = NetworkManager()) {
                     }
 
                     // Log updating posts
-                    if (Debugger.DEBUGGING_ENABLED)
-                        DebugLog("Posts", "Updating posts for courses",
-                                bundleOf("courses" to courses)).log()
+                    DebugLog("Posts", "Updating posts for courses",
+                            bundleOf("courses" to courses))
 
                 } else callback(NetworkManager.SUCCESS)
             } else callback(success)
@@ -139,12 +137,11 @@ class Posts(private val networkManager: NetworkManager = NetworkManager()) {
         var coursesSize = courses.size // Will be increased with more semesters
 
         // Log loading posts
-        if (Debugger.DEBUGGING_ENABLED)
             DebugLog("Posts", "Loading posts and post data",
                     bundleOf("courses" to coursesToLoad,
                             "markAsRead" to markAsRead,
                             "semester" to semester,
-                            "courses" to courses)).log()
+                            "courses" to courses))
 
         val prefs = SphPlanner.appContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
         val time = Date().time
@@ -160,10 +157,9 @@ class Posts(private val networkManager: NetworkManager = NetworkManager()) {
                     prefs.edit().putLong("updated_posts", time).apply()
                 } else callback(errors.maxOf { it })
                 // Log
-                if (Debugger.DEBUGGING_ENABLED)
                     DebugLog("Posts", "Loaded posts",
                             bundleOf("errors" to errors),
-                            Debugger.LOG_TYPE_VAR).log()
+                            Debugger.LOG_TYPE_VAR)
             }
         }
 
@@ -171,9 +167,8 @@ class Posts(private val networkManager: NetworkManager = NetworkManager()) {
             // If not courses are specified, simply return - just a fallback
             callbackIfLast()
             // Log this
-            if (Debugger.DEBUGGING_ENABLED)
                 DebugLog("Posts", "No courses to load!",
-                        type = Debugger.LOG_TYPE_WARNING).log()
+                        type = Debugger.LOG_TYPE_WARNING)
             return
         }
 
@@ -191,16 +186,14 @@ class Posts(private val networkManager: NetworkManager = NetworkManager()) {
             }
 
             // Log loading posts
-            if (Debugger.DEBUGGING_ENABLED)
                 DebugLog("Posts", "Loading posts for ${course.courseId}",
-                        bundleOf("url" to url)).log()
+                        bundleOf("url" to url))
           
             networkManager.getSiteAuthed(url) { success: Int, result: String? ->
 
                 if (success == NetworkManager.SUCCESS) {
                     // Log parsing posts
-                    if (Debugger.DEBUGGING_ENABLED)
-                        DebugLog("Posts", "Parsing data for ${course.courseId}").log()
+                    DebugLog("Posts", "Parsing data for ${course.courseId}")
 
                     // Parse data
                     RawParser().parsePosts(course.courseId,
@@ -234,8 +227,7 @@ class Posts(private val networkManager: NetworkManager = NetworkManager()) {
                             coursesSize++
 
                             // Log loading posts from another semester
-                            if (Debugger.DEBUGGING_ENABLED)
-                                DebugLog("Posts", "2nd semester posts for ${course.courseId}").log()
+                            DebugLog("Posts", "2nd semester posts for ${course.courseId}")
 
                             // Call this function again with the corresponding semester
                             load(coursesToLoad = listOf(course),

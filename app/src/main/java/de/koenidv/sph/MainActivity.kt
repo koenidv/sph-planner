@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.IntentSender.SendIntentException
 import android.net.NetworkCapabilities
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.util.TypedValue
 import android.view.Menu
@@ -292,9 +293,10 @@ class MainActivity : AppCompatActivity() {
             val autoLoginIntent = Intent(Intent.ACTION_VIEW, uri)
             val manualIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://start.schulportal.hessen.de/"))
 
-            // Auto log in if user has accepted before and network is trusted
+            // Auto log in if user has accepted before and network is trusted (R and above)
             if (prefs.getBoolean("open_sph_accepted_auto", false)
-                    && NetworkCapabilities().hasCapability(NetworkCapabilities.NET_CAPABILITY_TRUSTED)) {
+                    && (Build.VERSION.SDK_INT < Build.VERSION_CODES.R ||
+                            NetworkCapabilities().hasCapability(NetworkCapabilities.NET_CAPABILITY_TRUSTED))) {
                 context.startActivity(autoLoginIntent)
             } else {
                 AlertDialog.Builder(context)

@@ -30,8 +30,7 @@ class Users {
      */
     fun fetch(callback: (success: Int) -> Unit) {
         // Log fetching users
-        if (Debugger.DEBUGGING_ENABLED)
-            DebugLog("Users", "Fetching users").log()
+        DebugLog("Users", "Fetching users")
 
         // We need to make sure that we have an access token
         TokenManager.getToken { success, _ ->
@@ -70,10 +69,9 @@ class Users {
                         callback(NetworkManager.SUCCESS)
 
                         // Log success
-                        if (Debugger.DEBUGGING_ENABLED)
                             DebugLog("Users", "Loaded users",
                                     bundleOf("usersCount" to users.size),
-                                    type = Debugger.LOG_TYPE_SUCCESS).log()
+                                    type = Debugger.LOG_TYPE_SUCCESS)
                     }
                 } else {
                     callback(mSuccess)
@@ -98,8 +96,7 @@ class Users {
                           favoriteTeachers: List<String> = CoursesDb.getFavoriteTeacherIds(),
                           callback: (Int, List<User>) -> Unit) {
         // Log fetching users
-        if (Debugger.DEBUGGING_ENABLED)
-            DebugLog("Users", "Loading users for $query").log()
+        DebugLog("Users", "Loading users for $query")
 
         TokenManager.getToken { success, _ ->
             if (success != NetworkManager.SUCCESS) {
@@ -176,9 +173,7 @@ class Users {
                             // Handle request errors
 
                             // Log error
-                            if (Debugger.DEBUGGING_ENABLED)
-                                DebugLog("Users", "Error loading users",
-                                        error).log()
+                            DebugLog("Users", "Error loading users", error)
                             Log.d(SphPlanner.TAG, error.errorDetail)
 
                             when (error.errorDetail) {

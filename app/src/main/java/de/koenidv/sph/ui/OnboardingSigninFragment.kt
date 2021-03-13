@@ -43,8 +43,7 @@ class OnboardingSigninFragment : Fragment() {
         val prefs = SphPlanner.appContext().getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
         if (prefs.getBoolean("credsVerified", false)) {
             // If logging is enabled, log this
-            if (Debugger.DEBUGGING_ENABLED)
-                DebugLog("SigninFrag", "Already signed in, skipping").log()
+                DebugLog("SigninFrag", "Already signed in, skipping")
             val ft = parentFragmentManager.beginTransaction()
             ft.replace(R.id.fragment, OnboardingSupportlistFragment()).commit()
             return null
@@ -67,8 +66,7 @@ class OnboardingSigninFragment : Fragment() {
 
 
             // If logging is enabled, log loading the start page
-            if (Debugger.DEBUGGING_ENABLED)
-                DebugLog("SigninFrag", "Loading list of schools").log()
+            DebugLog("SigninFrag", "Loading list of schools")
 
             // Load school names and ids to display them in a spinner
             // Hide loading icon and show contents once done
@@ -88,17 +86,13 @@ class OnboardingSigninFragment : Fragment() {
                                 description.setTextColor(requireContext().getColor(R.color.colorAccent))
                                 description.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f)
                                 // If logging is enabled, log maintenance
-                                if (Debugger.DEBUGGING_ENABLED)
-                                    DebugLog("SigninFrag",
-                                            "School list loading failed, maintenance",
-                                            bundleOf("response" to response)
-                                    ).log()
+                                DebugLog("SigninFrag",
+                                        "School list loading failed, maintenance",
+                                        bundleOf("response" to response))
                                 description.setOnClickListener {
                                     // Log trying again
-                                    if (Debugger.DEBUGGING_ENABLED)
-                                        DebugLog("SigninFrag",
-                                                "User Input: Trying again after maintenance"
-                                        ).log()
+                                    DebugLog("SigninFrag",
+                                            "User Input: Trying again after maintenance")
                                     val ft = parentFragmentManager.beginTransaction()
                                     ft.detach(this@OnboardingSigninFragment).attach(
                                             this@OnboardingSigninFragment).commit()
@@ -122,21 +116,17 @@ class OnboardingSigninFragment : Fragment() {
                                 signinButton.visibility = View.VISIBLE
 
                                 // Log schools loaded
-                                if (Debugger.DEBUGGING_ENABLED)
-                                    DebugLog("SigninFrag",
-                                            "School list loading: Success",
-                                            bundleOf("listSize" to schoolIds.size)
-                                    ).log()
+                                DebugLog("SigninFrag",
+                                        "School list loading: Success",
+                                        bundleOf("listSize" to schoolIds.size))
                             }
                         }
 
                         override fun onError(anError: ANError) {
                             // Log network error
-                            if (Debugger.DEBUGGING_ENABLED)
-                                DebugLog("SigninFrag",
-                                        "NetError loading schools list",
-                                        anError
-                                ).log()
+                            DebugLog("SigninFrag",
+                                    "NetError loading schools list",
+                                    anError)
 
                             // Error occurred, very high chance of no network
                             // Show error
@@ -148,10 +138,8 @@ class OnboardingSigninFragment : Fragment() {
                             description.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f)
                             description.setOnClickListener {
                                 // Log trying again
-                                if (Debugger.DEBUGGING_ENABLED)
-                                    DebugLog("SigninFrag",
-                                            "User Input: Trying again after net error"
-                                    ).log()
+                                DebugLog("SigninFrag",
+                                        "User Input: Trying again after net error")
                                 // Recreate fragment
                                 val ft = parentFragmentManager.beginTransaction()
                                 ft.detach(this@OnboardingSigninFragment).attach(this@OnboardingSigninFragment).commit()
@@ -220,17 +208,15 @@ class OnboardingSigninFragment : Fragment() {
                         .apply()
 
                 // Log signing in
-                if (Debugger.DEBUGGING_ENABLED)
-                    DebugLog("SigninFrag", "Signing in with $school").log()
+                DebugLog("SigninFrag", "Signing in with $school")
 
                 // Check if credentials are valid
                 // We'll only get a token if login was successfull
                 TokenManager.getToken(true) { success: Int, token: String? ->
 
                     // Log signing in
-                    if (Debugger.DEBUGGING_ENABLED)
                         DebugLog("SigninFrag", "Signin cb: $success",
-                                type = Debugger.LOG_TYPE_VAR).log()
+                                type = Debugger.LOG_TYPE_VAR)
 
                     if (success == NetworkManager.SUCCESS && token != null && token != "") {
                         // User signed in successfully - NOW DO SOMETHING WITH IT :)

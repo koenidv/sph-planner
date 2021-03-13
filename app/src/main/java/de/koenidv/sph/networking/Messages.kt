@@ -41,8 +41,7 @@ class Messages {
               callback: (success: Int) -> Unit) {
 
         // Log fetching messages
-        if (Debugger.DEBUGGING_ENABLED)
-            DebugLog("Messages", "Fetching messages").log()
+        DebugLog("Messages", "Fetching messages")
 
         val typeBody = if (!archived) "All" else "All"
 
@@ -54,10 +53,9 @@ class Messages {
                 if (success != NetworkManager.SUCCESS || cryption == null) {
                     // Return if network manager could not be started
                     // Log error
-                    if (Debugger.DEBUGGING_ENABLED)
-                        DebugLog("Messages", "Could not start Cryption",
-                                bundleOf("success" to success),
-                                Debugger.LOG_TYPE_ERROR).log()
+                    DebugLog("Messages", "Could not start Cryption",
+                            bundleOf("success" to success),
+                            Debugger.LOG_TYPE_ERROR)
                     callback(success)
                     return@start
                 }
@@ -227,14 +225,7 @@ class Messages {
             }
         } catch (e: Exception) {
             // If messages fetching failed, log and return
-            Log.e(TAG, "Fetching messages failed")
-            Log.e(TAG, e.stackTraceToString())
-            FirebaseCrashlytics.getInstance().recordException(e)
-            // Log error
-            if (Debugger.DEBUGGING_ENABLED)
-                DebugLog("Messages", "Error fetching messages",
-                        bundleOf("exception" to e.stackTraceToString()),
-                        Debugger.LOG_TYPE_ERROR).log()
+            DebugLog("Messages", "Error fetching messages", e)
 
             // Call back with unknown error
             callback(NetworkManager.FAILED_UNKNOWN)

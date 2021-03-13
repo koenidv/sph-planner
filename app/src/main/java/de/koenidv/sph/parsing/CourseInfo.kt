@@ -1,10 +1,8 @@
 package de.koenidv.sph.parsing
 
-import android.util.Log
 import androidx.core.os.bundleOf
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import de.koenidv.sph.R
-import de.koenidv.sph.SphPlanner.Companion.TAG
 import de.koenidv.sph.debugging.DebugLog
 import de.koenidv.sph.debugging.Debugger
 import java.util.*
@@ -42,8 +40,8 @@ object CourseInfo {
             DebugLog("CrsInf",
                     "Shortname: Id does not seem to be of type internal",
                     bundleOf("id" to courseId),
-                    Debugger.LOG_TYPE_WARNING).log()
-            Log.w("$TAG CourseInfo", "Id does not seem to be of type internal")
+                    Debugger.LOG_TYPE_WARNING)
+            // Throw a new exception to be able to log this to crashlytics
             try {
                 throw Exception(
                         "CourseInfo#getShortnameFromInternalId: Failed internal id requirement for id $courseId")

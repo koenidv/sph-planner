@@ -17,10 +17,9 @@ class Timetable {
      * This will replace any current lessons in the timetable
      */
     fun fetch(callback: (success: Int) -> Unit) {
-      
+
         // Log fetching timetable
-        if (Debugger.DEBUGGING_ENABLED)
-            DebugLog("Timetable", "Fetching timetable").log()
+        DebugLog("Timetable", "Fetching timetable")
 
         NetworkManager().getSiteAuthed(appContext().getString(R.string.url_timetable),
                 callback = { success: Int, result: String? ->
@@ -33,9 +32,8 @@ class Timetable {
                     }
                     callback(success)
                     // Log success
-                    if (Debugger.DEBUGGING_ENABLED)
-                        DebugLog("Timetable", "Fetched timetable: $success",
-                                type = Debugger.LOG_TYPE_VAR).log()
+                    DebugLog("Timetable", "Fetched timetable: $success",
+                            type = Debugger.LOG_TYPE_VAR)
                 })
     }
 
