@@ -67,8 +67,10 @@ class CompactTasksAdapter(private val tasks: List<Tasks.TaskData>,
             description.text = task.description
 
             // Set checkmark color per course, about 70% opacity
-            checkbox.buttonTintList = ColorStateList(arrayOf(intArrayOf(android.R.attr.state_enabled)),
-                    intArrayOf(task.color and 0x00FFFFFF or 0xb4000000.toInt()))
+            if (task.color != 0)
+                checkbox.buttonTintList = ColorStateList(
+                        arrayOf(intArrayOf(android.R.attr.state_enabled)),
+                        intArrayOf(task.color and 0x00FFFFFF or 0xb4000000.toInt()))
 
         }
 

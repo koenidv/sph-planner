@@ -153,7 +153,12 @@ class TasksFragment : Fragment() {
 
         // Create task fab
         view.findViewById<FloatingActionButton>(R.id.createTaskFab).setOnClickListener {
-            EditTaskSheet {}.show(parentFragmentManager, "create-task")
+            EditTaskSheet {
+                // Add new task to the top of the list and scroll there
+                tasks.add(0, it)
+                adapter.notifyItemInserted(0)
+                tasksRecycler.layoutManager?.scrollToPosition(0)
+            }.show(parentFragmentManager, "create-task")
         }
 
         return view

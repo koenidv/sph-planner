@@ -37,12 +37,10 @@ public class TasksDb {
 
     /**
      * Save a task to the db
-     * Will save, but not update pinned and dueDate
-     * Will only update isdone if it is done
      *
      * @param task Task to save
      */
-    public void save(Task task) {
+    public void save(Task task, boolean override) {
         final SQLiteDatabase db = dbhelper.getReadableDatabase();
         ContentValues cv = new ContentValues();
 
@@ -62,12 +60,25 @@ public class TasksDb {
             db.insert("tasks", null, cv);
         } else {
             // Only update done status if it is true
-            if (!task.isDone()) cv.remove("isdone");
-            cv.remove("pinned");
-            cv.remove("dueDate");
+            if (!override) {
+                if (!task.isDone()) cv.remove("isdone");
+                cv.remove("pinned");
+                cv.remove("dueDate");
+            }
             db.update("tasks", cv, "task_id = '" + task.getTaskId() + "'", null);
         }
         cursor.close();
+    }
+
+    /**
+     * Save a task to the db
+     * Will save, but not update pinned and dueDate
+     * Will only update isdone if it is done
+     *
+     * @param task Task to save
+     */
+    public void save(Task task) {
+        save(task, false);
     }
 
     /**

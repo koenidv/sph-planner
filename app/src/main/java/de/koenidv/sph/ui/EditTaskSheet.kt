@@ -14,8 +14,10 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.button.MaterialButton
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner.Companion.prefs
+import de.koenidv.sph.database.TasksDb
 import de.koenidv.sph.objects.Task
 import java.util.*
+import kotlin.math.roundToInt
 
 
 //  Created by koenidv on 14.02.2021.
@@ -86,8 +88,8 @@ class EditTaskSheet(private val task: Task? = null,
             // If new task shall be created, callback with a new task
             // Else update the task to be edited and call back with it
             if (task == null) {
-                callback(Task(
-                        taskId = "test",
+                Task(
+                        taskId = "custom_" + (Date().time / 1000.toDouble()).roundToInt(),
                         description = description.text.toString(),
                         date = date.time,
                         dueDate = due?.time,
@@ -95,14 +97,22 @@ class EditTaskSheet(private val task: Task? = null,
                         isDone = false,
                         id_course = null,
                         id_post = null
-                ))
+                ).also {
+                    // Save to db
+                    TasksDb.getInstance().save(it, true)
+                    // Call back
+                    callback(it)
+                }
             } else {
                 // Apply changes and call back
                 task.description = description.text.toString()
                 task.date = date.time
                 task.dueDate = due?.time
                 task.isPinned = pinned.isChecked
-                callback(task)
+                task.also {
+                    TasksDb.getInstance().save(it, true)
+                    callback(it)
+                }
             }
 
             dismiss()

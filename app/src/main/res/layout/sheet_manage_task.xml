@@ -3,7 +3,24 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/editTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
+        android:drawablePadding="16dp"
+        android:gravity="center_vertical"
+        android:padding="16dp"
+        android:text="Edit"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textSize="16sp"
+        android:visibility="gone"
+        app:drawableStartCompat="@drawable/ic_edit"
+        app:drawableTint="?attr/colorOnSurface"
+        tools:visibility="visible" />
 
     <TextView
         android:id="@+id/changeDueTextView"

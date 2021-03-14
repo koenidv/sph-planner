@@ -1,6 +1,5 @@
 package de.koenidv.sph.adapters
 
-import android.app.Activity
 import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
@@ -10,6 +9,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.bottomsheets.BottomSheet
@@ -22,13 +22,14 @@ import de.koenidv.sph.database.TasksDb
 import de.koenidv.sph.networking.Tasks
 import de.koenidv.sph.objects.Task
 import de.koenidv.sph.parsing.Utility
+import de.koenidv.sph.ui.EditTaskSheet
 import java.text.SimpleDateFormat
 import java.util.*
 
 
 //  Created by koenidv on 20.12.2020.
 class TasksAdapter(private val tasks: MutableList<Task>,
-                   private val activity: Activity,
+                   private val activity: FragmentActivity,
                    private val onDateClick: (postId: String) -> Unit,
                    private val onCourseClick: (courseId: String) -> Unit,
                    private val onTaskCheckedChanged: (taskdata: Tasks.TaskData, isDone: Boolean) -> Unit) :
@@ -39,6 +40,7 @@ class TasksAdapter(private val tasks: MutableList<Task>,
         val sheet = BottomSheetDialog(activity)
         sheet.setContentView(R.layout.sheet_manage_task)
 
+        val edit = sheet.findViewById<TextView>(R.id.editTextView)
         val dueChange = sheet.findViewById<TextView>(R.id.changeDueTextView)
         val pin = sheet.findViewById<TextView>(R.id.pinTextView)
         val unpin = sheet.findViewById<TextView>(R.id.unpinTextView)
@@ -47,6 +49,8 @@ class TasksAdapter(private val tasks: MutableList<Task>,
         // Only show applicable options
         if (task.isPinned) pin?.visibility = View.GONE
         else unpin?.visibility = View.GONE
+
+        if (task.taskId.startsWith("custom")) edit?.visibility = View.VISIBLE
 
         // Function for pinning / unpinning a task
         val setPinned = { pinned: Boolean ->
@@ -57,6 +61,14 @@ class TasksAdapter(private val tasks: MutableList<Task>,
             tasks[position] = task
             // Notify the adapter about the changed item
             notifyItemChanged(position)
+        }
+
+        // Show a bottom sheet to edit this custom task
+        edit?.setOnClickListener {
+            sheet.dismiss()
+            EditTaskSheet(task) {
+                notifyItemChanged(position)
+            }.show(activity.supportFragmentManager, task.taskId)
         }
 
         // Change due date, same as dueLayout click
@@ -84,7 +96,8 @@ class TasksAdapter(private val tasks: MutableList<Task>,
             sheet.dismiss()
             // Share task description as plaintext
             val text = SphPlanner.appContext().getString(R.string.tasks_share_template)
-                    .replace("%course", CoursesDb.getFullname(task.id_course).toString())
+                    .replace("%course", CoursesDb.getFullname(task.id_course.toString()).toString())
+                    // Todo sharing custom tasks
                     .replace("%description", task.description)
             val sendIntent: Intent = Intent().apply {
                 action = Intent.ACTION_SEND
@@ -185,7 +198,7 @@ class TasksAdapter(private val tasks: MutableList<Task>,
 
             // Set checkbox checked
             checkboxset = false
-            checkbox.isChecked = TasksDb.getInstance().taskDoneByPost(task.id_post)
+            checkbox.isChecked = TasksDb.getInstance().taskDoneByPost(task.id_post) ?: false
             checkboxset = true
 
             // Set data
@@ -244,11 +257,17 @@ class TasksAdapter(private val tasks: MutableList<Task>,
                 }
             }
 
-            // Set course
-            course.text = CoursesDb.getFullname(task.id_course)
-            // Adjust course background color
-            // Set background color, about 70% opacity
-            Utility.tintBackground(course, CoursesDb.getColor(task.id_course), 0xb4000000.toInt())
+            // If not a custom task
+            if (task.id_course != null) {
+                // Set course
+                course.apply {
+                    visibility = View.VISIBLE
+                    text = CoursesDb.getFullname(task.id_course!!)
+                }
+                // Adjust course background color
+                // Set background color, about 70% opacity
+                Utility.tintBackground(course, CoursesDb.getColor(task.id_course!!), 0xb4000000.toInt())
+            } else course.visibility = View.GONE
 
             // Tint background with theme color at 15% if task is pinned
             if (task.isPinned)
