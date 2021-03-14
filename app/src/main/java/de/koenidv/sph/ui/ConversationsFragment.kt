@@ -151,7 +151,7 @@ class ConversationsFragment : Fragment() {
      */
     private fun newConversation() {
         // Show a bottom sheet to start a new conversation
-        NewConversationSheet { subject, recipients ->
+        CreateConversationSheet { subject, recipients ->
             Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
                     .navigate(R.id.newChatFromConversationsAction, bundleOf(
                             "subject" to subject,

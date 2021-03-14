@@ -336,5 +336,10 @@
     <string name="messages_see_archive">Archivierte Unterhaltungen</string>
     <string name="messages_archive_title">Archiv</string>
     <string name="imagedescr_unarchive">Wiederherstellen</string>
+    <string name="tasks_create_description">Erstelle eine Aufgabe</string>
+    <string name="tasks_create_date">Füge ein Datum hinzu</string>
+    <string name="tasks_create_due">Erledigen am..</string>
+    <string name="tasks_create_pin">Aufgabe anheften</string>
+    <string name="imagedescr_newtask">Erstelle eine neue Aufgabe</string>
 
 </resources>

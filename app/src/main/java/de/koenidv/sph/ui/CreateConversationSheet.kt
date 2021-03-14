@@ -20,12 +20,12 @@ import de.koenidv.sph.objects.User
 
 //  Created by koenidv on 14.02.2021.
 // Bottom sheet showing options to start a new conversation
-class NewConversationSheet(private val preselect: User? = null,
-                           private val callback: (String, List<String>) -> Unit) :
+class CreateConversationSheet(private val preselect: User? = null,
+                              private val callback: (String, List<String>) -> Unit) :
         BottomSheetDialogFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        val view: View = inflater.inflate(R.layout.sheet_newconversation, container, false)
+        val view: View = inflater.inflate(R.layout.sheet_create_conversation, container, false)
 
         val subject = view.findViewById<EditText>(R.id.subjectEditText)
         val recipients = view.findViewById<EditText>(R.id.recipientsEditText)

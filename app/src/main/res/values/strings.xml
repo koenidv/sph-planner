@@ -178,6 +178,10 @@
     </plurals>
     <string name="tasks_share_template">Task for %course: %description</string>
     <string name="tasks_sync_info">If you check a task here, it will also be updated it in the education portal.\n\nIt might take a few minutes for the changes to reflect there.</string>
+    <string name="tasks_create_description">Add a task</string>
+    <string name="tasks_create_date">Add a date</string>
+    <string name="tasks_create_due">Do this task on..</string>
+    <string name="tasks_create_pin">Pin task</string>
 
     <!-- Attachments -->
     <string name="attachments_pins_title">Pinned attachments</string>
@@ -405,6 +409,7 @@
     <string name="imagedescr_expand">Expand</string>
     <string name="imagedescr_info">Illustration</string>
     <string name="imagedescr_newconversation">Start a new conversation</string>
+    <string name="imagedescr_newtask">Create a new task</string>
     <string name="imagedescr_external">External Image</string>
     <string name="imagedescr_identicon">Identicon</string>
     <string name="imagedescr_unarchive">Unarchive</string>

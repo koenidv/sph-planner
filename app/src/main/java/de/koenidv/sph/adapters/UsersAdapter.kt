@@ -14,7 +14,7 @@ import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.objects.User
 import de.koenidv.sph.parsing.Utility
-import de.koenidv.sph.ui.NewConversationSheet
+import de.koenidv.sph.ui.CreateConversationSheet
 
 //  Created by koenidv on 09.01.2021.
 class UsersAdapter(private val users: List<User>,
@@ -30,7 +30,7 @@ class UsersAdapter(private val users: List<User>,
      */
     val onclick: (User) -> Unit = {
         // Show a bottom sheet to start a new conversation, but also show an option to send an email
-        NewConversationSheet(it) { subject, recipients ->
+        CreateConversationSheet(it) { subject, recipients ->
             Navigation.findNavController(activity, R.id.nav_host_fragment)
                     .navigate(R.id.newChatAction, bundleOf(
                             "subject" to subject,

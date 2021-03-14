@@ -1,9 +1,11 @@
 package de.koenidv.sph.debugging
 
-import android.content.*
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import com.androidnetworking.AndroidNetworking
 import com.androidnetworking.error.ANError
@@ -13,6 +15,7 @@ import com.google.gson.GsonBuilder
 import de.koenidv.sph.BuildConfig
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner.Companion.appContext
+import de.koenidv.sph.SphPlanner.Companion.prefs
 import de.koenidv.sph.database.CoursesDb
 import org.json.JSONObject
 import java.io.BufferedReader
@@ -33,9 +36,6 @@ object Debugger {
 
     private val logs = mutableListOf<DebugLog>()
     private var logcatAdded = false
-
-    val prefs: SharedPreferences = appContext()
-            .getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
 
     init {
         DEBUGGING_ENABLED = prefs.getBoolean("debugging_enabled", false)

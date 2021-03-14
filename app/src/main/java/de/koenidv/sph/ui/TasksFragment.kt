@@ -15,6 +15,7 @@ import androidx.fragment.app.Fragment
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.switchmaterial.SwitchMaterial
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
@@ -148,6 +149,11 @@ class TasksFragment : Fragment() {
             // Notify recyclerview
             // Should do this with notifyItemRemoved/Inserted..
             tasksRecycler.adapter?.notifyDataSetChanged()
+        }
+
+        // Create task fab
+        view.findViewById<FloatingActionButton>(R.id.createTaskFab).setOnClickListener {
+            EditTaskSheet {}.show(parentFragmentManager, "create-task")
         }
 
         return view
