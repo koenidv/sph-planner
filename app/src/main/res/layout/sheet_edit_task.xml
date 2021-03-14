@@ -21,6 +21,7 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/descriptionText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/tasks_create_description" />
@@ -51,19 +52,19 @@
             app:layout_constraintTop_toBottomOf="@id/descriptionInputLayout" />
 
         <CheckBox
-            android:id="@+id/pinCheckbox"
+            android:id="@+id/pinnedCheckbox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:text="@string/tasks_create_pin"
-            app:layout_constraintBottom_toBottomOf="@+id/createButton"
-            app:layout_constraintEnd_toStartOf="@+id/createButton"
+            app:layout_constraintBottom_toBottomOf="@id/saveButton"
+            app:layout_constraintEnd_toStartOf="@id/saveButton"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/dueButton" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/createButton"
+            android:id="@+id/saveButton"
             style="@style/Widget.MaterialComponents.FloatingActionButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
