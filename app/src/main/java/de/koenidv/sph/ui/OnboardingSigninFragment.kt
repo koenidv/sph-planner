@@ -75,7 +75,11 @@ class OnboardingSigninFragment : Fragment() {
                     .build()
                     .getAsString(object : StringRequestListener {
                         override fun onResponse(response: String) {
+                            // If app was closed don't continue
+                            if (context == null) return
+                            // Parse schools from response
                             schoolIds = RawParser().parseSchoolIds(response)
+                            // Fill spinner if response was valid, else show error
                             if (response.contains("Wartungsarbeiten") || schoolIds.isEmpty()) {
                                 // Maintenance work
                                 // Show error

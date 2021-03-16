@@ -670,14 +670,13 @@ class RawParser {
                         attachIds.add(fileId)
 
                         // Get file info
-                        fileName = file.toString().substring(file.toString().indexOf("</span>") + 7,
-                                file.toString().indexOf("<small>"))
+                        fileName = file.toString().substringAfter("</span>")
+                                .substringBefore("<small>")
                                 .replace("_", " ").replace("-", " ").trim()
                         fileSize = file.select("small").text()
                         fileSize = fileSize.substring(1, fileSize.length - 1) // Remove brackets
-                        fileType = fileName.substring(
-                                fileName.lastIndexOf(".") + 1).toLowerCase(Locale.ROOT)
-                        fileName = fileName.substring(0, fileName.lastIndexOf("."))
+                        fileType = fileName.substringAfter('.', "").toLowerCase(Locale.ROOT)
+                        fileName = fileName.substringBefore('.')
 
                         // Parse file url
                         fileUrl = ("https://start.schulportal.hessen.de/meinunterricht.php?a=downloadFile&id="

@@ -73,7 +73,7 @@ class Messages {
                         // rows - The encrypted headers for each message
 
                         cryption.decrypt(json.get("rows").toString()) { headers ->
-                            if (headers != null && headers != "") {
+                            if (headers != null && headers.length > 2) {
                                 val conversations = ConversationsDb()
 
                                 var data: JsonObject

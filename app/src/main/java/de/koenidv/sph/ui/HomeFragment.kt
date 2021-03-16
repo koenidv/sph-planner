@@ -143,7 +143,8 @@ class HomeFragment : Fragment() {
                     if (postIndex != -1) unreadPostsRecycler.adapter?.notifyItemChanged(postIndex)
                 }
             } else if (intent.getStringExtra("content") == "changes" &&
-                    FunctionTilesDb.getInstance().supports(FunctionTile.FEATURE_CHANGES)) {
+                    FunctionTilesDb.getInstance().supports(FunctionTile.FEATURE_CHANGES)
+                    && ::changesAdapter.isInitialized) {
 
                 // Update changes ui
 
