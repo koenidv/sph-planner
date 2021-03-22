@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <defaultsMap>
+
+    <!-- Options for TokenManager -->
     <entry>
         <key>token_fix_0106</key>
         <value>false</value>
     </entry>
+
+    <!-- Options for Messages -->
     <entry>
         <key>messages_display_possible</key>
         <value>true</value>
@@ -16,4 +20,15 @@
         <key>messages_enabled</key>
         <value>true</value>
     </entry>
+
+    <!-- Options for UrlResolver -->
+    <entry>
+        <key>urlresolver_enable_resolving</key>
+        <value>true</value>
+    </entry>
+    <entry>
+        <key>urlresolver_reset_token</key>
+        <value>true</value>
+    </entry>
+
 </defaultsMap>

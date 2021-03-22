@@ -23,6 +23,7 @@ import de.koenidv.sph.debugging.DebugLog
 import de.koenidv.sph.debugging.Debugger
 import de.koenidv.sph.networking.NetworkManager
 import de.koenidv.sph.networking.TokenManager
+import de.koenidv.sph.networking.UrlResolver
 import de.koenidv.sph.parsing.RawParser
 import kotlinx.coroutines.*
 
@@ -187,7 +188,7 @@ class OnboardingSupportlistFragment : Fragment() {
                 DebugLog("FeaturesFrag", "Resolving tile urls")
 
                 // Resolve feature tile urls if necessary
-                NetworkManager().resolveFeatureUrls(featureList) {
+                UrlResolver().resolveFeatureUrls(featureList) {
                     // Save features in case we need them later
                     FunctionTilesDb.getInstance().save(featureList)
 
