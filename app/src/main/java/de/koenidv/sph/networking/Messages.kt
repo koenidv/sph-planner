@@ -2,6 +2,7 @@ package de.koenidv.sph.networking
 
 import android.content.Intent
 import android.util.Log
+import android.util.MalformedJsonException
 import androidx.core.os.bundleOf
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.firebase.crashlytics.FirebaseCrashlytics
@@ -92,8 +93,19 @@ class Messages {
                                 // List of conversations to load all messages for
                                 val loadMessagesList = mutableListOf<Conversation>()
 
+                                val headersArray = try {
+                                    JsonParser.parseString(headers).asJsonArray
+                                } catch (e: MalformedJsonException) {
+                                    // Json is malformed
+                                    // Callback, reset time
+                                    callback(NetworkManager.FAILED_UNKNOWN)
+                                    prefs.edit().putLong("cryption_time", 0).apply()
+                                    // And don't continue
+                                    return@decrypt
+                                }
+
                                 // Process each message header
-                                for (header in JsonParser.parseString(headers).asJsonArray) {
+                                for (header in headersArray) {
                                     data = header.asJsonObject
 
                                     conversationId = data.get("Id").asString

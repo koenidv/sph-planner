@@ -104,7 +104,7 @@ class NewChatFragment : Fragment() {
 
             // Send the message
             Messages().sendFirstMessage(recipients, subject, text) { success, id ->
-                requireActivity().runOnUiThread {
+                activity?.runOnUiThread {
                     if (success == NetworkManager.SUCCESS && id != null) {
                         // If it was successful, switch to the regular chat fragment
                         Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
