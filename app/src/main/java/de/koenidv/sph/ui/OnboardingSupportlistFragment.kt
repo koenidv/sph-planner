@@ -186,92 +186,83 @@ class OnboardingSupportlistFragment : Fragment() {
                 DebugLog("FeaturesFrag", "INDEXING START")
                 DebugLog("FeaturesFrag", "Resolving tile urls")
 
-                // Resolve tile urls
-                var tilesResolved = 0
-                for (feature in featureList) {
-                    NetworkManager().resolveUrl(feature.location, callback = { successUrl: Int, resolvedUrl: String ->
-                        // Save new url to object
-                        if (successUrl == NetworkManager.SUCCESS
-                                || successUrl == NetworkManager.FAILED_UNKNOWN) {
-                            // If success or sph redirected back to home
-                            feature.location = resolvedUrl
-                        }
-                        // Save number of tiles resolved
-                        tilesResolved++
-                        // If this was the last tile
-                        if (tilesResolved == featureList.size) {
-                            // Save features in case we need them later
-                            FunctionTilesDb.getInstance().save(featureList)
+                // Resolve feature tile urls if necessary
+                NetworkManager().resolveFeatureUrls(featureList) {
+                    // Save features in case we need them later
+                    FunctionTilesDb.getInstance().save(featureList)
 
-                            // Now index everything else
-                            NetworkManager().indexAll({
-                                // Update status text on status update
-                                status ->
-                                activity?.runOnUiThread {
-                                    statusText.text = status
-                                }
-                            }) { indexsuccess ->
-                                // Log index status
-                                DebugLog("FeaturesFrag",
-                                        "INDEXING DONE: $indexsuccess",
-                                        type = Debugger.LOG_TYPE_VAR)
+                    // Now index everything else
+                    NetworkManager().indexAll({ status ->
+                        // Update status text on status update
+                        activity?.runOnUiThread { statusText.text = status }
+                    }) { indexsuccess ->
 
-                                // Continue on indexing completion
-                                statusText.visibility = View.GONE
-                                if (indexsuccess == NetworkManager.SUCCESS) {
-                                    indexLoading.visibility = View.GONE
-                                    nextFab.visibility = View.VISIBLE
-                                    // Mark onboarding complete
-                                    prefs.edit().putBoolean("introComplete", true).apply()
+                        /**
+                         * Indexing was successful
+                         */
 
-                                    Debugger.logOnboardingComplete()
-                                } else {
-                                    // Display error message
-                                    indexLoading.visibility = View.GONE
-                                    warningText.text = when (indexsuccess) {
-                                        NetworkManager.FAILED_NO_NETWORK -> getString(R.string.onboard_supported_error_network)
-                                        NetworkManager.FAILED_MAINTENANCE -> getString(R.string.onboard_supported_error_maintenance)
-                                        NetworkManager.FAILED_SERVER_ERROR -> getString(R.string.onboard_supported_error_server)
-                                        else -> getString(R.string.onboard_supported_error_unknown)
-                                    }
-                                    warningText.visibility = View.VISIBLE
-                                    warningText.setTextColor(requireContext().getColor(R.color.colorAccent))
-                                    warningText.setOnClickListener {
-                                        // Log retrying
-                                        DebugLog("FeaturesFrag",
-                                                "Recreating on user input")
+                        // Log index status
+                        DebugLog("FeaturesFrag",
+                                "INDEXING DONE: $indexsuccess",
+                                type = Debugger.LOG_TYPE_VAR)
 
-                                        // Clear session id
-                                        TokenManager.reset()
-                                        // Recreate to try again
-                                        requireActivity().recreate()
-                                    }
-                                    // Debug option to share response on unknown error
-                                    warningText.setOnLongClickListener {
-                                        val sendIntent: Intent = Intent().apply {
-                                            action = Intent.ACTION_SEND
-                                            putExtra(Intent.EXTRA_TEXT,
-                                                    indexsuccess.toString()
-                                                            + "@" + statusText.text
-                                                            + "\n--- Server Response ---\n"
-                                                            + response)
-                                            this.type = "text/plain"
-                                        }
-                                        requireActivity().startActivity(Intent.createChooser(sendIntent, null))
-                                        true
-                                    }
-                                }
+                        // Continue on indexing completion
+                        statusText.visibility = View.GONE
+                        if (indexsuccess == NetworkManager.SUCCESS) {
+                            indexLoading.visibility = View.GONE
+                            nextFab.visibility = View.VISIBLE
+                            // Mark onboarding complete
+                            prefs.edit().putBoolean("introComplete", true).apply()
+
+                            Debugger.logOnboardingComplete()
+                        } else {
+
+                            /**
+                             * Indexing was not successful
+                             */
+
+                            // Display error message
+                            indexLoading.visibility = View.GONE
+                            warningText.text = when (indexsuccess) {
+                                NetworkManager.FAILED_NO_NETWORK -> getString(R.string.onboard_supported_error_network)
+                                NetworkManager.FAILED_MAINTENANCE -> getString(R.string.onboard_supported_error_maintenance)
+                                NetworkManager.FAILED_SERVER_ERROR -> getString(R.string.onboard_supported_error_server)
+                                else -> getString(R.string.onboard_supported_error_unknown)
                             }
+                            warningText.visibility = View.VISIBLE
+                            warningText.setTextColor(requireContext().getColor(R.color.colorAccent))
+                            warningText.setOnClickListener {
+                                // Log retrying
+                                DebugLog("FeaturesFrag",
+                                        "Recreating on user input")
 
-
+                                // Clear session id
+                                TokenManager.reset()
+                                // Recreate to try again
+                                requireActivity().recreate()
+                            }
+                            // Debug option to share response on unknown error
+                            warningText.setOnLongClickListener {
+                                val sendIntent: Intent = Intent().apply {
+                                    action = Intent.ACTION_SEND
+                                    putExtra(Intent.EXTRA_TEXT,
+                                            indexsuccess.toString()
+                                                    + "@" + statusText.text
+                                                    + "\n--- Server Response ---\n"
+                                                    + response)
+                                    this.type = "text/plain"
+                                }
+                                requireActivity().startActivity(Intent.createChooser(sendIntent, null))
+                                true
+                            }
                         }
-                    })
+                    }
                 }
             } else {
                 // Log unsupported school
-                    DebugLog("FeaturesFrag", "School unsupported",
-                            bundleOf("schoolid" to prefs.getString("schoolid", "0")),
-                            Debugger.LOG_TYPE_ERROR)
+                DebugLog("FeaturesFrag", "School unsupported",
+                        bundleOf("schoolid" to prefs.getString("schoolid", "0")),
+                        Debugger.LOG_TYPE_ERROR)
                 // School unsupported. Log to analytics
                 FirebaseAnalytics.getInstance(requireContext()).logEvent(
                         "school_unsupported",
@@ -284,9 +275,9 @@ class OnboardingSupportlistFragment : Fragment() {
         // Continue button
         nextFab.setOnClickListener {
             // Log onboarding complete
-                DebugLog("FeaturesFrag",
-                        "ONBOARDING COMPLETE",
-                        type = Debugger.LOG_TYPE_SUCCESS)
+            DebugLog("FeaturesFrag",
+                    "ONBOARDING COMPLETE",
+                    type = Debugger.LOG_TYPE_SUCCESS)
             // Mark onboarding completed for Crashlytics
             FirebaseCrashlytics.getInstance().setCustomKey("onboarding_completed", true)
             // Disable debugger after indexing is complete

@@ -31,8 +31,8 @@ object TokenManager {
      * Creates an signed-in access token and saves it to CookieStore
      * @param onComplete Called when a token is ready
      */
-    fun authenticate(onComplete: (success: Int) -> Unit) {
-        getToken { success, _ ->
+    fun authenticate(forceNewToken: Boolean = false, onComplete: (success: Int) -> Unit) {
+        getToken(forceNewToken) { success, _ ->
             onComplete(success)
         }
     }

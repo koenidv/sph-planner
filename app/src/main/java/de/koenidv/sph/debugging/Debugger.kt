@@ -2,6 +2,7 @@ package de.koenidv.sph.debugging
 
 import android.content.*
 import android.net.Uri
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
@@ -12,6 +13,7 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.gson.GsonBuilder
 import de.koenidv.sph.BuildConfig
 import de.koenidv.sph.R
+import de.koenidv.sph.SphPlanner.Companion.TAG
 import de.koenidv.sph.SphPlanner.Companion.appContext
 import de.koenidv.sph.database.CoursesDb
 import org.json.JSONObject
@@ -47,6 +49,8 @@ object Debugger {
      */
     fun log(log: DebugLog) {
         logs.add(log)
+        if (BuildConfig.DEBUG)
+            Log.d("$TAG ${log.source}", log.description + " " + log.data.toString())
     }
 
     /**
