@@ -208,7 +208,9 @@ class OnboardingSupportlistFragment : Fragment() {
                                 type = Debugger.LOG_TYPE_VAR)
 
                         // Continue on indexing completion
-                        statusText.visibility = View.GONE
+                        runBlocking {
+                            statusText.visibility = View.GONE
+                        }
                         if (indexsuccess == NetworkManager.SUCCESS) {
                             indexLoading.visibility = View.GONE
                             nextFab.visibility = View.VISIBLE

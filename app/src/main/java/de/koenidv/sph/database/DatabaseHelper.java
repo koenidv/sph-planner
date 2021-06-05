@@ -42,8 +42,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
          */
 
         // Create courses table
-        db.execSQL("CREATE TABLE courses(course_id TEXT UNIQUE PRIMARY KEY, gmb_id TEXT UNIQUE," +
-                " sph_id TEXT UNIQUE, named_id TEXT UNIQUE, number_id TEXT UNIQUE, fullname TEXT," +
+        db.execSQL("CREATE TABLE courses(course_id TEXT UNIQUE PRIMARY KEY, gmb_id TEXT," +
+                " sph_id TEXT UNIQUE, named_id TEXT, number_id TEXT UNIQUE, fullname TEXT," +
                 " id_teacher TEXT, isFavorite INTEGER, isLK INTEGER, color INTEGER)");
         // Create changes table
         db.execSQL("CREATE TABLE changes(change_id INTEGER UNIQUE PRIMARY KEY AUTOINCREMENT," +

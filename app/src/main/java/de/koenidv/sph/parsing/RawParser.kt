@@ -396,9 +396,7 @@ class RawParser {
                             id_teacher = teacherId,
                             isFavorite = true,
                             isLK = isLK,
-                            color = (nameColorMap[
-                                    uniformNamedId
-                                            .substring(0, uniformNamedId.indexOf(" "))]
+                            color = (nameColorMap[uniformNamedId.substringBefore(" ")]
                                     ?: nameColorMap["default"])!!.toColorInt()
                     )
                 }
@@ -604,8 +602,8 @@ class RawParser {
                 postId = courseId + "_post-" + internalDateFormat.format(date) + "_" + sphPostId
 
                 /*
-             * Posts
-             */
+                 * Posts
+                 */
 
                 // Check if current post was already in the db and if so, use it again
                 // This is mainly to set the unread attribute
@@ -613,7 +611,7 @@ class RawParser {
                     posts.add(currentPosts[currentPostIds.indexOf(postId)])
                 } else {
                     // Get information from html
-                    postTitle = cells[1].selectFirst("b").wholeText().trim()
+                    postTitle = cells[1].selectFirst("b")?.wholeText()?.trim() ?: ""
                     // Correct weird stuff that sph does
                     postTitle = postTitle.replace("""&amp;amp;quot;""", "\"")
                     if (postTitle == "kein Thema") postTitle = null
