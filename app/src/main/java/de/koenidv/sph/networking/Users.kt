@@ -48,6 +48,7 @@ class Users {
             var char = 'a'
             var completed = 0
 
+            // Lambda function to execute for each completed network request
             val onDone: (Int, List<User>) -> Unit = { mSuccess, mUsers ->
                 if (mSuccess == NetworkManager.SUCCESS) {
 
@@ -110,6 +111,10 @@ class Users {
                     .build()
                     .getAsJSONObject(object : JSONObjectRequestListener {
                         override fun onResponse(response: JSONObject) {
+                            // Check if response contains an "items" array
+                            if (response.isNull("items")) return
+
+                            // If response is valid, get the users array
                             var index = 0
                             val items = response.getJSONArray("items")
                             var currentItem: JSONObject
