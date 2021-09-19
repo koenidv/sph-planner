@@ -1,3 +1,20 @@
+> # ⚠ Maintainers needed
+> I am now done with school and don't have credentials for Schulportal.<br/>
+> However, as Schulportal keeps evolving, the app has to keep pace in order to not stop working because of unexpected data.<br/>
+> If I would have had time, there were also plans for even more features to make the app even better than the original website, some of which are actually partly implemented.<br/>
+> ```diff
+> ! So, if you are interested in learning about and improving yourself: 
+> ```
+> - in native Android app development with Kotlin
+> - webscraping (using Jsoup in this case)
+> - managing a touch more complicated projects
+> - supporting a growing user base of currently _several hundred_ users
+> ```diff
+> ! Hit me up 
+> ```
+> [Send me a message on Twitter](https://twitter.com/koenidv) or [post me an email](https://github.com/koenidv).<br/>
+> Looking forward to hearing from you 👋
+
 # [SPHplanner on Google Play](https://play.google.com/store/apps/details?id=de.koenidv.sph?utm_source=gh_head)
 Android app to easily access Hesse's education portal - 
 *SPH: Schulportal Hessen / Education Portal Hesse*
