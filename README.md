@@ -3,12 +3,12 @@
 > However, as Schulportal keeps evolving, the app has to keep pace in order to not stop working because of unexpected data.<br/>
 > If I would have had time, there were also plans for even more features to make the app even better than the original website, some of which are actually partly implemented.<br/>
 > ```diff
-> ! So, if you are interested in learning about and improving yourself: 
+> ! So, if you are interested in learning about and improving yourself in: 
 > ```
-> - in native Android app development with Kotlin
-> - webscraping (using Jsoup in this case)
-> - managing a touch more complicated projects
-> - supporting a growing user base of currently _several hundred_ users
+> - Native Android app development with Kotlin
+> - Webscraping (using Jsoup in this case)
+> - Managing a touch more complicated projects
+> - Supporting a growing user base of currently _several hundred_ users
 > ```diff
 > ! Hit me up 
 > ```
