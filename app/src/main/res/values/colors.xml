@@ -20,12 +20,15 @@
     <color name="grey_800">#424242</color>
     <color name="grey_850">#1b1b1b</color>
 
-
     <!-- Gotta remove this stuff sometimes -->
     <color name="colorAccent">#FF6200EE</color>
     <color name="titleText">#808080</color>
     <color name="infoText">#cccccc</color>
     <color name="textColor">#000</color>
+
+    <!-- Color for the timetable recycler views (columns) -->
+    <color name="lightGrey">#FFDDDDDD</color>
+    <color name="lighterGrey">#FFF4F4F4</color>
 
     <color name="ambientShadowColor">#0A000000</color>
     <color name="spotShadowColor">#30000000</color>

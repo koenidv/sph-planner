@@ -20,6 +20,7 @@ class HolidaysFragment : Fragment() {
         // Setup adapter
         val holidaysRecycler = view.findViewById<RecyclerView>(R.id.holidaysRecycler)
         val futureHolidays = HolidaysDb().future
+        //Reihenfolge aendern
         holidaysRecycler.adapter = HolidaysAdapter(futureHolidays)
 
         return view

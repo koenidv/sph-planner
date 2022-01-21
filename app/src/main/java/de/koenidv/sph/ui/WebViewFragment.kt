@@ -27,7 +27,7 @@ class WebViewFragment : Fragment() {
 
     lateinit var webView: WebView
 
-    // Reload webvoew whenever the broadcast "uichange" with content=webview is received
+    // Reload webview whenever the broadcast "uichange" with content=webview is received
     private val uichangeReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             webView.reload()

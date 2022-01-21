@@ -61,6 +61,7 @@ class CourseOverviewFragment : Fragment() {
                                     CourseOverviewFragment().also {
                                         it.arguments = bundleOf("courseId" to courseId)
                                     })
+                            .setReorderingAllowed(true) //Optimizing state changes for better transitions
                             .commit()
                     return
                 }

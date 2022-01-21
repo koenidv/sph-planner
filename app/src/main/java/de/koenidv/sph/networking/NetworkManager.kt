@@ -1,5 +1,6 @@
 package de.koenidv.sph.networking
 
+//import de.koenidv.sph.BuildConfig
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -7,17 +8,19 @@ import android.util.Log
 import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.afollestad.date.year
 import com.androidnetworking.AndroidNetworking
+import com.androidnetworking.BuildConfig
 import com.androidnetworking.common.Priority
 import com.androidnetworking.error.ANError
 import com.androidnetworking.interfaces.JSONObjectRequestListener
 import com.androidnetworking.interfaces.StringRequestListener
 import com.google.firebase.crashlytics.FirebaseCrashlytics
-import de.koenidv.sph.BuildConfig
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner.Companion.TAG
 import de.koenidv.sph.SphPlanner.Companion.appContext
 import de.koenidv.sph.SphPlanner.Companion.prefs
+import de.koenidv.sph.database.ChangesDb
 import de.koenidv.sph.database.CoursesDb
 import de.koenidv.sph.database.FunctionTilesDb
 import de.koenidv.sph.debugging.DebugLog
@@ -26,13 +29,19 @@ import de.koenidv.sph.objects.FunctionTile.Companion.FEATURE_CHANGES
 import de.koenidv.sph.objects.FunctionTile.Companion.FEATURE_COURSES
 import de.koenidv.sph.objects.FunctionTile.Companion.FEATURE_MESSAGES
 import de.koenidv.sph.objects.FunctionTile.Companion.FEATURE_TIMETABLE
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import okhttp3.OkHttpClient
+import okhttp3.Request
 import org.json.JSONObject
 import org.jsoup.Jsoup
+import java.net.URL
 import java.util.*
 import java.util.concurrent.TimeUnit
+//import okhttp3.RequestBody.Companion.asRequestBody //to use file.asReqestBody
+//import okhttp3.RequestBody.Companion.toRequestBody //to use content.toRequestBody
+
+
+
 
 //  Created by koenidv on 11.12.2020.
 class NetworkManager {
@@ -46,6 +55,7 @@ class NetworkManager {
         const val FAILED_SERVER_ERROR = 4
         const val FAILED_CANCELLED = 5
         const val FAILED_CRYPTION = 6
+        const val FAILED_TOKEN = 7
     }
 
     /**
@@ -68,6 +78,8 @@ class NetworkManager {
         val updateData = mutableMapOf<String, String>()
         var disableList = false
 
+        val chngs = ChangesDb.instance!!.existAny()//Crash456
+
         // Log pull to refresh
         DebugLog("NetMgr", "Handling PTR",
                 bundleOf("destination" to destinationId,
@@ -75,8 +87,11 @@ class NetworkManager {
 
         when (destinationId) {
             R.id.nav_home, R.id.nav_explore -> {
+                //Crash456: Running through from nav_home swipe refresh
                 // Update changes after 5min
-                if (shouldUpdate("updated_changes", 5)) updateList.add("changes")
+                if (   (chngs) && (shouldUpdate("updated_changes", 5))   ) {
+                    updateList.add("changes")
+                }
                 // posts after 15min
                 if (shouldUpdate("updated_posts", 15)) updateList.add("posts")
                 // messages after 15min
@@ -138,7 +153,7 @@ class NetworkManager {
                         }
                     } else
                     // Just return SUCCESS if posts for this course were updated within the last 2 minutes
-                        callback(SUCCESS)
+                    callback(SUCCESS)
                 }
             }
             R.id.frag_webview -> {
@@ -179,8 +194,30 @@ class NetworkManager {
 
             if (success == SUCCESS) {
 
-                // Getting webpage
-                AndroidNetworking.get(url)
+                if(url.contains("kalender")) {
+                    /*
+                     * Idea is to use okhttp to receive a stream
+                     * and to save the data in an appointment db
+                     *
+                     * E/AndroidRuntime: FATAL EXCEPTION: main => at android.os.StrictMode$AndroidBlockGuardPolicy.onNetwork(...
+                     * Rootcause is a timeintensive calculation has to be done in an async thread
+                     */
+                     //Token done and OK, now url has to be handled
+
+                     //Pls. check and make functional
+                     //Target is to have a stream/ string which I can parse to a new db
+                     //stream/ string available in Calendar.kt is enough, the rest I like to do
+                     //thx
+                     val oneAsync = clndrFetch(url)
+                     //Pls. check and make functional
+
+                     //awaitAll(oneAsync)
+                     //var rspns = oneAsync.await()
+                     //callback(SUCCESS, rspns)
+                }
+                else {
+                    // Getting webpage
+                    AndroidNetworking.get(url)
                         .setUserAgent("sph-planner")
                         .setPriority(Priority.LOW)
                         .build()
@@ -188,75 +225,105 @@ class NetworkManager {
                             override fun onResponse(response: String) {
                                 val responseLine = response.replace("\n", "")
 
+                                DebugLog("NetMgr", "responseLine: $responseLine")
+
                                 if (responseLine.contains("- Schulportal Hessen")
-                                        && !responseLine.contains("Login - Schulportal Hessen")
-                                        && !responseLine.contains("Fehler - Schulportal Hessen")
-                                        && !responseLine.contains("Schulauswahl - Schulportal Hessen")) {
+                                    && !responseLine.contains("Login - Schulportal Hessen")
+                                    && !responseLine.contains("Fehler - Schulportal Hessen")
+                                    && !responseLine.contains("Schulauswahl - Schulportal Hessen")
+                                ) {
                                     // Getting site was successful
                                     // Log site loaded
-                                    DebugLog("NetMgr", "Loaded url: Success",
-                                            bundleOf("url" to url,
-                                                    "title" to Debugger.responseTitle(response)),
-                                            Debugger.LOG_TYPE_SUCCESS)
+                                    DebugLog(
+                                        "NetMgr", "Loaded url: Success",
+                                        bundleOf(
+                                            "url" to url,
+                                            "title" to Debugger.responseTitle(response)
+                                        ),
+                                        Debugger.LOG_TYPE_SUCCESS
+                                    )
 
                                     callback(SUCCESS, response)
                                     prefs.edit().putLong("token_last_success", Date().time).apply()
                                 } else if (responseLine.contains("Login - Schulportal Hessen")
-                                        || responseLine.contains("Fehler - Schulportal Hessen")
-                                        || responseLine.contains("Schulauswahl - Schulportal Hessen")) {
+                                    || responseLine.contains("Fehler - Schulportal Hessen")
+                                    || responseLine.contains("Schulauswahl - Schulportal Hessen")
+                                ) {
                                     // Signin was not successful
                                     // Log error
-                                    DebugLog("NetMgr",
-                                            "Error loading url, invalid credentials",
-                                            bundleOf("url" to url,
-                                                    "title" to Debugger.responseTitle(response)),
-                                            Debugger.LOG_TYPE_ERROR)
+                                    DebugLog(
+                                        "NetMgr",
+                                        "Error loading url, invalid credentials",
+                                        bundleOf(
+                                            "url" to url,
+                                            "title" to Debugger.responseTitle(response)
+                                        ),
+                                        Debugger.LOG_TYPE_ERROR
+                                    )
 
                                     Log.e(TAG, "Invalid credentials for $url")
                                     prefs.edit().putLong("token_last_success", 0).apply()
-                                    callback(FAILED_INVALID_CREDENTIALS, response)
+                                    callback(
+                                        FAILED_INVALID_CREDENTIALS,
+                                        response
+                                    )//Crash456 - final statement and root cause - Because chnages are not supported from our school
                                 } else if (response.contains("Wartungsarbeiten")) {
                                     // Maintenance work
                                     callback(FAILED_MAINTENANCE, response)
 
                                     // Log maintenance
-                                    DebugLog("NetMgr",
-                                            "Error loading url, maintenance",
-                                            bundleOf("url" to url,
-                                                    "title" to Debugger.responseTitle(response)),
-                                            Debugger.LOG_TYPE_ERROR)
+                                    DebugLog(
+                                        "NetMgr",
+                                        "Error loading url, maintenance",
+                                        bundleOf(
+                                            "url" to url,
+                                            "title" to Debugger.responseTitle(response)
+                                        ),
+                                        Debugger.LOG_TYPE_ERROR
+                                    )
                                 }
                             }
 
                             override fun onError(error: ANError) {
                                 // Log network error
-                                DebugLog("TokenMgr",
-                                        "NetError loading url authenticated",
-                                        error, bundleOf(
+                                DebugLog(
+                                    "TokenMgr",
+                                    "NetError loading url authenticated",
+                                    error, bundleOf(
                                         "url" to url
-                                ))
+                                    )
+                                )
 
                                 when (error.errorDetail) {
                                     "connectionError" -> {
                                         // This will also be called if request timed out
-                                        callback(FAILED_NO_NETWORK, "No connection to server or timeout")
+                                        callback(
+                                            FAILED_NO_NETWORK,
+                                            "No connection to server or timeout"
+                                        )
                                     }
                                     "requestCancelledError" -> {
                                         callback(FAILED_CANCELLED, "Network request was cancelled")
                                     }
                                     else -> {
-                                        Toast.makeText(appContext(), "Error for $url",
-                                                Toast.LENGTH_LONG).show()
-                                        Toast.makeText(appContext(),
-                                                error.errorCode.toString()
-                                                        + ": " + error.errorDetail,
-                                                Toast.LENGTH_LONG).show()
+                                        Toast.makeText(
+                                            appContext(), "Error for $url",
+                                            Toast.LENGTH_LONG
+                                        ).show()
+                                        Toast.makeText(
+                                            appContext(),
+                                            error.errorCode.toString()
+                                                    + ": " + error.errorDetail,
+                                            Toast.LENGTH_LONG
+                                        ).show()
                                         // Provide some details for user debugging
-                                        callback(FAILED_UNKNOWN,
-                                                "--- Network error code: ${error.errorCode}\n"
-                                                        + "--- Error description: ${error.errorDetail}\n"
-                                                        + "--- Error body: ${error.errorCode}\n"
-                                                        + "--- No server response available ---")
+                                        callback(
+                                            FAILED_UNKNOWN,
+                                            "--- Network error code: ${error.errorCode}\n"
+                                                    + "--- Error description: ${error.errorDetail}\n"
+                                                    + "--- Error body: ${error.errorCode}\n"
+                                                    + "--- No server response available ---"
+                                        )
                                         // Log the error in Crashlytics
                                         FirebaseCrashlytics.getInstance().recordException(error)
                                     }
@@ -264,8 +331,9 @@ class NetworkManager {
                             }
 
                         })
+                }
             } else callback(success, null)
-        }
+        } //w/o any cnd - TokenManager.authenticate(forceNewToken)
     }
 
     /**
@@ -372,7 +440,10 @@ class NetworkManager {
                         number++
                         if (number == entries.size) {
                             if (lastError == null) callback(SUCCESS)
-                            else callback(lastError!!)
+                            else {
+                                callback(lastError!!)
+                                DebugLog("NetMgr", "Issue in update")
+                            }
                         }
 
                     }
@@ -401,10 +472,18 @@ class NetworkManager {
         // todo include tiles
 
         // Get all supported features as String list
-        val features = FunctionTilesDb.getInstance().supportedFeatures.map { it.type }
+        val features = FunctionTilesDb.getInstance().supportedFeatures.map { it.type } +
+                FunctionTilesDb.getInstance().getSupportedFeatureName("Kalender").map {it.name }
+
+        //duringupdate
+        //Add choosen functionalities from type other to features
+        //features = FunctionTilesDb.getInstance().getSupportedFeatureName("Kalender").map {it.name }
+        //duringupdate end
+
         val loadList = mutableListOf("userid", "courses")
 
         // Mark each supported feature for loading
+        //if (features.contains(FEATURE_CALENDAR)) loadList.add("calendar")//duringupdate
         if (features.contains(FEATURE_TIMETABLE)) loadList.add("timetable")
         if (features.contains(FEATURE_COURSES)) loadList.add("posts")
         if (features.contains(FEATURE_CHANGES)) loadList.add("changes")
@@ -422,22 +501,48 @@ class NetworkManager {
         var index = 0
         var loadNextFeature = {}
         val onDone: (Int) -> Unit = {
+            DebugLog("NetMgr", "onDone - it: " + it.toString())
             if (it == SUCCESS) {
                 index++
+                DebugLog("NetMgr", "onDone - it index: " + index.toString() + "/ " + loadList.size.toString())
                 // If this was the last feature, call back success
-                if (index == loadList.size) callback(SUCCESS)
+                if (index >= loadList.size) {
+                    DebugLog("NetMgr", "All features done - Final success callback for indexAll")
+                    callback(SUCCESS)
+                }
                 // Else load the next feature
                 else loadNextFeature()
             } else {
-                // Callback an error and stop loading
-                callback(it)
-                Log.e(TAG, "Error loading ${loadList[index]}: $it")
+                /*
+                StKl Test - In case index >= loadList.size means success is ok...
+
+                Since initial download from github of SPHplanner v1.3.3 there was a crash at the end of onboarding.
+                Crash location was => "Rootcause Crash #A"
+                After investigation this location was creating -1 feedback for unknown error
+                Debug leads to index 10 but list size is only 7?...
+                    callback(10+index) => 20 => index 10 crash rootcause
+                    callback(10+loadList.size) => 17 => listsize is 7! only (8 minus not supported changes = 7 - this fits)
+                So following i tested an if cnd. We are in err case here but in case of index is gt list size we feedback succes
+                Maybe solution is not final but crash is solved at the moment.
+                Original code is in else part.
+                 */
+                if(index >= loadList.size) {
+                    callback(SUCCESS)
+                }
+                else {
+                    DebugLog("NetMgr", "onDone callback err - Stop loading")
+                    // Callback an error and stop loading
+                    callback(it)
+                    // callback(10+index) => 20 => index 10 crash rootcause
+                    // callback(10+loadList.size) => 17 => listsize is 7! only (8 minus not supported changes = 7 - this fits)
+                    Log.e(TAG, "Error loading ${loadList[index]}: $it")
+                }
             }
         }
         // Load the feature at the current index
         loadNextFeature = {
             // Log indexing status
-            DebugLog("NetMgr", "Fetching ${loadList[index]}")
+            DebugLog("NetMgr", "Fetching ${loadList[index]} ..." + index.toString() + "...")
             when (loadList[index]) {
                 "userid" -> {
                     status(appContext().getString(R.string.index_status_userid))
@@ -470,6 +575,10 @@ class NetworkManager {
                 "holidays" -> {
                     status(appContext().getString(R.string.index_status_holidays))
                     Holidays().fetch(onDone)
+                }
+                "calendar" -> {
+                    status(appContext().getString(R.string.index_status_calendar))
+                    Clndr().fetch(onDone)
                 }
                 else -> {
                     // Log unsupported feature
@@ -504,6 +613,58 @@ class NetworkManager {
 
                 callback(SUCCESS)
             } else callback(success)
+        }
+    }
+
+    private fun clndrFetch(url: String): Deferred<Unit> = GlobalScope.async {
+
+        //val client = OkHttpClient()
+        val client = OkHttpClient.Builder()
+            .addNetworkInterceptor { chain ->
+                chain.proceed(
+                    chain.request()
+                        .newBuilder()
+                        .header("User-Agent", "sph-planner")
+                        .build()
+                )
+            }
+            .build()
+
+        try {
+            var sUrl = url//appContext().getString(R.string.url_calendar)
+            //replace %yr with current year
+            val c = Calendar.getInstance()
+            c.time = Date()
+            sUrl = sUrl.replace("%yr", c.year.toString())
+            // Create URL
+            //val myUrl = URL("https://publicobject.com/helloworld.txt")//test ok with 1759 byte length
+            val myUrl = URL(sUrl)//Fehler - Du bist nicht angemeldet oder diese Funktion ist für dich nicht freigeschaltet!
+            // Build request
+            val tkn = prefs.getString("token", "")!!//CookieStore.getToken()!!
+
+            val request = Request.Builder()
+                .url(myUrl)
+                .header("Authorization", tkn)
+                .build()
+
+            // Execute request
+            val response = client.newCall(request).execute()
+
+            val responseBody = response.body()
+                ?: throw IllegalStateException("Response doesn't contain a file")
+
+            var str = ""
+            str += response.body()!!.string()
+            str += ""
+
+            var lngth: Long = 0
+            lngth += response.body()!!.contentLength()
+            lngth += 1
+
+            //return response
+        }
+        catch(err:Error) {
+            print("Error when executing get request: "+err.localizedMessage)
         }
     }
 

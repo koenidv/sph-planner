@@ -30,7 +30,7 @@
         android:textStyle="bold"
         android:typeface="monospace"
         android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@+id/signinDescriptionTextView"
+        app:layout_constraintBottom_toTopOf="@id/signinDescriptionTextView"
         app:layout_constraintStart_toStartOf="parent"
         tools:visibility="visible" />
 
@@ -44,7 +44,7 @@
         android:layout_marginTop="24dp"
         android:text="@string/onboard_welcome_description"
         android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@+id/schoolIdSpinner"
+        app:layout_constraintBottom_toTopOf="@id/schoolIdSpinner"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
@@ -79,7 +79,7 @@
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/schoolIdSpinner"
+        app:layout_constraintTop_toBottomOf="@id/schoolIdSpinner"
         tools:visibility="visible">
 
         <com.google.android.material.textfield.TextInputEditText
@@ -105,7 +105,7 @@
         app:endIconMode="password_toggle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textInputLayout"
+        app:layout_constraintTop_toBottomOf="@id/textInputLayout"
         tools:visibility="visible">
 
         <com.google.android.material.textfield.TextInputEditText
@@ -136,7 +136,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textInputLayout2"
+        app:layout_constraintTop_toBottomOf="@id/textInputLayout2"
         app:layout_constraintVertical_bias="0.0"
         tools:visibility="visible" />
 

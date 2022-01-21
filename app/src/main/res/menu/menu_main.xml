@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/mnmn">
 
     <item
         android:id="@+id/openInBrowserItem"
@@ -10,6 +11,11 @@
     <item
         android:id="@+id/optionsItem"
         android:icon="@drawable/ic_settings"
+        android:title="@string/info_menuaction"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/donateItem"
+        android:icon="@drawable/ic_baseline_add_reaction_24"
         android:title="@string/info_menuaction"
         app:showAsAction="ifRoom" />
 </menu>
