@@ -1,4 +1,4 @@
-name: Deploy to Alpha
+name: Deploy to Google Play
 
 on:
   release:
