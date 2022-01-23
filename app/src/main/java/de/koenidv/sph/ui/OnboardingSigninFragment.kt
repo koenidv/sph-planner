@@ -108,7 +108,8 @@ class OnboardingSigninFragment : Fragment() {
                                 schoolid.setPositiveButton(getString(R.string.cancel))
                                 schoolid.setTitle(getString(R.string.onboard_select_school))
                                 schoolid.setSelection(schoolIds.indexOf(
-                                        "Gymnasium am Mosbacher Berg, Wiesbaden" to "5146"))
+                                        //"Gymnasium am Mosbacher Berg, Wiesbaden" to "5146"))
+                                        "Mendelssohn-Bartholdy-Schule, Sulzbach (Taunus)" to "6119"))
 
                                 // Set component visibility
                                 loadicon.visibility = View.GONE
@@ -275,11 +276,15 @@ class OnboardingSigninFragment : Fragment() {
                             description.text = getString(R.string.onboard_signin_error_server)
                         } else {
                             // Some other error occurred
+                            // StKl - 04.12.2021 - Hier gehe ich manchmal rein. App stuerzt ab. Bei Neustart bin ich dann drin
+                            DebugLog("Onboarding", "BlueScreen? $success")
                             description.text = getString(R.string.onboard_signin_error_unknown)
                         }
                     }
                 }
+                DebugLog("Onboarding", "BlueScreen? Tolenmanager1")
             }
+            DebugLog("Onboarding", "BlueScreen? signinButton 1")
 
             // Restore credentials if sign in failed before
             userText.setText(prefs.getString("user", ""))

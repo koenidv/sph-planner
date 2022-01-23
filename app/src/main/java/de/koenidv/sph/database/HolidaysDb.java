@@ -10,6 +10,7 @@ import java.util.List;
 
 import de.koenidv.sph.objects.Holiday;
 
+//  Extended by StKl DEC-2022
 public class HolidaysDb {
     SQLiteDatabase writable = DatabaseHelper.getInstance().getWritableDatabase();
 
@@ -38,19 +39,31 @@ public class HolidaysDb {
      */
     public List<Holiday> getFuture() {
         return getFromCursor(writable.rawQuery(
-                "SELECT * FROM holidays WHERE start > " + new Date().getTime() / 1000,
+                "SELECT * FROM holidays WHERE start > " + new Date().getTime() / 1000 + " ORDER BY start ASC",
                 null));
     }
 
     /**
      * Get the next holiday entry
      */
-    public Holiday getNext() {
+    public Holiday getNext(Date dt) {
         List<Holiday> nextHoliday = getFromCursor(writable.rawQuery(
-                "SELECT * FROM holidays WHERE start > " + new Date().getTime() / 1000
+                "SELECT * FROM holidays WHERE start > " + /*new Date()*/dt.getTime() / 1000
                         + " LIMIT 1", null));
         if (nextHoliday.isEmpty()) return null;
         else return nextHoliday.get(0);
+    }
+
+    /**
+     * Get holiday entry in case we are in vacation at the moment
+     */
+    public Holiday getCurrent(Date dt) {
+        //Example: SELECT * FROM Customers WHERE Country='Mexico' AND City='México D.F.' LIMIT 1;
+        List<Holiday> currentHoliday = getFromCursor(writable.rawQuery(
+                "SELECT * FROM holidays WHERE start < " + /*new Date()*/dt.getTime() / 1000
+                        + " AND endtime > " + /*new Date()*/dt.getTime() / 1000 + " LIMIT 1", null));
+        if (currentHoliday.isEmpty()) return null;
+        else return currentHoliday.get(0);
     }
 
     /**

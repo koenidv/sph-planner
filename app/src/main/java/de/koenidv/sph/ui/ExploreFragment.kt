@@ -5,7 +5,9 @@ import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.WebView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
@@ -121,12 +123,16 @@ class ExploreFragment : Fragment() {
             val moodleIntent = requireContext().packageManager.getLaunchIntentForPackage("com.moodle.moodlemobile")
             if (it.name == "SchulMoodle" && moodleIntent != null) {
                 startActivity(moodleIntent)
-            } else {
-                // Open WebViewFragment with respective url on click
-                nav.navigate(R.id.webviewFromExploreAction, bundleOf("url" to it.location))
-                // Set action bar title
-                (activity as AppCompatActivity).supportActionBar?.title = it.name
-                SphPlanner.openInBrowserUrl = it.location
+            }/*
+            else if(it.name == "Kalender") {
+                //Access WebView and get somehow calendar data... extern *.js file...
+            }*/
+            else {
+                    // Open WebViewFragment with respective url on click
+                    nav.navigate(R.id.webviewFromExploreAction, bundleOf("url" to it.location))
+                    // Set action bar title
+                    (activity as AppCompatActivity).supportActionBar?.title = it.name
+                    SphPlanner.openInBrowserUrl = it.location
             }
         }
         linksRecycler.layoutManager = LinearLayoutManager(requireContext())

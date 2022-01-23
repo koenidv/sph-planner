@@ -4,17 +4,20 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.TextView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.database.DatabaseHelper
 import java.io.File
+import java.time.LocalDate
 
 //  Created by koenidv on 16.02.2020.
 // Sorry for horrible code - was imported from GMB-Planner
@@ -27,10 +30,12 @@ class OptionsSheet internal constructor() : BottomSheetDialogFragment() {
         val prefs = SphPlanner.appContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
 
         // Append version to app name
+        view.findViewById<TextView>(R.id.titleTextView).text = getString(R.string.info_app)
         try {
             val pInfo = SphPlanner.appContext().packageManager.getPackageInfo(SphPlanner.appContext().packageName, 0)
-            val appnameTitle = getString(R.string.info_app).replace("%version", pInfo.versionName)
-            view.findViewById<TextView>(R.id.titleTextView).text = appnameTitle
+            var appnameTitle = getString(R.string.info_author).replace("%version", pInfo.versionName)
+            appnameTitle = appnameTitle.replace("%status", LocalDate.now().year.toString())
+            view.findViewById<TextView>(R.id.authorTextView).text = appnameTitle
         } catch (e: PackageManager.NameNotFoundException) {
         }
 
@@ -68,7 +73,7 @@ class OptionsSheet internal constructor() : BottomSheetDialogFragment() {
          * Each opens the corresponding bottom sheet
          */
         view.findViewById<Button>(R.id.chooseThemeButton).bottomSheetClick(this, ThemeSheet())
-        view.findViewById<Button>(R.id.debuggingButton).bottomSheetClick(this, DebuggingSheet())
+        //view.findViewById<Button>(R.id.debuggingButton).bottomSheetClick(this, DebuggingSheet())
         view.findViewById<Button>(R.id.contactButton).bottomSheetClick(this, ContactSheet())
 
         /**
@@ -84,6 +89,34 @@ class OptionsSheet internal constructor() : BottomSheetDialogFragment() {
                 SphPlanner.prefs.edit().putBoolean("share_done", true).apply()
             }
             startActivity(Intent.createChooser(sendIntent, getString(R.string.share_action)))
+        }
+
+        /**
+         * Support
+         */
+        view.findViewById<View>(R.id.donateButton).setOnClickListener {
+            // Link to paypal donation
+            try {
+                dismiss()
+                startActivity(Intent(
+                    Intent.ACTION_VIEW,
+                    Uri.parse(getString(R.string.support_data))))
+            } catch (e: Exception) {
+            }
+        }
+
+        /**
+         * Privacy
+         */
+        view.findViewById<View>(R.id.dataButton).setOnClickListener {
+            // Link to privacy page
+            try {
+                dismiss()
+                startActivity(Intent(
+                    Intent.ACTION_VIEW,
+                    Uri.parse(getString(R.string.data_data))))
+            } catch (e: Exception) {
+            }
         }
 
         /**
