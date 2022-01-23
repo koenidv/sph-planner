@@ -45,4 +45,3 @@ jobs:
           track: production
           whatsNewDirectory: distribution/
           userFraction: 0.2
-          status: draft
