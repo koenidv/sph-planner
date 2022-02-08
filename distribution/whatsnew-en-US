@@ -1,1 +1,30 @@
 Thanks to Tiefkhlpizza, who continues development of the app!
+Thx to koenidv, who created this opportunity first.
+===
+
+Quarter 4-2021/  JAN-2022
+- Timetable covers timeframe of +/- 3 months (ToDo: Take care of new timetables)
+- Date, name of the day, CW and year added
+- Start and end times of the lessons will be fetched and added, number of lesson added
+- Day, Lesson and form will be highlighted respective to time
+- Red flag is indicating dates, posts, schedules in days and forms, more information onClick
+
+- Reading and pay attention to blank holidays in Hesse in addition to already existing holidays
+- Fetching, displaying, filtering and sharing of schedules from Schulportal
+
+- Improvement of readability of chat fragment for some designs
+- Determination of filetype & name of attachments improved (Split of string on last ".")
+- Name of the form is read and is used in some text
+
+- Privacy information restructured
+- Integration of a donate button to become a millionaire
+
+- Crashes during onboarding fixed 
+- In case we do not going in the app after onboarding, this will be done automaticly after 60s
+
+- Failed in horizontal scrolling with ViewPager 2
+
+- Name of the app changed to SPickzettel and launcher icon replaced
+===
+
+Keep developing...
