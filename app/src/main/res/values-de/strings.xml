@@ -95,7 +95,7 @@
     <!-- Only translate values (after "|"), not the keys! -->
     <!-- Spanish, Russian, Korean ? -->
     <string name="onboard_legal_privacy">Ich habe die  <a href="https://www.tiefkuehlpizza.com/datenschutz/">Datenschutzerklärung</a> gelesen, verstanden und stimme ihr zu.</string>
-    <string name="timetable_personal_title">Dein Stundenplan</string>
+    <string name="timetable_personal_title">Dein %class Stundenplan</string>
     <string name="timetable_personal_filter">Nur eigene Kurse</string>
     <string name="timetable_title">Stundenplan</string>
 
@@ -141,6 +141,7 @@
     <string name="greeting_random_evening_2">Was hast du heute gemacht?</string>
     <string name="greeting_random_general_3">Naa du?</string>
     <string name="attachments_pins_title">Angepinnte Elemente</string>
+    <string name="schedules_pins_title">Termine</string>
     <string name="error_offline">Keine Verbindung</string>
     <string name="error_maintenance">Wartung, versuche es später erneut</string>
     <string name="error_server">Versuche es in einigen Minuten erneut</string>
@@ -337,7 +338,9 @@
     <string name="debug_token_description">Durch das Teilen eines Sitzungstokens kannst du temporären Zugang zum Schulportal gewähren, ohne deine Zugangsdaten zu teilen.</string>
     <string name="dev_options">Entwicklereinstellungen</string>
     <string name="explore_collection_holidays">🚆 Ferien</string>
+    <string name="explore_collection_schedule">📆 Termine</string>
     <string name="holidays_title">Ferien</string>
+    <string name="schedules_title">Termine</string>
     <string name="holidays_summer">Sommerferien</string>
     <string name="holidays_autumn">Herbstferien</string>
     <string name="holidays_winter">Winterferien</string>
@@ -359,6 +362,8 @@
     <string name="holidays_date">Vom %s bis %e</string>
     <string name="holidays_date_template">dd.MM</string>
     <string name="holidays_date_template2">dd.MM.yy</string>
+    <string name="schedule_duration">Dauer: %m min</string>
+    <string name="schedule_hour">Stunde: %l</string>
     <string name="messages_new_button">Neue Unterhaltung</string>
     <string name="messages_partic_fromself">Du an %partner</string>
     <string name="messages_partic_fromself_more">Du an %count Empfänger</string>
@@ -408,5 +413,6 @@
     <string name="dfltRealName">Max</string>
     <string name="dfltFamName">Mustermann</string>
     <string name="dfltClssName">0</string>
+    <string name="Tagestermine">Heutige Termine</string>
 
 </resources>

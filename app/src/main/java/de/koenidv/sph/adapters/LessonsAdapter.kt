@@ -1,6 +1,8 @@
 package de.koenidv.sph.adapters
 
-import android.graphics.*
+import android.graphics.BlendMode
+import android.graphics.BlendModeColorFilter
+import android.graphics.PorterDuff
 import android.graphics.drawable.StateListDrawable
 import android.os.Build
 import android.text.Html
@@ -17,6 +19,7 @@ import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.SphPlanner.Companion.lssn_ps
 import de.koenidv.sph.database.HolidaysDb
+import de.koenidv.sph.database.SchedulesDb
 import de.koenidv.sph.debugging.DebugLog
 import de.koenidv.sph.objects.Change
 import de.koenidv.sph.objects.TimetableEntry
@@ -64,7 +67,10 @@ class LessonsAdapter(private var dt: Date, //Current date from Mon till Fri of t
             }
         }
 
-        fun bind(entries: List<TimetableEntry>, position: Int, hourcount: Int, expanded: Boolean, multiple: Boolean, maxConcurrent: Int = 1) {
+        //could work with dataset variable as well, but could lead to incosistencies => Only work with function prameters!
+        fun bind(entries: List<TimetableEntry>, dat: Date, position: Int, hourcount: Int, expanded: Boolean, multiple: Boolean, maxConcurrent: Int = 1) {
+            val checkCal = Calendar.getInstance()
+            checkCal.time = dt
 
             if (!multiple) currentEntry = entries
 
@@ -79,9 +85,8 @@ class LessonsAdapter(private var dt: Date, //Current date from Mon till Fri of t
                 if (expanded) title += "<br><small>${entries[0].lesson.room}</small>"
             } else {
                 entries.forEach {
-                    //title += "${CourseInfo.getShortnameFromInternald(it.lesson.idCourse)}"
                     title += CourseInfo.getShortnameFromInternald(it.lesson.idCourse)
-                    if(it.course?.id_teacher != "") {
+                    if (it.course?.id_teacher != "") {
                         title += "(${it.course?.id_teacher})"
                     }
                     if (expanded) title += "<br><small>${it.lesson.room}<br></small>"
@@ -89,11 +94,36 @@ class LessonsAdapter(private var dt: Date, //Current date from Mon till Fri of t
                 }
             }
 
+            // In case of exam => Set red triangle flag " \uD83D\uDEA9"
+            val schedules = SchedulesDb.getSchedWithStartDate(dat)//Exam tdy?
+            var exam = false
+            if (schedules.isNotEmpty()) {
+                for (entries1 in schedules) {
+                    if ((entries1.hr != "") && (entries1.src == "portal")) {
+                        val hArr = entries1.hr.split("#").toMutableList()
+                        for (h in hArr) {
+                            try {
+                                if (h.toInt() == (entries[0].lesson.hour/*position + 1*/)) {
+                                    exam = true
+                                }
+                            } catch (nfe: NumberFormatException) {
+                                //nfe.printStackTrace()
+                            }
+                        }
+                    }
+                }
+            }
+
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                textView.text = Html.fromHtml(title, Html.FROM_HTML_MODE_LEGACY)
+                textView.text = Html.fromHtml(title, Html.FROM_HTML_MODE_LEGACY).toString()
             } else {
                 @Suppress("DEPRECATION")
-                textView.text = Html.fromHtml(title)
+                textView.text = Html.fromHtml(title).toString()
+            }
+            if (exam) {
+                var spprtStr = textView.text
+                spprtStr = "$spprtStr \uD83D\uDEA9"//red triangle flag
+                textView.text = spprtStr
             }
 
             /*
@@ -103,15 +133,17 @@ class LessonsAdapter(private var dt: Date, //Current date from Mon till Fri of t
             // Set size
             // Enlarge to show rooms
             // Or span multiple hours if consecutive lessons are the same
-            val height = if (expanded && !multiple) 64f else if (multiple) maxConcurrent * 32f else 32f
+            val height =
+                if (expanded && !multiple) 64f else if (multiple) maxConcurrent * 32f else 32f
             val extrapadding = (hourcount - 1) * 4f
             //layout.layoutParams.height = Utility.dpToPx(hourcount * height + extrapadding).toInt()
             layout.layoutParams.height = (hourcount * height + extrapadding).toInt().toPx()
 
             //Current Lesson? => Thin red stroke
-            val nw = Date() //We use only hour and minutes, so year, month, day is still used from dt
+            val nw =
+                Date() //We use only hour and minutes, so year, month, day is still used from dt
             val start = tmbr[0][0]
-            var end   = tmbr[0][1]
+            var end = tmbr[0][1]
             var i = 0
             while (tmbr[i][1] != LocalTime.of(0, 0)) {
                 end = tmbr[i][1]
@@ -119,19 +151,19 @@ class LessonsAdapter(private var dt: Date, //Current date from Mon till Fri of t
             }
             val c = Calendar.getInstance()
             c.time = Date()
-            c.set(Calendar.HOUR_OF_DAY,start.hour)
-            c.set(Calendar.MINUTE,start.minute-1)
+            c.set(Calendar.HOUR_OF_DAY, start.hour)
+            c.set(Calendar.MINUTE, start.minute - 1)
             val cmpStart = c.time
-            c.set(Calendar.HOUR_OF_DAY,end.hour)
-            c.set(Calendar.MINUTE,end.minute)
+            c.set(Calendar.HOUR_OF_DAY, end.hour)
+            c.set(Calendar.MINUTE, end.minute)
             val cmpEnd = c.time
 
-            if( (nw.day == dt.day) /*&& (nw.month == dt.month)  && (nw.year == dt.year)*/
+            if ((nw.day == dat.day) /*&& (nw.month == dat.month)  && (nw.year == dat.year)*/
             ) {
                 //textView.text = position.toString() + lssn_ps.toString() + cmpStart.toString() + ":" + cmpEnd.toString()//stkl
-                if(     (   ((position+1) <= lssn_ps) && (lssn_ps <= (position+hourcount))   ) &&
-                        (   nw.after(cmpStart) && nw.before(cmpEnd)  ) &&
-                        (   lssn_ps > 0   )
+                if ((((position + 1) <= lssn_ps) && (lssn_ps <= (position + hourcount))) &&
+                    (nw.after(cmpStart) && nw.before(cmpEnd)) &&
+                    (lssn_ps > 0)
                 ) {
                     layout.setBackgroundResource(R.drawable.background_red)
                 }
@@ -143,7 +175,7 @@ class LessonsAdapter(private var dt: Date, //Current date from Mon till Fri of t
 
             val color: Int = if (!multiple) {
                 (entries[0].course?.color
-                   ?: 6168631)
+                    ?: 6168631)
             } else {
                 SphPlanner.appContext().getColor(R.color.grey_800)
             }
@@ -154,8 +186,7 @@ class LessonsAdapter(private var dt: Date, //Current date from Mon till Fri of t
                     (layout.background as StateListDrawable).colorFilter = BlendModeColorFilter(
                         color and 0x00FFFFFF or 0x00000000, BlendMode.SRC_ATOP
                     )
-                }
-                else {
+                } else {
                     (layout.background as StateListDrawable).colorFilter = BlendModeColorFilter(
                         color and 0x00FFFFFF or 0x66000000, BlendMode.SRC_ATOP
                     )
@@ -168,8 +199,7 @@ class LessonsAdapter(private var dt: Date, //Current date from Mon till Fri of t
                             color and 0x00FFFFFF or 0x00000000,
                             PorterDuff.Mode.SRC_ATOP
                         )
-                }
-                else {
+                } else {
                     @Suppress("DEPRECATION") // not in < Q
                     (layout.background as StateListDrawable)
                         .setColorFilter(
@@ -209,7 +239,7 @@ class LessonsAdapter(private var dt: Date, //Current date from Mon till Fri of t
     This method should update the contents of the RecyclerView.ViewHolder.itemView to reflect the item at the given position.
     Invoked (aufrufen/ aktivieren) by the layout manager for every recyclerview => for every day
      */
-    override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {//position := lesson
+    override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {//position := position in recycler view := +1 = lesson
         // Bind data to ConversationViewHolder
         // sph will not mix different rowspans, therefore we can just check the first item
         DebugLog("LssnAdpt", "LssnsAdpt - Data: " + dataset[position][0].toString())
@@ -231,6 +261,7 @@ class LessonsAdapter(private var dt: Date, //Current date from Mon till Fri of t
         }
 
         if(
+            (
             ( (futureHolidays != null) &&
               (    (tdy.after(futureHolidays.start) && tdy.before(futureHolidays.end))
                 || ((c.year == d.year) && (c.month == d.month) && (c.dayOfMonth == d.dayOfMonth))
@@ -241,6 +272,8 @@ class LessonsAdapter(private var dt: Date, //Current date from Mon till Fri of t
                 || ((c.year == e.year) && (c.month == e.month) && (c.dayOfMonth == e.dayOfMonth))
               )
             )
+            )
+            //&& ((dataset[position][0].lesson.day + 2) == c.get(Calendar.DAY_OF_WEEK) ) /* MON := 0, ... VS. SUN := 1, MON := 2, ... */
         ) {
             //Prepare some random addition to holidays
             val hldyAdder = listOf(
@@ -300,7 +333,9 @@ class LessonsAdapter(private var dt: Date, //Current date from Mon till Fri of t
         //else => Unchanged dataset to use (NO holidays)
 
         if (!dataset.getOrNull(position).isNullOrEmpty() /*List not empty*/
-                && dataset[position][0].lesson.isDisplayed != true) { /*Standard null*/
+                && (dataset[position][0].lesson.isDisplayed != true) /*Standard null*/
+                //&& ((dataset[position][0].lesson.day + 2) == c.get(Calendar.DAY_OF_WEEK) ) /* MON := 0, ... VS. SUN := 1, MON := 2, ... */
+        ) {
 
             // Check if the next lessons and changes are the same
             // Ignore rooms if not expanded
@@ -337,10 +372,12 @@ class LessonsAdapter(private var dt: Date, //Current date from Mon till Fri of t
 
 
             // Bind lesson to view
-            viewHolder.bind(dataset[position], position, hourcount, expanded, multiple, maxConcurrent)
+            viewHolder.bind(dataset[position], dt, position, hourcount, expanded, multiple, maxConcurrent)
 
         } else if (!dataset.getOrNull(position).isNullOrEmpty()
-                && dataset[position][0].lesson.isDisplayed == true) {
+                && (dataset[position][0].lesson.isDisplayed == true)
+                //&& ((dataset[position][0].lesson.day + 2) == c.get(Calendar.DAY_OF_WEEK) ) /* MON := 0, ... VS. SUN := 1, MON := 2, ... */
+        ) {
             // Lesson is already displayed, hide completely
             viewHolder.outerlayout.visibility = View.GONE
         } else {
@@ -368,10 +405,12 @@ class LessonsAdapter(private var dt: Date, //Current date from Mon till Fri of t
     }
     */
 
-    fun setDataAndMultiple(newDataset: List<List<TimetableEntry>>, multiple: Boolean, maxConcurrent: Int) {
+    fun setDataAndMultiple(nwDt: Date, newDataset: List<List<TimetableEntry>>, expanded: Boolean, multiple: Boolean, maxConcurrent: Int) {
         this.dataset = newDataset
         this.multiple = multiple
         this.maxConcurrent = maxConcurrent
+        this.dt = nwDt
+        this.expanded = expanded
         notifyDataSetChanged()
     }
 

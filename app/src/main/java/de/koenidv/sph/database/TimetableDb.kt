@@ -10,6 +10,7 @@ import de.koenidv.sph.objects.TimetableEntry
 //  Created by koenidv on 24.12.2020.
 // Sorry, had to do this in Kotlin. Sometimes Java is horrible.
 class TimetableDb private constructor() {
+
     private val dbhelper = DatabaseHelper.getInstance()
 
     /**
@@ -184,6 +185,36 @@ class TimetableDb private constructor() {
             } while (cursor.moveToNext())
         }
         cursor.close()
+        return returnList
+    }
+
+    /**
+     * Get a list of lessons for the mentioned course
+     * @param course Initialized cursor. Will close.
+     * @return List of lessons
+     */
+    fun getForCourse(course: String?): List<Lesson> {
+        val db = dbhelper.readableDatabase
+        var returnList: MutableList<Lesson> = mutableListOf()
+        val query: String = "SELECT * FROM timetable WHERE id_course = '$course'"
+
+        returnList = getWithCursor(db.rawQuery(query, null)).toMutableList()
+
+        return returnList
+    }
+
+    /**
+     * Get a list of lessons for the mentioned course
+     * @param course Initialized cursor. Will close.
+     * @return List of lessons
+     */
+    fun getCoursesWithDayHour(dy: Int, hr: Int): List<Lesson> {
+        val db = dbhelper.readableDatabase
+        var returnList: MutableList<Lesson> = mutableListOf()
+        val query: String = "SELECT * FROM timetable WHERE day = '$dy' AND hour = '$hr'"
+
+        returnList = getWithCursor(db.rawQuery(query, null)).toMutableList()
+
         return returnList
     }
 

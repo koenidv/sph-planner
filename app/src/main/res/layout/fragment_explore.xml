@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.ExploreFragment">
+    tools:context=".ui.ExploreFragment" >
+    <!-- android:background="@color/black" -->
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -132,6 +133,23 @@
                 android:gravity="center"
                 android:padding="8dp"
                 android:text="@string/explore_collection_holidays"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                android:textSize="16sp"
+                app:layout_columnWeight="1"
+                tools:targetApi="o" />
+
+            <TextView
+                android:id="@+id/schedulesTextView"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_margin="8dp"
+                android:autoSizeMaxTextSize="16sp"
+                android:autoSizeTextType="uniform"
+                android:background="@drawable/card_background"
+                android:foreground="?selectableItemBackground"
+                android:gravity="center"
+                android:padding="8dp"
+                android:text="@string/explore_collection_schedule"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                 android:textSize="16sp"
                 app:layout_columnWeight="1"

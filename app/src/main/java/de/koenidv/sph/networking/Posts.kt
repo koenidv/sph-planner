@@ -164,7 +164,7 @@ class Posts(private val networkManager: NetworkManager = NetworkManager()) {
         }
 
         if (courses.isEmpty()) {
-            // If not courses are specified, simply return - just a fallback
+            // If no courses are specified, simply return - just a fallback
             callbackIfLast()
             // Log this
                 DebugLog("Posts", "No courses to load!",
@@ -234,9 +234,9 @@ class Posts(private val networkManager: NetworkManager = NetworkManager()) {
                                     markAsRead = markAsRead,
                                     semester = semesterMatches[1],
                                     callback = {
-                                        // If there was an error, add it to our list
-                                        if (it != NetworkManager.SUCCESS) errors.add(it)
-                                        else prefs.edit().putLong(
+                                       //If there was an error, add it to our list
+                                       if (it != NetworkManager.SUCCESS) errors.add(it)
+                                       else prefs.edit().putLong(
                                                 "updated_posts_${course.courseId}_semester_$semesterMatches[1]",
                                                 time
                                         ).apply()

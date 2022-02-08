@@ -52,7 +52,8 @@ object UsersDb {
             // Get template
             var name = SphPlanner.appContext().getString(
                     if (lastnamefirst) R.string.users_name_template_last
-                    else R.string.users_name_template_first)
+                    else R.string.users_name_template_first
+            )
             // Replace placeholders
             name = name.replace("%firstname", nameCursor.getString(0))
                     .replace("%lastname", nameCursor.getString(1))

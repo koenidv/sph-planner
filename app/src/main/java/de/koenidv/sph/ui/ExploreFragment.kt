@@ -5,9 +5,7 @@ import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.webkit.WebView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
@@ -42,6 +40,7 @@ class ExploreFragment : Fragment() {
         val changesText = view.findViewById<TextView>(R.id.changesTextView)
         val usersText = view.findViewById<TextView>(R.id.usersTextView)
         val holidaysText = view.findViewById<TextView>(R.id.holidaysTextView)
+        val schedulesText = view.findViewById<TextView>(R.id.schedulesTextView)
 
         // Set on click listeners, open respective fragment
 
@@ -95,6 +94,11 @@ class ExploreFragment : Fragment() {
         // Holidays
         holidaysText.setOnClickListener {
             nav.navigate(R.id.holidaysFromExploreAction)
+        }
+
+        // Schedules
+        schedulesText.setOnClickListener {
+            nav.navigate(R.id.schedulesFromExploreAction)
         }
 
 
