@@ -58,6 +58,7 @@
     <string name="index_status_users">Finding your teachers…</string>
     <string name="index_status_holidays">Searching for holidays…</string>
     <string name="index_status_calendar">Searching for calendar entries…</string>
+
     <string name="upgrading_messages">Loading messages. This might take a while.</string>
 
     <!-- Sign in process -->
@@ -410,6 +411,11 @@
     <string name="share_text" translatable="false">Hey, kennst du schon die Schulportal-App?\n→ ToDoLinkPlayStoreNew</string>
     <string name="donate_button">Support</string>
     <string name="data_button">Privacy</string>
+
+    <!-- Looking for maintainer -->
+    <string name="maintainer_prompt">Got some experience with coding?</string>
+    <string name="maintainer_action">Read me</string>
+    <string name="maintainer_text">Hey, I\'m Florian, the creator of this app.\n\nAs you might have noticed, there hasn\'t been new stuff in a while now. That\'s because I finished school a few months ago, and now have neither the time the time to continue supporting this app, nor do I still have an account with SPH.\n\nIf you have any experience with developing apps for Android and/or are interested in working on or taking over this project, plase! contact me.\n\nYou can also find SPHplanners entire codebase on GitHub at github.com/koenidv/sphplanner. Thank you :)</string>
 
     <!--
     Looking for maintainer
