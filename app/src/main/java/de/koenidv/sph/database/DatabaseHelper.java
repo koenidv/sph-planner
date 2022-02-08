@@ -8,6 +8,7 @@ import androidx.annotation.Nullable;
 import de.koenidv.sph.SphPlanner;
 
 //  Created by R-Theis on 8.12.2020.
+//  Adapted StKl
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     // todo close db on exit
@@ -41,6 +42,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
          * Create tables
          */
 
+        // Create schedules table
+        db.execSQL("CREATE TABLE schedules(nameS TEXT UNIQUE PRIMARY KEY, startS INTEGER," +
+                " endeS INTEGER, hourS TEXT, durationS INTEGER, textS TEXT," +
+                " courseS TEXT, categoryS TEXT, sourceS TEXT, shareS INTEGER, locationS TEXT, respS TEXT)");
         // Create courses table
         db.execSQL("CREATE TABLE courses(course_id TEXT UNIQUE PRIMARY KEY, gmb_id TEXT," +
                 " sph_id TEXT UNIQUE, named_id TEXT, number_id TEXT UNIQUE, fullname TEXT," +
@@ -70,6 +75,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "date INTEGER, url TEXT, pinned INTEGER, lastUse INTEGER)");
         // Create timetable table
         db.execSQL("CREATE TABLE timetable(id_course TEXT, day INTEGER, hour INTEGER, room TEXT)");
+        // Create timebar table
+        db.execSQL("CREATE TABLE timebar(someinfo TEXT)");
         // Create users (teachers) table
         db.execSQL("CREATE TABLE users(user_id TEXT, teacher_id TEXT, firstname TEXT, " +
                 "lastname TEXT, type TEXT, pinned INTEGER)");
@@ -96,7 +103,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.execSQL("CREATE TABLE holidays(id TEXT PRIMARY KEY, start INTEGER," +
                     "endtime INTEGER, name TEXT, year TEXT)");
         }
-        if (oldversion < 5) createMessagesTables(db);
+        if (oldversion < 5) {
+            createMessagesTables(db);
+            // Create schedules table
+            db.execSQL("CREATE TABLE schedules(nameS TEXT UNIQUE PRIMARY KEY, startS INTEGER," +
+                    " endeS INTEGER, hourS TEXT, durationS INTEGER, textS TEXT," +
+                    " courseS TEXT, categoryS TEXT, sourceS TEXT, shareS INTEGER, locationS TEXT, respS TEXT)");
+            // Create timebar table
+            db.execSQL("CREATE TABLE timebar(someinfo TEXT)");
+        }
     }
 
     // Create conversations and messages tables
@@ -130,8 +145,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      */
     public void deleteAll() {
         // List of tables to be deleted
-        String[] tables = {"changes", "conversations", "courses", "fileAttachments", "holidays",
-                "linkAttachments", "messages", "posts", "tasks", "tiles", "timetable", "users"};
+        String[] tables = {"schedules", "changes", "conversations", "courses", "fileAttachments", "holidays",
+                "linkAttachments", "messages", "posts", "tasks", "tiles", "timetable", "timebar", "users"};
         SQLiteDatabase db = getWritableDatabase();
 
         // Delete each table

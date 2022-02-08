@@ -6,9 +6,12 @@ import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.database.CoursesDb
 import de.koenidv.sph.database.FunctionTilesDb
+import de.koenidv.sph.database.SchedulesDb
 import de.koenidv.sph.debugging.DebugLog
 import de.koenidv.sph.debugging.Debugger
+import de.koenidv.sph.objects.Course
 import de.koenidv.sph.objects.FunctionTile
+import de.koenidv.sph.objects.Schedule
 import de.koenidv.sph.parsing.RawParser
 import java.util.*
 
@@ -27,9 +30,11 @@ class Courses(private val networkManager: NetworkManager = NetworkManager()) {
         DebugLog("Courses", "Starting course indexing")
 
         val prefs = SphPlanner.appContext().getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
-        // Remove old courses, it'll just lead to isses
-        val coursesDb = CoursesDb
+        // Remove old courses, it'll just lead to issues
+        val coursesDb   = CoursesDb
         coursesDb.clear()
+        val schedulesDb = SchedulesDb
+        schedulesDb.clear()//first call of schedules here, second call via calendar later on - clear only here
         // Set courses last updated to 0 in case this gets cancelled
         prefs.edit().putLong("courses_last_updated", 0).apply()
 
@@ -93,8 +98,18 @@ class Courses(private val networkManager: NetworkManager = NetworkManager()) {
                                     // We now know which courses are favorites,
                                     // so mark all unknown as not favorite
                                     coursesDb.setNulledNotFavorite()
+
+                                    //return courses and schedule entries from studygroups
+                                    val (crsLst:List<Course>, schdlLst:List<Schedule>) = RawParser().parseCoursesFromStudygroups(response!!)
+
                                     // Save parsed courses from study groups
-                                    coursesDb.save(RawParser().parseCoursesFromStudygroups(response!!))
+                                    coursesDb.save(crsLst)
+
+                                    // Save parsed schedules from study groups - db clear is done before
+                                    //val schedulesDb = SchedulesDb
+                                    schedulesDb.clearStudyGroupEntries(schdlLst)
+                                    schedulesDb.save(schdlLst)
+
                                     // Remember when we last updated the courses from studygroups
                                     prefs.edit().putLong("courses_last_updated_studygroups", Date().time).apply()
                                 }

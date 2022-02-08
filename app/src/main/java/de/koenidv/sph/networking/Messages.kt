@@ -234,10 +234,16 @@ class Messages {
                         prefs.edit().putLong("cryption_time", 0).apply()
                     }
                 }
+                //StKl:10.12.2021:Das callback hier am Ende von try eingefuegt
+                DebugLog("Onboarding", "BlueScreen? Messages Fetch 2")
+                callback(NetworkManager.SUCCESS)//Returns unchanged success
             }
+            //StKl:03.12.2021:Das callback hier am Ende von try eingefuegt, da kein ordentiches Ende ueber den fetch Einstieg gefunden wurde
+            DebugLog("Onboarding", "BlueScreen? Messages Fetch 1")
+            callback(NetworkManager.SUCCESS)//Returns unchanged success
         } catch (e: Exception) {
             // If messages fetching failed, log and return
-            DebugLog("Messages", "Error fetching messages", e)
+            DebugLog("Messages", "Error fetching messages - catch", e)
 
             // Call back with unknown error
             callback(NetworkManager.FAILED_UNKNOWN)

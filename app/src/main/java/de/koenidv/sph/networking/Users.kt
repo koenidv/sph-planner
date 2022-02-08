@@ -41,6 +41,8 @@ class Users {
                 return@getToken
             }
 
+            DebugLog("Users", "Fetching users - Success status " + success.toString())
+
             val users = mutableListOf<User>()
             val favoriteTeachers = CoursesDb.getFavoriteTeacherIds()
 
@@ -50,6 +52,7 @@ class Users {
 
             // Lambda function to execute for each completed network request
             val onDone: (Int, List<User>) -> Unit = { mSuccess, mUsers ->
+                DebugLog("Users", "Fetching users - mSuccess status" + mSuccess.toString())
                 if (mSuccess == NetworkManager.SUCCESS) {
 
                     // Add found users to the list
@@ -63,7 +66,7 @@ class Users {
                     // We could check for char = z here, but that'd break if one
                     // request takes longer than the previous
                     completed++
-                    if (completed == 26) {
+                    if (completed >= 26) {
                         // If this was the last request, save the user list
                         // and call back success
                         UsersDb.save(users)
@@ -85,8 +88,15 @@ class Users {
                 // Use the next char
                 char++
             }
-
+            //StKl:03.12.2021:Das callback hier eingefuegt, da kein ordentiches Ende ueber den fetch Einstieg gefunden wurde
+            //ToDo - Chech correct position of this callback
+            DebugLog("Users", "Users - After while - My callback is comming")
+            callback(success)
         }
+        DebugLog("Users", "User fetch - Token finishes")
+        //StKl:10.12.2021:Das callback hier am Ende von try eingefuegt
+        DebugLog("Onboarding", "BlueScreen? Users Fetch")
+        callback(NetworkManager.SUCCESS)//Returns unchanged success
     }
 
     /**
@@ -104,6 +114,7 @@ class Users {
                 callback(success, listOf())
                 return@getToken
             }
+            DebugLog("Users", "LoadUserQuery - Step 1")
             // Not get the all recipients for the current character
             AndroidNetworking.post(SphPlanner.appContext().getString(R.string.url_messages))
                     .addBodyParameter("a", "searchRecipt")
@@ -113,6 +124,8 @@ class Users {
                         override fun onResponse(response: JSONObject) {
                             // Check if response contains an "items" array
                             if (response.isNull("items")) return
+
+                            DebugLog("Users", "LoadUserQuery - Step 2")
 
                             // If response is valid, get the users array
                             var index = 0
@@ -127,7 +140,7 @@ class Users {
                             // Get every item from the array
                             while (index < response.getInt("total_count")) {
                                 currentItem = items.getJSONObject(index)
-
+                                DebugLog("Users", "LoadUserQuery - Step 3")
                                 // If list doesn't contain this user yet
                                 // Also, only get teachers at this time (type=lul)
                                 if (currentUsers.indexOfFirst {
@@ -138,6 +151,7 @@ class Users {
                                     // This way we'll ignore admin entries
                                     // However, this will not add anything if a school does not
                                     // show a teacher's first name or shorthand
+                                    DebugLog("Users", "LoadUserQuery - Step 4")
                                     text = currentItem.getString("text")
 
                                     if (text.contains(",") &&
@@ -168,6 +182,8 @@ class Users {
                                 index++ // Next user for this result
                             }
 
+                            DebugLog("Users", "Returned user list index: " + index.toString())
+                            DebugLog("Users", "Returned user list: $query")
                             // Call back with the found users
                             callback(NetworkManager.SUCCESS, returnUsers)
 
@@ -194,7 +210,9 @@ class Users {
                             }
                         }
                     })
+            DebugLog("Users", "Not get the all recipients for the current character")
         }
+        DebugLog("Users", "Token Manager finishes")
     }
 
     /**

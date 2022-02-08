@@ -22,7 +22,7 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Body2"
         android:textSize="16sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toStartOf="@+id/holidayRemainingTextView"
+        app:layout_constraintEnd_toStartOf="@id/holidayRemainingTextView"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="Testferien" />
@@ -52,7 +52,7 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Body2"
         android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/holidayRemainingTextView"
+        app:layout_constraintEnd_toStartOf="@id/holidayRemainingTextView"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/holidayNameTextView"
         tools:text="start date" />
