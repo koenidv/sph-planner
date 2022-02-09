@@ -206,7 +206,8 @@ class HomeFragment : Fragment() {
                                   container: ViewGroup?,
                                   savedInstanceState: Bundle?): View? {
 
-            val view = inflater.inflate(R.layout.fragment_home, container, false)
+            val view  = inflater.inflate(R.layout.fragment_home, container, false)
+            val prefs = SphPlanner.appContext().getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
 
             // Set random greeting as action bar title, once per app start, or after 30 minutes
             if (SphPlanner.randomGreeting == null || Date().time - SphPlanner.randomGreetingTime > 30 * 60 * 1000) {
@@ -226,6 +227,15 @@ class HomeFragment : Fragment() {
                 .add(R.id.timetableFragment, TimetableViewFragment())
                 .setReorderingAllowed(true) //Optimizing state changes for better transitions
                 .commit()
+
+        var spprtStr = SphPlanner.prefs.getString("clss_name", "")!!
+        if (spprtStr.isNullOrEmpty() || (spprtStr == "0")) spprtStr = ""
+        val timetableText = view.findViewById<TextView>(R.id.timetableTitleTextView)
+
+        timetableText.text =
+            SphPlanner.appContext().getString(R.string.timetable_personal_title)
+                .replace("%class", spprtStr)
+
         timetableLayout.setOnClickListener {
             Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
                     .navigate(R.id.timetableFromHomeAction, null, null,

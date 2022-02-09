@@ -61,8 +61,8 @@
     </style>
 
     <style name="Theme.SPH.Monochrome" parent="Theme.SPH">
-        <!-- Primary -->
-        <item name="colorPrimary">@color/grey_850</item>
+        <!-- Primary grey_850-->
+        <item name="colorPrimary">@color/grey_500</item>
         <item name="colorPrimaryVariant">@color/black</item>
         <item name="colorOnPrimary">@color/white</item>
         <!-- Secondary -->

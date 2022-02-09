@@ -12,12 +12,15 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.RecyclerView
+import de.koenidv.sph.MainActivity
 import de.koenidv.sph.R
+import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.SphPlanner.Companion.TMLMT
 import de.koenidv.sph.SphPlanner.Companion.mainMonday
 import de.koenidv.sph.adapters.LessonsAdapter
 import de.koenidv.sph.adapters.TimebarAdapter
 import de.koenidv.sph.database.ChangesDb
+import de.koenidv.sph.database.SchedulesDb
 import de.koenidv.sph.database.TimebarDb
 import de.koenidv.sph.database.TimetableDb
 import de.koenidv.sph.objects.Change
@@ -57,6 +60,7 @@ class TimetableViewFragment : Fragment() {
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_view_timetable, container, false)
+        val nav = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
         val prefs =
             requireContext().getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE)
 
@@ -94,7 +98,7 @@ class TimetableViewFragment : Fragment() {
         wednesday.setRecycledViewPool(recyclerViewPool)
         thursday.setRecycledViewPool(recyclerViewPool)
         friday.setRecycledViewPool(recyclerViewPool)
-        //tmbrView.setRecycledViewPool(recyclerViewPool) //Crash in case of general timetable is viewed/ switc is set accordingly
+        //tmbrView.setRecycledViewPool(recyclerViewPool) //Crash in case of general timetable is viewed/ switch is set accordingly
 
         // OnClick function for all timetable entries
         val onClick: (List<TimetableEntry>) -> Unit = {
@@ -321,20 +325,104 @@ class TimetableViewFragment : Fragment() {
         if (   (c.get(Calendar.DAY_OF_YEAR) - (week*7)) > 3   ) {
             week++
         }
-        lssnDt.text = "#" + week.toString()
+        lssnDt.text = "#${week}"
 
         c.time = tdy
+        val dtStrMon = "${c.get(Calendar.DAY_OF_MONTH)}.${c.get(Calendar.MONTH)+1}.${c.get(Calendar.YEAR)}"
         mondayDt.text = c.get(Calendar.DAY_OF_MONTH).toString() + "." + (c.get(Calendar.MONTH)+1).toString()
         c.add(Calendar.DATE, 1)
+        val tdy22 = c.time
+        val dtStrTue = "${c.get(Calendar.DAY_OF_MONTH)}.${c.get(Calendar.MONTH)+1}.${c.get(Calendar.YEAR)}"
         tuesdayDt.text = c.get(Calendar.DAY_OF_MONTH).toString() + "." + (c.get(Calendar.MONTH)+1).toString()
         c.add(Calendar.DATE, 1)
+        val tdy33 = c.time
+        val dtStrWed = "${c.get(Calendar.DAY_OF_MONTH)}.${c.get(Calendar.MONTH)+1}.${c.get(Calendar.YEAR)}"
         wednesdayDt.text = c.get(Calendar.DAY_OF_MONTH).toString() + "." + (c.get(Calendar.MONTH)+1).toString()
         c.add(Calendar.DATE, 1)
+        val tdy44 = c.time
+        val dtStrThu = "${c.get(Calendar.DAY_OF_MONTH)}.${c.get(Calendar.MONTH)+1}.${c.get(Calendar.YEAR)}"
         thursdayDt.text = c.get(Calendar.DAY_OF_MONTH).toString() + "." + (c.get(Calendar.MONTH)+1).toString()
         c.add(Calendar.DATE, 1)
+        val tdy55 = c.time
+        val dtStrFri = "${c.get(Calendar.DAY_OF_MONTH)}.${c.get(Calendar.MONTH)+1}.${c.get(Calendar.YEAR)}"
         fridayDt.text = c.get(Calendar.DAY_OF_MONTH).toString() + "." + (c.get(Calendar.MONTH)+1).toString()
 
         //tmbrTxt.text = LocalDate.parse(vldDate.toString(), DateTimeFormatter.ISO_LOCAL_DATE).toString() //Date of the last update of the timetable in Schulportal
+
+        //Set flag and schedules for the days on the name of the day
+        //1v5
+        if(SchedulesDb.getSchedWithStartDate(tdy).isNotEmpty() && !expanded) {
+            mondayTxt.text = "${mondayTxt.text} \uD83D\uDEA9"//red triangle flag
+            mondayTxt.setOnClickListener {
+                nav.navigate(R.id.schedulesFromHomeAction)
+                parentFragmentManager.beginTransaction()
+                    .replace(R.id.nav_host_fragment,
+                        SchedulesFragment().also {
+                            it.arguments = bundleOf("startS" to dtStrMon)//Date for the schedule
+                        })
+                    .setReorderingAllowed(true) //Optimizing state changes for better transitions
+                    .commit()
+            }
+        }
+        //2v5
+        if(SchedulesDb.getSchedWithStartDate(tdy22).isNotEmpty() && !expanded) { //later on check for view and set navigate accordingly but now simly orbid it; the easy way
+            tuesdayTxt.text = "${tuesdayTxt.text} \uD83D\uDEA9"//red triangle flag
+            tuesdayTxt.setOnClickListener {
+                nav.navigate(R.id.schedulesFromHomeAction)
+                parentFragmentManager.beginTransaction()
+                    .replace(R.id.nav_host_fragment,
+                        SchedulesFragment().also {
+                            it.arguments = bundleOf("startS" to dtStrTue)//Date for the schedule
+                        })
+                    .setReorderingAllowed(true) //Optimizing state changes for better transitions
+                    .commit()
+            }
+        }
+        //3v5
+        if(SchedulesDb.getSchedWithStartDate(tdy33).isNotEmpty() && !expanded) {
+            wednesdayTxt.text = "${wednesdayTxt.text} \uD83D\uDEA9"//red triangle flag
+            wednesdayTxt.setOnClickListener {
+                nav.navigate(R.id.schedulesFromHomeAction)
+                parentFragmentManager.beginTransaction()
+                    .replace(R.id.nav_host_fragment,
+                        SchedulesFragment().also {
+                            it.arguments = bundleOf("startS" to dtStrWed)//Date for the schedule
+                        })
+                    .setReorderingAllowed(true) //Optimizing state changes for better transitions
+                    .commit()
+            }
+        }
+        //4v5
+        if(SchedulesDb.getSchedWithStartDate(tdy44).isNotEmpty() && !expanded) {
+            thursdayTxt.text = "${thursdayTxt.text} \uD83D\uDEA9"//red triangle flag
+            thursdayTxt.setOnClickListener {
+                nav.navigate(R.id.schedulesFromHomeAction)
+                parentFragmentManager.beginTransaction()
+                    .replace(R.id.nav_host_fragment,
+                        SchedulesFragment().also {
+                            it.arguments = bundleOf("startS" to dtStrThu)//Date for the schedule
+                        })
+                    .setReorderingAllowed(true) //Optimizing state changes for better transitions
+                    .commit()
+            }
+        }
+        //5v5
+        if(SchedulesDb.getSchedWithStartDate(tdy55).isNotEmpty() && !expanded) {
+            fridayTxt.text = "${fridayTxt.text} \uD83D\uDEA9"//red triangle flag
+            fridayTxt.setOnClickListener {
+                nav.navigate(R.id.schedulesFromHomeAction)
+                parentFragmentManager.beginTransaction()
+                    .replace(R.id.nav_host_fragment,
+                        SchedulesFragment().also {
+                            it.arguments = bundleOf("startS" to dtStrFri)//Date for the schedule
+                        })
+                    .setReorderingAllowed(true) //Optimizing state changes for better transitions
+                    .commit()
+            }
+        }
+
+
+
 
         if (withChanges) {
             GlobalScope.launch {
@@ -399,7 +487,17 @@ class TimetableViewFragment : Fragment() {
         if (view == null) return // Avoid IllegalStateException if view is not done creating
 
         if (this.viewAll != viewAll) {
+            if(viewAll) {
+                //set title
+                var spprtStr = SphPlanner.prefs.getString("clss_name", "")!!
+                if (spprtStr.isNullOrEmpty() || (spprtStr == "0")) spprtStr = ""
+                (activity as MainActivity).supportActionBar?.title = spprtStr
+            }
+            else {
+                (activity as MainActivity).supportActionBar?.title = SphPlanner.appContext().getString(R.string.timetable_title)
+            }
             this.viewAll = viewAll
+
             // Recreate if pesonal timetable was for some reason not shown
             if (requireView().findViewById<RecyclerView>(R.id.mondayRecycler).adapter == null) {
                 parentFragmentManager.beginTransaction()
@@ -421,12 +519,26 @@ class TimetableViewFragment : Fragment() {
                 // Cancel if timetable does not for some reason contain entries for 5 days
                 if (timetable.size < 5) return
                 // Notify recyclerviews
+
+                // Set up lessons adapters
+                val c = Calendar.getInstance()
+                c.time = mainMonday
+                c.add(Calendar.DATE, 1)
+                val tdy2 = c.time
+                c.add(Calendar.DATE, 1)
+                val tdy3 = c.time
+                c.add(Calendar.DATE, 1)
+                val tdy4 = c.time
+                c.add(Calendar.DATE, 1)
+                val tdy5 = c.time
+
                 (requireView().findViewById<RecyclerView>(R.id.lssnRecycler).adapter        as TimebarAdapter).setDataAndMultiple(              viewAll, maxConcurrent)
-                (requireView().findViewById<RecyclerView>(R.id.mondayRecycler).adapter      as LessonsAdapter).setDataAndMultiple(timetable[0], viewAll, maxConcurrent)
-                (requireView().findViewById<RecyclerView>(R.id.tuesdayRecycler).adapter     as LessonsAdapter).setDataAndMultiple(timetable[1], viewAll, maxConcurrent)
-                (requireView().findViewById<RecyclerView>(R.id.wednesdayRecycler).adapter   as LessonsAdapter).setDataAndMultiple(timetable[2], viewAll, maxConcurrent)
-                (requireView().findViewById<RecyclerView>(R.id.thursdayRecycler).adapter    as LessonsAdapter).setDataAndMultiple(timetable[3], viewAll, maxConcurrent)
-                (requireView().findViewById<RecyclerView>(R.id.fridayRecycler).adapter      as LessonsAdapter).setDataAndMultiple(timetable[4], viewAll, maxConcurrent)
+                (requireView().findViewById<RecyclerView>(R.id.mondayRecycler).adapter      as LessonsAdapter).setDataAndMultiple(
+                    mainMonday, timetable[0], expanded, viewAll, maxConcurrent)
+                (requireView().findViewById<RecyclerView>(R.id.tuesdayRecycler).adapter     as LessonsAdapter).setDataAndMultiple(tdy2, timetable[1], expanded, viewAll, maxConcurrent)
+                (requireView().findViewById<RecyclerView>(R.id.wednesdayRecycler).adapter   as LessonsAdapter).setDataAndMultiple(tdy3, timetable[2], expanded, viewAll, maxConcurrent)
+                (requireView().findViewById<RecyclerView>(R.id.thursdayRecycler).adapter    as LessonsAdapter).setDataAndMultiple(tdy4, timetable[3], expanded, viewAll, maxConcurrent)
+                (requireView().findViewById<RecyclerView>(R.id.fridayRecycler).adapter      as LessonsAdapter).setDataAndMultiple(tdy5, timetable[4], expanded, viewAll, maxConcurrent)
             }
         }
     }

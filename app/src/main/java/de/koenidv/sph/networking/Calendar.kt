@@ -25,18 +25,6 @@ class Clndr {
             callback = { success: Int, result: String? ->
 
                 if (success == NetworkManager.SUCCESS) {
-
-                    DebugLog("Calendar", "Clear")
-                        //I like to do
-
-                    DebugLog("Calendar", "Parser")
-                        //I like to do
-
-                    DebugLog("Calendar", "Save")
-                        //I like to do
-
-                    DebugLog("Calendar", "OK")
-
                     appContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
                         .edit().putLong("updated_calendar", Date().time).apply()
                 }

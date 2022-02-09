@@ -153,14 +153,12 @@ class TimebarAdapter(
     }
 
     fun setDataAndMultiple(multiple: Boolean, maxConcurrent: Int) {
-        //this.dataset = newDataset
         this.multiple = multiple
         this.maxConcurrent = maxConcurrent
         notifyDataSetChanged()
     }
 
     fun setTiming(nwDt: Date) {
-        //this.dataset = newDataset
         this.dt = nwDt
         notifyDataSetChanged()
     }

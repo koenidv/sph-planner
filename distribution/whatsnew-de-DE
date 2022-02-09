@@ -1,1 +1,31 @@
 Danke an Tiefkhlpizza, der die Entwicklung der App weiterführt!
+Danke an koenidv, der mir das erst ermöglicht hat, durch die eigentliche Erstellung der App!
+===
+
+Quarter 4-2021/  JAN-2022
+- Einsehbarkeit der Stundenpläne über +/- 3 Monate (ToDo: Beachtung von neuen Stundenplänen beim vor- und zurück- schalten)
+- Datum, Tag, KW und Jahr hinzugefügt
+- Anfangs- und End- Zeiten der Stunden werden gefecht und angezeigt
+- Kennzeichnung von Tag, Schulstunde und Fach (roter Rahmen) bearbeitet
+- Kennzeichnung von Terminen, Posts und Ähnlichem über ein rotes Flag, Anzeige der Daten bei onClick
+
+- Einlesen und Beachtung von hessischen Feiertagen zusätzlich zu den Ferien
+- Einlesen, Anzeige, Filtern und Sharen (Exportieren, Drucken, Versenden) von Terminen
+
+- Verbesserung der Lesbarkeit im Chat Fragment bei bestimmten Designs
+- Anzeige von Attachment/ Bestimmung des Datatypes verbessert (Trennung am letzten Punkt)
+- Klassenbezeichnung wird eingelesen und an bestimmten STellen verwendet
+
+- Datenschutzformulierung umgebaut
+- Donate Button integriert damit ich Millionär werde
+
+- Onboarding Abstürze so gut es geht behoben (Master im Unwissen)
+- Schaltet man beim Onboarding nicht weiter, gehen wir nach 60s automatisch in die App rein
+
+- An der Einführung vom horizontalen SWipen mit ViewPager2 gescheitert
+
+- Angezeigter Titel geändert auf SPickzettel
+- Icon geändert auf Schildkröte mit Muffins
+===
+
+Weiter gehts...

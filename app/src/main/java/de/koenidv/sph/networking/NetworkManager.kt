@@ -8,6 +8,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.afollestad.date.month
 import com.afollestad.date.year
 import com.androidnetworking.AndroidNetworking
 import com.androidnetworking.BuildConfig
@@ -23,18 +24,19 @@ import de.koenidv.sph.SphPlanner.Companion.prefs
 import de.koenidv.sph.database.ChangesDb
 import de.koenidv.sph.database.CoursesDb
 import de.koenidv.sph.database.FunctionTilesDb
+import de.koenidv.sph.database.SchedulesDb
 import de.koenidv.sph.debugging.DebugLog
 import de.koenidv.sph.debugging.Debugger
+import de.koenidv.sph.objects.FunctionTile.Companion.FEATURE_CALENDAR
 import de.koenidv.sph.objects.FunctionTile.Companion.FEATURE_CHANGES
 import de.koenidv.sph.objects.FunctionTile.Companion.FEATURE_COURSES
 import de.koenidv.sph.objects.FunctionTile.Companion.FEATURE_MESSAGES
 import de.koenidv.sph.objects.FunctionTile.Companion.FEATURE_TIMETABLE
+import de.koenidv.sph.objects.Schedule
 import kotlinx.coroutines.*
-import okhttp3.OkHttpClient
-import okhttp3.Request
 import org.json.JSONObject
 import org.jsoup.Jsoup
-import java.net.URL
+import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
 //import okhttp3.RequestBody.Companion.asRequestBody //to use file.asReqestBody
@@ -99,6 +101,8 @@ class NetworkManager {
                 // holidays after 1 month
                 if (shouldUpdate("updated_holidays", 31, TimeUnit.DAYS))
                     updateList.add("holidays")
+                // calendar after 12h (720min)
+                if (shouldUpdate("updated_calendar", 720)) updateList.add("calendar")
             }
             R.id.nav_courses, R.id.frag_tasks, R.id.frag_allposts, R.id.frag_attachments -> {
                 // 2 minutes cooldown, update all posts
@@ -122,6 +126,8 @@ class NetworkManager {
             }
             R.id.frag_timetable -> {
                 updateList.add("timetable")
+                // calendar after 12h (720min)
+                if (shouldUpdate("updated_calendar", 720)) updateList.add("calendar")
             }
             R.id.frag_changes -> {
                 // Changes fragment
@@ -197,23 +203,17 @@ class NetworkManager {
                 if(url.contains("kalender")) {
                     /*
                      * Idea is to use okhttp to receive a stream
-                     * and to save the data in an appointment db
+                     * and to save the data in schedule db
                      *
                      * E/AndroidRuntime: FATAL EXCEPTION: main => at android.os.StrictMode$AndroidBlockGuardPolicy.onNetwork(...
                      * Rootcause is a timeintensive calculation has to be done in an async thread
                      */
                      //Token done and OK, now url has to be handled
-
-                     //Pls. check and make functional
-                     //Target is to have a stream/ string which I can parse to a new db
-                     //stream/ string available in Calendar.kt is enough, the rest I like to do
-                     //thx
-                     val oneAsync = clndrFetch(url)
-                     //Pls. check and make functional
-
-                     //awaitAll(oneAsync)
-                     //var rspns = oneAsync.await()
-                     //callback(SUCCESS, rspns)
+                     val scope = CoroutineScope(Dispatchers.Unconfined)//CoroutineScope(Job() + Dispatchers.Main)
+                     val job/* Unique instance ID*/ = scope.launch { clndrFetch(url) }
+                     // launch = fire and forget - Start an asynchronous task execution from a normal function
+                     // therein we can handle feedbacks with async
+                     callback(SUCCESS, "")
                 }
                 else {
                     // Getting webpage
@@ -457,6 +457,7 @@ class NetworkManager {
                             "messages" -> Messages().fetch(callback = checkDone)
                             "holidays" -> Holidays().fetch(callback = checkDone)
                             "chat" -> Messages().updateConversation(data["chatid"], checkDone)
+                            "calendar" -> Clndr().fetch(callback = checkDone)
                         }
                     }
                 } else callback(success)
@@ -475,23 +476,20 @@ class NetworkManager {
         val features = FunctionTilesDb.getInstance().supportedFeatures.map { it.type } +
                 FunctionTilesDb.getInstance().getSupportedFeatureName("Kalender").map {it.name }
 
-        //duringupdate
-        //Add choosen functionalities from type other to features
-        //features = FunctionTilesDb.getInstance().getSupportedFeatureName("Kalender").map {it.name }
-        //duringupdate end
-
         val loadList = mutableListOf("userid", "courses")
 
         // Mark each supported feature for loading
-        //if (features.contains(FEATURE_CALENDAR)) loadList.add("calendar")//duringupdate
+                                                  loadList.add("holidays")
+                                                  //has to be done BEFORE calendar because in schedule db we sync with holidays db!
+                                                  //furthermore we need some space in between to have a filled holidays db
         if (features.contains(FEATURE_TIMETABLE)) loadList.add("timetable")
-        if (features.contains(FEATURE_COURSES)) loadList.add("posts")
-        if (features.contains(FEATURE_CHANGES)) loadList.add("changes")
+        if (features.contains(FEATURE_COURSES))   loadList.add("posts")
+        if (features.contains(FEATURE_CHANGES))   loadList.add("changes")
+        if (features.contains(FEATURE_CALENDAR))  loadList.add("calendar")
         if (features.contains(FEATURE_MESSAGES)) {
-            loadList.add("users")
-            loadList.add("messages")
+                                                  loadList.add("users")
+                                                  loadList.add("messages")
         }
-        loadList.add("holidays")
 
         // Log indexing status
         DebugLog("NetMgr", "Indexing list assembled",
@@ -616,15 +614,134 @@ class NetworkManager {
         }
     }
 
-    private fun clndrFetch(url: String): Deferred<Unit> = GlobalScope.async {
+    //https://developer.android.com/kotlin/coroutines/coroutines-adv
+    //unterbrechbare fun <NAME> als Coroutine
+    private suspend fun clndrFetch(url: String) = coroutineScope {
+        //aufgeschobenes Ergebnis 1
+        val deferredOne = async { doClndrFetch(url) }
+        deferredOne.await()
+    }
 
-        //val client = OkHttpClient()
-        val client = OkHttpClient.Builder()
+    /*
+     * To specify where the coroutines should run, Kotlin provides three dispatchers that you can use:
+     *
+     * Dispatchers.Main - Use this dispatcher to run a coroutine on the main Android thread. This should be used only for interacting with the UI and performing quick work. Examples include calling suspend functions, running Android UI framework operations, and updating LiveData objects.
+     * Dispatchers.IO - This dispatcher is optimized to perform disk or network I/O outside of the main thread. Examples include using the Room component, reading from or writing to files, and running any network operations.
+     * Dispatchers.Default - This dispatcher is optimized to perform CPU-intensive work outside of the main thread. Example use cases include sorting a list and parsing JSON.
+    */
+    private suspend fun doClndrFetch(url: String): String = withContext(Dispatchers.IO) {
+
+        //Schoolyear starts ~AUG-n and ends ~JUN-(n+1)
+        //So in case current year <= JUN we ask for (n-1) and n
+        //In case we are > JUN we ask for n and (n+1)
+
+        //n
+        var sUrl = url//appContext().getString(R.string.url_calendar)
+        //replace %yr with current year
+        val c = Calendar.getInstance()
+        c.time = Date()
+        sUrl = sUrl.replace("%yr", c.year.toString())
+
+        AndroidNetworking.get(sUrl)
+            .setUserAgent("sph-planner")
+            .setPriority(Priority.LOW)
+            .build()
+            .getAsString(object : StringRequestListener {
+                override fun onResponse(response: String) {
+
+                    if(response.contains("Von_Datum")) {//Checking for a unique string in csv export expected
+                        var rspns = response
+                        val replacementArray: List<String> = listOf("&quot;", "&amp;", "&lt;", "&gt;", "&nbsp;")//ToDo - find better way to remove special html chars only
+                        for(replacement in replacementArray) rspns = rspns.replace(replacement, "")
+                        val regex = "([^;]*[;]){8}([^;]*)([\\r\\n]+)".toRegex() //(any char except ; followed by ; {8 times} followed by any char followed by \r\n
+                        var responseLine = ""
+
+                        while(rspns.isNotEmpty()) {
+                            try {
+                                val match = regex.find(rspns)!!
+                                if (!match.value.isNullOrEmpty()) {
+                                    responseLine += match.value + "#split#"
+                                    rspns = rspns.substring(match.range.last()+1)
+                                } else {
+                                    rspns = ""
+                                }
+                            }
+                            catch (err:Error) {
+                                //do nothing
+                            }
+                        }
+
+                        if(responseLine.isNotEmpty()) {
+                            val schedule: List<Schedule> = parseResponse(responseLine)
+                            val schedulesDb = SchedulesDb
+                            schedulesDb.save(schedule)
+                        }
+                    }
+                }
+
+                override fun onError(error: ANError) {
+                    //do nothing
+                }
+            })
+
+        //(n-1) or (n+1)
+        sUrl = url//appContext().getString(R.string.url_calendar)
+        c.time = Date()
+        if(c.month <= 5) c.add(Calendar.YEAR, -1) else c.add(Calendar.YEAR, 1)
+        sUrl = sUrl.replace("%yr", c.year.toString())
+
+        AndroidNetworking.get(sUrl)
+            .setUserAgent("sph-planner")
+            .setPriority(Priority.LOW)
+            .build()
+            .getAsString(object : StringRequestListener {
+                override fun onResponse(response: String) {
+
+                    if(response.contains("Von_Datum")) {//Checking for a unique string in csv export expected
+                        var rspns = response
+                        val replacementArray: List<String> = listOf("&quot;", "&amp;", "&lt;", "&gt;", "&nbsp;")//ToDo - find better way to remove special html chars only
+                        for(replacement in replacementArray) rspns = rspns.replace(replacement, "")
+                        val regex = "([^;]*[;]){8}([^;]*)([\\r\\n]+)".toRegex() //(any char except ; followed by ; {8 times} followed by any char followed by \r\n
+                        var responseLine = ""
+
+                        while(rspns.isNotEmpty()) {
+                            try {
+                                val match = regex.find(rspns)!!
+                                if (!match.value.isNullOrEmpty()) {
+                                    responseLine += match.value + "#split#"
+                                    rspns = rspns.substring(match.range.last()+1)
+                                } else {
+                                    rspns = ""
+                                }
+                            }
+                            catch (err:Error) {
+                                //do nothing
+                            }
+                        }
+
+                        if(responseLine.isNotEmpty()) {
+                            val schedule: List<Schedule> = parseResponse(responseLine)
+                            val schedulesDb = SchedulesDb
+                            schedulesDb.save(schedule)
+                        }
+                    }
+                }
+
+                override fun onError(error: ANError) {
+                    //do nothing
+                }
+            })
+
+        return@withContext ""
+
+         /* okhttp approach => Other approach is functional
+         val client = OkHttpClient.Builder()
             .addNetworkInterceptor { chain ->
                 chain.proceed(
                     chain.request()
                         .newBuilder()
                         .header("User-Agent", "sph-planner")
+                        .header("Authorization", tkn)
                         .build()
                 )
             }
@@ -661,11 +778,76 @@ class NetworkManager {
             lngth += response.body()!!.contentLength()
             lngth += 1
 
-            //return response
+            return@withContext responseBody.toString()
         }
         catch(err:Error) {
             print("Error when executing get request: "+err.localizedMessage)
+            return@withContext ""
+        }
+        */
+    }
+
+    private fun parseResponse(rspns: String): List<Schedule> {
+        //Input example
+        /*
+        Titel;Art;Von_Datum;Von_Uhrzeit;Bis_Datum;Bis_Uhrzeit;Beschreibung;Ort;Verantwortlich
+        Herbstferien Hessen 2022;Ferien/ beweglicher Ferientag/ Feiertag;24.10.2022;00:00;29.10.2022;23:59;;;
+        Weihnachtsferien Hessen 2022/2023;Ferien/ beweglicher Ferientag/ Feiertag;22.12.2022;00:00;07.01.2023;23:59;;;
+        */
+        //Assigned to a schedule list
+        val returnSchedule: MutableList<Schedule> = mutableListOf()
+
+        try {
+            val rspnsLineArr = rspns.split("#split#").toMutableList()//Line per cell - Now: Go through
+            rspnsLineArr.removeFirst()//delete line with table headers
+            for (line in rspnsLineArr) {
+                if (!line.isNullOrEmpty()) {
+                    val lineArr = line.split(";").toMutableList()//parts of a line
+                    val mySchedule = Schedule()
+
+                    if (!lineArr[0].isNullOrEmpty()) {
+                        mySchedule.nme = lineArr[0]
+                        if (!lineArr[6].isNullOrEmpty()) mySchedule.txt = lineArr[6] else mySchedule.txt = lineArr[0]
+                    }
+                    if (!lineArr[1].isNullOrEmpty()) mySchedule.ctgr = lineArr[1]
+                    if (!lineArr[2].isNullOrEmpty()) mySchedule.strt =
+                        SimpleDateFormat("dd.MM.yyyy HH:mm").parse("${lineArr[2]} ${lineArr[3]}")
+                    if (!lineArr[4].isNullOrEmpty()) mySchedule.nd =
+                        SimpleDateFormat("dd.MM.yyyy HH:mm").parse("${lineArr[4]} ${lineArr[5]}")
+
+                    if ((mySchedule.nd.time - mySchedule.strt.time)/*ms*/ > (16*60*60*1000)/*ms*/) {//Diff gt 16h
+                        mySchedule.drtn = 0
+                        mySchedule.hr = ""
+                    }
+                    else {
+                        mySchedule.drtn = ((mySchedule.nd.time - mySchedule.strt.time)/(1000*60)).toInt()//Diff in [min]
+                        mySchedule.hr = "" //ToDo - try an assignment/ algorithm later on with timebar information
+                    }
+
+                    mySchedule.crs = "none"
+                    mySchedule.src = "portal"
+                    mySchedule.shr = false
+
+                    if (!lineArr[7].isNullOrEmpty()) mySchedule.plc = lineArr[7]
+
+                    if (!lineArr[8].isNullOrEmpty()) {
+                        //last element - delete of line end/ file end information before assignment
+                        lineArr[8] = lineArr[8].replace("\r", "")
+                        lineArr[8] = lineArr[8].replace("\n", "")
+                        mySchedule.rsp = lineArr[8]
+                    }
+
+                    returnSchedule.add(mySchedule)
+                }
+            }
+
+            return returnSchedule
+        }
+        catch (err:Error) {
+            return returnSchedule
         }
     }
+
+
 
 }

@@ -60,8 +60,8 @@ public class HolidaysDb {
     public Holiday getCurrent(Date dt) {
         //Example: SELECT * FROM Customers WHERE Country='Mexico' AND City='México D.F.' LIMIT 1;
         List<Holiday> currentHoliday = getFromCursor(writable.rawQuery(
-                "SELECT * FROM holidays WHERE start < " + /*new Date()*/dt.getTime() / 1000
-                        + " AND endtime > " + /*new Date()*/dt.getTime() / 1000 + " LIMIT 1", null));
+                "SELECT * FROM holidays WHERE start <= " + /*new Date()*/dt.getTime() / 1000
+                        + " AND endtime >= " + /*new Date()*/dt.getTime() / 1000 + " LIMIT 1", null));
         if (currentHoliday.isEmpty()) return null;
         else return currentHoliday.get(0);
     }

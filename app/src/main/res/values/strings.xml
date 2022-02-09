@@ -40,7 +40,9 @@
     <string name="open_in_browser">Open in browser</string>
     <string name="emoji_check" translatable="false">✔</string>
     <string name="emoji_cross" translatable="false">❌</string>
+    <string name="emoji_cross_bw" translatable="false">✖️</string>
     <string name="emoji_warning" translatable="false">❗</string>
+    <string name="emoji_print" translatable="false">🖨️</string>
 
     <!-- Network stuff -->
     <string name="error_offline">No connection</string>
@@ -58,6 +60,7 @@
     <string name="index_status_users">Finding your teachers…</string>
     <string name="index_status_holidays">Searching for holidays…</string>
     <string name="index_status_calendar">Searching for calendar entries…</string>
+
     <string name="upgrading_messages">Loading messages. This might take a while.</string>
 
     <!-- Sign in process -->
@@ -153,7 +156,7 @@
     <string name="posts_filter_task_done">Done</string>
 
     <!-- Timetable -->
-    <string name="timetable_personal_title">Your timetable</string>
+    <string name="timetable_personal_title">Your %class timetable</string>
     <string name="timetable_personal_filter">Only show own courses</string>
     <string name="timetable_title">Timetable</string>
     <string name="timetable_change_template">%shortname. %type</string>
@@ -200,6 +203,8 @@
     </plurals>
     <string name="tasks_share_template">Task for %course: %description</string>
     <string name="tasks_sync_info">If you check a task here, it will also be updated it in the education portal.\n\nIt might take a few minutes for the changes to reflect there.</string>
+
+    <string name="schedules_pins_title">Schedules</string>
 
     <!-- Attachments -->
     <string name="attachments_pins_title">Pinned attachments</string>
@@ -297,6 +302,7 @@
 
     <!-- Holidays -->
     <string name="holidays_title">Holidays</string>
+    <string name="schedules_title">Schedules</string>
     <string name="holidays_spring">Spring Holidays</string>
     <string name="holidays_summer">Summer Holidays</string>
     <string name="holidays_autumn">Autumn Holidays</string>
@@ -318,6 +324,8 @@
     <string name="holidays_date">From %s to %e</string>
     <string name="holidays_date_template">d MMM</string>
     <string name="holidays_date_template2">d MMM yy</string>
+    <string name="schedule_duration">Period: %m min</string>
+    <string name="schedule_hour">Lesson: %l</string>
 
     <!-- Options sheet -->
     <string name="info_menuaction">Options</string>
@@ -364,6 +372,7 @@
     <string name="explore_collection_changes">🗞️️ Changes</string>
     <string name="explore_collection_users">👥 Teachers</string>
     <string name="explore_collection_holidays">🚆 Holidays</string>
+    <string name="explore_collection_schedule">📆 Dates</string>
 
     <!-- Contact -->
     <string name="contact_telegram_icon" translatable="false">paper-plane</string>
@@ -410,6 +419,11 @@
     <string name="share_text" translatable="false">Hey, kennst du schon die Schulportal-App?\n→ ToDoLinkPlayStoreNew</string>
     <string name="donate_button">Support</string>
     <string name="data_button">Privacy</string>
+
+    <!-- Looking for maintainer -->
+    <string name="maintainer_prompt">Got some experience with coding?</string>
+    <string name="maintainer_action">Read me</string>
+    <string name="maintainer_text">Hey, I\'m Florian, the creator of this app.\n\nAs you might have noticed, there hasn\'t been new stuff in a while now. That\'s because I finished school a few months ago, and now have neither the time the time to continue supporting this app, nor do I still have an account with SPH.\n\nIf you have any experience with developing apps for Android and/or are interested in working on or taking over this project, plase! contact me.\n\nYou can also find SPHplanners entire codebase on GitHub at github.com/koenidv/sphplanner. Thank you :)</string>
 
     <!--
     Looking for maintainer
@@ -492,4 +506,6 @@
     <string name="dfltRealName">John</string>
     <string name="dfltFamName">Doe</string>
     <string name="dfltClssName">0</string>
+    <string name="Tagestermine">Todays schedule</string>
+    <string name="category_for_db_sync_holiday" translatable="false">Ferien/ beweglicher Ferientag/ Feiertag</string>
 </resources>

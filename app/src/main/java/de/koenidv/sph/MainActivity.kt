@@ -67,6 +67,10 @@ import java.util.*
 //ToDo #2.3: Crashes during onboarding to check for sustainability, temporary solution integrated
 //ToDo #2.4: Verschränken of not supported features
 //ToDo #2.5: Implement an option fragment (end of school before holidays [hour], notifications on/ off, correction of teacher names, ...
+//ToDo #2.6: Sometimes different timetables exists (e.g. new scholl year) We can detect this by
+//<div class=" col-md-10 column form-group"> <label for="exampleInputName2">Stundenplan gültig</label> <select class="form-control" id="dateSelect"> <option value="2022-02-07" selected="selected">ab 07.02.2022</option> <option value="2021-11-08" >ab 08.11.2021 (bis 06.02.2022)</option> </select> </div>
+//https://start.schulportal.hessen.de/stundenplan.php?a=detail_klasse&e=1&k=05f1&date=2021-11-08
+//https://start.schulportal.hessen.de/stundenplan.php?a=detail_klasse&e=1&k=05f1&date=2022-02-07
 
 /*
 
