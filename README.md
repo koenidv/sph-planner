@@ -21,13 +21,16 @@ Android app to easily access Hesse's education portal -
 
 <details>
 
-<summary>Screenshots as of 1.2 (v120)</summary>
+<summary>Screenshots</summary>
 
 <p float="left">
-  <img src="https://play-lh.googleusercontent.com/W998xiTW5TvKZvtqZFm6hhVLo9ji97VgnDJ9Z86sMJEs53_kA0NU4ohTP9S2W1Pv7Q=w1920-h947-rw" width="200" />
-  <img src="https://play-lh.googleusercontent.com/tYMyPkNZc6qIEbNMNbLksOuiLM9sPncAHFC74Nq-QB1pCetwCEls5baYFo2bhE--tTM=w1920-h947-rw" width="200" /> 
-  <img src="https://play-lh.googleusercontent.com/htYdoaD9un77stFjNjDeuJ02bA8cTNpwsmv59uv6CWst8yvHsHomIPvpP-VqQfOU5Q=w1920-h947-rw" width="200" />
-  <img src="https://play-lh.googleusercontent.com/W8Buymrj0ShiNaHG3CcXcVh2RcztyA1Tgm4U7xMCqF1cBQzrJyhVLRb89jOZpjXuHA=w1920-h947-rw" width="200" />
+  <img src="https://lh3.googleusercontent.com/UYR2UMZTjfgarGyHWIh3mFm8cKrUxcLCjzdedMm7IhNdodLSrgpXpvZ_8Ogq2Ttxmw=w1920-h947-rw" width="140" />
+  <img src="https://lh3.googleusercontent.com/-jtJp2r3RJ5cR7MXCuo-5XmLNz2PXYaKItqkKaRcHh7vww3miNm5zDSVKQcjR75QkyQ=w1920-h947-rw" width="140" /> 
+  <img src="https://lh3.googleusercontent.com/-i6wmnsOo7ZDiBTYsmAQIZch9sd-TnQZ7kyC1jvg30v6AJHltD5rZKmMezJ1wCcUbic=w1920-h947-rw" width="140" />
+  <img src="https://lh3.googleusercontent.com/KuLaAQ5LvOUwUlKPX4vSp0cUIZK_zjpvW0mS6u0BnGB2PkYixt4wNmWvwaoJ7moW2Q=w1920-h947-rw" width="140" />
+  <img src="https://lh3.googleusercontent.com/ep0kuFOV6X2B5KtUFhu8KqDhzYwTHrOKWBux3U6SUhxRkRacnwtJ2rzsGNBqpBlcvtqx=w1920-h947-rw" width="140" />
+  <img src="https://lh3.googleusercontent.com/Jp40z5UIwHvZmDIwgp2X7LYEbqrjeMrpuapewxpgDfkysX5vJChEOWbDNZQQpr3mNqWt=w1920-h947-rw" width="140" />
+  <img src="https://lh3.googleusercontent.com/xMIR85ERzKu_0PEnHJ4ywBIirz6M9VLd2vpRJ0jYB0mlTYBfBNIYxXkOx7JJbR_kNQ=w1920-h947-rw" width="140" />
 </p>
 
 </details>
