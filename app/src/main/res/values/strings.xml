@@ -1,5 +1,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="app_name">SPickzettel HE</string>
+    <string name="app_name">Schulportal</string>
     <string name="title_overview">Overview</string>
     <string name="title_courses">Your Courses</string>
     <string name="title_messages">Messages</string>
@@ -68,7 +68,7 @@
     <string name="onboard_legal_description">You should know a few things so that we\'ll along well 😊</string>
     <string name="onboard_legal_liability">I know that the app is not liable for any data shown and any mistake made.</string>
     <string name="onboard_legal_sources">I understand that all data is provided by Schulportal Hessen and courtesy of the respective author.</string>
-    <string name="onboard_legal_privacy">I have read and understood and agree to the app\'s <a href="https://www.tiefkuehlpizza.com/datenschutz/">privacy policy</a>.</string>
+    <string name="onboard_legal_privacy">I have read and understood and agree to the app\'s <a href="https://koeni.dev/sph/datenschutz">privacy policy</a>.</string>
     <string name="onboard_welcome_title">Hey</string>
     <string name="onboard_welcome_description">"You need an account with Hesse's education portal to use this app."</string>
     <string name="onboard_welcome_error_connection">You need to be online to sign in.\nTap to retry.</string>
@@ -330,7 +330,7 @@
     <!-- Options sheet -->
     <string name="info_menuaction">Options</string>
     <string name="info_greeting">Hey %name</string>
-    <string name="info_app">SPickzettel HE</string>
+    <string name="info_app">Schulportal App</string>
     <string name="info_author">v%version&#160;&#160;&#160;%status</string>
     <string name="info_author_history"> Based on SPHplanner</string>
     <string name="info_thanks">Special thanks to Ryan etc</string>
@@ -380,17 +380,17 @@
     <string name="contact_telegram_data" translatable="false">https://t.me/koenidv</string>
     <string name="contact_instagram_icon" translatable="false">comment</string>
     <string name="contact_instagram_text">Insta</string>
-    <!-- <string name="contact_instagram_data" translatable="false">https://instagram.com/halbunsichtbar</string> -->
-    <string name="contact_instagram_data" translatable="false">https://www.instagram.com/tief.kuehl.pizza/</string>
-    <string name="support_data" translatable="false">https://www.paypal.com/donate?hosted_button_id=ZBKYL5HPA4E6G</string>
-    <string name="data_data" translatable="false">https://www.tiefkuehlpizza.com/datenschutz/</string>
+    <string name="contact_instagram_data" translatable="false">https://instagram.com/halbunsichtbar</string>
+    <!-- <string name="contact_instagram_data" translatable="false">https://www.instagram.com/tief.kuehl.pizza/</string> -->
+    <string name="support_data" translatable="false">https://koeni.dev</string>
+    <string name="data_data" translatable="false">https://koeni.dev/sph/datenschutz/</string>
     <string name="contact_github_icon" translatable="false">code-branch</string>
     <string name="contact_github_text">GitHub</string>
     <string name="contact_github_data" translatable="false">https://github.com/koenidv/sph-planner/issues/new</string>
     <string name="contact_mail_icon" translatable="false">envelope</string>
     <string name="contact_mail_text">Email</string>
-    <string name="contact_mail_data" translatable="false">stefan.klabe#atgooglemail.com</string>
-    <string name="feedback_subject" translatable="false">[SPickzettel HE] Feedback</string>
+    <string name="contact_mail_data" translatable="false">koenidv@gmail.com</string>
+    <string name="feedback_subject" translatable="false">[SPH] Feedback</string>
     <string name="feedback_body" translatable="false">\n\nApp: v%app\nSDK: v%android\n School: %school</string>
 
     <!-- In-App updates -->
@@ -416,7 +416,7 @@
     <string name="share_action">Sharing is caring</string>
     <string name="share_button">Share</string>
     <!-- Share text is always in German as the app is mainly for German users... -->
-    <string name="share_text" translatable="false">Hey, kennst du schon die Schulportal-App?\n→ ToDoLinkPlayStoreNew</string>
+    <string name="share_text" translatable="false">Hey, kennst du schon die Schulportal-App?\n→ https://play.google.com/store/apps/details?id=de.koenidv.sph</string>
     <string name="donate_button">Support</string>
     <string name="data_button">Privacy</string>
 
