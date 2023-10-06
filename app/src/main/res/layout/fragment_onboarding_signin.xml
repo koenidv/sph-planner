@@ -131,7 +131,9 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/signinButton"
-        android:text="@string/onbaord_use_demodata"/>
+        android:text="@string/onbaord_use_demodata"
+        android:visibility="gone"
+        tools:visibility="visible"/>
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/signinButton"
