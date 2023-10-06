@@ -382,7 +382,6 @@
     <string name="contact_instagram_icon" translatable="false">comment</string>
     <string name="contact_instagram_text">Insta</string>
     <string name="contact_instagram_data" translatable="false">https://instagram.com/halbunsichtbar</string>
-    <!-- <string name="contact_instagram_data" translatable="false">https://www.instagram.com/tief.kuehl.pizza/</string> -->
     <string name="support_data" translatable="false">https://koeni.dev</string>
     <string name="data_data" translatable="false">https://koeni.dev/sph/datenschutz/</string>
     <string name="contact_github_icon" translatable="false">code-branch</string>
