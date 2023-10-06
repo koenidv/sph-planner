@@ -13,9 +13,4 @@
         android:icon="@drawable/ic_settings"
         android:title="@string/info_menuaction"
         app:showAsAction="ifRoom" />
-    <item
-        android:id="@+id/donateItem"
-        android:icon="@drawable/ic_baseline_add_reaction_24"
-        android:title="@string/info_menuaction"
-        app:showAsAction="ifRoom" />
 </menu>

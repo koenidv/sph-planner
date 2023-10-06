@@ -333,7 +333,6 @@
     <string name="info_greeting">Hey %name</string>
     <string name="info_app">Schulportal App</string>
     <string name="info_author">v%version&#160;&#160;&#160;%status</string>
-    <string name="info_author_history">(with some modifications from St.Klabe)</string>
     <string name="info_thanks">Special thanks to Ryan etc</string>
     <string name="menu_option_logout">Logout</string>
     <string name="menu_option_logout_question">Are you sure you want to log out?\nAll local data will be removed.</string>
@@ -380,9 +379,9 @@
     <string name="contact_telegram_text">Telegram</string>
     <string name="contact_telegram_data" translatable="false">https://t.me/koenidv</string>
     <string name="contact_instagram_icon" translatable="false">comment</string>
-    <string name="contact_instagram_text">Insta</string>
+    <string name="contact_instagram_text">Instagram</string>
     <string name="contact_instagram_data" translatable="false">https://instagram.com/halbunsichtbar</string>
-    <string name="support_data" translatable="false">https://koeni.dev</string>
+    <string name="support_data" translatable="false">https://github.com/koenidv/sphplanner</string>
     <string name="data_data" translatable="false">https://koeni.dev/sph/datenschutz/</string>
     <string name="contact_github_icon" translatable="false">code-branch</string>
     <string name="contact_github_text">GitHub</string>
@@ -417,7 +416,7 @@
     <string name="share_button">Share</string>
     <!-- Share text is always in German as the app is mainly for German users... -->
     <string name="share_text" translatable="false">Hey, kennst du schon die Schulportal-App?\n→ https://play.google.com/store/apps/details?id=de.koenidv.sph</string>
-    <string name="donate_button">Support</string>
+    <string name="contribute_button">Support</string>
     <string name="data_button">Privacy</string>
 
     <!-- Looking for maintainer -->

@@ -418,9 +418,6 @@ class MainActivity : AppCompatActivity() {
             // Reset token timer
             getSharedPreferences("sharedPrefs", MODE_PRIVATE).edit()
                     .putLong("updated_posts", 0).apply()
-        } else if (item.itemId == R.id.donateItem) {
-            // Forward to donation w/ paypal
-            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.support_data))))
         }
         return super.onOptionsItemSelected(item)
     }
