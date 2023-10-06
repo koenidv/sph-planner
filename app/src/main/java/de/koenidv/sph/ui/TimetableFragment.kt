@@ -21,7 +21,7 @@ class TimetableFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        sharedElementEnterTransition = TransitionInflater.from(context).inflateTransition(android.R.transition.move)
+        sharedElementEnterTransition = TransitionInflater.from(requireContext()).inflateTransition(android.R.transition.move)
         arguments?.let {
             expanded = it.getBoolean("expanded")
             viewAll = it.getBoolean("viewAll")
