@@ -37,7 +37,7 @@
     <string name="menu_option_theme_light">Hell</string>
     <string name="menu_open_sph">Schulportal öffnen</string>
     <string name="menu_open_sph_warning_title">Automatisch anmelden?</string>
-    <string name="menu_open_sph_warning_description">Dein Netzanbieter oder Angreifer könnten deine Zugangsdaten sehen, wenn du dich automatisch anmeldest.</string>
+    <string name="menu_open_sph_warning_description">Dein Netzanbieter oder Angreifer könnten deine Zugangsdaten sehen, wenn du dich automatisch anmeldest.\nDiese Funktion nutzt Florians AutoSPH-Dienst.</string>
     <string name="menu_open_sph_warning_no">Manuell anmelden</string>
     <string name="menu_open_sph_warning_yes">Automatisch fortfahren</string>
     <string name="info_last_refresh">Meine Kurse: %courses\nVertretungen: %changes\nLetzte Änderung: %changeTimestamp\nIndiziert: %indexed</string>
