@@ -333,7 +333,7 @@
     <string name="info_greeting">Hey %name</string>
     <string name="info_app">Schulportal App</string>
     <string name="info_author">v%version&#160;&#160;&#160;%status</string>
-    <string name="info_author_history"> Based on SPHplanner</string>
+    <string name="info_author_history">(with some modifications from St.Klabe)</string>
     <string name="info_thanks">Special thanks to Ryan etc</string>
     <string name="menu_option_logout">Logout</string>
     <string name="menu_option_logout_question">Are you sure you want to log out?\nAll local data will be removed.</string>

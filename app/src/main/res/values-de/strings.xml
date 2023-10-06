@@ -16,7 +16,7 @@
         <item quantity="one">Ein weiterer ungelesener Beitrag</item>
         <item quantity="other">%d weitere ungelesene Beiträge</item>
     </plurals>
-    <string name="app_name">SPickzettel HE</string>
+    <string name="app_name">Schulportal App</string>
     <string name="title_overview">Übersicht</string>
     <string name="title_courses">Deine Kurse</string>
     <string name="title_messages">Nachrichten</string>
@@ -28,9 +28,9 @@
     <string name="not_now">Später</string>
     <string name="info_menuaction">Optionen</string>
     <string name="info_greeting">Hey %name</string>
-    <string name="info_app">SPickzettel HE</string>
+    <string name="info_app">Schulportal App</string>
     <string name="info_author"> v%version&#160;&#160;&#160;%status</string>
-    <string name="info_author_history"> Based on SPHplanner v1.3.3</string>
+    <string name="info_author_history">(with some modifications from St.Klabe)</string>
     <string name="info_thanks">Besonderer Dank an Ryan etc</string>
     <string name="menu_option_logout">Abmelden</string>
     <string name="menu_option_courses">Gefundene Kurse</string>
