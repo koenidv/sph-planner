@@ -505,6 +505,6 @@
     <string name="dfltRealName">John</string>
     <string name="dfltFamName">Doe</string>
     <string name="dfltClssName">0</string>
-    <string name="Tagestermine">Today's schedule</string>
+    <string name="Tagestermine">Today\'s schedule</string>
     <string name="category_for_db_sync_holiday" translatable="false">Ferien/ beweglicher Ferientag/ Feiertag</string>
 </resources>

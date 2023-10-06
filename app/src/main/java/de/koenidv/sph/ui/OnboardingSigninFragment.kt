@@ -297,7 +297,9 @@ class OnboardingSigninFragment : Fragment() {
                     .putBoolean("demoMode", true)
                     .putBoolean("introComplete", true)
                     .putBoolean("credsVerified", true)
-                    .putString("user", "Demo User")
+                    .putString("real_name", "John")
+                    .putString("fam_name", "Doe")
+                    .putString("clss_name", "Royal CODE Class")
                     .apply()
                 startActivity(Intent(context, MainActivity().javaClass)); requireActivity().finish()
             }
