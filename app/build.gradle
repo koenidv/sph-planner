@@ -9,13 +9,12 @@ plugins {
 }
 
 android {
-    compileSdkVersion 30
-    buildToolsVersion "30.0.3"
+    compileSdk 34
 
     defaultConfig {
         applicationId "de.koenidv.sph"
         minSdkVersion 23
-        targetSdkVersion 30
+        targetSdkVersion 34
         versionCode 138
         versionName "1.3.8"
 
@@ -30,13 +29,13 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
         coreLibraryDesugaringEnabled true //enables date and time handling in APIs lower than 26
     }
 
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = '17'
     }
     packagingOptions {
         resources {
@@ -90,7 +89,7 @@ dependencies {
 
     implementation 'org.apache.commons:commons-csv:1.5'
 
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.2.21'
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.8.22'
     implementation 'com.opencsv:opencsv:4.0'
 
     implementation 'com.squareup.okhttp3:okhttp:3.12.1'
