@@ -27,6 +27,7 @@ import com.toptoche.searchablespinnerlibrary.SearchableSpinner
 import de.koenidv.sph.MainActivity
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
+import de.koenidv.sph.database.demodata.Demodata
 import de.koenidv.sph.debugging.DebugLog
 import de.koenidv.sph.debugging.Debugger
 import de.koenidv.sph.networking.NetworkManager
@@ -293,6 +294,7 @@ class OnboardingSigninFragment : Fragment() {
 
             demodataButton.setOnClickListener {
                 // Enable demo mode
+                Demodata().populateDemoData()
                 prefs.edit()
                     .putBoolean("demoMode", true)
                     .putBoolean("introComplete", true)
