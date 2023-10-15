@@ -64,13 +64,13 @@ class Demodata {
 
         // Courses
         CoursesDb.save(listOf(
-            Course(courseId = "se21", fullname = "Mobile App Development", id_teacher = "teacher4", color = Color.CYAN, isFavorite = true),
-            Course(courseId = "d01", fullname = "Sachen machen", id_teacher = "teacher1", color = Color.MAGENTA, isFavorite = true),
-            Course(courseId = "d02", fullname = "Dingsen & Döngsen", id_teacher = "teacher2", color = Color.BLUE, isFavorite = true),
-            Course(courseId = "cs101", fullname =  "Introduction to Computer Science", id_teacher = "teacher1", color =  Color.GREEN, isFavorite = true),
-            Course(courseId = "webdev", fullname =  "Web Development", id_teacher = "teacher2", color =  Color.BLUE, isFavorite =  true),
-            Course(courseId = "dbms", fullname =  "Database Management Systems", id_teacher = "taecher3", color =  Color.RED, isFavorite = true),
-            Course(courseId = "ai2023", fullname =  "Artificial Intelligence", id_teacher = "teacher12", color =  Color.MAGENTA, isFavorite =  true),
+            Course(courseId = "se21", fullname = "Mobile App Development", id_teacher = "teacher4", color = Color.parseColor("#03A9F4"), isFavorite = true),
+            Course(courseId = "d01", fullname = "Sachen machen", id_teacher = "teacher1", color = Color.parseColor("#FFA726"), isFavorite = true),
+            Course(courseId = "d02", fullname = "Dingsen & Döngsen", id_teacher = "teacher2", color = Color.parseColor("#4CAF50"), isFavorite = true),
+            Course(courseId = "cs101", fullname =  "Introduction to Computer Science", id_teacher = "teacher1", color =  Color.parseColor("#9C27B0"), isFavorite = true),
+            Course(courseId = "webdev", fullname =  "Web Development", id_teacher = "teacher2", color =  Color.parseColor("#2196F3"), isFavorite =  true),
+            Course(courseId = "dbms", fullname =  "Database Management Systems", id_teacher = "taecher3", color =  Color.parseColor("#8BC34A"), isFavorite = true),
+            Course(courseId = "ai2023", fullname =  "Artificial Intelligence", id_teacher = "teacher12", color =  Color.parseColor("#FF5722"), isFavorite =  true),
         ))
 
         TimetableDb.instance!!.save(listOf(
@@ -93,16 +93,16 @@ class Demodata {
         ))
 
         FunctionTilesDb.getInstance().save(listOf(
-            FunctionTile(name = "Mein Unterricht", location = "", type = "mycourses", icon = "test", color = Color.GRAY),
-            FunctionTile(name = "Nachrichten", location = "", type = "messages", icon = "test", color = Color.GRAY),
-            FunctionTile(name = "Stundenplan", location = "", type = "timetable", icon = "test", color = Color.GRAY),
-            FunctionTile(name = "Vertretungsplan", location = "", type = "changes", icon = "test", color = Color.GRAY),
-            FunctionTile(name = "Lerngruppen", location = "", type = "studygroups", icon = "test", color = Color.GRAY),
-            FunctionTile(name = "Moodle", location = "https://koeni.dev", type = "other", icon = "sitemap", color = Color.GRAY),
-            FunctionTile(name = "Edupool", location = "https://koeni.dev", type = "other", icon = "play", color = Color.GRAY),
-            FunctionTile(name = "Blog", location = "https://koeni.dev", type = "other", icon = "comment", color = Color.GRAY),
-            FunctionTile(name = "Fileserver", location = "https://koeni.dev", type = "other", icon = "file-alt", color = Color.GRAY),
-            FunctionTile(name = "Calculator", location = "https://koeni.dev", type = "other", icon = "calculator", color = Color.GRAY),
+            FunctionTile(name = "Mein Unterricht", location = "", type = "mycourses", icon = "test", color = Color.WHITE),
+            FunctionTile(name = "Nachrichten", location = "", type = "messages", icon = "test", color = Color.WHITE),
+            FunctionTile(name = "Stundenplan", location = "", type = "timetable", icon = "test", color = Color.WHITE),
+            FunctionTile(name = "Vertretungsplan", location = "", type = "changes", icon = "test", color = Color.WHITE),
+            FunctionTile(name = "Lerngruppen", location = "", type = "studygroups", icon = "test", color = Color.WHITE), // this is a not user-facing in the app, but a required feature to map the user to their classes
+            FunctionTile(name = "Moodle", location = "https://koeni.dev", type = "other", icon = "sitemap", color = Color.parseColor("#9c27b0")),
+            FunctionTile(name = "Edupool", location = "https://koeni.dev", type = "other", icon = "play", color = Color.parseColor("#03a9f4")),
+            FunctionTile(name = "Blog", location = "https://koeni.dev", type = "other", icon = "comment", color = Color.parseColor("#795548")),
+            FunctionTile(name = "Fileserver", location = "https://koeni.dev", type = "other", icon = "file-alt", color = Color.parseColor("#4caf50")),
+            FunctionTile(name = "Calculator", location = "https://koeni.dev", type = "other", icon = "calculator", color = Color.parseColor("#ffa726")),
         ))
 
         PostsDb.getInstance().save(listOf(
