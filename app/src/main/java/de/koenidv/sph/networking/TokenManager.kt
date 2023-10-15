@@ -2,6 +2,7 @@ package de.koenidv.sph.networking
 
 import android.util.Log
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import com.androidnetworking.AndroidNetworking
 import com.androidnetworking.common.Priority
@@ -54,6 +55,13 @@ object TokenManager {
      * @param onComplete Called when a token is ready
      */
     fun getToken(forceNewToken: Boolean = false, onComplete: (success: Int, token: String?) -> Unit) {
+        if (appContext().getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE).getBoolean("demoMode", false)) {
+            DebugLog("TokenMgr", "Using demo mode",
+                    type = LOG_TYPE_WARNING)
+
+            onComplete(NetworkManager.SUCCESS, "demo")
+            return
+        }
 
         // Use existing, signed-in token if it was used within 15 Minutes
         // Else get a new token
