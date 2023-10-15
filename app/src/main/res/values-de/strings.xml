@@ -145,6 +145,7 @@
     <string name="error_maintenance">Wartung, versuche es später erneut</string>
     <string name="error_server">Versuche es in einigen Minuten erneut</string>
     <string name="error_credentials">Fehler: Deine Legitimation war nicht erfolgreich..</string>
+    <string name="error_demo">Demomodus aktiv</string>
     <string name="error_unknown">Unbekannter Fehler. Bitte versuche es erneut.</string>
     <string name="onboard_signin_error_server">Ein Serverfehler ist aufgetreten.\nBitte versuche es in einigen Minuten erneut.</string>
     <string name="onboard_supported_error_maintenance">Das Schulportal wird im Moment gewartet.\nTippe, um es erneut zu versuchen.</string>

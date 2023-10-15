@@ -49,6 +49,7 @@
     <string name="error_maintenance">Maintenance, try again later</string>
     <string name="error_server">Try again in a few minutes</string>
     <string name="error_credentials">Please check your credentials.</string>
+    <string name="error_demo">Using demo mode</string>
     <string name="error_unknown">Something went wrong.\nPlease try again.</string>
     <string name="sph_status">Status</string>
     <string name="index_status_userid">Collecting some information…</string>
