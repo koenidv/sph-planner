@@ -47,7 +47,7 @@
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/headTextView"
+        app:layout_constraintTop_toBottomOf="@+id/headTextView"
         tools:text="@string/onboard_supported_featurelist"
         tools:visibility="visible" />
 
@@ -63,7 +63,7 @@
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/featurelistTextView"
+        app:layout_constraintTop_toBottomOf="@+id/featurelistTextView"
         tools:visibility="visible" />
 
     <com.google.android.material.button.MaterialButton
@@ -76,12 +76,12 @@
         android:text="@string/menu_contact"
         android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/warningTextView"
+        app:layout_constraintTop_toBottomOf="@+id/warningTextView"
         tools:visibility="visible" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/debugButton"
-        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -89,7 +89,7 @@
         android:text="@string/menu_debugging"
         android:visibility="gone"
         app:layout_constraintStart_toEndOf="@id/contactButton"
-        app:layout_constraintTop_toBottomOf="@id/warningTextView"
+        app:layout_constraintTop_toBottomOf="@+id/warningTextView"
         tools:visibility="visible" />
 
     <ProgressBar
@@ -125,23 +125,11 @@
         android:layout_marginEnd="16dp"
         android:layout_marginStart="16dp"
         android:textAlignment="textEnd"
+        app:layout_constraintBottom_toBottomOf="@+id/indexLoading"
+        app:layout_constraintEnd_toStartOf="@+id/indexLoading"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintBottom_toBottomOf="@id/indexLoading"
-        app:layout_constraintEnd_toStartOf="@id/indexLoading"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/indexLoading" />
-
-    <TextView
-        android:id="@+id/statusTextViewForward"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:layout_marginStart="16dp"
-        android:textAlignment="center"
-        app:layout_constraintBottom_toTopOf="@id/indexLoading"
-        app:layout_constraintEnd_toStartOf="@id/indexLoading"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/contactButton" />
+        app:layout_constraintTop_toTopOf="@+id/indexLoading" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

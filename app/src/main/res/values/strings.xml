@@ -11,14 +11,12 @@
     <string name="url_course_overview_semester" translatable="false">https://start.schulportal.hessen.de/meinunterricht.php?a=sus_view&amp;id=%numberid&amp;halb=%semester</string>
     <string name="url_start" translatable="false">https://start.schulportal.hessen.de/</string>
     <string name="url_timetable" translatable="false">https://start.schulportal.hessen.de/stundenplan.php</string>
-    <string name="url_calendar" translatable="false">https://start.schulportal.hessen.de/kalender.php?a=export&amp;export=csv&amp;year=%yr</string>
     <string name="url_studygroups" translatable="false">https://start.schulportal.hessen.de/lerngruppen.php</string>
     <string name="url_mycourses" translatable="false">https://start.schulportal.hessen.de/meinunterricht.php</string>
     <string name="url_changes" translatable="false">https://start.schulportal.hessen.de/vertretungsplan.php</string>
     <string name="url_changes_debug" translatable="false">https://gist.githubusercontent.com/koenidv/7c0b35895d1daf86b2b00f243d687fe2/raw/13d8feb0b7216d8278f9421a06a2eeba305f4525/gistfile1.txt</string>
     <string name="url_messages" translatable="false">https://start.schulportal.hessen.de/nachrichten.php</string>
     <string name="url_holidays" translatable="false">https://ferien-api.de/api/v1/holidays/HE.json</string>
-    <string name="url_bank_holidays" translatable="false">https://feiertage-api.de/api/?jahr=%hldyYear&amp;nur_land=HE</string>
     <string name="url_cryption_publickey" translatable="false">https://start.schulportal.hessen.de/ajax.php?f=rsaPublicKey</string>
     <string name="url_cryption_handshake" translatable="false">https://start.schulportal.hessen.de/ajax.php?f=rsaHandshake&amp;s=%s</string>
     <string name="url_status" translatable="false">https://info.schulportal.hessen.de/</string>
@@ -40,9 +38,7 @@
     <string name="open_in_browser">Open in browser</string>
     <string name="emoji_check" translatable="false">✔</string>
     <string name="emoji_cross" translatable="false">❌</string>
-    <string name="emoji_cross_bw" translatable="false">✖️</string>
     <string name="emoji_warning" translatable="false">❗</string>
-    <string name="emoji_print" translatable="false">🖨️</string>
 
     <!-- Network stuff -->
     <string name="error_offline">No connection</string>
@@ -60,8 +56,6 @@
     <string name="index_status_messages">Getting your messages…</string>
     <string name="index_status_users">Finding your teachers…</string>
     <string name="index_status_holidays">Searching for holidays…</string>
-    <string name="index_status_calendar">Searching for calendar entries…</string>
-
     <string name="upgrading_messages">Loading messages. This might take a while.</string>
 
     <!-- Sign in process -->
@@ -91,12 +85,11 @@
     <string name="onboard_supported_features_partly_hidden">✔ Your school supports some of the features we need.</string>
     <string name="onboard_supported_features_partly_not">❌ Your school does not support all the features we need. Please get in touch to see how you can help us support your school!</string><!--todo link to contact-->
     <string name="onboard_supported_features_none">❌ Sorry, your school does not support the features we need to work.</string>
-    <string name="onboard_supported_featurelist">%mycourses My Courses\n%studygroups Study Groups\n%timetable Timetable\n%changes Changes\n%messages Messages \n%calendar Calendar</string>
+    <string name="onboard_supported_featurelist">%mycourses My Courses\n%studygroups Study Groups\n%timetable Timetable\n%changes Changes\n%messages Messages</string>
     <string name="onboard_supported_warning">Please report any issues you might experience via the options menu!</string>
     <string name="onboard_supported_error_network">There was a network error.\nTap to retry.</string>
     <string name="onboard_supported_error_maintenance">The education portal is currently under maintenance.\nTap to retry.</string>
     <string name="onboard_supported_error_server">A server error occurred.\nPlease try again in a few minutes.</string>
-    <string name="onboard_token">Cannot authorize token, no credentials provided</string>
     <string name="onboard_supported_error_unknown">Something went wrong.\nTap to retry.</string>
 
     <!-- Greetings -->
@@ -158,25 +151,10 @@
     <string name="posts_filter_task_done">Done</string>
 
     <!-- Timetable -->
-    <string name="timetable_personal_title">Your %class timetable</string>
+    <string name="timetable_personal_title">Your timetable</string>
     <string name="timetable_personal_filter">Only show own courses</string>
     <string name="timetable_title">Timetable</string>
     <string name="timetable_change_template">%shortname. %type</string>
-    <string name="day1" translatable="false">Mon</string>
-    <string name="day2" translatable="false">Tue</string>
-    <string name="day3" translatable="false">Wed</string>
-    <string name="day4" translatable="false">Thr</string>
-    <string name="day5" translatable="false">Fri</string>
-    <string name="day6" translatable="false">Sat</string>
-    <string name="day7" translatable="false">Sun</string>
-    <string name="l1" translatable="false">1</string>
-    <string name="l2" translatable="false">2</string>
-    <string name="l3" translatable="false">3</string>
-    <string name="l4" translatable="false">4</string>
-    <string name="l5" translatable="false">5</string>
-    <string name="l6" translatable="false">6</string>
-    <!-- https://www.programmierenlernenhq.de/tutorial-android-daten-aktualisieren-mit-swiperefreshlayout/ -->
-
 
     <!-- Tasks -->
     <string name="tasks_title">Tasks</string>
@@ -192,8 +170,7 @@
     <string name="tasks_due_change">Change due date</string>
     <string name="tasks_filter_undone">Only show undone tasks</string>
     <string name="tasks_filter_none">No tasks found</string>
-    <!-- <string name="tasks_filter_none_undone">All tasks completed ✅</string> -->
-    <string name="tasks_filter_none_undone">All tasks done</string>
+    <string name="tasks_filter_none_undone">All tasks completed ✅</string>
     <string name="tasks_personalized_title">Undone tasks</string>
     <plurals name="tasks_personalized_title_count">
         <item quantity="one">%d undone task</item>
@@ -205,8 +182,6 @@
     </plurals>
     <string name="tasks_share_template">Task for %course: %description</string>
     <string name="tasks_sync_info">If you check a task here, it will also be updated it in the education portal.\n\nIt might take a few minutes for the changes to reflect there.</string>
-
-    <string name="schedules_pins_title">Schedules</string>
 
     <!-- Attachments -->
     <string name="attachments_pins_title">Pinned attachments</string>
@@ -304,30 +279,15 @@
 
     <!-- Holidays -->
     <string name="holidays_title">Holidays</string>
-    <string name="schedules_title">Schedules</string>
     <string name="holidays_spring">Spring Holidays</string>
     <string name="holidays_summer">Summer Holidays</string>
     <string name="holidays_autumn">Autumn Holidays</string>
     <string name="holidays_winter">Winter Holidays</string>
-
-    <string name="holidays_karfreitag">Good Friday</string>
-    <string name="holidays_arbeit">Labour Day</string>
-    <string name="holidays_himmelfahrt">Ascension Day</string>
-    <string name="holidays_pfingstmontag">Whit Monday</string>
-    <string name="holidays_fronleichnam">Corpus Christi</string>
-    <string name="holidays_einheit">German Unity Day</string>
-    <string name="holidays_xmas1">Christmas Day</string>
-    <string name="holidays_xmas2">Boxing Day</string>
-    <string name="holidays_nye">New Year\'s Day</string>
-    <string name="holidays_ostermontag">Easter Monday</string>
-
     <string name="holidays_remaining_days">%d days</string>
     <string name="holidays_remaining_weeks">%w weeks\n%d days</string>
     <string name="holidays_date">From %s to %e</string>
     <string name="holidays_date_template">d MMM</string>
     <string name="holidays_date_template2">d MMM yy</string>
-    <string name="schedule_duration">Period: %m min</string>
-    <string name="schedule_hour">Lesson: %l</string>
 
     <!-- Options sheet -->
     <string name="info_menuaction">Options</string>
@@ -339,7 +299,6 @@
     <string name="menu_option_logout_question">Are you sure you want to log out?\nAll local data will be removed.</string>
     <string name="menu_option_courses">Discovered courses</string>
     <string name="menu_option_choosetheme">Choose a theme</string>
-    <string name="menu_option_option">Options</string>
     <string name="menu_option_theme_light">Light</string>
     <string name="menu_option_theme_dark">Dark</string>
     <string name="menu_option_theme_system">System</string>
@@ -373,7 +332,6 @@
     <string name="explore_collection_changes">🗞️️ Changes</string>
     <string name="explore_collection_users">👥 Teachers</string>
     <string name="explore_collection_holidays">🚆 Holidays</string>
-    <string name="explore_collection_schedule">📆 Dates</string>
 
     <!-- Contact -->
     <string name="contact_telegram_icon" translatable="false">paper-plane</string>
@@ -440,7 +398,6 @@
         <item>e|English</item>
         <item>l|Latin</item>
         <item>f|French</item>
-        <item>spa|Spanish</item>
         <item>g|History</item>
         <item>info|Computer Science</item>
         <item>ku|Arts</item>
@@ -452,42 +409,16 @@
         <item>ek|Geography</item>
         <item>powi|Politics</item>
         <item>spo|Sports</item>
-        <item>sp|Sports</item>
-        <item>schw|Swimming</item>
         <item>rka|Religion</item>
-        <item>Rel ka.|Religion</item>
         <item>rev|Religion</item>
-        <item>Rel ev.|Religion</item>
-        <item>rel|Religion</item>
-        <item>reli|Religion</item>
         <item>rfrr|Religion</item>
-        <item>ethik|Ethics</item>
         <item>ethi|Ethics</item>
-        <item>eth|Ethics</item>
-        <item>pr|Pr</item>
-        <item>pm|Conflict Resolution</item> <!-- Peer Mediation: pädagogische Methode, um Konflikte zwischen Gleichaltrigen aufzuarbeiten und zu lösen -->
-        <item>lrs|Dyslexia</item>
-        <item>daz|German as second-language</item>
-        <item>lern|Study time</item>
-        <item>fk-m|Math remedial</item>
-        <item>kll|Form teacher lesson</item>
     </string-array>
     <string-array name="courseId_shortName_override" tools:ignore="InconsistentArrays">
         <item>info|CS</item>
         <item>bio|Bio</item>
         <item>ch|Chem</item>
         <item>ek|Geo</item>
-        <item>spo|PE</item>
-        <item>lrs|SLD</item> <!-- Specific Learning Disability -->
-        <item>daz|GSL</item>
-        <item>pm|Mediation</item>
-        <item>spa|Span</item>
-        <item>kll|Form</item>
-        <item>d|Ger</item>
-        <item>e|Eng</item>
-        <item>spa|Spa</item>
-        <item>schw|Swim</item>
-        <item>fk-m|Maths+</item>
     </string-array>
 
     <!-- Usabilty -->
@@ -497,15 +428,4 @@
     <string name="imagedescr_external">External Image</string>
     <string name="imagedescr_identicon">Identicon</string>
     <string name="imagedescr_unarchive">Unarchive</string>
-
-    <string name="vac">Hols_x_x</string>
-    <string name="forwarding_message">To be continued soon&#8230;</string>
-    <string name="timetable_left"><![CDATA[<]]></string>
-    <string name="timetable_right"><![CDATA[>]]></string>
-    <string name="timetable_tdy">🏠</string>
-    <string name="dfltRealName">John</string>
-    <string name="dfltFamName">Doe</string>
-    <string name="dfltClssName">0</string>
-    <string name="Tagestermine">Today\'s schedule</string>
-    <string name="category_for_db_sync_holiday" translatable="false">Ferien/ beweglicher Ferientag/ Feiertag</string>
 </resources>

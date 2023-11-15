@@ -8,20 +8,9 @@ import com.androidnetworking.AndroidNetworking
 import com.androidnetworking.common.Priority
 import com.androidnetworking.error.ANError
 import com.androidnetworking.interfaces.StringRequestListener
-import com.google.firebase.crashlytics.FirebaseCrashlytics  //https://firebase.google.com/products/crashlytics =>
-// Track, prioritize and fix crashes faster
-import com.google.firebase.ktx.Firebase                     //https://firebase.google.com/docs/android/setup =>
-// Firebase support for kotlin and setup
-import com.google.firebase.remoteconfig.ktx.remoteConfig    //https://firebase.google.com/docs/remote-config =>
-/*
-Firebase Remote Config ist ein Cloud-Dienst, mit dem Sie das Verhalten und das Erscheinungsbild Ihrer App ändern können,
-ohne dass Benutzer ein App-Update herunterladen müssen.
-Wenn Sie Remote Config verwenden, erstellen Sie In-App-Standardwerte, die das Verhalten und die Darstellung Ihrer App steuern.
-Anschließend können Sie später die Firebase-Konsole oder die Back-End-APIs von Remote Config verwenden,
-um In-App-Standardwerte für alle App-Nutzer oder für Segmente Ihrer Nutzerbasis zu überschreiben.
-Ihre App steuert, wann Updates angewendet werden
-und sie kann häufig nach Updates suchen und diese mit vernachlässigbaren Auswirkungen auf die Leistung anwenden.
- */
+import com.google.firebase.crashlytics.FirebaseCrashlytics
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.remoteconfig.ktx.remoteConfig
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner.Companion.TAG
 import de.koenidv.sph.SphPlanner.Companion.appContext
@@ -76,10 +65,11 @@ object TokenManager {
             // overwrite it
             // Only check once per minute
             if (Date().time - lastTokenCheck > 60 * 1000) {
-                if (CookieStore.getToken() !== prefs.getString("token", "")) {  //Referential equality - if token reference in the cookie != reference in pref (App/ User Vorlieben)
-                    CookieStore.setToken(prefs.getString("token", "")!!)        //make it equal
+                if (CookieStore.getToken() !== prefs.getString("token", "")) {
+                    CookieStore.setToken(prefs.getString("token", "")!!)
 
                     // Log writing token to cookiestore
+
                     DebugLog("TokenMgr", "Rewriting sid cookie")
                 }
                 // Save this time so we don't have to check again within a short time span
@@ -90,7 +80,7 @@ object TokenManager {
             onComplete(NetworkManager.SUCCESS, prefs.getString("token", "")!!)
         } else {
             // Get a new token
-            if (prefs.getString("user", "") != null && prefs.getString("password", "") != null) {   //User and pw exist
+            if (prefs.getString("user", "") != null && prefs.getString("password", "") != null) {
                 // Log creating new access token
                 DebugLog("TokenMgr", "Authorizing new sid token")
 
@@ -99,13 +89,11 @@ object TokenManager {
 
                 // Try loading sph's sign in page and save the sid cookie
                 getTokenWithUrlencoded(onComplete)
-            } else { //NO user or pw found
+            } else {
                 // Log token failure
                 DebugLog("TokenMgr",
                         "Cannot authorize token, no credentials provided",
                         type = LOG_TYPE_ERROR)
-                // StKl:26.12.2021 Call back with NO success
-                onComplete(NetworkManager.FAILED_TOKEN, prefs.getString("token", "")!!)
             }
         }
     }
@@ -231,8 +219,7 @@ object TokenManager {
                             DebugLog("TokenMgr", "Using 0106 fix",
                                     type = LOG_TYPE_WARNING)
                             AndroidNetworking.get("https://start.schulportal.hessen.de/index.php?i="
-                                    //+ prefs.getString("schoolid", "5146")) <= Used Gymnasium am Mosbacher Berg, Wiesbaden (5146) from FlKö as default value
-                                    + prefs.getString("schoolid", "6119"))
+                                    + prefs.getString("schoolid", "5146"))
                                     .setTag("token-2")
                                     .setPriority(Priority.HIGH)
                                     .build()

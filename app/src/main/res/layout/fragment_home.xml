@@ -1,18 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.HomeFragment" >
-    <!-- android:background="@color/black" -->
+    tools:context=".ui.HomeFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingBottom="50dp">
+        android:paddingBottom="8dp">
 
         <LinearLayout
             android:id="@+id/timetableLayout"
@@ -24,7 +22,7 @@
             android:orientation="vertical"
             android:paddingEnd="8dp"
             android:paddingStart="8dp"
-            android:paddingTop="2dp">
+            android:paddingTop="8dp">
 
             <TextView
                 android:id="@+id/timetableTitleTextView"
@@ -48,7 +46,7 @@
                 android:transitionName="timetable"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/timetableTitleTextView" />
+                app:layout_constraintTop_toBottomOf="@+id/timetableTitleTextView" />
 
         </LinearLayout>
 
@@ -56,13 +54,13 @@
             android:id="@+id/messagesLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
+            android:layout_marginTop="8dp"
             android:background="?attr/selectableItemBackground"
             android:clipChildren="false"
             android:orientation="vertical"
             android:paddingEnd="8dp"
             android:paddingStart="8dp"
-            android:paddingTop="2dp">
+            android:paddingTop="8dp">
 
             <TextView
                 android:id="@+id/messagesTextView"
@@ -95,13 +93,13 @@
             android:id="@+id/changesLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
+            android:layout_marginTop="8dp"
             android:background="?attr/selectableItemBackground"
             android:clipChildren="false"
             android:orientation="vertical"
             android:paddingEnd="8dp"
             android:paddingStart="8dp"
-            android:paddingTop="2dp">
+            android:paddingTop="8dp">
 
             <TextView
                 android:id="@+id/changesTitleTextView"
@@ -134,13 +132,13 @@
             android:id="@+id/tasksLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
+            android:layout_marginTop="8dp"
             android:background="?attr/selectableItemBackground"
             android:clipChildren="false"
             android:orientation="vertical"
             android:paddingEnd="8dp"
             android:paddingStart="8dp"
-            android:paddingTop="2dp">
+            android:paddingTop="8dp">
 
             <TextView
                 android:id="@+id/tasksTitleTextView"
@@ -190,13 +188,13 @@
             android:id="@+id/unreadPostsLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
+            android:layout_marginTop="8dp"
             android:background="?attr/selectableItemBackground"
             android:clipChildren="false"
             android:orientation="vertical"
             android:paddingEnd="8dp"
             android:paddingStart="8dp"
-            android:paddingTop="2dp">
+            android:paddingTop="8dp">
 
             <TextView
                 android:id="@+id/unreadPostsTitleTextView"
@@ -246,14 +244,14 @@
             android:id="@+id/pinsLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
+            android:layout_marginTop="8dp"
             android:background="?attr/selectableItemBackground"
             android:clipChildren="false"
             android:clipToPadding="false"
             android:orientation="vertical"
             android:paddingEnd="8dp"
             android:paddingStart="8dp"
-            android:paddingTop="2dp">
+            android:paddingTop="8dp">
 
             <TextView
                 android:id="@+id/pinsTitleTextView"
@@ -283,29 +281,6 @@
                 tools:listitem="@layout/item_attachment" />
 
         </LinearLayout>
-
-        <!--
-        <LinearLayout
-            android:id="@+id/webLayout"
-            android:layout_width="match_parent"
-            android:layout_height="300dp"
-            android:layout_marginTop="2dp"
-            android:background="?attr/selectableItemBackground"
-            android:clipChildren="false"
-            android:clipToPadding="false"
-            android:orientation="vertical"
-            android:paddingEnd="8dp"
-            android:paddingStart="8dp"
-            android:paddingTop="2dp">
-
-            <WebView
-                android:id="@+id/webview2"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                />
-
-        </LinearLayout>
-        -->
 
         <Button
             android:id="@+id/surpriseButton"

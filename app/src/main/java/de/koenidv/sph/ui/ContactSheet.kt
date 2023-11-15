@@ -11,11 +11,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.LinearLayout
-import android.widget.TextView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
-import java.time.LocalDate
 
 //  Created by koenidv on 29.12.2020.
 class ContactSheet internal constructor() : BottomSheetDialogFragment() {
@@ -23,24 +21,13 @@ class ContactSheet internal constructor() : BottomSheetDialogFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val view: View = inflater.inflate(R.layout.sheet_contact, container, false)
 
-        //val telegramLayout = view.findViewById<LinearLayout>(R.id.contactTelegramLayout)
-        val instagramLayout = view.findViewById<LinearLayout>(R.id.contactInstagramLayout)
-        //val githubLayout = view.findViewById<LinearLayout>(R.id.contactGithubLayout)
+        val telegramLayout = view.findViewById<LinearLayout>(R.id.contactTelegramLayout)
+        val githubLayout = view.findViewById<LinearLayout>(R.id.contactGithubLayout)
         val mailLayout = view.findViewById<LinearLayout>(R.id.contactMailLayout)
         val doneButton = view.findViewById<Button>(R.id.doneButton)
 
-        // Append version to app name
-        view.findViewById<TextView>(R.id.titleTextView).text = getString(R.string.info_app)
-        try {
-            val pInfo = SphPlanner.appContext().packageManager.getPackageInfo(SphPlanner.appContext().packageName, 0)
-            var appnameTitle = getString(R.string.info_author).replace("%version", pInfo.versionName)
-            appnameTitle = appnameTitle.replace("%status", LocalDate.now().year.toString())
-            view.findViewById<TextView>(R.id.authorTextView).text = appnameTitle
-        } catch (e: PackageManager.NameNotFoundException) {
-        }
 
         // Send telegram message
-        /*
         telegramLayout.setOnClickListener {
             try {
                 dismiss()
@@ -50,21 +37,8 @@ class ContactSheet internal constructor() : BottomSheetDialogFragment() {
             } catch (e: Exception) {
             }
         }
-        */
-
-        // Open Instagram profile to send a message
-        instagramLayout.setOnClickListener {
-            try {
-                dismiss()
-                startActivity(Intent(
-                        Intent.ACTION_VIEW,
-                        Uri.parse(getString(R.string.contact_instagram_data))))
-            } catch (e: Exception) {
-            }
-        }
 
         // Open GitHub site to open an issue
-        /*
         githubLayout.setOnClickListener {
             try {
                 dismiss()
@@ -74,7 +48,6 @@ class ContactSheet internal constructor() : BottomSheetDialogFragment() {
             } catch (e: Exception) {
             }
         }
-        */
 
         // Send email with android and version code
         mailLayout.setOnClickListener {
@@ -94,8 +67,7 @@ class ContactSheet internal constructor() : BottomSheetDialogFragment() {
             // Send an email
             val emailIntent = Intent(Intent.ACTION_SENDTO)
                     .setData(Uri.parse("mailto:"))
-                    //.putExtra(Intent.EXTRA_EMAIL, arrayOf("koenidv@gmail.com"))
-                    .putExtra(Intent.EXTRA_EMAIL, arrayOf("stefan.klabe@googlemail.com"))
+                    .putExtra(Intent.EXTRA_EMAIL, arrayOf("koenidv@gmail.com"))
                     .putExtra(Intent.EXTRA_SUBJECT, getString(R.string.feedback_subject))
                     .putExtra(Intent.EXTRA_TEXT, getString(R.string.feedback_body)
                             .replace("%app", version)

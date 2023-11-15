@@ -19,11 +19,9 @@ import de.koenidv.sph.networking.Messages
 import de.koenidv.sph.networking.NetworkManager
 import de.koenidv.sph.objects.FunctionTile
 import okhttp3.OkHttpClient
-import java.util.*
 
 
 //  Created by koenidv on 05.12.2020.
-//  Extended by StKl Q4-2021
 class SphPlanner : Application() {
 
     init {
@@ -36,12 +34,6 @@ class SphPlanner : Application() {
         var randomGreetingTime: Long = 0
         var webViewFixed = false
         private var instance: SphPlanner? = null
-
-        //StKl
-        var lssn_ps = 0             //Current lesson; Used to higlight some things, later maybe for some messages
-        //var lssnMaxWeek = 1       //max. amount of hours per day in a week to limit timetable high (e.g. in case of holidays); Minimum 1 to allow one entry per day at least
-        var mainMonday = Date()     //This var contains the basic Monday, In case we are switching back and forth
-        const val TMLMT: Int = 3    //Timelimit for getting back and forth in time (timetable, holidays, ...)
 
         // Returns the applications context for usage everywhere within the app
         fun appContext(): Context {
@@ -125,11 +117,7 @@ class SphPlanner : Application() {
                     NetworkManager().getOwnUserId {
                         Messages().fetch(archived = true) {
                             Holidays().fetch {
-                                //Toast.makeText(this, R.string.done, Toast.LENGTH_LONG).show() //StKl: 29.12.2021: Set as comment because of root cause for sporadic crash
-                                //          + E/AndroidRuntime: FATAL EXCEPTION: cryption
-                                //          + Process: de.koenidv.sph, PID: 5247
-                                //          + java.lang.NullPointerException: Can't toast on a thread that has not called Looper.prepare()
-                                //          + What is a toast? A toast provides simple feedback about an operation in a small popup e.g. sending message for some seconds after mail is sent
+                                Toast.makeText(this, R.string.done, Toast.LENGTH_LONG).show()
                                 prefs.edit().putInt("appVersion", 130).apply()
                             }
                         }

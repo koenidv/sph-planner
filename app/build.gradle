@@ -27,13 +27,11 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
         coreLibraryDesugaringEnabled true //enables date and time handling in APIs lower than 26
     }
-
     kotlinOptions {
         jvmTarget = '17'
     }

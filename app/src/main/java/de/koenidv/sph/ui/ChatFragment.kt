@@ -226,7 +226,6 @@ class ChatFragment : Fragment() {
                                         it.arguments = bundleOf(
                                                 "conversationId" to conversationId)
                                     })
-                            .setReorderingAllowed(true) //Optimizing state changes for better transitions
                             .commit()
                 }
             }

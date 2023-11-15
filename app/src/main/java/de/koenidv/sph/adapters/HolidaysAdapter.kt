@@ -17,7 +17,6 @@ import java.util.*
 
 
 //  Created by LbTobi on 10.02.2021
-//  Extended by StKl JAN-2022
 class HolidaysAdapter(private val holidays: List<Holiday>) :
     RecyclerView.Adapter<HolidaysAdapter.ViewHolder>() {
 
@@ -26,7 +25,7 @@ class HolidaysAdapter(private val holidays: List<Holiday>) :
     private val name = view.findViewById<TextView>(R.id.holidayNameTextView)
     private val date = view.findViewById<TextView>(R.id.holidayDateTextView)
     private val remaining = view.findViewById<TextView>(R.id.holidayRemainingTextView)
-    private lateinit var currentHoliday: Holiday
+    lateinit var currentHoliday: Holiday
 
 
     fun bind(holiday: Holiday, position: Int) {
@@ -43,17 +42,7 @@ class HolidaysAdapter(private val holidays: List<Holiday>) :
             "sommerferien" -> appContext().getString(R.string.holidays_summer) + " $year"
             "herbstferien" -> appContext().getString(R.string.holidays_autumn) + " $year"
             "weihnachtsferien" -> appContext().getString(R.string.holidays_winter) + " $year"
-            "Karfreitag" -> appContext().getString(R.string.holidays_karfreitag)
-            "Ostermontag" -> appContext().getString(R.string.holidays_ostermontag)
-            "Tag der Arbeit" -> appContext().getString(R.string.holidays_arbeit)
-            "Christi Himmelfahrt" -> appContext().getString(R.string.holidays_himmelfahrt)
-            "Pfingstmontag" -> appContext().getString(R.string.holidays_pfingstmontag)
-            "Fronleichnam" -> appContext().getString(R.string.holidays_fronleichnam)
-            "Tag der Deutschen Einheit" -> appContext().getString(R.string.holidays_einheit)
-            "1. Weihnachtstag" -> appContext().getString(R.string.holidays_xmas1)
-            "2. Weihnachtstag" -> appContext().getString(R.string.holidays_xmas2)
-            "Neujahrstag" -> appContext().getString(R.string.holidays_nye)
-            else -> currentName //e.g. bank holidays in other regions of GER != Hesse
+            else -> currentName
         }
 
         //date stuff
@@ -79,20 +68,18 @@ class HolidaysAdapter(private val holidays: List<Holiday>) :
         }
         // TODO: 13/02/2021 make use of plurals/singulars
 
-        // Tint background with holiday color at 15%
-        val color = when (currentName) {
-            "osterferien" -> appContext().getColor(R.color.holiday_color_spring)
-            "sommerferien" -> appContext().getColor(R.color.holiday_color_summer)
-            "herbstferien" -> appContext().getColor(R.color.holiday_color_autumn)
-            "weihnachtsferien" -> appContext().getColor(R.color.holiday_color_winter)
-            else -> Color.TRANSPARENT //Bank holidays and unknown holidays
-        }
-        if (color == Color.TRANSPARENT) {
-            layout.background.clearColorFilter()
-        }
-        else {
+        // Tint background with holiday color at 15% for next 4 Holidays
+        if (position < 4) {
+            val color = when (currentName) {
+                "osterferien" -> appContext().getColor(R.color.holiday_color_spring)
+                "sommerferien" -> appContext().getColor(R.color.holiday_color_summer)
+                "herbstferien" -> appContext().getColor(R.color.holiday_color_autumn)
+                "weihnachtsferien" -> appContext().getColor(R.color.holiday_color_winter)
+                else -> Color.TRANSPARENT
+            }
             Utility.tintBackground(layout, color, 0x32000000)
-        }
+        } else
+            layout.background.clearColorFilter()
     }
 
 }

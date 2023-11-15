@@ -61,16 +61,6 @@ public class FunctionTilesDb {
         return supported;
     }
 
-    //duringupdate
-    /**
-     * Check if a feature with name parameter is available
-     */
-    public List<FunctionTile> getSupportedFeatureName(String nm) {
-        return fromCursor(dbhelper.getReadableDatabase()
-                .rawQuery("SELECT * FROM tiles WHERE name = \"" + nm + "\"", null));
-    }
-    //duringupdate end
-
     /**
      * Adds or updates feature functionTiles in the database
      * Will override everything with the same name if it's not null

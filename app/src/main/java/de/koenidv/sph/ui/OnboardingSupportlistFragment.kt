@@ -43,27 +43,15 @@ class OnboardingSupportlistFragment : Fragment() {
         val indexLoading = view.findViewById<ProgressBar>(R.id.indexLoading)
         val statusText = view.findViewById<TextView>(R.id.statusTextView)
         val nextFab = view.findViewById<FloatingActionButton>(R.id.nextFab)
-        val nextFab90s = view.findViewById<TextView>(R.id.statusTextViewForward)
-        nextFab90s.visibility = View.GONE
 
         // Log loading features
         DebugLog("FeaturesFrag", "Loading features list")
 
         // Get supported features
-        /* Lambda function:
-            - Innerhalb der Klammern stehen zuerst die Lambda- Parameter: success: Int, response: String?
-            - dann der Pfeil -> und rechts vom Pfeil der Lambda-Body
-            - ...(){letzter Funktionsparameter}
-
-         getSiteAuthed will be executed - {...} is the parameter for callback
-         fun getSiteAuthed(url: String,
-                              forceNewToken: Boolean = false,
-                              callback: (success: Int, result: String?) -> Unit) {
-        */
         NetworkManager().getSiteAuthed("https://start.schulportal.hessen.de/index.php") { success: Int, response: String? ->
-            // Fragment => Must be hosted by (another fragment and finally) an activity: Here OnboardingActivity
+
             // Would otherwise crash if fragment has been detached in the meantime
-            if (host == null) return@getSiteAuthed //return to the end of getSiteAuthed function
+            if (host == null) return@getSiteAuthed
 
             if (success != NetworkManager.SUCCESS) {
                 // Display error
@@ -71,17 +59,12 @@ class OnboardingSupportlistFragment : Fragment() {
                 featuresLoading.visibility = View.GONE
                 warningText.text = when (success) {
                     NetworkManager.FAILED_NO_NETWORK -> getString(R.string.onboard_supported_error_network)
-                    NetworkManager.FAILED_INVALID_CREDENTIALS -> "INVALID_CREDENTIALS"//getString(R.string.xxx)
                     NetworkManager.FAILED_MAINTENANCE -> getString(R.string.onboard_supported_error_maintenance)
                     NetworkManager.FAILED_SERVER_ERROR -> getString(R.string.onboard_supported_error_server)
-                    NetworkManager.FAILED_CANCELLED -> "FAILED_CANCELLED"//getString(R.string.xxx)
-                    NetworkManager.FAILED_CRYPTION -> "FAILED_CRYPTION"//getString(R.string.xxx)
-                    NetworkManager.FAILED_TOKEN -> getString(R.string.onboard_token)
                     else -> getString(R.string.onboard_supported_error_unknown)
                 }
                 warningText.visibility = View.VISIBLE
                 warningText.setTextColor(requireContext().getColor(R.color.colorAccent))
-
                 warningText.setOnClickListener {
                     // Recreate to try again
                     requireActivity().recreate()
@@ -97,51 +80,24 @@ class OnboardingSupportlistFragment : Fragment() {
                     requireActivity().startActivity(Intent.createChooser(sendIntent, null))
                     true
                 }
-
                 // Debug show toast if credential are somehow wrong
                 if (success == NetworkManager.FAILED_INVALID_CREDENTIALS)
                     Toast.makeText(requireContext(), "Invalid credentials", Toast.LENGTH_LONG).show()
-
                 return@getSiteAuthed
             }
 
             // Get real name from result
-            // Could also get it from username, but we're not processing that here
-            // <span class="glyphicon glyphicon-user"></span>Mustermann, Max  (Klasse)<span class="caret"></span>...
-            val srch = "<span class=\"glyphicon glyphicon-user\"></span>"
-            var realName = response?.substring(response.indexOf(srch))
-            val famName  = realName?.substring(srch.length, realName.indexOf(", "))?.trim()
-            val clssName = realName?.substring(realName.indexOf("(")+1, realName.indexOf(")"))?.trim()
-            //Mustermann, Max  (Klasse)<span class="caret"></span>...
-            realName = realName?.substring(realName.indexOf(", ") + 2)//Max  (Klasse)<span class="caret"></span>...
-            realName = realName?.substring(0, realName.indexOf(" "))//Max
-            if (realName != null) {
-                prefs.edit().putString("real_name", realName).apply()
-            }
-            else {
-                prefs.edit().putString("real_name", getString(R.string.dfltRealName)).apply()
-            }
-            if (famName  != null) {
-                prefs.edit().putString("fam_name" , famName ).apply()
-            }
-            else {
-                prefs.edit().putString("fam_name" , getString(R.string.dfltFamName) ).apply()
-            }
-            if (clssName != null) {
-                prefs.edit().putString("clss_name", clssName).apply()
-            }
-            else {
-                prefs.edit().putString("clss_name", getString(R.string.dfltClssName)).apply()
-            }
+            // Could also get it from username, but we're not processing that heh
+            var realName = response?.substring(response.indexOf("<span class=\"glyphicon glyphicon-user\"></span>"))
+            realName = realName?.substring(realName.indexOf(", ") + 2)
+            realName = realName?.substring(0, realName.indexOf(" "))
+            if (realName != null) prefs.edit().putString("real_name", realName).apply()
 
             // todo all indexing in NetworkManager
 
             val featureList = RawParser().parseFeatureList(response!!)
             // Get string list of supported features
-            // Features by => type, A lot of features are type other ...
-            // Features by => name, An alternative
             val features = featureList.map { it.type }
-            val featuresName = featureList.map { it.name }
 
             // Log supported features
             DebugLog("FeaturesFrag", "Loaded features list",
@@ -172,10 +128,10 @@ class OnboardingSupportlistFragment : Fragment() {
                 featurelistText = featurelistText.replace("%mycourses", checkmarkText)
             }
             if (!features.contains("messages")) {
-                allFeatures = false
+                //allFeatures = false
                 featurelistText = featurelistText.replace("%messages", crossmarkText)
             } else {
-                someFeatures = true
+                //someFeatures = true
                 featurelistText = featurelistText.replace("%messages", checkmarkText)
             }
             if (!features.contains("studygroups")) {
@@ -198,13 +154,6 @@ class OnboardingSupportlistFragment : Fragment() {
             } else {
                 someFeatures = true
                 featurelistText = featurelistText.replace("%changes", checkmarkText)
-            }
-            if (!featuresName.contains("Kalender")) {
-                allFeatures = false
-                featurelistText = featurelistText.replace("%calendar", crossmarkText)
-            } else {
-                someFeatures = true
-                featurelistText = featurelistText.replace("%calendar", checkmarkText)
             }
 
             // Get title text from supported tags
@@ -240,10 +189,10 @@ class OnboardingSupportlistFragment : Fragment() {
 
                 // Resolve feature tile urls if necessary
                 UrlResolver().resolveFeatureUrls(featureList) {
-
                     // Save features in case we need them later
                     FunctionTilesDb.getInstance().save(featureList)
 
+                    // Now index everything else
                     NetworkManager().indexAll({ status ->
                         // Update status text on status update
                         activity?.runOnUiThread { statusText.text = status }
@@ -279,15 +228,9 @@ class OnboardingSupportlistFragment : Fragment() {
                             indexLoading.visibility = View.GONE
                             warningText.text = when (indexsuccess) {
                                 NetworkManager.FAILED_NO_NETWORK -> getString(R.string.onboard_supported_error_network)
-                                NetworkManager.FAILED_INVALID_CREDENTIALS -> "INVALID_CREDENTIALS"//getString(R.string.xxx)
                                 NetworkManager.FAILED_MAINTENANCE -> getString(R.string.onboard_supported_error_maintenance)
                                 NetworkManager.FAILED_SERVER_ERROR -> getString(R.string.onboard_supported_error_server)
-                                NetworkManager.FAILED_CANCELLED -> "FAILED_CANCELLED"//getString(R.string.xxx)
-                                NetworkManager.FAILED_CRYPTION -> "FAILED_CRYPTION"//getString(R.string.xxx)
-                                NetworkManager.FAILED_TOKEN -> getString(R.string.onboard_token)
-                                else -> getString(R.string.onboard_supported_error_unknown)//"Rootcause Crash #A" (anchor for docu, pls NOT delete)
-                                //success := 0
-                                //indexsuccess := -1
+                                else -> getString(R.string.onboard_supported_error_unknown)
                             }
                             warningText.visibility = View.VISIBLE
                             warningText.setTextColor(requireContext().getColor(R.color.colorAccent))
@@ -297,7 +240,7 @@ class OnboardingSupportlistFragment : Fragment() {
                                         "Recreating on user input")
 
                                 // Clear session id
-                                TokenManager.reset() //tknrst
+                                TokenManager.reset()
                                 // Recreate to try again
                                 requireActivity().recreate()
                             }
@@ -330,7 +273,7 @@ class OnboardingSupportlistFragment : Fragment() {
                                 "school" to prefs.getString("schoolid", "0")!!
                         ))
             }
-        } //w/o any cnds => NetworkManager().getSiteAuthed
+        }
 
         // Continue button
         nextFab.setOnClickListener {
@@ -354,12 +297,8 @@ class OnboardingSupportlistFragment : Fragment() {
         /*
         * After 45s, display debugging options
         */
-
         CoroutineScope(Dispatchers.Unconfined).launch {
             delay(45000)
-
-
-
             withContext(Dispatchers.Main) {
                 // Set up share debug log button
                 view.findViewById<MaterialButton>(R.id.debugButton).apply {
@@ -369,31 +308,6 @@ class OnboardingSupportlistFragment : Fragment() {
                     }
                 }
 
-                if(context != null) {
-                    //Show hint for automatic continuation between this time point and time point for forwarding
-                    nextFab90s.text = getString(R.string.forwarding_message)
-                    nextFab90s.visibility = View.VISIBLE
-                }
-
-            }
-        }
-
-        /*
-        * After 60s of inactivity continue automaticly
-        */
-
-        //dispatch := entsendet, gemeldet; unconfined := not limited (nicht abgegrenzt)
-        CoroutineScope(Dispatchers.Unconfined).launch {
-            delay(60000)
-            withContext(Dispatchers.Main) {
-                if(context != null) {
-                    startActivity(
-                        Intent(
-                            context,
-                            MainActivity().javaClass
-                        )
-                    ); requireActivity().finish()
-                }
             }
         }
 

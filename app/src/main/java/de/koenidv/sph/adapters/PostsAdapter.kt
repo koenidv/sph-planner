@@ -126,8 +126,8 @@ class PostsAdapter(private val posts: List<Post>,
                 constraintSet.applyTo(layout)
             } else {
                 // Set up file attachments recycler
-                attachmentsRecycler.setHasFixedSize(true) // changing the contents of the adapter does not change it's height or the width.
-                attachmentsRecycler.setRecycledViewPool(attachmentsViewPool)//put recycler views in the pool with same structure
+                attachmentsRecycler.setHasFixedSize(true)
+                attachmentsRecycler.setRecycledViewPool(attachmentsViewPool)
                 // Add a pagerSnapHelper for nice scrolling with many attachments
                 if (attachmentsRecycler.onFlingListener == null)
                     PagerSnapHelper().attachToRecyclerView(attachmentsRecycler)

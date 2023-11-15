@@ -30,7 +30,6 @@
         <item>Politik|#5a0d94</item>
         <item>Sport|#31005c</item>
         <item>Religion|#002e0a</item>
-        <item>free|#5e2037</item>
     </string-array>
     <string-array name="namedid_replacements">
         <item>Q34|13</item>
@@ -62,23 +61,5 @@
         <item>Politik|powi</item>
         <item>Sport|spo</item>
         <item>Religion|reli</item>
-        <item>Schwimmen|schw</item>
-        <item>Klassenlehrerstunde|kll</item>
-        <item>Sport|sp</item>
-        <item>Religion|rka</item>
-        <item>Religion|Rel ka.</item>
-        <item>Religion|rev</item>
-        <item>Religion|Rel ev.</item>
-        <item>Religion|rel</item>
-        <item>Religion|rfrr</item>
-        <item>Ethik|ethik</item>
-        <item>Ethik|ethi</item>
-        <item>Ethik|eth</item>
-        <item>Pr|pr</item>
-        <item>Konfliktlösung|pm</item> <!-- Peer Mediation: pädagogische Methode, um Konflikte zwischen Gleichaltrigen aufzuarbeiten und zu lösen -->
-        <item>Lese/ Rechtschreibung|lrs</item>
-        <item>Deutsch als Zweitsprache|daz</item>
-        <item>Lernzeit|lern</item>
-        <item>Mathe Förderung|fk-m</item>
     </string-array>
 </resources>

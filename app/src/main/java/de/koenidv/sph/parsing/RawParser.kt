@@ -17,16 +17,10 @@ import de.koenidv.sph.objects.*
 import org.jsoup.Jsoup
 import org.jsoup.select.Elements
 import java.net.URLEncoder
-import java.sql.Time
 import java.text.SimpleDateFormat
-import java.time.DateTimeException
-import java.time.LocalDate
-import java.time.LocalTime
-import java.time.format.DateTimeFormatter
 import java.util.*
 
 //  Created by koenidv on 08.12.2020.
-//  Adapted by StKl JAN-2022
 class RawParser {
 
     /**
@@ -234,29 +228,19 @@ class RawParser {
 
     /**
      * Parse courses from raw study groups webpage
-     * StKL: Parse also Arbeiten/ KLausuren for schedule db
      * @param rawResponse Html repsonse from SPH
      * @return List of all found courses
      */
-    //fun parseCoursesFromStudygroups(rawResponse: String): List<Course> {
-    fun parseCoursesFromStudygroups(rawResponse: String): Pair<List<Course>, List<Schedule>> {
+    fun parseCoursesFromStudygroups(rawResponse: String): List<Course> {
         val courses = mutableListOf<Course>()
-        val schdls  = mutableListOf<Schedule>()
 
-        // Return empty lists if content is invalid
+        // Return empty list if content is invalid
         try {
 
-            //#1
             // Remove stuff we don't need
-            // There are multiple <tbody> tables in this page, we'll just take the first one for courses
+            // There are multiple tables in this page, we'll just take the first one
             val rawContent = rawResponse.substring(rawResponse.indexOf("<tbody>") + 7, rawResponse.indexOf("</tbody>"))
 
-            //#2
-            // And the second <tbody> tble for schedule, because in the second <tbody> table are only entries in with Klausren/ Arbeiten
-            var schdlCntnt = rawResponse.substring(rawResponse.indexOf("</tbody>") + 8)
-            schdlCntnt = schdlCntnt.substring(schdlCntnt.indexOf("<tbody>") + 7, schdlCntnt.indexOf("</tbody>"))
-
-            //#1
             /*
              * It seems as if the sph id index is in the same order as the timetable
              * i.e. Q3Gvac03 - GYM is the 3rd History GK in the timetable
@@ -302,141 +286,12 @@ class RawParser {
                 ))
             }
 
-            //#2
-            /*
-            Example:
-            ...
-            <tbody>
-             <tr>
-             <td colspan="6"> <b>November</b></td>
-             </tr>
-                            v
-             <tr data-type="klausur" data-id="892" data-lerngruppe="2914" >
-                      v
-             <td>Do, 25.11.2021</td>
-                   v
-             <td>Biologie 05f1 <small>(051BIO01-F)</small> </td>
-                     v
-             <td>Lernkontrolle </td>
-                    v
-             <td>1., 2.</td>
-                   v
-             <td>45 Min.</td>
-             </tr>
-             ...
-            </tbody>
-            ...
-            */
-
-            //divide string in the parts between <tr> and </tr>
-            val schdlCntntArr = schdlCntnt.split("<tr").toMutableList()
-            schdlCntntArr.removeFirst()
-            val c = Calendar.getInstance()
-            c.time = Date()
-
-            for (entry1 in schdlCntntArr) {
-                //ignore the month headline by investigating for Klausur in the starting tr tag
-                if ("klausur" in entry1) {
-                    //good entry
-                    val tmSchedule = Schedule()
-                    val tdCntntArr = entry1.split("<td").toMutableList()
-                    tdCntntArr.removeFirst()
-                    var spprtStr: String
-
-                    if (tdCntntArr.getOrNull(0) != null) {
-                        //first <td> contains date - e.g. <td>Do, 25.11.2021</td>
-                        spprtStr = tdCntntArr[0].substring(
-                            tdCntntArr[0].indexOf(".") - 2,
-                            tdCntntArr[0].indexOf(".") + 8
-                        )
-                        if (spprtStr.isNotEmpty()) {
-                            tmSchedule.nme = spprtStr
-                            val dtArr = spprtStr.split(".").toMutableList()
-                            if ( (dtArr.getOrNull(0) != null) && (dtArr.getOrNull(1) != null) && (dtArr.getOrNull(2) != null) ) {
-                                c.set(dtArr[2].toInt(), dtArr[1].toInt() - 1, dtArr[0].toInt())
-                            }
-                            else {
-                                c.time = Date(0)
-                            }
-                            tmSchedule.strt = c.time
-                            tmSchedule.nd = tmSchedule.strt
-                        }
-                    }
-
-                    if (tdCntntArr.getOrNull(1) != null) {
-                        //second <td> contains form - e.g. <td>Biologie 05f1 <small>(051BIO01-F)</small> </td>
-                        //another example: <td> Religion - evangelisch 5 <small>(051REV01-)</small> </td>
-                        //from ">" plus 0..n spaces => #1#
-                        spprtStr = tdCntntArr[1].replace("[>]{1}+[\\s]{0,}".toRegex(), "#1#")
-                        //to spaces followed by letter-numbers combintion followed by spaces {0,} followed by "<"
-                        spprtStr = spprtStr.replace(
-                            "[\\s]{1,}+[\\w]{1,}+[\\s]{0,}+[<]{1,}".toRegex(),
-                            "#2#"
-                        )
-                        if (spprtStr.isNotEmpty()) {
-                            tmSchedule.crs =
-                                spprtStr.substring(
-                                    spprtStr.indexOf("#1#") + 3,
-                                    spprtStr.indexOf("#2#")
-                                )
-                            tmSchedule.nme += "_" + tmSchedule.crs
-                        }
-                    }
-
-                    if (tdCntntArr.getOrNull(2) != null) {
-                        //third <td> contains txt - e.g. <td>Lernkontrolle </td>
-                        tmSchedule.txt = tdCntntArr[2].substring(
-                            tdCntntArr[2].indexOf(">") + 1,
-                            tdCntntArr[2].indexOf("</td>")
-                        )
-                        tmSchedule.txt = tmSchedule.txt.replace("[ ]".toRegex(), "")
-                        tmSchedule.nme += "_" + tmSchedule.txt
-                        if ((tmSchedule.txt == "Arbeit") || (tmSchedule.txt == "Lernkontrolle")) {
-                            tmSchedule.ctgr = "Prüfungen"
-                        }
-                    }
-
-                    if (tdCntntArr.getOrNull(3) != null) {
-                        //fourth <td> contains lessons - e.g. <td>1., 2.</td>
-                        spprtStr = tdCntntArr[3].substring(
-                            tdCntntArr[2].indexOf(">") + 1,
-                            tdCntntArr[3].indexOf("</td>")
-                        )
-                        if (spprtStr.isNotEmpty()) {
-                            val lssnArr = spprtStr.split(",").toMutableList()
-                            val lssnArr2 = mutableListOf<Int>()
-                            for (entry2 in lssnArr) if ("[\\d]".toRegex()
-                                    .containsMatchIn(entry2)
-                            ) lssnArr2.add(entry2.replace("[\\D]".toRegex(), "").toInt())
-                            for (nmbr in lssnArr2) tmSchedule.hr += "$nmbr#"
-                        }
-                    }
-
-                    if (tdCntntArr.getOrNull(4) != null) {
-                        //fifth <td> contains duration - e.g. <td>45 Min.</td>
-                        spprtStr = tdCntntArr[4].substring(
-                            tdCntntArr[4].indexOf(">") + 1,
-                            tdCntntArr[4].indexOf("</td>")
-                        )
-                        if (spprtStr.isNotEmpty()) {
-                            spprtStr = spprtStr.replace("[\\D]".toRegex(), "")
-                            tmSchedule.drtn = spprtStr.toInt()
-                        }
-                    }
-
-                    schdls.add(tmSchedule)
-
-                }
-                //else - we can ignore the entry
-            }
-
         } catch (e: Exception) {
             Log.w(TAG, "Studygroups parsing failed!")
             Log.w(TAG, e.stackTraceToString())
         }
 
-        //return courses
-        return Pair(courses, schdls)
+        return courses
     }
 
     /**
@@ -781,8 +636,8 @@ class RawParser {
                 }
 
                 /*
-                 * Tasks
-                 */
+             * Tasks
+             */
 
                 // If post contains a task
                 if (cells[1].toString().contains("<span class=\"homework\">")) {
@@ -818,9 +673,8 @@ class RawParser {
                                 .replace("_", " ").replace("-", " ").trim()
                         fileSize = file.select("small").text()
                         fileSize = fileSize.substring(1, fileSize.length - 1) // Remove brackets
-                        //StKl: Take care file type is using last "." in the string!
-                        fileType = fileName.substringAfterLast('.', "").toLowerCase(Locale.ROOT)
-                        fileName = fileName.substringBeforeLast('.')
+                        fileType = fileName.substringAfter('.', "").toLowerCase(Locale.ROOT)
+                        fileName = fileName.substringBefore('.')
 
                         // Parse file url
                         fileUrl = ("https://start.schulportal.hessen.de/meinunterricht.php?a=downloadFile&id="
@@ -897,44 +751,8 @@ class RawParser {
      * @param rawResponse Raw timetable site from sph
      * @return List of courses
      */
-    fun parseTimetable(rawResponse: String): Triple<List<Lesson>, Array<Array<LocalTime>>, LocalDate>  {
-    //fun parseTimetable(rawResponse: String): List<Lesson> {
+    fun parseTimetable(rawResponse: String): List<Lesson> {
         val returnList = mutableListOf<Lesson>()
-        val lssnTms = arrayOf(
-            arrayOf(LocalTime.of(0, 0), LocalTime.of(0, 0)),
-            arrayOf(LocalTime.of(0, 0), LocalTime.of(0, 0)),
-            arrayOf(LocalTime.of(0, 0), LocalTime.of(0, 0)),
-            arrayOf(LocalTime.of(0, 0), LocalTime.of(0, 0)),
-            arrayOf(LocalTime.of(0, 0), LocalTime.of(0, 0)),
-            arrayOf(LocalTime.of(0, 0), LocalTime.of(0, 0)),
-            arrayOf(LocalTime.of(0, 0), LocalTime.of(0, 0)),
-            arrayOf(LocalTime.of(0, 0), LocalTime.of(0, 0)),
-            arrayOf(LocalTime.of(0, 0), LocalTime.of(0, 0)),
-            arrayOf(LocalTime.of(0, 0), LocalTime.of(0, 0)),
-            arrayOf(LocalTime.of(0, 0), LocalTime.of(0, 0)),
-            arrayOf(LocalTime.of(0, 0), LocalTime.of(0, 0))
-        )
-        var tmTblVldDsince = LocalDate.now()
-
-        //Mehrere Rückgabewerte
-        //https://www.it-swarm.com.de/de/android/wie-geben-wir-mehrere-werte-von-einer-funktion-kotlin-zurueck-wie-wir-es-swift-tun/835554854/
-
-        //DebugLog("Timetable Parser RAW", "Raw timetable list: $rawResponse")
-        /*
-        Done
-        - Timetable valid till:
-        <div class="plan" data-date="2021-11-08">
-        - Timetable timing (can be different from school to school):
-        <tr><td>
-        <span class="hidden-xs"> <b>1. Stunde</b>
-            <br />
-            <span class="VonBis"> <small>07:45 - 08:30</small></span>
-            </span>
-            <span class="hidden-sm hidden-lg hidden-md hidden-print" title="1. Stunde">
-            1.
-            </span>
-         </td> <td >
-         */
 
         // Return empty list if content is not what we expected
         try {
@@ -962,92 +780,11 @@ class RawParser {
             var teacherId: String
             var room: String
 
-            //Things to be checked without a loop - Simply in the string => rawResponse
-            //Valid date of the time table  StKl - 06.12.2021
-            // => tmTblVldDsince
-            //<div class="plan" data-date="2021-11-08">
-            //In case of string is not handled properly, we are running in datetime exception below
-            DebugLog("Timetable Parser RAW", "Spannnung!")
-            var str = rawResponse.substringAfterLast("div class=\"plan\"")//<div class="plan" data-date="2021-11-08">
-            str = str.substringAfterLast("data-date=\"")//2021-11-08">
-            str = str.substringBefore("\"")//2021-11-08
-            DebugLog("Timetable Parser RAW", "TmTblDate_str: $str")
-            //Handling for API lvl 26 or higher
-            //Handling for API lt 26 - gradle build updated
-            tmTblVldDsince =
-                try {
-                    // some code
-                    LocalDate.parse(str, DateTimeFormatter.ISO_LOCAL_DATE)
-                } catch (e: DateTimeException) {
-                    // handler
-                    //Some error? => Use todays date
-                    LocalDate.now()
-                }
-            DebugLog("Timetable Parser RAW", "TmTblDate_date: $tmTblVldDsince")
-
-            //timing for the lessons StKl - 06.12.2021
-            //What format? Array/list - Index = Stunde; content = start and end as time
-            //array of max 12 lessons with start and end time, time == 0 := initial value and later not valid
-            // => lssnTms
-
-            //Handling the string, focus to class="vonbis"
-            //<span class="VonBis"> <small>07:45 - 08:30</small></span>
-            //            </span>
-            //            <span class="hidden-sm hidden-lg hidden-md hidden-print" title="1. Stunde">
-            //            1.
-            //            </span>
-            var str1: String
-            var lssn: Int
-            str = rawResponse
-            while("class=\"VonBis\"" in str) {
-                str  = str.substringAfter("class=\"VonBis\"")//returns a substring after the first occurrence
-                str1 = str.substringAfter("title=")
-                str1 = str1.substringBefore(">")//"1. Stunde"
-                lssn = str1.filter { it.isDigit() }.toInt()
-                if (
-                    (lssn > 0) &&
-                    (lssnTms[lssn-1][0] == LocalTime.of(0, 0))
-                ) {//Wenn Feld noch leer ist und lssn sinnvollen Wert hat
-                   //Now pasing for start time => > <small>07:45 - 08:30</small></span>...
-                    str1 = str.substringAfter("<small>")
-                    lssnTms[lssn-1][0] =
-                        try {
-                            // some code
-                            LocalTime.parse(str1.substringBefore(" - "), DateTimeFormatter.ISO_LOCAL_TIME)//07:45 to time
-                        } catch (e: DateTimeException) {
-                            // handler
-                            //Some error? => Use todays date
-                            Time(0)
-                        } as LocalTime?
-                    //Now pasing for end time => > <small>07:45 - 08:30</small></span>...
-                    str1 = str.substringAfter(" - ")
-                    lssnTms[lssn-1][1] =
-                        try {
-                            // some code
-                            LocalTime.parse(str1.substringBefore("</small>"), DateTimeFormatter.ISO_LOCAL_TIME)//08:30 to time
-                        } catch (e: DateTimeException) {
-                            // handler
-                            //Some error? => Use todays date
-                            Time(0)
-                        } as LocalTime?
-                }
-                //else => Another while run or not if string is done
-            }//while end => String parsed => field filled
-            /*Debugging
-            for (array in lssnTms) {
-                for (value in array) {
-                    DebugLog("Timetable Parser RAW", " : $value")
-                }
-                println()
-            }
-            */
-
             // For each hour
             for (row in table.select("tr")) {
                 cells = row.select("td")
                 // First column is always a description, including time
                 // todo get lesson times
-                DebugLog("Timetable Parser RAW", "Raw timetable list - Every tr: $rawResponse")
                 currentDay = -1
                 currentDayRaw = 1
                 // For every day, also skip non-existent columns
@@ -1118,48 +855,6 @@ class RawParser {
             Log.w(TAG, e.stackTraceToString())
         }
 
-        //DebugLog("Timetable Parser", "Parsed timetable list: $returnList")
-        /*
-        [
-        Lesson(idCourse=m_be_1, day=1, hour=1, room=025, isDisplayed=null),
-                Lesson(idCourse=schw_bri_1, day=2, hour=1, room=, , isDisplayed=null),
-                Lesson(idCourse=schw_bri_1, day=2, hour=2, room=, , isDisplayed=null),
-        Lesson(idCourse=bio_tur_1, day=3, hour=1, room=215, isDisplayed=null),
-        Lesson(idCourse=mu_hff_1, day=4, hour=1, room=018, isDisplayed=null),
-        Lesson(idCourse=mu_hff_1, day=4, hour=2, room=018, isDisplayed=null),
-            Lesson(idCourse=e_wz_1, day=0, hour=2, room=025, isDisplayed=null),
-        Lesson(idCourse=e_wz_1, day=1, hour=2, room=025, isDisplayed=null),
-        Lesson(idCourse=e_wz_1, day=1, hour=3, room=025, isDisplayed=null),
-        Lesson(idCourse=d_wz_1, day=3, hour=2, room=025, isDisplayed=null),
-        Lesson(idCourse=d_wz_1, day=3, hour=3, room=025, isDisplayed=null),
-            Lesson(idCourse=m_be_1, day=0, hour=3, room=025, isDisplayed=null),
-            Lesson(idCourse=m_be_1, day=0, hour=4, room=025, isDisplayed=null),
-                Lesson(idCourse=schw_bri_1, day=2, hour=3, room=, , isDisplayed=null),
-        Lesson(idCourse=m_be_1, day=4, hour=3, room=025, isDisplayed=null),
-        Lesson(idCourse=d_wz_1, day=1, hour=4, room=025, isDisplayed=null),
-        Lesson(idCourse=d_wz_1, day=1, hour=5, room=025, isDisplayed=null),
-                Lesson(idCourse=gl_koc_1, day=2, hour=4, room=025, isDisplayed=null),
-        Lesson(idCourse=gl_koc_1, day=3, hour=4, room=025, isDisplayed=null),
-        Lesson(idCourse=gl_koc_1, day=3, hour=5, room=025, isDisplayed=null),
-        Lesson(idCourse=e_wz_1, day=4, hour=4, room=025, isDisplayed=null),
-        Lesson(idCourse=e_wz_1, day=4, hour=5, room=025, isDisplayed=null),
-            Lesson(idCourse=kll_wz_1, day=0, hour=5, room=025, isDisplayed=null),
-                Lesson(idCourse=rel ka._bt_1, day=2, hour=5, room=018, isDisplayed=null),
-                Lesson(idCourse=rel ka._bt_1, day=2, hour=6, room=018, isDisplayed=null),
-                Lesson(idCourse=rel ka._eb_1, day=2, hour=5, room=027, isDisplayed=null),
-                Lesson(idCourse=rel ka._eb_1, day=2, hour=6, room=027, isDisplayed=null),
-                Lesson(idCourse=rel ev._hff_1, day=2, hour=5, room=030, isDisplayed=null),
-                Lesson(idCourse=rel ev._hff_1, day=2, hour=6, room=030, isDisplayed=null),
-                Lesson(idCourse=eth_km_1, day=2, hour=5, room=129, 130, 219, isDisplayed=null),
-                Lesson(idCourse=eth_km_1, day=2, hour=6, room=129, 130, 219, isDisplayed=null),
-        Lesson(idCourse=bio_tur_1, day=1, hour=6, room=215, isDisplayed=null),
-         Lesson(idCourse=lrs_se_1, day=3, hour=6, room=025, isDisplayed=null),
-         Lesson(idCourse=lern_ap_1, day=3, hour=6, room=026, isDisplayed=null),
-         Lesson(idCourse=fk_spa_1, day=3, hour=6, room=027, isDisplayed=null),
-        Lesson(idCourse=d_wz_1, day=4, hour=6, room=025, isDisplayed=null)
-        ] Bundle[{}]
-         */
-
-        return Triple(returnList, lssnTms, tmTblVldDsince)
+        return returnList
     }
 }

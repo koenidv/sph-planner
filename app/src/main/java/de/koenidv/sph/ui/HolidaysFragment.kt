@@ -1,10 +1,10 @@
 package de.koenidv.sph.ui
 
 import android.os.Bundle
+import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import de.koenidv.sph.R
 import de.koenidv.sph.adapters.HolidaysAdapter
@@ -20,7 +20,6 @@ class HolidaysFragment : Fragment() {
         // Setup adapter
         val holidaysRecycler = view.findViewById<RecyclerView>(R.id.holidaysRecycler)
         val futureHolidays = HolidaysDb().future
-        //Reihenfolge aendern
         holidaysRecycler.adapter = HolidaysAdapter(futureHolidays)
 
         return view

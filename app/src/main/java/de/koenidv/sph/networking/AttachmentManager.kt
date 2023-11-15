@@ -468,11 +468,12 @@ class AttachmentManager {
     private fun openAttachmentFile(attachment: FileAttachment) {
         val fileToOpen = File(attachment.localPath())
         val path = FileProvider.getUriForFile(appContext(), appContext().packageName + ".provider", fileToOpen)
-        //stkl hier
+
         val fileIntent = Intent(Intent.ACTION_VIEW)
         fileIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
 
         fileIntent.setDataAndType(path, getMimeType(attachment.fileType))
+
         // Try opening the file with the correct application
         // If no application can be found, let the user decide
         try {
