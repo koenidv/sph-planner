@@ -113,9 +113,9 @@ class ChatAdapter(val messages: MutableList<Message>, private val conversationIn
                     .replace("%count", info.second.toString())
 
 
-            // Get an identicon using Kwelo's API
+            // Get an identicon using florians's API
             Glide.with(identicon.context)
-                    .load("https://api.kwelo.com/v1/media/identicon/${info.first}?format=webm")
+                    .load("https://with.koeni.dev/identicon/${info.first}")
                     .circleCrop()
                     .into(identicon)
 

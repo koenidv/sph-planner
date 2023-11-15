@@ -3,6 +3,7 @@ package de.koenidv.sph.networking
 import android.content.Intent
 import android.util.Log
 import android.util.MalformedJsonException
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.firebase.crashlytics.FirebaseCrashlytics
@@ -43,6 +44,13 @@ class Messages {
 
         // Log fetching messages
         DebugLog("Messages", "Fetching messages")
+        if (appContext().getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE).getBoolean("demoMode", false)) {
+            DebugLog("Messages", "Skipping fetching messages: using demo mode",
+                type = Debugger.LOG_TYPE_WARNING
+            )
+            callback(NetworkManager.FAILED_DEMO)
+            return
+        }
 
         val typeBody = if (!archived) "All" else "All"
 

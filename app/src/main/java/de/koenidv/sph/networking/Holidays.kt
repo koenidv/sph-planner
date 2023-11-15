@@ -1,6 +1,7 @@
 package de.koenidv.sph.networking
 
 import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import com.afollestad.date.dayOfMonth
 import com.afollestad.date.month
 import com.afollestad.date.year
@@ -33,6 +34,13 @@ class Holidays {
     fun fetch(callback: (success: Int) -> Unit) {
         // Log fetching holidays
         DebugLog("Holidays", "Fetching holidays")
+        if (appContext().getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE).getBoolean("demoMode", false)) {
+            DebugLog("Holidays", "Skipping fetching holidays: using demo mode",
+                type = Debugger.LOG_TYPE_WARNING
+            )
+            callback(NetworkManager.FAILED_DEMO)
+            return
+        }
 
         // 1) Cntr for holidays via ferien-api (Case success +1) and
         // 2) for bank-holidays via feiertage-api(Case success +1)

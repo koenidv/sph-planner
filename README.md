@@ -67,3 +67,8 @@ Simply cloning the repository from Android Studio should be plenty.
 
 ### Debugging
 As of version 122, there's an easily shareably debug logger. There is an [online tool](https://koenidv.github.io/sph-planner/debugger) to visualize its data.
+
+### ... development space
+
+The following db diagram is for wrapping my mind around what we've built years ago. It's AI generated and might contain errors.
+![dbdiagram.png](assets/dbdiagram.png)

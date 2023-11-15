@@ -1,6 +1,7 @@
 package de.koenidv.sph.ui
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.text.method.PasswordTransformationMethod
 import android.util.TypedValue
@@ -23,8 +24,10 @@ import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.toptoche.searchablespinnerlibrary.SearchableSpinner
+import de.koenidv.sph.MainActivity
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
+import de.koenidv.sph.database.demodata.Demodata
 import de.koenidv.sph.debugging.DebugLog
 import de.koenidv.sph.debugging.Debugger
 import de.koenidv.sph.networking.NetworkManager
@@ -61,6 +64,7 @@ class OnboardingSigninFragment : Fragment() {
             val textlayout1 = view.findViewById<TextInputLayout>(R.id.textInputLayout)
             val textlayout2 = view.findViewById<TextInputLayout>(R.id.textInputLayout2)
             val signinButton = view.findViewById<ExtendedFloatingActionButton>(R.id.signinButton)
+            val demodataButton = view.findViewById<Button>(R.id.demodataButton)
 
             signinButton.shrink()
 
@@ -77,6 +81,8 @@ class OnboardingSigninFragment : Fragment() {
                         override fun onResponse(response: String) {
                             // If app was closed don't continue
                             if (context == null) return
+                            // no matter the outcome, display demo data button
+                            demodataButton.visibility = View.VISIBLE
                             // Parse schools from response
                             schoolIds = RawParser().parseSchoolIds(response)
                             // Fill spinner if response was valid, else show error
@@ -108,8 +114,7 @@ class OnboardingSigninFragment : Fragment() {
                                 schoolid.setPositiveButton(getString(R.string.cancel))
                                 schoolid.setTitle(getString(R.string.onboard_select_school))
                                 schoolid.setSelection(schoolIds.indexOf(
-                                        //"Gymnasium am Mosbacher Berg, Wiesbaden" to "5146"))
-                                        "Mendelssohn-Bartholdy-Schule, Sulzbach (Taunus)" to "6119"))
+                                        "Gymnasium am Mosbacher Berg, Wiesbaden" to "5146"))
 
                                 // Set component visibility
                                 loadicon.visibility = View.GONE
@@ -138,6 +143,7 @@ class OnboardingSigninFragment : Fragment() {
                             loadicon.visibility = View.GONE
                             title.visibility = View.VISIBLE
                             description.visibility = View.VISIBLE
+                            demodataButton.visibility = View.VISIBLE
                             description.text = getString(R.string.onboard_welcome_error_connection)
                             description.setTextColor(requireContext().getColor(R.color.colorAccent))
                             description.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f)
@@ -285,6 +291,21 @@ class OnboardingSigninFragment : Fragment() {
                 DebugLog("Onboarding", "BlueScreen? Tolenmanager1")
             }
             DebugLog("Onboarding", "BlueScreen? signinButton 1")
+
+            demodataButton.setOnClickListener {
+                // Enable demo mode
+                Demodata().populateDemoData()
+                prefs.edit()
+                    .putBoolean("demoMode", true)
+                    .putBoolean("introComplete", true)
+                    .putBoolean("credsVerified", true)
+                    .putString("real_name", "John")
+                    .putString("fam_name", "Doe")
+                    .putString("clss_name", "Royal CODE Class")
+                    .apply()
+                startActivity(Intent(context, MainActivity().javaClass)); requireActivity().finish()
+            }
+
 
             // Restore credentials if sign in failed before
             userText.setText(prefs.getString("user", ""))

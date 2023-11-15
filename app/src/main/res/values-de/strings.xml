@@ -16,7 +16,7 @@
         <item quantity="one">Ein weiterer ungelesener Beitrag</item>
         <item quantity="other">%d weitere ungelesene Beiträge</item>
     </plurals>
-    <string name="app_name">SPickzettel HE</string>
+    <string name="app_name">Schulportal App</string>
     <string name="title_overview">Übersicht</string>
     <string name="title_courses">Deine Kurse</string>
     <string name="title_messages">Nachrichten</string>
@@ -28,9 +28,8 @@
     <string name="not_now">Später</string>
     <string name="info_menuaction">Optionen</string>
     <string name="info_greeting">Hey %name</string>
-    <string name="info_app">SPickzettel HE</string>
+    <string name="info_app">Schulportal App</string>
     <string name="info_author"> v%version&#160;&#160;&#160;%status</string>
-    <string name="info_author_history"> Based on SPHplanner v1.3.3</string>
     <string name="info_thanks">Besonderer Dank an Ryan etc</string>
     <string name="menu_option_logout">Abmelden</string>
     <string name="menu_option_courses">Gefundene Kurse</string>
@@ -38,7 +37,7 @@
     <string name="menu_option_theme_light">Hell</string>
     <string name="menu_open_sph">Schulportal öffnen</string>
     <string name="menu_open_sph_warning_title">Automatisch anmelden?</string>
-    <string name="menu_open_sph_warning_description">Dein Netzanbieter oder Angreifer könnten deine Zugangsdaten sehen, wenn du dich automatisch anmeldest.</string>
+    <string name="menu_open_sph_warning_description">Dein Netzanbieter oder Angreifer könnten deine Zugangsdaten sehen, wenn du dich automatisch anmeldest.\nDiese Funktion nutzt Florians AutoSPH-Dienst.</string>
     <string name="menu_open_sph_warning_no">Manuell anmelden</string>
     <string name="menu_open_sph_warning_yes">Automatisch fortfahren</string>
     <string name="info_last_refresh">Meine Kurse: %courses\nVertretungen: %changes\nLetzte Änderung: %changeTimestamp\nIndiziert: %indexed</string>
@@ -94,7 +93,7 @@
     <!-- Translatable Arrays -->
     <!-- Only translate values (after "|"), not the keys! -->
     <!-- Spanish, Russian, Korean ? -->
-    <string name="onboard_legal_privacy">Ich habe die  <a href="https://www.tiefkuehlpizza.com/datenschutz/">Datenschutzerklärung</a> gelesen, verstanden und stimme ihr zu.</string>
+    <string name="onboard_legal_privacy">Ich habe die  <a href="https://koeni.dev/sph/datenschutz">Datenschutzerklärung</a> gelesen, verstanden und stimme ihr zu.</string>
     <string name="timetable_personal_title">Dein %class Stundenplan</string>
     <string name="timetable_personal_filter">Nur eigene Kurse</string>
     <string name="timetable_title">Stundenplan</string>
@@ -146,11 +145,13 @@
     <string name="error_maintenance">Wartung, versuche es später erneut</string>
     <string name="error_server">Versuche es in einigen Minuten erneut</string>
     <string name="error_credentials">Fehler: Deine Legitimation war nicht erfolgreich..</string>
+    <string name="error_demo">Demomodus aktiv</string>
     <string name="error_unknown">Unbekannter Fehler. Bitte versuche es erneut.</string>
     <string name="onboard_signin_error_server">Ein Serverfehler ist aufgetreten.\nBitte versuche es in einigen Minuten erneut.</string>
     <string name="onboard_supported_error_maintenance">Das Schulportal wird im Moment gewartet.\nTippe, um es erneut zu versuchen.</string>
     <string name="onboard_supported_error_server">Ein Serverfehler ist aufgetreten.\nBitte versuche es in einigen Minuten erneut.</string>
     <string name="onboard_supported_error_unknown">Etwas ist schiefgelaufen.\nTippe, um es erneut zu versuchen.</string>
+    <string name="onbaord_use_demodata">Demodaten nutzen</string>
     <string name="onboard_signin_info_wrong_credentials">Deine Zugangsdaten scheinen nicht mehr zu stimmen.\nBitte melde dich erneut an.</string>
     <string name="posts_unread_title">Neue Einträge</string>
     <string name="posts_no_text">Keine Beschreibung</string>
@@ -254,7 +255,7 @@
     <string name="explore_collection_changes">🗞️️ Vertretungen</string>
     <string name="posts_filter_no_data">Keine Einträge gefunden 🗃</string>
     <string name="contact_telegram_text">Telegram</string>
-    <string name="contact_instagram_text">Insta</string>
+    <string name="contact_instagram_text">Instagram</string>
     <string name="contact_github_text">GitHub</string>
     <string name="contact_mail_text">E-Mail</string>
     <string name="attachments_pins_none">Angepinnte Anhänge werden hier erscheinen</string>
@@ -399,7 +400,7 @@
     <string name="share_action">Sharing is caring</string>
     <string name="share_prompt">Magst du die App? Dann teile sie doch mit deinen Freunden :)</string>
     <string name="share_button">Teilen</string>
-    <string name="donate_button">Unterstützen</string>
+    <string name="contribute_button">Unterstützen</string>
     <string name="data_button">Datenschutz</string>
     <string name="messages_see_archive">Archivierte Unterhaltungen</string>
     <string name="messages_archive_title">Archiv</string>

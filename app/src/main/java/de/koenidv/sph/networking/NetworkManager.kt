@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.afollestad.date.month
@@ -27,6 +28,7 @@ import de.koenidv.sph.database.FunctionTilesDb
 import de.koenidv.sph.database.SchedulesDb
 import de.koenidv.sph.debugging.DebugLog
 import de.koenidv.sph.debugging.Debugger
+import de.koenidv.sph.debugging.Debugger.LOG_TYPE_WARNING
 import de.koenidv.sph.objects.FunctionTile.Companion.FEATURE_CALENDAR
 import de.koenidv.sph.objects.FunctionTile.Companion.FEATURE_CHANGES
 import de.koenidv.sph.objects.FunctionTile.Companion.FEATURE_COURSES
@@ -58,6 +60,7 @@ class NetworkManager {
         const val FAILED_CANCELLED = 5
         const val FAILED_CRYPTION = 6
         const val FAILED_TOKEN = 7
+        const val FAILED_DEMO = 8
     }
 
     /**
@@ -76,6 +79,14 @@ class NetworkManager {
     fun handlePullToRefresh(destinationId: Int,
                             arguments: Bundle?,
                             callback: (success: Int) -> Unit) {
+
+        if (appContext().getSharedPreferences("sharedPrefs", AppCompatActivity.MODE_PRIVATE).getBoolean("demoMode", false)) {
+            DebugLog("NetMgr", "PTR: Using demo mode",
+                type = LOG_TYPE_WARNING)
+            callback(FAILED_DEMO)
+            return
+        }
+
         val updateList = mutableListOf<String>()
         val updateData = mutableMapOf<String, String>()
         var disableList = false

@@ -43,25 +43,6 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingTop="8dp">
-
-            <TextView
-                android:id="@+id/authorTextViewhistory"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/roboto_slab"
-                android:paddingEnd="8dp"
-                android:paddingStart="8dp"
-                android:text="@string/info_author_history"
-                android:gravity="center"
-                android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:orientation="horizontal">
 
@@ -153,7 +134,7 @@
                 android:layout_height="48dp"
                 android:layout_margin="4dp"
                 android:layout_weight="1"
-                android:text="@string/donate_button"
+                android:text="@string/contribute_button"
                 android:textColor="@color/titleText"
                 app:layout_columnWeight="1" />
 
