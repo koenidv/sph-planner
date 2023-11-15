@@ -1,8 +1,6 @@
 package de.koenidv.sph.adapters
 
-import android.graphics.BlendMode
-import android.graphics.BlendModeColorFilter
-import android.graphics.PorterDuff
+import android.graphics.*
 import android.graphics.drawable.StateListDrawable
 import android.os.Build
 import android.text.Html
@@ -69,36 +67,11 @@ class LessonsAdapter(private var dataset: List<List<TimetableEntry>>,
                 }
             }
 
-            // In case of exam => Set red triangle flag " \uD83D\uDEA9"
-            val schedules = SchedulesDb.getSchedWithStartDate(dat)//Exam tdy?
-            var exam = false
-            if (schedules.isNotEmpty()) {
-                for (entries1 in schedules) {
-                    if ((entries1.hr != "") && (entries1.src == "portal")) {
-                        val hArr = entries1.hr.split("#").toMutableList()
-                        for (h in hArr) {
-                            try {
-                                if (h.toInt() == (entries[0].lesson.hour/*position + 1*/)) {
-                                    exam = true
-                                }
-                            } catch (nfe: NumberFormatException) {
-                                //nfe.printStackTrace()
-                            }
-                        }
-                    }
-                }
-            }
-
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                textView.text = Html.fromHtml(title, Html.FROM_HTML_MODE_LEGACY).toString()
+                textView.text = Html.fromHtml(title, Html.FROM_HTML_MODE_LEGACY)
             } else {
                 @Suppress("DEPRECATION")
-                textView.text = Html.fromHtml(title).toString()
-            }
-            if (exam) {
-                var spprtStr = textView.text
-                spprtStr = "$spprtStr \uD83D\uDEA9"//red triangle flag
-                textView.text = spprtStr
+                textView.text = Html.fromHtml(title)
             }
 
             /*
@@ -108,8 +81,7 @@ class LessonsAdapter(private var dataset: List<List<TimetableEntry>>,
             // Set size
             // Enlarge to show rooms
             // Or span multiple hours if consecutive lessons are the same
-            val height =
-                if (expanded && !multiple) 64f else if (multiple) maxConcurrent * 32f else 32f
+            val height = if (expanded && !multiple) 64f else if (multiple) maxConcurrent * 32f else 32f
             val extrapadding = (hourcount - 1) * 4f
             layout.layoutParams.height = Utility.dpToPx(hourcount * height + extrapadding).toInt()
 
@@ -186,9 +158,7 @@ class LessonsAdapter(private var dataset: List<List<TimetableEntry>>,
             viewHolder.bind(dataset[position], hourcount, expanded, multiple, maxConcurrent)
 
         } else if (!dataset.getOrNull(position).isNullOrEmpty()
-                && (dataset[position][0].lesson.isDisplayed == true)
-                //&& ((dataset[position][0].lesson.day + 2) == c.get(Calendar.DAY_OF_WEEK) ) /* MON := 0, ... VS. SUN := 1, MON := 2, ... */
-        ) {
+                && dataset[position][0].lesson.isDisplayed == true) {
             // Lesson is already displayed, hide completely
             viewHolder.outerlayout.visibility = View.GONE
         } else {
@@ -213,7 +183,7 @@ class LessonsAdapter(private var dataset: List<List<TimetableEntry>>,
         notifyDataSetChanged()
     }
 
-    fun setDataAndMultiple(nwDt: Date, newDataset: List<List<TimetableEntry>>, expanded: Boolean, multiple: Boolean, maxConcurrent: Int) {
+    fun setDataAndMultiple(newDataset: List<List<TimetableEntry>>, multiple: Boolean, maxConcurrent: Int) {
         this.dataset = newDataset
         this.multiple = multiple
         this.maxConcurrent = maxConcurrent

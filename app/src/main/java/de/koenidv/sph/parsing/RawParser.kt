@@ -21,7 +21,6 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 //  Created by koenidv on 08.12.2020.
-//  Adapted by StKl JAN-2022
 class RawParser {
 
     /**
@@ -229,29 +228,19 @@ class RawParser {
 
     /**
      * Parse courses from raw study groups webpage
-     * StKL: Parse also Arbeiten/ KLausuren for schedule db
      * @param rawResponse Html repsonse from SPH
      * @return List of all found courses
      */
-    //fun parseCoursesFromStudygroups(rawResponse: String): List<Course> {
-    fun parseCoursesFromStudygroups(rawResponse: String): Pair<List<Course>, List<Schedule>> {
+    fun parseCoursesFromStudygroups(rawResponse: String): List<Course> {
         val courses = mutableListOf<Course>()
-        val schdls  = mutableListOf<Schedule>()
 
-        // Return empty lists if content is invalid
+        // Return empty list if content is invalid
         try {
 
-            //#1
             // Remove stuff we don't need
-            // There are multiple <tbody> tables in this page, we'll just take the first one for courses
+            // There are multiple tables in this page, we'll just take the first one
             val rawContent = rawResponse.substring(rawResponse.indexOf("<tbody>") + 7, rawResponse.indexOf("</tbody>"))
 
-            //#2
-            // And the second <tbody> tble for schedule, because in the second <tbody> table are only entries in with Klausren/ Arbeiten
-            var schdlCntnt = rawResponse.substring(rawResponse.indexOf("</tbody>") + 8)
-            schdlCntnt = schdlCntnt.substring(schdlCntnt.indexOf("<tbody>") + 7, schdlCntnt.indexOf("</tbody>"))
-
-            //#1
             /*
              * It seems as if the sph id index is in the same order as the timetable
              * i.e. Q3Gvac03 - GYM is the 3rd History GK in the timetable
@@ -297,141 +286,12 @@ class RawParser {
                 ))
             }
 
-            //#2
-            /*
-            Example:
-            ...
-            <tbody>
-             <tr>
-             <td colspan="6"> <b>November</b></td>
-             </tr>
-                            v
-             <tr data-type="klausur" data-id="892" data-lerngruppe="2914" >
-                      v
-             <td>Do, 25.11.2021</td>
-                   v
-             <td>Biologie 05f1 <small>(051BIO01-F)</small> </td>
-                     v
-             <td>Lernkontrolle </td>
-                    v
-             <td>1., 2.</td>
-                   v
-             <td>45 Min.</td>
-             </tr>
-             ...
-            </tbody>
-            ...
-            */
-
-            //divide string in the parts between <tr> and </tr>
-            val schdlCntntArr = schdlCntnt.split("<tr").toMutableList()
-            schdlCntntArr.removeFirst()
-            val c = Calendar.getInstance()
-            c.time = Date()
-
-            for (entry1 in schdlCntntArr) {
-                //ignore the month headline by investigating for Klausur in the starting tr tag
-                if ("klausur" in entry1) {
-                    //good entry
-                    val tmSchedule = Schedule()
-                    val tdCntntArr = entry1.split("<td").toMutableList()
-                    tdCntntArr.removeFirst()
-                    var spprtStr: String
-
-                    if (tdCntntArr.getOrNull(0) != null) {
-                        //first <td> contains date - e.g. <td>Do, 25.11.2021</td>
-                        spprtStr = tdCntntArr[0].substring(
-                            tdCntntArr[0].indexOf(".") - 2,
-                            tdCntntArr[0].indexOf(".") + 8
-                        )
-                        if (spprtStr.isNotEmpty()) {
-                            tmSchedule.nme = spprtStr
-                            val dtArr = spprtStr.split(".").toMutableList()
-                            if ( (dtArr.getOrNull(0) != null) && (dtArr.getOrNull(1) != null) && (dtArr.getOrNull(2) != null) ) {
-                                c.set(dtArr[2].toInt(), dtArr[1].toInt() - 1, dtArr[0].toInt())
-                            }
-                            else {
-                                c.time = Date(0)
-                            }
-                            tmSchedule.strt = c.time
-                            tmSchedule.nd = tmSchedule.strt
-                        }
-                    }
-
-                    if (tdCntntArr.getOrNull(1) != null) {
-                        //second <td> contains form - e.g. <td>Biologie 05f1 <small>(051BIO01-F)</small> </td>
-                        //another example: <td> Religion - evangelisch 5 <small>(051REV01-)</small> </td>
-                        //from ">" plus 0..n spaces => #1#
-                        spprtStr = tdCntntArr[1].replace("[>]{1}+[\\s]{0,}".toRegex(), "#1#")
-                        //to spaces followed by letter-numbers combintion followed by spaces {0,} followed by "<"
-                        spprtStr = spprtStr.replace(
-                            "[\\s]{1,}+[\\w]{1,}+[\\s]{0,}+[<]{1,}".toRegex(),
-                            "#2#"
-                        )
-                        if (spprtStr.isNotEmpty()) {
-                            tmSchedule.crs =
-                                spprtStr.substring(
-                                    spprtStr.indexOf("#1#") + 3,
-                                    spprtStr.indexOf("#2#")
-                                )
-                            tmSchedule.nme += "_" + tmSchedule.crs
-                        }
-                    }
-
-                    if (tdCntntArr.getOrNull(2) != null) {
-                        //third <td> contains txt - e.g. <td>Lernkontrolle </td>
-                        tmSchedule.txt = tdCntntArr[2].substring(
-                            tdCntntArr[2].indexOf(">") + 1,
-                            tdCntntArr[2].indexOf("</td>")
-                        )
-                        tmSchedule.txt = tmSchedule.txt.replace("[ ]".toRegex(), "")
-                        tmSchedule.nme += "_" + tmSchedule.txt
-                        if ((tmSchedule.txt == "Arbeit") || (tmSchedule.txt == "Lernkontrolle")) {
-                            tmSchedule.ctgr = "Prüfungen"
-                        }
-                    }
-
-                    if (tdCntntArr.getOrNull(3) != null) {
-                        //fourth <td> contains lessons - e.g. <td>1., 2.</td>
-                        spprtStr = tdCntntArr[3].substring(
-                            tdCntntArr[2].indexOf(">") + 1,
-                            tdCntntArr[3].indexOf("</td>")
-                        )
-                        if (spprtStr.isNotEmpty()) {
-                            val lssnArr = spprtStr.split(",").toMutableList()
-                            val lssnArr2 = mutableListOf<Int>()
-                            for (entry2 in lssnArr) if ("[\\d]".toRegex()
-                                    .containsMatchIn(entry2)
-                            ) lssnArr2.add(entry2.replace("[\\D]".toRegex(), "").toInt())
-                            for (nmbr in lssnArr2) tmSchedule.hr += "$nmbr#"
-                        }
-                    }
-
-                    if (tdCntntArr.getOrNull(4) != null) {
-                        //fifth <td> contains duration - e.g. <td>45 Min.</td>
-                        spprtStr = tdCntntArr[4].substring(
-                            tdCntntArr[4].indexOf(">") + 1,
-                            tdCntntArr[4].indexOf("</td>")
-                        )
-                        if (spprtStr.isNotEmpty()) {
-                            spprtStr = spprtStr.replace("[\\D]".toRegex(), "")
-                            tmSchedule.drtn = spprtStr.toInt()
-                        }
-                    }
-
-                    schdls.add(tmSchedule)
-
-                }
-                //else - we can ignore the entry
-            }
-
         } catch (e: Exception) {
             Log.w(TAG, "Studygroups parsing failed!")
             Log.w(TAG, e.stackTraceToString())
         }
 
-        //return courses
-        return Pair(courses, schdls)
+        return courses
     }
 
     /**
@@ -776,8 +636,8 @@ class RawParser {
                 }
 
                 /*
-                 * Tasks
-                 */
+             * Tasks
+             */
 
                 // If post contains a task
                 if (cells[1].toString().contains("<span class=\"homework\">")) {
@@ -813,9 +673,8 @@ class RawParser {
                                 .replace("_", " ").replace("-", " ").trim()
                         fileSize = file.select("small").text()
                         fileSize = fileSize.substring(1, fileSize.length - 1) // Remove brackets
-                        //StKl: Take care file type is using last "." in the string!
-                        fileType = fileName.substringAfterLast('.', "").toLowerCase(Locale.ROOT)
-                        fileName = fileName.substringBeforeLast('.')
+                        fileType = fileName.substringAfter('.', "").toLowerCase(Locale.ROOT)
+                        fileName = fileName.substringBefore('.')
 
                         // Parse file url
                         fileUrl = ("https://start.schulportal.hessen.de/meinunterricht.php?a=downloadFile&id="

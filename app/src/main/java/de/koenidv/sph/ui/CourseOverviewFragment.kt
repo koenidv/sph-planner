@@ -19,19 +19,19 @@ import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
 import de.koenidv.sph.adapters.AttachmentsAdapter
 import de.koenidv.sph.adapters.PostsAdapter
-import de.koenidv.sph.adapters.SchedulesAdapter
-import de.koenidv.sph.database.*
+import de.koenidv.sph.database.CoursesDb
+import de.koenidv.sph.database.FileAttachmentsDb
+import de.koenidv.sph.database.LinkAttachmentsDb
+import de.koenidv.sph.database.PostsDb
 import de.koenidv.sph.networking.AttachmentManager
 import de.koenidv.sph.networking.Tasks
 import de.koenidv.sph.objects.Attachment
 import de.koenidv.sph.objects.Course
-import de.koenidv.sph.objects.Lesson
 import de.koenidv.sph.objects.Post
 import me.saket.bettermovementmethod.BetterLinkMovementMethod
 
 
 // Created by koenidv on 18.12.2020.
-// Adapted JAN-22 StKl
 class CourseOverviewFragment : Fragment() {
 
     lateinit var courseId: String
@@ -116,9 +116,6 @@ class CourseOverviewFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_course_overview, container, false)
         val prefs: SharedPreferences = SphPlanner.appContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
 
-        val pinsSchedText = view.findViewById<TextView>(R.id.pinsScheduleTextView)
-        val pinsSchedRecycler = view.findViewById<RecyclerView>(R.id.pinsScheduleRecycler)
-
         val pinsTitleText = view.findViewById<TextView>(R.id.pinsTitleTextView)
         val pinsRecycler = view.findViewById<RecyclerView>(R.id.pinsRecycler)
         val postsTitleText = view.findViewById<TextView>(R.id.postsTitleTextView)
@@ -132,14 +129,7 @@ class CourseOverviewFragment : Fragment() {
 
         // Set action bar title
         val appendix = if (course?.isLK == true) getString(R.string.course_appendix_lk) else ""
-        if(!course?.fullname.isNullOrEmpty()) {
-            (activity as AppCompatActivity).supportActionBar?.title =
-                course?.fullname + appendix
-        }
-        else {
-            (activity as AppCompatActivity).supportActionBar?.title =
-                course?.courseId + appendix
-        }
+        (activity as AppCompatActivity).supportActionBar?.title = course?.fullname + appendix
         // Set open in browser url
         SphPlanner.openInBrowserUrl = getString(R.string.url_course_overview).replace("%numberid", course?.number_id.toString())
 
@@ -235,46 +225,6 @@ class CourseOverviewFragment : Fragment() {
             pinsRecycler.visibility = View.GONE
         }
 
-        /*
-         * Pinned schedules recycler
-         */
-
-        //Primary loop for data
-        var sched = SchedulesDb.getSchedForCourse(course?.named_id).toMutableList()//courseId
-
-        //Extra loop fr data
-        //course_id => stunde.. in timetable => Damit nochmal schedule abfragen
-        //if title null dann course.id
-
-        //timetable entries with course ID
-        val tmTblEntries1 = TimetableDb.instance!!.getForCourse(course?.courseId)
-        //search timetable entries with same day and hour to check alternative search string
-        var tmTblEntries2: MutableList<Lesson> = mutableListOf()
-        for (item in tmTblEntries1) {
-            tmTblEntries2.addAll(TimetableDb.instance!!.getCoursesWithDayHour(item.day, item.hour))
-        }
-        tmTblEntries2 = tmTblEntries2.distinct().toMutableList()
-
-        //now I can check in this list for all returned id_course (e.g. rel ka) and search with first letters in schedule db gain for add. stuff
-        //attetion! NOT to do in case of one letter only - e.g. d_wz_1 for Deutsch
-        for (item in tmTblEntries2) {
-            var spprtStr = item.idCourse//rel ka OR e_wz_1 OR bio_tur
-            spprtStr = spprtStr.replace(
-                "[^a-zA-Z]".toRegex(), /*NOT a letter*/
-                "#"
-            )
-            spprtStr = spprtStr.substring(0, spprtStr.indexOf("#"))
-            if(spprtStr.length >= 2) sched.addAll(SchedulesDb.getSchedForCourse(spprtStr).toMutableList())
-        }
-        sched = sched.distinctBy { it.nme }.toMutableList()
-
-        if (!sched.isNullOrEmpty()) {
-            pinsSchedRecycler.adapter = SchedulesAdapter(sched, false, false)
-        } else {
-            // Hide recycler and title if there are no pinned schedules
-            pinsSchedText.visibility = View.GONE
-            pinsSchedRecycler.visibility = View.GONE
-        }
 
         /*
          * Posts recycler

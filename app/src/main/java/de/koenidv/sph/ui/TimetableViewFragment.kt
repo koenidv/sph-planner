@@ -10,7 +10,6 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.RecyclerView
-import de.koenidv.sph.MainActivity
 import de.koenidv.sph.R
 import de.koenidv.sph.adapters.LessonsAdapter
 import de.koenidv.sph.database.ChangesDb
@@ -160,17 +159,7 @@ class TimetableViewFragment : Fragment() {
         if (view == null) return // Avoid IllegalStateException if view is not done creating
 
         if (this.viewAll != viewAll) {
-            if(viewAll) {
-                //set title
-                var spprtStr = SphPlanner.prefs.getString("clss_name", "")!!
-                if (spprtStr.isNullOrEmpty() || (spprtStr == "0")) spprtStr = ""
-                (activity as MainActivity).supportActionBar?.title = spprtStr
-            }
-            else {
-                (activity as MainActivity).supportActionBar?.title = SphPlanner.appContext().getString(R.string.timetable_title)
-            }
             this.viewAll = viewAll
-
             // Recreate if pesonal timetable was for some reason not shown
             if (requireView().findViewById<RecyclerView>(R.id.mondayRecycler).adapter == null) {
                 parentFragmentManager.beginTransaction()

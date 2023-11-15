@@ -59,13 +59,6 @@
             app:exitAnim="@anim/fade_out"
             app:popEnterAnim="@anim/fade_in"
             app:popExitAnim="@anim/exit_to_right" />
-        <action
-            android:id="@+id/schedulesFromHomeAction"
-            app:destination="@id/frag_schedules"
-            app:enterAnim="@anim/enter_from_right"
-            app:exitAnim="@anim/fade_out"
-            app:popEnterAnim="@anim/fade_in"
-            app:popExitAnim="@anim/exit_to_right" />
     </fragment>
 
     <fragment
@@ -167,13 +160,6 @@
         <action
             android:id="@+id/holidaysFromExploreAction"
             app:destination="@id/frag_holidays"
-            app:enterAnim="@anim/nav_default_enter_anim"
-            app:exitAnim="@anim/nav_default_exit_anim"
-            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
-            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
-        <action
-            android:id="@+id/schedulesFromExploreAction"
-            app:destination="@id/frag_schedules"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
@@ -293,11 +279,6 @@
         android:name="de.koenidv.sph.ui.HolidaysFragment"
         android:label="@string/holidays_title"
         tools:layout="@layout/fragment_holidays" />
-    <fragment
-        android:id="@+id/frag_schedules"
-        android:name="de.koenidv.sph.ui.SchedulesFragment"
-        android:label="@string/schedules_title"
-        tools:layout="@layout/fragment_schedules" />
     <fragment
         android:id="@+id/chatFragment"
         android:name="de.koenidv.sph.ui.ChatFragment"

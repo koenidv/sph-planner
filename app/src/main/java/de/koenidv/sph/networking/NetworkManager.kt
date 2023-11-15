@@ -21,7 +21,6 @@ import de.koenidv.sph.SphPlanner.Companion.appContext
 import de.koenidv.sph.SphPlanner.Companion.prefs
 import de.koenidv.sph.database.CoursesDb
 import de.koenidv.sph.database.FunctionTilesDb
-import de.koenidv.sph.database.SchedulesDb
 import de.koenidv.sph.debugging.DebugLog
 import de.koenidv.sph.debugging.Debugger
 import de.koenidv.sph.debugging.Debugger.LOG_TYPE_WARNING
@@ -98,8 +97,6 @@ class NetworkManager {
                 // holidays after 1 month
                 if (shouldUpdate("updated_holidays", 31, TimeUnit.DAYS))
                     updateList.add("holidays")
-                // calendar after 12h (720min)
-                if (shouldUpdate("updated_calendar", 720)) updateList.add("calendar")
             }
             R.id.nav_courses, R.id.frag_tasks, R.id.frag_allposts, R.id.frag_attachments -> {
                 // 2 minutes cooldown, update all posts
@@ -123,8 +120,6 @@ class NetworkManager {
             }
             R.id.frag_timetable -> {
                 updateList.add("timetable")
-                // calendar after 12h (720min)
-                if (shouldUpdate("updated_calendar", 720)) updateList.add("calendar")
             }
             R.id.frag_changes -> {
                 // Changes fragment
@@ -404,7 +399,6 @@ class NetworkManager {
                             "messages" -> Messages().fetch(callback = checkDone)
                             "holidays" -> Holidays().fetch(callback = checkDone)
                             "chat" -> Messages().updateConversation(data["chatid"], checkDone)
-                            "calendar" -> Clndr().fetch(callback = checkDone)
                         }
                     }
                 } else callback(success)
@@ -425,13 +419,13 @@ class NetworkManager {
 
         // Mark each supported feature for loading
         if (features.contains(FEATURE_TIMETABLE)) loadList.add("timetable")
-        if (features.contains(FEATURE_COURSES))   loadList.add("posts")
-        if (features.contains(FEATURE_CHANGES))   loadList.add("changes")
-        if (features.contains(FEATURE_CALENDAR))  loadList.add("calendar")
+        if (features.contains(FEATURE_COURSES)) loadList.add("posts")
+        if (features.contains(FEATURE_CHANGES)) loadList.add("changes")
         if (features.contains(FEATURE_MESSAGES)) {
-                                                  loadList.add("users")
-                                                  loadList.add("messages")
+            loadList.add("users")
+            loadList.add("messages")
         }
+        loadList.add("holidays")
 
         // Log indexing status
         DebugLog("NetMgr", "Indexing list assembled",
