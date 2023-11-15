@@ -32,7 +32,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/legalTitleTextView" />
+        app:layout_constraintTop_toBottomOf="@+id/legalTitleTextView" />
 
     <com.google.android.material.checkbox.MaterialCheckBox
         android:id="@+id/legalLiabilityCheckBox"
@@ -47,7 +47,7 @@
         android:textColor="@android:color/tab_indicator_text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/legalDescriptionTextView" />
+        app:layout_constraintTop_toBottomOf="@+id/legalDescriptionTextView" />
 
     <com.google.android.material.checkbox.MaterialCheckBox
         android:id="@+id/legalSourcesCheckBox"
@@ -62,7 +62,7 @@
         android:textColor="@android:color/tab_indicator_text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/legalLiabilityCheckBox" />
+        app:layout_constraintTop_toBottomOf="@+id/legalLiabilityCheckBox" />
 
     <com.google.android.material.checkbox.MaterialCheckBox
         android:id="@+id/legalPrivacyCheckBox"
@@ -77,6 +77,6 @@
         android:textColor="@android:color/tab_indicator_text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/legalSourcesCheckBox" />
+        app:layout_constraintTop_toBottomOf="@+id/legalSourcesCheckBox" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

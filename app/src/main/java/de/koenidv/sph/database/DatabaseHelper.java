@@ -75,8 +75,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "date INTEGER, url TEXT, pinned INTEGER, lastUse INTEGER)");
         // Create timetable table
         db.execSQL("CREATE TABLE timetable(id_course TEXT, day INTEGER, hour INTEGER, room TEXT)");
-        // Create timebar table
-        db.execSQL("CREATE TABLE timebar(someinfo TEXT)");
         // Create users (teachers) table
         db.execSQL("CREATE TABLE users(user_id TEXT, teacher_id TEXT, firstname TEXT, " +
                 "lastname TEXT, type TEXT, pinned INTEGER)");
@@ -145,8 +143,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      */
     public void deleteAll() {
         // List of tables to be deleted
-        String[] tables = {"schedules", "changes", "conversations", "courses", "fileAttachments", "holidays",
-                "linkAttachments", "messages", "posts", "tasks", "tiles", "timetable", "timebar", "users"};
+        String[] tables = {"changes", "conversations", "courses", "fileAttachments", "holidays",
+                "linkAttachments", "messages", "posts", "tasks", "tiles", "timetable", "users"};
         SQLiteDatabase db = getWritableDatabase();
 
         // Delete each table

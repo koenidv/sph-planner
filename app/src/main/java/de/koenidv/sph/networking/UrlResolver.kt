@@ -19,7 +19,6 @@ class UrlResolver {
     /**
      * Resolves feature urls if necessary
      */
-    //callback explanation: If i call callback, the function will be executed
     fun resolveFeatureUrls(features: List<FunctionTile>, callback: () -> Unit) {
         if (FirebaseRemoteConfig.getInstance().getBoolean("urlresolver_enable_resolving")) {
             // Count resolved tile urls
@@ -33,11 +32,8 @@ class UrlResolver {
                 return
             }
 
-            DebugLog("FeaturesFrag", "Starting feature resolving")
-
             // Resolve each feature
             for (feature in filteredFeatures) {
-                DebugLog("FeaturesFrag", "Callback w/ some resolving")
                 resolveUrl(feature.location, callback = { success: Int, resolved: String ->
                     // Save new url to object
                     if (success == NetworkManager.SUCCESS || success == NetworkManager.FAILED_UNKNOWN) {
@@ -46,27 +42,19 @@ class UrlResolver {
                     }
                     // Save number of tiles resolved
                     tilesResolved++
-
-                    DebugLog("FeaturesFrag", tilesResolved.toString() + "/ " + filteredFeatures.size)
-
                     // If this was the last tile
-                    if (tilesResolved >= filteredFeatures.size) {
+                    if (tilesResolved == filteredFeatures.size) {
                         // As of 22.3.21, sph gets really confused with their session ids when using
                         // their redirects. Therefore reset it after we resolved the urls.
                         if (FirebaseRemoteConfig.getInstance().getBoolean("urlresolver_reset_token")) {
-                            TokenManager.reset() //tknrst
+                            TokenManager.reset()
                         }
-
-                        DebugLog("FeaturesFrag", "Featuring resolving callback")
                         callback()
                     }
                 })
+
             }
-        }
-        else {
-            DebugLog("FeaturesFrag", "Callback w/o some resolving")
-            callback()
-        }
+        } else callback()
     }
 
     /**

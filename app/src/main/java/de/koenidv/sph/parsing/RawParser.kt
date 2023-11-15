@@ -17,12 +17,7 @@ import de.koenidv.sph.objects.*
 import org.jsoup.Jsoup
 import org.jsoup.select.Elements
 import java.net.URLEncoder
-import java.sql.Time
 import java.text.SimpleDateFormat
-import java.time.DateTimeException
-import java.time.LocalDate
-import java.time.LocalTime
-import java.time.format.DateTimeFormatter
 import java.util.*
 
 //  Created by koenidv on 08.12.2020.
@@ -897,44 +892,8 @@ class RawParser {
      * @param rawResponse Raw timetable site from sph
      * @return List of courses
      */
-    fun parseTimetable(rawResponse: String): Triple<List<Lesson>, Array<Array<LocalTime>>, LocalDate>  {
-    //fun parseTimetable(rawResponse: String): List<Lesson> {
+    fun parseTimetable(rawResponse: String): List<Lesson> {
         val returnList = mutableListOf<Lesson>()
-        val lssnTms = arrayOf(
-            arrayOf(LocalTime.of(0, 0), LocalTime.of(0, 0)),
-            arrayOf(LocalTime.of(0, 0), LocalTime.of(0, 0)),
-            arrayOf(LocalTime.of(0, 0), LocalTime.of(0, 0)),
-            arrayOf(LocalTime.of(0, 0), LocalTime.of(0, 0)),
-            arrayOf(LocalTime.of(0, 0), LocalTime.of(0, 0)),
-            arrayOf(LocalTime.of(0, 0), LocalTime.of(0, 0)),
-            arrayOf(LocalTime.of(0, 0), LocalTime.of(0, 0)),
-            arrayOf(LocalTime.of(0, 0), LocalTime.of(0, 0)),
-            arrayOf(LocalTime.of(0, 0), LocalTime.of(0, 0)),
-            arrayOf(LocalTime.of(0, 0), LocalTime.of(0, 0)),
-            arrayOf(LocalTime.of(0, 0), LocalTime.of(0, 0)),
-            arrayOf(LocalTime.of(0, 0), LocalTime.of(0, 0))
-        )
-        var tmTblVldDsince = LocalDate.now()
-
-        //Mehrere Rückgabewerte
-        //https://www.it-swarm.com.de/de/android/wie-geben-wir-mehrere-werte-von-einer-funktion-kotlin-zurueck-wie-wir-es-swift-tun/835554854/
-
-        //DebugLog("Timetable Parser RAW", "Raw timetable list: $rawResponse")
-        /*
-        Done
-        - Timetable valid till:
-        <div class="plan" data-date="2021-11-08">
-        - Timetable timing (can be different from school to school):
-        <tr><td>
-        <span class="hidden-xs"> <b>1. Stunde</b>
-            <br />
-            <span class="VonBis"> <small>07:45 - 08:30</small></span>
-            </span>
-            <span class="hidden-sm hidden-lg hidden-md hidden-print" title="1. Stunde">
-            1.
-            </span>
-         </td> <td >
-         */
 
         // Return empty list if content is not what we expected
         try {
@@ -962,92 +921,11 @@ class RawParser {
             var teacherId: String
             var room: String
 
-            //Things to be checked without a loop - Simply in the string => rawResponse
-            //Valid date of the time table  StKl - 06.12.2021
-            // => tmTblVldDsince
-            //<div class="plan" data-date="2021-11-08">
-            //In case of string is not handled properly, we are running in datetime exception below
-            DebugLog("Timetable Parser RAW", "Spannnung!")
-            var str = rawResponse.substringAfterLast("div class=\"plan\"")//<div class="plan" data-date="2021-11-08">
-            str = str.substringAfterLast("data-date=\"")//2021-11-08">
-            str = str.substringBefore("\"")//2021-11-08
-            DebugLog("Timetable Parser RAW", "TmTblDate_str: $str")
-            //Handling for API lvl 26 or higher
-            //Handling for API lt 26 - gradle build updated
-            tmTblVldDsince =
-                try {
-                    // some code
-                    LocalDate.parse(str, DateTimeFormatter.ISO_LOCAL_DATE)
-                } catch (e: DateTimeException) {
-                    // handler
-                    //Some error? => Use todays date
-                    LocalDate.now()
-                }
-            DebugLog("Timetable Parser RAW", "TmTblDate_date: $tmTblVldDsince")
-
-            //timing for the lessons StKl - 06.12.2021
-            //What format? Array/list - Index = Stunde; content = start and end as time
-            //array of max 12 lessons with start and end time, time == 0 := initial value and later not valid
-            // => lssnTms
-
-            //Handling the string, focus to class="vonbis"
-            //<span class="VonBis"> <small>07:45 - 08:30</small></span>
-            //            </span>
-            //            <span class="hidden-sm hidden-lg hidden-md hidden-print" title="1. Stunde">
-            //            1.
-            //            </span>
-            var str1: String
-            var lssn: Int
-            str = rawResponse
-            while("class=\"VonBis\"" in str) {
-                str  = str.substringAfter("class=\"VonBis\"")//returns a substring after the first occurrence
-                str1 = str.substringAfter("title=")
-                str1 = str1.substringBefore(">")//"1. Stunde"
-                lssn = str1.filter { it.isDigit() }.toInt()
-                if (
-                    (lssn > 0) &&
-                    (lssnTms[lssn-1][0] == LocalTime.of(0, 0))
-                ) {//Wenn Feld noch leer ist und lssn sinnvollen Wert hat
-                   //Now pasing for start time => > <small>07:45 - 08:30</small></span>...
-                    str1 = str.substringAfter("<small>")
-                    lssnTms[lssn-1][0] =
-                        try {
-                            // some code
-                            LocalTime.parse(str1.substringBefore(" - "), DateTimeFormatter.ISO_LOCAL_TIME)//07:45 to time
-                        } catch (e: DateTimeException) {
-                            // handler
-                            //Some error? => Use todays date
-                            Time(0)
-                        } as LocalTime?
-                    //Now pasing for end time => > <small>07:45 - 08:30</small></span>...
-                    str1 = str.substringAfter(" - ")
-                    lssnTms[lssn-1][1] =
-                        try {
-                            // some code
-                            LocalTime.parse(str1.substringBefore("</small>"), DateTimeFormatter.ISO_LOCAL_TIME)//08:30 to time
-                        } catch (e: DateTimeException) {
-                            // handler
-                            //Some error? => Use todays date
-                            Time(0)
-                        } as LocalTime?
-                }
-                //else => Another while run or not if string is done
-            }//while end => String parsed => field filled
-            /*Debugging
-            for (array in lssnTms) {
-                for (value in array) {
-                    DebugLog("Timetable Parser RAW", " : $value")
-                }
-                println()
-            }
-            */
-
             // For each hour
             for (row in table.select("tr")) {
                 cells = row.select("td")
                 // First column is always a description, including time
                 // todo get lesson times
-                DebugLog("Timetable Parser RAW", "Raw timetable list - Every tr: $rawResponse")
                 currentDay = -1
                 currentDayRaw = 1
                 // For every day, also skip non-existent columns
@@ -1118,48 +996,6 @@ class RawParser {
             Log.w(TAG, e.stackTraceToString())
         }
 
-        //DebugLog("Timetable Parser", "Parsed timetable list: $returnList")
-        /*
-        [
-        Lesson(idCourse=m_be_1, day=1, hour=1, room=025, isDisplayed=null),
-                Lesson(idCourse=schw_bri_1, day=2, hour=1, room=, , isDisplayed=null),
-                Lesson(idCourse=schw_bri_1, day=2, hour=2, room=, , isDisplayed=null),
-        Lesson(idCourse=bio_tur_1, day=3, hour=1, room=215, isDisplayed=null),
-        Lesson(idCourse=mu_hff_1, day=4, hour=1, room=018, isDisplayed=null),
-        Lesson(idCourse=mu_hff_1, day=4, hour=2, room=018, isDisplayed=null),
-            Lesson(idCourse=e_wz_1, day=0, hour=2, room=025, isDisplayed=null),
-        Lesson(idCourse=e_wz_1, day=1, hour=2, room=025, isDisplayed=null),
-        Lesson(idCourse=e_wz_1, day=1, hour=3, room=025, isDisplayed=null),
-        Lesson(idCourse=d_wz_1, day=3, hour=2, room=025, isDisplayed=null),
-        Lesson(idCourse=d_wz_1, day=3, hour=3, room=025, isDisplayed=null),
-            Lesson(idCourse=m_be_1, day=0, hour=3, room=025, isDisplayed=null),
-            Lesson(idCourse=m_be_1, day=0, hour=4, room=025, isDisplayed=null),
-                Lesson(idCourse=schw_bri_1, day=2, hour=3, room=, , isDisplayed=null),
-        Lesson(idCourse=m_be_1, day=4, hour=3, room=025, isDisplayed=null),
-        Lesson(idCourse=d_wz_1, day=1, hour=4, room=025, isDisplayed=null),
-        Lesson(idCourse=d_wz_1, day=1, hour=5, room=025, isDisplayed=null),
-                Lesson(idCourse=gl_koc_1, day=2, hour=4, room=025, isDisplayed=null),
-        Lesson(idCourse=gl_koc_1, day=3, hour=4, room=025, isDisplayed=null),
-        Lesson(idCourse=gl_koc_1, day=3, hour=5, room=025, isDisplayed=null),
-        Lesson(idCourse=e_wz_1, day=4, hour=4, room=025, isDisplayed=null),
-        Lesson(idCourse=e_wz_1, day=4, hour=5, room=025, isDisplayed=null),
-            Lesson(idCourse=kll_wz_1, day=0, hour=5, room=025, isDisplayed=null),
-                Lesson(idCourse=rel ka._bt_1, day=2, hour=5, room=018, isDisplayed=null),
-                Lesson(idCourse=rel ka._bt_1, day=2, hour=6, room=018, isDisplayed=null),
-                Lesson(idCourse=rel ka._eb_1, day=2, hour=5, room=027, isDisplayed=null),
-                Lesson(idCourse=rel ka._eb_1, day=2, hour=6, room=027, isDisplayed=null),
-                Lesson(idCourse=rel ev._hff_1, day=2, hour=5, room=030, isDisplayed=null),
-                Lesson(idCourse=rel ev._hff_1, day=2, hour=6, room=030, isDisplayed=null),
-                Lesson(idCourse=eth_km_1, day=2, hour=5, room=129, 130, 219, isDisplayed=null),
-                Lesson(idCourse=eth_km_1, day=2, hour=6, room=129, 130, 219, isDisplayed=null),
-        Lesson(idCourse=bio_tur_1, day=1, hour=6, room=215, isDisplayed=null),
-         Lesson(idCourse=lrs_se_1, day=3, hour=6, room=025, isDisplayed=null),
-         Lesson(idCourse=lern_ap_1, day=3, hour=6, room=026, isDisplayed=null),
-         Lesson(idCourse=fk_spa_1, day=3, hour=6, room=027, isDisplayed=null),
-        Lesson(idCourse=d_wz_1, day=4, hour=6, room=025, isDisplayed=null)
-        ] Bundle[{}]
-         */
-
-        return Triple(returnList, lssnTms, tmTblVldDsince)
+        return returnList
     }
 }

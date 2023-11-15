@@ -16,8 +16,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:itemCount="20"
-        tools:listitem="@layout/item_holiday"
-        android:paddingBottom="60dp" />
+        tools:itemCount="15"
+        tools:listitem="@layout/item_holiday" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

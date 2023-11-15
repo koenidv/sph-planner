@@ -60,7 +60,6 @@ class TasksFragment : Fragment() {
                                     TasksFragment().also {
                                         it.arguments = bundleOf("undone" to undone)
                                     })
-                            .setReorderingAllowed(true) //Optimizing state changes for better transitions
                             .commit()
                 }
             }

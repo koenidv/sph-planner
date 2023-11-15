@@ -14,6 +14,5 @@ data class FunctionTile(
         const val FEATURE_STUDYGROUPS = "studygroups"
         const val FEATURE_CHANGES = "changes"
         const val FEATURE_MESSAGES = "messages"
-        const val FEATURE_CALENDAR = "Kalender"//duringupdate
     }
 }

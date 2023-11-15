@@ -37,9 +37,6 @@ class Changes(private val networkManager: NetworkManager = NetworkManager()) {
                     }
                     callback(success)
                 })
-        //StKl:11.12.2021:Das callback hier eingefuegt
-        DebugLog("Onboarding", "BlueScreen? Changes Fetch")
-        callback(NetworkManager.SUCCESS) //Return of unchanged argument success
     }
 
 }

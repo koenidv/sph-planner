@@ -282,15 +282,11 @@ class OnboardingSigninFragment : Fragment() {
                             description.text = getString(R.string.onboard_signin_error_server)
                         } else {
                             // Some other error occurred
-                            // StKl - 04.12.2021 - Hier gehe ich manchmal rein. App stuerzt ab. Bei Neustart bin ich dann drin
-                            DebugLog("Onboarding", "BlueScreen? $success")
                             description.text = getString(R.string.onboard_signin_error_unknown)
                         }
                     }
                 }
-                DebugLog("Onboarding", "BlueScreen? Tolenmanager1")
             }
-            DebugLog("Onboarding", "BlueScreen? signinButton 1")
 
             demodataButton.setOnClickListener {
                 // Enable demo mode

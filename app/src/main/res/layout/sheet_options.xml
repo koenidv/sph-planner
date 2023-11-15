@@ -29,13 +29,12 @@
 
             <TextView
                 android:id="@+id/authorTextView"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/roboto_slab"
                 android:paddingEnd="8dp"
                 android:paddingStart="8dp"
                 android:text="@string/info_author"
-                android:gravity="end"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
         </LinearLayout>
@@ -77,18 +76,19 @@
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="0dp"
                 android:layout_height="48dp"
-                android:layout_margin="4dp"
+                android:layout_marginEnd="4dp"
                 android:text="@string/menu_option_choosetheme"
                 android:textColor="@color/titleText"
                 app:layout_columnWeight="1" />
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/showOptionsButton"
+                android:id="@+id/debuggingButton"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="0dp"
                 android:layout_height="48dp"
-                android:layout_margin="4dp"
-                android:text="@string/menu_option_option"
+                android:layout_marginStart="4dp"
+                android:layout_weight="1"
+                android:text="@string/menu_debugging"
                 android:textColor="@color/titleText"
                 app:layout_columnWeight="1" />
 
@@ -97,7 +97,7 @@
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_margin="4dp"
+                android:layout_marginEnd="4dp"
                 android:layout_weight="1"
                 android:text="@string/menu_contact"
                 android:textColor="@color/titleText"
@@ -108,44 +108,9 @@
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="0dp"
                 android:layout_height="48dp"
-                android:layout_margin="4dp"
+                android:layout_marginStart="4dp"
                 android:layout_weight="1"
                 android:text="@string/share_button"
-                android:textColor="@color/titleText"
-                app:layout_columnWeight="1" />
-
-            <!--
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/debuggingButton"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_margin="4dp"
-                android:layout_weight="1"
-                android:text="@string/menu_debugging"
-                android:textColor="@color/titleText"
-                app:layout_columnWeight="1" />
-            -->
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/donateButton"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_margin="4dp"
-                android:layout_weight="1"
-                android:text="@string/contribute_button"
-                android:textColor="@color/titleText"
-                app:layout_columnWeight="1" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/dataButton"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_margin="4dp"
-                android:layout_weight="1"
-                android:text="@string/data_button"
                 android:textColor="@color/titleText"
                 app:layout_columnWeight="1" />
 

@@ -1,6 +1,5 @@
 package de.koenidv.sph.parsing
 
-import android.content.res.Resources
 import android.graphics.BlendMode
 import android.graphics.BlendModeColorFilter
 import android.graphics.PorterDuff
@@ -13,7 +12,6 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
-import de.koenidv.sph.debugging.DebugLog
 import java.util.*
 
 
@@ -64,25 +62,19 @@ object Utility {
     }
 
     /**
-     * Convert px to dp and vice versa
+     * Convert px to dp
      */
-    fun Int.toPx(): Int = (this * Resources.getSystem().displayMetrics.density).toInt()
     fun dpToPx(dp: Float): Float =
             TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, SphPlanner.appContext().resources.displayMetrics)
 
-    fun Int.toDp(): Int = (this / Resources.getSystem().displayMetrics.density).toInt()
-    //fun pxToDp(px: Float): Float =
-    //        TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, SphPlanner.appContext().resources.displayMetrics)
 
     /**
      * Get today, after 5pm tomorrow and monday on weekends
      * @return 0: monday,.. 4: friday
      */
     fun getCurrentDayAdjusted(): Int {
-        // Calendar class (java) provides values in following way: Mon:= 2, Sun:= 8
         // Get today or tomorrow after 5pm
-        var weekDay = Calendar.getInstance()[Calendar.DAY_OF_WEEK] - 2 //Mon:= 0, Sun:= 6
-        // DebugLog("Utility", "Weekday" + weekDay.toString())
+        var weekDay = Calendar.getInstance()[Calendar.DAY_OF_WEEK] - 2
         if (Calendar.getInstance()[Calendar.HOUR_OF_DAY] > 16) weekDay++
         if (weekDay < 0 || weekDay > 4) weekDay = 0
         return weekDay

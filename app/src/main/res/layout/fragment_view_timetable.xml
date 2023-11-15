@@ -1,357 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/parentparent"
+    android:id="@+id/timetableRecyclerLayout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:baselineAligned="false">
-
-    <LinearLayout
-        android:id="@+id/bttnLeftRight"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingTop="0dp"
-        android:paddingBottom="0dp"
-        android:paddingStart="0dp"
-        android:paddingEnd="0dp"
-        android:layout_weight="0">
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/bttnLeft"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/timetable_left"
-            android:textColor="@color/titleText" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/bttnTdy"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/timetable_tdy"
-            android:textColor="@color/titleText" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/bttnRight"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/timetable_right"
-            android:textColor="@color/titleText" />
-
-    </LinearLayout>
-
-
-
-
-
-
-<!--
-xmlns:android="http://schemas.android.com/apk/res/android"
-xmlns:app="http://schemas.android.com/apk/res-auto"
-xmlns:tools="http://schemas.android.com/tools"
--->
-<LinearLayout
-android:id="@+id/timetableTextRecyclerLayout_main"
-android:layout_width="match_parent"
-android:layout_height="wrap_content"
-android:orientation="horizontal"
-android:baselineAligned="false">
-
-<LinearLayout
-    android:id="@+id/timetableTextRecyclerLayout_lssn"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:paddingTop="0dp"
-    android:paddingBottom="6dp"
-    android:paddingStart="6dp"
-    android:paddingEnd="2dp"
-    android:layout_weight="0">
-
-    <TextView
-        android:id="@+id/lssnTextView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        android:textColor="?attr/colorOnSurface"
-        app:autoSizeMaxTextSize="14sp"
-        app:autoSizeMinTextSize="8sp"
-        app:autoSizeTextType="uniform"
-        android:text="2021" />
-
-    <TextView
-        android:id="@+id/lssnDate"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:textAppearance="@style/TextAppearance.AppCompat.Small"
-        android:textColor="?attr/colorOnSurface"
-        app:autoSizeMaxTextSize="9sp"
-        app:autoSizeMinTextSize="8sp"
-        app:autoSizeTextType="uniform"
-        android:text="CW48" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/lssnRecycler"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="0dp"
-        android:isScrollContainer="false"
-        android:overScrollMode="never"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        tools:itemCount="4"
-        tools:listitem="@layout/item_timebar" />
-</LinearLayout>
-
-<LinearLayout
-    android:id="@+id/timetableTextRecyclerLayout_mon"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:paddingTop="0dp"
-    android:paddingBottom="6dp"
-    android:paddingLeft="2dp"
-    android:paddingRight="2dp"
-    android:layout_weight="1">
-
-    <TextView
-        android:id="@+id/mondayTextView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        android:textColor="?attr/colorOnSurface"
-        app:autoSizeMaxTextSize="14sp"
-        app:autoSizeMinTextSize="8sp"
-        app:autoSizeTextType="uniform"
-        android:text="@string/day1" />
-
-    <TextView
-        android:id="@+id/mondayDate"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:textAppearance="@style/TextAppearance.AppCompat.Small"
-        android:textColor="?attr/colorOnSurface"
-        app:autoSizeMaxTextSize="9sp"
-        app:autoSizeMinTextSize="8sp"
-        app:autoSizeTextType="uniform"
-        android:text="06.12" />
+    android:orientation="horizontal"
+    android:padding="6dp">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/mondayRecycler"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="0dp"
+        android:padding="2dp"
+        android:layout_weight="1"
         android:isScrollContainer="false"
         android:overScrollMode="never"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         tools:itemCount="6"
         tools:listitem="@layout/item_lesson" />
-</LinearLayout>
-
-<LinearLayout
-    android:id="@+id/timetableTextRecyclerLayout_tue"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:paddingTop="0dp"
-    android:paddingBottom="6dp"
-    android:paddingLeft="2dp"
-    android:paddingRight="2dp"
-    android:layout_weight="1">
-
-    <TextView
-        android:id="@+id/tuesdayTextView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        android:textColor="?attr/colorOnSurface"
-        app:autoSizeMaxTextSize="14sp"
-        app:autoSizeMinTextSize="8sp"
-        app:autoSizeTextType="uniform"
-        android:text="@string/day2" />
-
-    <TextView
-        android:id="@+id/tuesdayDate"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:textAppearance="@style/TextAppearance.AppCompat.Small"
-        android:textColor="?attr/colorOnSurface"
-        app:autoSizeMaxTextSize="9sp"
-        app:autoSizeMinTextSize="8sp"
-        app:autoSizeTextType="uniform"
-        android:text="07.12" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/tuesdayRecycler"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="0dp"
+        android:padding="2dp"
+        android:layout_weight="1"
         android:isScrollContainer="false"
         android:overScrollMode="never"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         tools:itemCount="8"
         tools:listitem="@layout/item_lesson" />
-</LinearLayout>
-
-<LinearLayout
-    android:id="@+id/timetableTextRecyclerLayout_wed"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:paddingTop="0dp"
-    android:paddingBottom="6dp"
-    android:paddingLeft="2dp"
-    android:paddingRight="2dp"
-    android:layout_weight="1">
-
-    <TextView
-        android:id="@+id/wednesdayTextView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        android:textColor="?attr/colorOnSurface"
-        app:autoSizeMaxTextSize="14sp"
-        app:autoSizeMinTextSize="8sp"
-        app:autoSizeTextType="uniform"
-        android:text="@string/day3" />
-
-    <TextView
-        android:id="@+id/wednesdayDate"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:textAppearance="@style/TextAppearance.AppCompat.Small"
-        android:textColor="?attr/colorOnSurface"
-        app:autoSizeMaxTextSize="9sp"
-        app:autoSizeMinTextSize="8sp"
-        app:autoSizeTextType="uniform"
-        android:text="08.12" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/wednesdayRecycler"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="0dp"
+        android:padding="2dp"
+        android:layout_weight="1"
         android:isScrollContainer="false"
         android:overScrollMode="never"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         tools:itemCount="8"
         tools:listitem="@layout/item_lesson" />
-</LinearLayout>
-
-<LinearLayout
-    android:id="@+id/timetableTextRecyclerLayout_thu"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:paddingTop="0dp"
-    android:paddingBottom="6dp"
-    android:paddingLeft="2dp"
-    android:paddingRight="2dp"
-    android:layout_weight="1">
-
-    <TextView
-        android:id="@+id/thursdayTextView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        android:textColor="?attr/colorOnSurface"
-        app:autoSizeMaxTextSize="14sp"
-        app:autoSizeMinTextSize="8sp"
-        app:autoSizeTextType="uniform"
-        android:text="@string/day4" />
-
-    <TextView
-        android:id="@+id/thursdayDate"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:textAppearance="@style/TextAppearance.AppCompat.Small"
-        android:textColor="?attr/colorOnSurface"
-        app:autoSizeMaxTextSize="9sp"
-        app:autoSizeMinTextSize="8sp"
-        app:autoSizeTextType="uniform"
-        android:text="09.12" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/thursdayRecycler"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="0dp"
+        android:padding="2dp"
+        android:layout_weight="1"
         android:isScrollContainer="false"
         android:overScrollMode="never"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         tools:itemCount="10"
         tools:listitem="@layout/item_lesson" />
-</LinearLayout>
-
-<LinearLayout
-    android:id="@+id/timetableTextRecyclerLayout_fri"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:paddingTop="0dp"
-    android:paddingBottom="6dp"
-    android:paddingStart="2dp"
-    android:paddingEnd="6dp"
-    android:layout_weight="1">
-
-    <TextView
-        android:id="@+id/fridayTextView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        android:textColor="?attr/colorOnSurface"
-        app:autoSizeMaxTextSize="14sp"
-        app:autoSizeMinTextSize="8sp"
-        app:autoSizeTextType="uniform"
-        android:text="@string/day5" />
-
-    <TextView
-        android:id="@+id/fridayDate"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:textAppearance="@style/TextAppearance.AppCompat.Small"
-        android:textColor="?attr/colorOnSurface"
-        app:autoSizeMaxTextSize="9sp"
-        app:autoSizeMinTextSize="8sp"
-        app:autoSizeTextType="uniform"
-        android:text="10.12" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/fridayRecycler"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="0dp"
+        android:padding="2dp"
+        android:layout_weight="1"
         android:isScrollContainer="false"
         android:overScrollMode="never"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         tools:itemCount="6"
         tools:listitem="@layout/item_lesson" />
-</LinearLayout>
-
-</LinearLayout>
-
-
-
 
 </LinearLayout>

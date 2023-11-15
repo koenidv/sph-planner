@@ -51,7 +51,6 @@ class ChangesFragment : Fragment() {
                                     ChangesFragment().also {
                                         it.arguments = bundleOf("favorites" to favorites)
                                     })
-                            .setReorderingAllowed(true) //Optimizing state changes for better transitions
                             .commit()
                 }
             }
@@ -77,7 +76,7 @@ class ChangesFragment : Fragment() {
         else ChangesDb.instance!!.getAllCurrent())
 
         // Add the next holiday
-        val nextHoliday = HolidaysDb().getNext(Date())
+        val nextHoliday = HolidaysDb().next
         if (nextHoliday != null) {
             // Get the number of days left until this holiday
             val daysLeft = (nextHoliday.start.time - Date().time) / (86400 * 1000)

@@ -51,10 +51,7 @@ class TimetableFragment : Fragment() {
                 "viewAll" to viewAll,
                 "openOnClick" to openOnClick,
                 "withChanges" to withChanges)
-
-        ft.replace(R.id.timetableFragment, timetableFragment)
-            .setReorderingAllowed(true) //Optimizing state changes for better transitions
-            .commit()
+        ft.replace(R.id.timetableFragment, timetableFragment).commit()
 
         val filterSwitch = view.findViewById<SwitchMaterial>(R.id.timetableFilterSwitch)
         filterSwitch.isChecked = !viewAll
