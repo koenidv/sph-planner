@@ -37,13 +37,24 @@
                 android:gravity="center"
                 android:text="@string/contact_telegram_text" />
 
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="24dp"
+                android:gravity="center"
+                android:text="@string/contact_instagram_text" />
+
         </LinearLayout>
 
-        <androidx.gridlayout.widget.GridLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="8dp"
-            app:columnCount="2">
+        <LinearLayout
+            android:id="@+id/contactGithubLayout"
+            android:layout_width="0dp"
+            android:layout_height="96dp"
+            android:layout_margin="8dp"
+            android:background="@drawable/card_background"
+            android:foreground="?attr/selectableItemBackground"
+            android:orientation="vertical"
+            android:padding="16dp"
+            app:layout_columnWeight="1">
 
             <TextView
                 android:layout_width="match_parent"

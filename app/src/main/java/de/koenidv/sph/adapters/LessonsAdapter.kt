@@ -217,8 +217,6 @@ class LessonsAdapter(private var dataset: List<List<TimetableEntry>>,
         this.dataset = newDataset
         this.multiple = multiple
         this.maxConcurrent = maxConcurrent
-        this.dt = nwDt
-        this.expanded = expanded
         notifyDataSetChanged()
     }
 

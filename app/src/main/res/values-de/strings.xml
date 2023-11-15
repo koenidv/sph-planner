@@ -91,6 +91,7 @@
     <!-- Translatable Arrays -->
     <!-- Only translate values (after "|"), not the keys! -->
     <!-- Spanish, Russian, Korean ? -->
+    <string name="onboard_legal_privacy">Ich habe die  <a href="http://koenidv.de/sph/datenschutz">Datenschutzerklärung</a> gelesen, verstanden und stimme ihr zu.</string>
     <string name="timetable_personal_title">Dein Stundenplan</string>
     <string name="onboard_legal_privacy">Ich habe die  <a href="https://koeni.dev/sph/datenschutz">Datenschutzerklärung</a> gelesen, verstanden und stimme ihr zu.</string>
     <string name="timetable_personal_filter">Nur eigene Kurse</string>
