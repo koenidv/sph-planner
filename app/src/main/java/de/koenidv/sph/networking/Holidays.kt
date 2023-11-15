@@ -1,5 +1,6 @@
 package de.koenidv.sph.networking
 
+import androidx.appcompat.app.AppCompatActivity
 import com.androidnetworking.AndroidNetworking
 import com.androidnetworking.error.ANError
 import com.androidnetworking.interfaces.JSONArrayRequestListener

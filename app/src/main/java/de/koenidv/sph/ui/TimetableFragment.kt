@@ -6,14 +6,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.RecyclerView
 import androidx.transition.TransitionInflater
 import com.google.android.material.switchmaterial.SwitchMaterial
 import de.koenidv.sph.R
 import de.koenidv.sph.SphPlanner
-import de.koenidv.sph.adapters.LessonsAdapter
-import de.koenidv.sph.adapters.TimebarAdapter
-import java.util.*
 
 class TimetableFragment : Fragment() {
 

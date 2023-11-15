@@ -22,7 +22,6 @@ class ContactSheet internal constructor() : BottomSheetDialogFragment() {
         val view: View = inflater.inflate(R.layout.sheet_contact, container, false)
 
         val telegramLayout = view.findViewById<LinearLayout>(R.id.contactTelegramLayout)
-        val instagramLayout = view.findViewById<LinearLayout>(R.id.contactInstagramLayout)
         val githubLayout = view.findViewById<LinearLayout>(R.id.contactGithubLayout)
         val mailLayout = view.findViewById<LinearLayout>(R.id.contactMailLayout)
         val doneButton = view.findViewById<Button>(R.id.doneButton)
@@ -35,17 +34,6 @@ class ContactSheet internal constructor() : BottomSheetDialogFragment() {
                 startActivity(Intent(
                         Intent.ACTION_VIEW,
                         Uri.parse(getString(R.string.contact_telegram_data))))
-            } catch (e: Exception) {
-            }
-        }
-
-        // Open Instagram profile to send a message
-        instagramLayout.setOnClickListener {
-            try {
-                dismiss()
-                startActivity(Intent(
-                        Intent.ACTION_VIEW,
-                        Uri.parse(getString(R.string.contact_instagram_data))))
             } catch (e: Exception) {
             }
         }

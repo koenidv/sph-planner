@@ -24,7 +24,6 @@ import de.koenidv.sph.database.FunctionTilesDb
 import de.koenidv.sph.debugging.DebugLog
 import de.koenidv.sph.debugging.Debugger
 import de.koenidv.sph.debugging.Debugger.LOG_TYPE_WARNING
-import de.koenidv.sph.objects.FunctionTile.Companion.FEATURE_CALENDAR
 import de.koenidv.sph.objects.FunctionTile.Companion.FEATURE_CHANGES
 import de.koenidv.sph.objects.FunctionTile.Companion.FEATURE_COURSES
 import de.koenidv.sph.objects.FunctionTile.Companion.FEATURE_MESSAGES
